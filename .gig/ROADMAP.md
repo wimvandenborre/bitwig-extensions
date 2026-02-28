@@ -14,6 +14,7 @@
 | # | Name | Version Range | Status |
 |---|------|---------------|--------|
 | 1 | Foundation | v0.1.1–v0.1.8 | complete |
+| 2 | Clip Grid + Device Params | v0.2.1–v0.2.5 | complete |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

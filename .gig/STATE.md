@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.1.8` |
-| **Phase** | 1 — Foundation |
+| **Version** | `0.2.5` |
+| **Phase** | 2 — Clip Grid + Device Params |
 | **Status** | `VERIFIED` |
-| **Last Batch** | Integration test + smoke suite |
+| **Last Batch** | Smoke test extension |
 | **Last Updated** | 2026-02-27 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.2.5 | 2 | Smoke test extension | PLANNED | done | 2026-02-27 |
+| 0.2.4 | 2 | Device + Cursor action handlers | PLANNED | done | 2026-02-27 |
+| 0.2.3 | 2 | Device observers + snapshot | PLANNED | done | 2026-02-27 |
+| 0.2.2 | 2 | Clip + Scene action handlers | PLANNED | done | 2026-02-27 |
+| 0.2.1 | 2 | Clip launcher observers + snapshot | PLANNED | done | 2026-02-27 |
 | 0.1.8 | 1 | Integration test + smoke suite | PLANNED | done | 2026-02-27 |
 | 0.1.7 | 1 | Track + Master action handlers | PLANNED | done | 2026-02-27 |
 | 0.1.6 | 1 | Transport action handlers | PLANNED | done | 2026-02-27 |
@@ -34,7 +39,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-_Phase 1 decisions archived to `.gig/phases/v0.1-foundation/DECISIONS.md`. Run `/gig:decide` to start Phase 2._
+_Phase 2 decisions archived to `.gig/phases/v0.2-clip-grid-device-params/DECISIONS.md`. Run `/gig:decide` to start Phase 3._
 
 ---
 
@@ -64,6 +69,15 @@ _None._
 - MasterTrack extends Track with no additional methods
 - Bitwig API quirks: JAR strips generic type signatures — need explicit callback casts; `Parameter.addRawValueObserver()` deprecated — use `Parameter.value().addRawValueObserver()`; `Parameter.value().set()` has take-over — use `setImmediately()` for RPC
 - Service loader: `META-INF/services/com.bitwig.extension.ExtensionDefinition` required for Bitwig to discover the extension
+- ClipLauncherSlotBank: bank-level indexed callbacks (`IndexedBooleanValueChangedCallback`, `IndexedStringValueChangedCallback`) more efficient than per-slot observers
+- `ClipLauncherSlotBankPlaybackStateChangedCallback`: `(slotIndex, playbackState, isQueued)` — playbackState: 0=stopped, 1=playing, 2=recording
+- `StringArrayValue.addValueObserver()` requires explicit `(StringArrayValueChangedCallback)` cast + `(String[])` value cast
+- CursorTrack: `host.createCursorTrack(id, name, sends, scenes, followSelection)` — follows UI track selection
+- CursorDevice: `cursorTrack.createCursorDevice(id, name, sends, CursorDeviceFollowMode.FOLLOW_SELECTION)`
+- CursorRemoteControlsPage: `cursorDevice.createCursorRemoteControlsPage(8)` — 8 params per page
+- `RangedValue.displayedValue()` returns `StringValue` with formatted param value ("1.2 kHz")
+- SceneBank: `trackBank.sceneBank()`, `sceneBank.getScene(i)` — Scene has `name()`, `clipCount()`
+- Total RPC methods: 36 (Phase 1: 23, Phase 2: 13)
 
 ---
 

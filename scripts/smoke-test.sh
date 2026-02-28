@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.1.x — Smoke Test Suite
+# Gig Maestro v0.2.x — Smoke Test Suite
 #
 # Requires: Bitwig Studio running with Gig Maestro extension loaded.
 # Usage: ./scripts/smoke-test.sh [port]
@@ -217,6 +217,116 @@ assert_contains "invalid params returns -32602" "$ERR" '-32602'
 echo "--- 10. HTTP Method Enforcement ---"
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${BASE}/rpc")
 assert_equals "GET /rpc returns 405" "$HTTP_CODE" "405"
+
+# 11. Clip snapshot
+echo "--- 11. Clip Snapshot ---"
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":70}')
+assert_contains "snapshot has scenes" "$SNAP" '"scenes"'
+CLIP_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['tracks'][0]['clips']))")
+assert_equals "track 0 has 8 clip slots" "$CLIP_COUNT" "8"
+SCENE_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['scenes']))")
+assert_equals "snapshot has 8 scenes" "$SCENE_COUNT" "8"
+assert_contains "clips have hasContent" "$SNAP" '"hasContent"'
+assert_contains "clips have isPlaying" "$SNAP" '"isPlaying"'
+
+# 12. Clip actions
+echo "--- 12. Clip Actions ---"
+
+# Create a clip on track 0, slot 7 (use slot 7 to avoid conflicts with user data)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/create","params":{"trackIndex":0,"slotIndex":7,"lengthInBeats":4},"id":71}')
+assert_contains "clip/create returns ok" "$RESP" '"ok"'
+sleep 0.5
+HAS=$(snapshot_field "['tracks'][0]['clips'][7]['hasContent']")
+assert_equals "slot 7 hasContent after create" "$HAS" "True"
+
+# Launch the clip
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/launch","params":{"trackIndex":0,"slotIndex":7},"id":72}')
+assert_contains "clip/launch returns ok" "$RESP" '"ok"'
+sleep 0.5
+PLAYING=$(snapshot_field "['tracks'][0]['clips'][7]['isPlaying']")
+assert_equals "slot 7 isPlaying after launch" "$PLAYING" "True"
+
+# Stop
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/stop","params":{"trackIndex":0},"id":73}')
+assert_contains "clip/stop returns ok" "$RESP" '"ok"'
+sleep 0.5
+
+# Stop transport (clip launcher may have started it)
+rpc '{"jsonrpc":"2.0","method":"transport/stop","id":74}' > /dev/null
+sleep 0.3
+
+# 13. Scene actions
+echo "--- 13. Scene Actions ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"scene/launch","params":{"index":0},"id":75}')
+assert_contains "scene/launch returns ok" "$RESP" '"ok"'
+sleep 0.3
+rpc '{"jsonrpc":"2.0","method":"transport/stop","id":76}' > /dev/null
+sleep 0.3
+
+# 14. Clip API list
+echo "--- 14. Clip + Scene API List ---"
+LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":77}')
+assert_contains "api/list has clip/launch" "$LIST" '"clip/launch"'
+assert_contains "api/list has clip/stop" "$LIST" '"clip/stop"'
+assert_contains "api/list has clip/record" "$LIST" '"clip/record"'
+assert_contains "api/list has clip/create" "$LIST" '"clip/create"'
+assert_contains "api/list has scene/launch" "$LIST" '"scene/launch"'
+
+# 15. Device snapshot
+echo "--- 15. Device Snapshot ---"
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":80}')
+assert_contains "snapshot has device" "$SNAP" '"device"'
+assert_contains "device has cursorTrackName" "$SNAP" '"cursorTrackName"'
+assert_contains "device has remoteControls" "$SNAP" '"remoteControls"'
+assert_contains "remoteControls has pageIndex" "$SNAP" '"pageIndex"'
+assert_contains "remoteControls has parameters" "$SNAP" '"parameters"'
+PARAM_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['device']['remoteControls']['parameters']))")
+assert_equals "device has 8 parameters" "$PARAM_COUNT" "8"
+
+# 16. Cursor track navigation
+echo "--- 16. Cursor Track Navigation ---"
+ORIG_TRACK=$(snapshot_field "['device']['cursorTrackName']")
+RESP=$(rpc '{"jsonrpc":"2.0","method":"cursor/selectTrack","params":{"direction":"next"},"id":81}')
+assert_contains "cursor/selectTrack next returns ok" "$RESP" '"ok"'
+sleep 0.3
+NEW_TRACK=$(snapshot_field "['device']['cursorTrackName']")
+TOTAL=$((TOTAL + 1))
+if [ "$NEW_TRACK" != "$ORIG_TRACK" ]; then
+  echo "  PASS  cursor track changed after selectTrack next"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL  cursor track unchanged after selectTrack next (still: $ORIG_TRACK)"
+  FAIL=$((FAIL + 1))
+fi
+# Navigate back
+rpc '{"jsonrpc":"2.0","method":"cursor/selectTrack","params":{"direction":"previous"},"id":82}' > /dev/null
+sleep 0.3
+
+# 17. Device API list
+echo "--- 17. Device + Cursor API List ---"
+LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":83}')
+assert_contains "api/list has device/selectNext" "$LIST" '"device/selectNext"'
+assert_contains "api/list has device/selectPrevious" "$LIST" '"device/selectPrevious"'
+assert_contains "api/list has device/setEnabled" "$LIST" '"device/setEnabled"'
+assert_contains "api/list has device/selectPage" "$LIST" '"device/selectPage"'
+assert_contains "api/list has device/nextPage" "$LIST" '"device/nextPage"'
+assert_contains "api/list has device/previousPage" "$LIST" '"device/previousPage"'
+assert_contains "api/list has device/setParameterValue" "$LIST" '"device/setParameterValue"'
+assert_contains "api/list has cursor/selectTrack" "$LIST" '"cursor/selectTrack"'
+
+# 18. Error handling — Phase 2
+echo "--- 18. Error Handling (Phase 2) ---"
+ERR=$(rpc '{"jsonrpc":"2.0","method":"clip/launch","params":{"trackIndex":999,"slotIndex":0},"id":84}')
+assert_contains "clip invalid trackIndex returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"scene/launch","params":{"index":99},"id":85}')
+assert_contains "scene invalid index returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/setParameterValue","params":{"index":99,"value":0.5},"id":86}')
+assert_contains "device invalid param index returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"cursor/selectTrack","params":{"direction":"invalid"},"id":87}')
+assert_contains "cursor invalid direction returns -32602" "$ERR" '-32602'
 
 # --- summary ---
 echo ""

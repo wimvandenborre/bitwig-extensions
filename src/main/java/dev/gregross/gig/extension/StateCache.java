@@ -1,9 +1,13 @@
 package dev.gregross.gig.extension;
 
 import com.bitwig.extension.callback.BooleanValueChangedCallback;
+import com.bitwig.extension.callback.ClipLauncherSlotBankPlaybackStateChangedCallback;
 import com.bitwig.extension.callback.ColorValueChangedCallback;
 import com.bitwig.extension.callback.DoubleValueChangedCallback;
+import com.bitwig.extension.callback.IndexedBooleanValueChangedCallback;
+import com.bitwig.extension.callback.IndexedStringValueChangedCallback;
 import com.bitwig.extension.callback.IntegerValueChangedCallback;
+import com.bitwig.extension.callback.StringArrayValueChangedCallback;
 import com.bitwig.extension.callback.StringValueChangedCallback;
 import com.bitwig.extension.controller.api.*;
 import com.google.gson.JsonArray;
@@ -12,6 +16,7 @@ import com.google.gson.JsonObject;
 public class StateCache {
 
     private static final int TRACK_COUNT = 64;
+    private static final int SCENE_COUNT = 8;
 
     // Transport state
     private volatile boolean isPlaying;
@@ -32,9 +37,44 @@ public class StateCache {
     private final boolean[] trackArms = new boolean[TRACK_COUNT];
     private final float[][] trackColors = new float[TRACK_COUNT][3]; // r, g, b
 
+    // Clip state — [trackIndex][slotIndex]
+    private final boolean[][] clipHasContent = new boolean[TRACK_COUNT][SCENE_COUNT];
+    private final boolean[][] clipIsPlaying = new boolean[TRACK_COUNT][SCENE_COUNT];
+    private final boolean[][] clipIsRecording = new boolean[TRACK_COUNT][SCENE_COUNT];
+    private final boolean[][] clipIsPlaybackQueued = new boolean[TRACK_COUNT][SCENE_COUNT];
+    private final boolean[][] clipIsRecordingQueued = new boolean[TRACK_COUNT][SCENE_COUNT];
+    private final boolean[][] clipIsStopQueued = new boolean[TRACK_COUNT][SCENE_COUNT];
+    private final String[][] clipNames = new String[TRACK_COUNT][SCENE_COUNT];
+    private final float[][][] clipColors = new float[TRACK_COUNT][SCENE_COUNT][3];
+
+    // Scene state
+    private final String[] sceneNames = new String[SCENE_COUNT];
+    private final int[] sceneClipCounts = new int[SCENE_COUNT];
+
     // Master state
     private volatile double masterVolume;
     private volatile double masterPan;
+
+    // Device state (cursor device)
+    private static final int PARAM_COUNT = 8;
+    private volatile String cursorTrackName = "";
+    private volatile String deviceName = "";
+    private volatile boolean deviceEnabled;
+    private volatile boolean deviceIsPlugin;
+    private volatile int devicePosition;
+    private volatile String presetName = "";
+    private volatile String presetCategory = "";
+    private volatile String presetCreator = "";
+    private volatile boolean isWindowOpen;
+    private volatile boolean isExpanded;
+
+    // Remote controls state
+    private volatile int pageIndex;
+    private volatile int pageCount;
+    private volatile String[] devicePageNames = new String[0];
+    private final String[] paramNames = new String[PARAM_COUNT];
+    private final double[] paramValues = new double[PARAM_COUNT];
+    private final String[] paramDisplayedValues = new String[PARAM_COUNT];
 
     // Application state
     private volatile String projectName = "";
@@ -122,10 +162,131 @@ public class StateCache {
         application.hasActiveEngine().addValueObserver((BooleanValueChangedCallback) v -> hasActiveEngine = v);
     }
 
+    public void registerClipObservers(TrackBank trackBank) {
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            final int trackIdx = i;
+            Track track = (Track) trackBank.getItemAt(i);
+            ClipLauncherSlotBank slotBank = track.clipLauncherSlotBank();
+
+            // Bank-level indexed observers
+            slotBank.addHasContentObserver((IndexedBooleanValueChangedCallback) (slotIndex, value) ->
+                clipHasContent[trackIdx][slotIndex] = value);
+
+            slotBank.addIsPlayingObserver((IndexedBooleanValueChangedCallback) (slotIndex, value) ->
+                clipIsPlaying[trackIdx][slotIndex] = value);
+
+            slotBank.addIsRecordingObserver((IndexedBooleanValueChangedCallback) (slotIndex, value) ->
+                clipIsRecording[trackIdx][slotIndex] = value);
+
+            slotBank.addNameObserver((IndexedStringValueChangedCallback) (slotIndex, value) ->
+                clipNames[trackIdx][slotIndex] = value);
+
+            // Playback state observer for queued states
+            slotBank.addPlaybackStateObserver((ClipLauncherSlotBankPlaybackStateChangedCallback)
+                (slotIndex, playbackState, isQueued) -> {
+                    clipIsPlaybackQueued[trackIdx][slotIndex] = (playbackState == 1 && isQueued);
+                    clipIsRecordingQueued[trackIdx][slotIndex] = (playbackState == 2 && isQueued);
+                    clipIsStopQueued[trackIdx][slotIndex] = (playbackState == 0 && isQueued);
+                });
+
+            // Per-slot color observers
+            for (int j = 0; j < SCENE_COUNT; j++) {
+                final int slotIdx = j;
+                ClipLauncherSlot slot = (ClipLauncherSlot) slotBank.getItemAt(j);
+                slot.color().markInterested();
+                slot.color().addValueObserver((ColorValueChangedCallback) (r, g, b) -> {
+                    clipColors[trackIdx][slotIdx][0] = r;
+                    clipColors[trackIdx][slotIdx][1] = g;
+                    clipColors[trackIdx][slotIdx][2] = b;
+                });
+            }
+        }
+
+        // Scene observers
+        SceneBank sceneBank = trackBank.sceneBank();
+        for (int i = 0; i < SCENE_COUNT; i++) {
+            final int sceneIdx = i;
+            Scene scene = sceneBank.getScene(sceneIdx);
+            sceneNames[sceneIdx] = "";
+            scene.name().markInterested();
+            scene.name().addValueObserver((StringValueChangedCallback) v -> sceneNames[sceneIdx] = (String) v);
+            scene.clipCount().markInterested();
+            scene.clipCount().addValueObserver((IntegerValueChangedCallback) v -> sceneClipCounts[sceneIdx] = v);
+        }
+    }
+
+    public void registerDeviceObservers(CursorTrack cursorTrack, CursorDevice cursorDevice,
+                                         CursorRemoteControlsPage remoteControlsPage) {
+        // Initialize param arrays
+        for (int i = 0; i < PARAM_COUNT; i++) {
+            paramNames[i] = "";
+            paramDisplayedValues[i] = "";
+        }
+
+        // Cursor track name
+        cursorTrack.name().markInterested();
+        cursorTrack.name().addValueObserver((StringValueChangedCallback) v -> cursorTrackName = (String) v);
+
+        // Device properties
+        cursorDevice.name().markInterested();
+        cursorDevice.name().addValueObserver((StringValueChangedCallback) v -> deviceName = (String) v);
+
+        cursorDevice.isEnabled().markInterested();
+        cursorDevice.isEnabled().addValueObserver((BooleanValueChangedCallback) v -> deviceEnabled = v);
+
+        cursorDevice.isPlugin().markInterested();
+        cursorDevice.isPlugin().addValueObserver((BooleanValueChangedCallback) v -> deviceIsPlugin = v);
+
+        cursorDevice.position().markInterested();
+        cursorDevice.position().addValueObserver((IntegerValueChangedCallback) v -> devicePosition = v);
+
+        cursorDevice.presetName().markInterested();
+        cursorDevice.presetName().addValueObserver((StringValueChangedCallback) v -> presetName = (String) v);
+
+        cursorDevice.presetCategory().markInterested();
+        cursorDevice.presetCategory().addValueObserver((StringValueChangedCallback) v -> presetCategory = (String) v);
+
+        cursorDevice.presetCreator().markInterested();
+        cursorDevice.presetCreator().addValueObserver((StringValueChangedCallback) v -> presetCreator = (String) v);
+
+        cursorDevice.isWindowOpen().markInterested();
+        cursorDevice.isWindowOpen().addValueObserver((BooleanValueChangedCallback) v -> isWindowOpen = v);
+
+        cursorDevice.isExpanded().markInterested();
+        cursorDevice.isExpanded().addValueObserver((BooleanValueChangedCallback) v -> isExpanded = v);
+
+        // Remote controls page state
+        remoteControlsPage.selectedPageIndex().markInterested();
+        remoteControlsPage.selectedPageIndex().addValueObserver((IntegerValueChangedCallback) v -> pageIndex = v);
+
+        remoteControlsPage.pageCount().markInterested();
+        remoteControlsPage.pageCount().addValueObserver((IntegerValueChangedCallback) v -> pageCount = v);
+
+        remoteControlsPage.pageNames().markInterested();
+        remoteControlsPage.pageNames().addValueObserver((StringArrayValueChangedCallback) v -> devicePageNames = (String[]) v);
+
+        // Per-parameter observers
+        for (int i = 0; i < PARAM_COUNT; i++) {
+            final int idx = i;
+            RemoteControl param = remoteControlsPage.getParameter(i);
+
+            param.name().markInterested();
+            param.name().addValueObserver((StringValueChangedCallback) v -> paramNames[idx] = (String) v);
+
+            param.value().markInterested();
+            param.value().addValueObserver((DoubleValueChangedCallback) v -> paramValues[idx] = v);
+
+            param.value().displayedValue().markInterested();
+            param.value().displayedValue().addValueObserver((StringValueChangedCallback) v -> paramDisplayedValues[idx] = (String) v);
+        }
+    }
+
     public JsonObject getSnapshot() {
         JsonObject snapshot = new JsonObject();
         snapshot.add("transport", getTransportState());
         snapshot.add("tracks", getTracksState());
+        snapshot.add("scenes", getScenesState());
+        snapshot.add("device", getDeviceState());
         snapshot.add("master", getMasterState());
         snapshot.add("application", getApplicationState());
         return snapshot;
@@ -162,9 +323,84 @@ public class StateCache {
             color.addProperty("b", trackColors[i][2]);
             track.add("color", color);
 
+            JsonArray clips = new JsonArray();
+            for (int j = 0; j < SCENE_COUNT; j++) {
+                JsonObject clip = new JsonObject();
+                clip.addProperty("slotIndex", j);
+                clip.addProperty("hasContent", clipHasContent[i][j]);
+                clip.addProperty("isPlaying", clipIsPlaying[i][j]);
+                clip.addProperty("isRecording", clipIsRecording[i][j]);
+                clip.addProperty("isPlaybackQueued", clipIsPlaybackQueued[i][j]);
+                clip.addProperty("isRecordingQueued", clipIsRecordingQueued[i][j]);
+                clip.addProperty("isStopQueued", clipIsStopQueued[i][j]);
+                clip.addProperty("name", clipNames[i][j] != null ? clipNames[i][j] : "");
+
+                JsonObject clipColor = new JsonObject();
+                clipColor.addProperty("r", clipColors[i][j][0]);
+                clipColor.addProperty("g", clipColors[i][j][1]);
+                clipColor.addProperty("b", clipColors[i][j][2]);
+                clip.add("color", clipColor);
+
+                clips.add(clip);
+            }
+            track.add("clips", clips);
+
             arr.add(track);
         }
         return arr;
+    }
+
+    private JsonArray getScenesState() {
+        JsonArray arr = new JsonArray();
+        for (int i = 0; i < SCENE_COUNT; i++) {
+            JsonObject scene = new JsonObject();
+            scene.addProperty("index", i);
+            scene.addProperty("name", sceneNames[i] != null ? sceneNames[i] : "");
+            scene.addProperty("clipCount", sceneClipCounts[i]);
+            arr.add(scene);
+        }
+        return arr;
+    }
+
+    private JsonObject getDeviceState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("cursorTrackName", cursorTrackName);
+        obj.addProperty("name", deviceName);
+        obj.addProperty("isEnabled", deviceEnabled);
+        obj.addProperty("isPlugin", deviceIsPlugin);
+        obj.addProperty("position", devicePosition);
+        obj.addProperty("presetName", presetName);
+        obj.addProperty("presetCategory", presetCategory);
+        obj.addProperty("presetCreator", presetCreator);
+        obj.addProperty("isWindowOpen", isWindowOpen);
+        obj.addProperty("isExpanded", isExpanded);
+
+        JsonObject remoteControls = new JsonObject();
+        remoteControls.addProperty("pageIndex", pageIndex);
+        remoteControls.addProperty("pageCount", pageCount);
+
+        JsonArray pageNamesArr = new JsonArray();
+        String[] names = devicePageNames;
+        if (names != null) {
+            for (String name : names) {
+                pageNamesArr.add(name != null ? name : "");
+            }
+        }
+        remoteControls.add("pageNames", pageNamesArr);
+
+        JsonArray params = new JsonArray();
+        for (int i = 0; i < PARAM_COUNT; i++) {
+            JsonObject param = new JsonObject();
+            param.addProperty("index", i);
+            param.addProperty("name", paramNames[i] != null ? paramNames[i] : "");
+            param.addProperty("value", paramValues[i]);
+            param.addProperty("displayedValue", paramDisplayedValues[i] != null ? paramDisplayedValues[i] : "");
+            params.add(param);
+        }
+        remoteControls.add("parameters", params);
+
+        obj.add("remoteControls", remoteControls);
+        return obj;
     }
 
     private JsonObject getMasterState() {

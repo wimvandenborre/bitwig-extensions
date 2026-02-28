@@ -5,6 +5,8 @@ import com.bitwig.extension.controller.api.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.handlers.ApplicationHandler;
+import dev.gregross.gig.handlers.ClipHandler;
+import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.TrackHandler;
 import dev.gregross.gig.handlers.TransportHandler;
@@ -19,6 +21,7 @@ public class GigMaestroExtension extends ControllerExtension {
 
     private static final int DEFAULT_PORT = 8787;
     private static final int TRACK_COUNT = 64;
+    private static final int SCENE_COUNT = 8;
 
     private final ControllerHost host;
     private JsonRpcDispatcher dispatcher;
@@ -34,9 +37,15 @@ public class GigMaestroExtension extends ControllerExtension {
     public void init() {
         // Create Bitwig API objects
         Transport transport = host.createTransport();
-        TrackBank trackBank = host.createMainTrackBank(TRACK_COUNT, 0, 0);
+        TrackBank trackBank = host.createMainTrackBank(TRACK_COUNT, 0, SCENE_COUNT);
         MasterTrack masterTrack = host.createMasterTrack(0);
         Application application = host.createApplication();
+
+        // Create cursor objects for device navigation
+        CursorTrack cursorTrack = host.createCursorTrack("gig-cursor", "Gig Maestro", 0, SCENE_COUNT, true);
+        CursorDevice cursorDevice = cursorTrack.createCursorDevice("gig-device", "Gig Device", 0,
+            CursorDeviceFollowMode.FOLLOW_SELECTION);
+        CursorRemoteControlsPage remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
 
         // Create infrastructure
         dispatcher = new JsonRpcDispatcher();
@@ -46,6 +55,8 @@ public class GigMaestroExtension extends ControllerExtension {
 
         // Register all observers into StateCache
         stateCache.registerObservers(transport, trackBank, masterTrack, application);
+        stateCache.registerClipObservers(trackBank);
+        stateCache.registerDeviceObservers(cursorTrack, cursorDevice, remoteControlsPage);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
@@ -64,6 +75,8 @@ public class GigMaestroExtension extends ControllerExtension {
         new TransportHandler(transport).register(dispatcher);
         new TrackHandler(trackBank).register(dispatcher);
         new MasterHandler(masterTrack).register(dispatcher);
+        new ClipHandler(trackBank, trackBank.sceneBank()).register(dispatcher);
+        new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage).register(dispatcher);
 
         // Start servers
         try {
