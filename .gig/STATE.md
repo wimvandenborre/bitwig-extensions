@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.1.4` |
+| **Version** | `0.1.8` |
 | **Phase** | 1 — Foundation |
-| **Status** | `IN-PROGRESS` |
-| **Last Batch** | Command queue + thread bridge |
+| **Status** | `VERIFIED` |
+| **Last Batch** | Integration test + smoke suite |
 | **Last Updated** | 2026-02-27 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.1.8 | 1 | Integration test + smoke suite | PLANNED | done | 2026-02-27 |
+| 0.1.7 | 1 | Track + Master action handlers | PLANNED | done | 2026-02-27 |
+| 0.1.6 | 1 | Transport action handlers | PLANNED | done | 2026-02-27 |
+| 0.1.5 | 1 | Extension entry point + observers + snapshot + api.list + app handler | PLANNED | done | 2026-02-27 |
 | 0.1.4 | 1 | Command queue + thread bridge | PLANNED | done | 2026-02-27 |
 | 0.1.3 | 1 | HTTP + WebSocket servers | PLANNED | done | 2026-02-27 |
 | 0.1.2 | 1 | JSON-RPC 2.0 dispatcher | PLANNED | done | 2026-02-27 |
@@ -30,14 +34,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- D-1.1a: Gradle + Kotlin DSL, API v25, JDK 21, Bitwig 6.0
-- D-1.2: Dual transport — HTTP for CLI, WebSocket for LLM agents, port 8787
-- D-1.3: Java-WebSocket + JDK HttpServer + Gson
-- D-1.4: Manual JSON-RPC 2.0 dispatcher, no reflection
-- D-1.5: Command queue + flush cycle for thread safety
-- D-1.6: Transport, TrackBank (64), MasterTrack, Application (undo/redo + projectName)
-- D-1.7a: Packages: extension, rpc, server, handlers under dev.gregross.gig
-- D-1.8: Trunk-based, batch branches, squash merge to main, tag each version
+_Phase 1 decisions archived to `.gig/phases/v0.1-foundation/DECISIONS.md`. Run `/gig:decide` to start Phase 2._
 
 ---
 
@@ -65,6 +62,8 @@ _None._
 - Transport: `play()`, `stop()`, `record()`, `tempo()`, `getPosition()`, `playPosition()`, `timeSignature()`, `isPlaying()`, `isArrangerRecordEnabled()`
 - Threading: network threads → CommandQueue → `host.requestFlush()` → `flush()` drains queue on session thread
 - MasterTrack extends Track with no additional methods
+- Bitwig API quirks: JAR strips generic type signatures — need explicit callback casts; `Parameter.addRawValueObserver()` deprecated — use `Parameter.value().addRawValueObserver()`; `Parameter.value().set()` has take-over — use `setImmediately()` for RPC
+- Service loader: `META-INF/services/com.bitwig.extension.ExtensionDefinition` required for Bitwig to discover the extension
 
 ---
 
