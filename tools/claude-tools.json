@@ -1,0 +1,467 @@
+[
+  {
+    "name": "session_snapshot",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm), master track, clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters), and application state (project name, undo/redo). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "api_list",
+    "description": "List all available JSON-RPC methods registered in the Gig Maestro extension. Returns an array of method name strings. Useful for discovering available capabilities.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_play",
+    "description": "Start playback in Bitwig Studio. If already playing, this has no effect.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_stop",
+    "description": "Stop playback in Bitwig Studio. If already stopped, this has no effect.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_record",
+    "description": "Toggle recording in Bitwig Studio. Arms the arranger record button.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_togglePlay",
+    "description": "Toggle between play and stop states. If playing, stops; if stopped, plays.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_rewind",
+    "description": "Rewind the transport position. Moves the playhead backward.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_fastForward",
+    "description": "Fast-forward the transport position. Moves the playhead forward.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_tapTempo",
+    "description": "Tap tempo. Each call registers a tap; Bitwig calculates the tempo from the tap interval.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_setTempo",
+    "description": "Set the project tempo in BPM. Value is raw BPM (e.g., 120.0 for 120 BPM), not normalized.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "tempo": {
+          "type": "number",
+          "description": "Tempo in BPM (e.g., 120.0). Raw value, not normalized."
+        }
+      },
+      "required": ["tempo"]
+    }
+  },
+  {
+    "name": "transport_setPosition",
+    "description": "Set the transport playhead position in beats. Beat 0.0 is the project start.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "beats": {
+          "type": "number",
+          "description": "Position in beats from project start (e.g., 4.0 for beat 5, since 0-based)."
+        }
+      },
+      "required": ["beats"]
+    }
+  },
+  {
+    "name": "transport_setLoop",
+    "description": "Enable or disable the arranger loop in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable looping, false to disable."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "transport_setMetronome",
+    "description": "Enable or disable the metronome click in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable the metronome, false to disable."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "app_undo",
+    "description": "Undo the last action in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_redo",
+    "description": "Redo the last undone action in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_getState",
+    "description": "Get application state including the project name, and whether undo/redo are available. Returns an object with projectName, canUndo, canRedo, and hasActiveEngine.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_setVolume",
+    "description": "Set the volume of a track in the track bank. Volume is normalized 0.0 to 1.0 (0.0 = -inf dB, 1.0 = max).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "value": {
+          "type": "number",
+          "description": "Volume level, normalized 0.0 to 1.0."
+        }
+      },
+      "required": ["index", "value"]
+    }
+  },
+  {
+    "name": "track_setPan",
+    "description": "Set the pan of a track in the track bank. Pan is normalized 0.0 (full left) to 1.0 (full right), with 0.5 as center.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "value": {
+          "type": "number",
+          "description": "Pan position, normalized 0.0 (left) to 1.0 (right). 0.5 is center."
+        }
+      },
+      "required": ["index", "value"]
+    }
+  },
+  {
+    "name": "track_setMute",
+    "description": "Mute or unmute a track in the track bank.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "muted": {
+          "type": "boolean",
+          "description": "True to mute the track, false to unmute."
+        }
+      },
+      "required": ["index", "muted"]
+    }
+  },
+  {
+    "name": "track_setSolo",
+    "description": "Solo or unsolo a track in the track bank.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "soloed": {
+          "type": "boolean",
+          "description": "True to solo the track, false to unsolo."
+        }
+      },
+      "required": ["index", "soloed"]
+    }
+  },
+  {
+    "name": "track_setArm",
+    "description": "Arm or disarm a track for recording in the track bank.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "armed": {
+          "type": "boolean",
+          "description": "True to arm the track for recording, false to disarm."
+        }
+      },
+      "required": ["index", "armed"]
+    }
+  },
+  {
+    "name": "master_setVolume",
+    "description": "Set the master track volume. Volume is normalized 0.0 to 1.0 (0.0 = -inf dB, 1.0 = max).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Volume level, normalized 0.0 to 1.0."
+        }
+      },
+      "required": ["value"]
+    }
+  },
+  {
+    "name": "master_setPan",
+    "description": "Set the master track pan. Pan is normalized 0.0 (full left) to 1.0 (full right), with 0.5 as center.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Pan position, normalized 0.0 (left) to 1.0 (right). 0.5 is center."
+        }
+      },
+      "required": ["value"]
+    }
+  },
+  {
+    "name": "clip_launch",
+    "description": "Launch a clip in the clip launcher. The clip at the specified track and slot index will start playing.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "clip_stop",
+    "description": "Stop all clips on a track. Stops any playing or recording clip on the specified track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        }
+      },
+      "required": ["trackIndex"]
+    }
+  },
+  {
+    "name": "clip_record",
+    "description": "Start recording into a clip slot. The track should be armed for recording first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "clip_create",
+    "description": "Create an empty clip in a clip launcher slot. The clip will have the specified length in beats and can then be launched or recorded into.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-based). Valid range: 0 to 7."
+        },
+        "lengthInBeats": {
+          "type": "integer",
+          "description": "Length of the new clip in beats (e.g., 4 for one bar at 4/4)."
+        }
+      },
+      "required": ["trackIndex", "slotIndex", "lengthInBeats"]
+    }
+  },
+  {
+    "name": "scene_launch",
+    "description": "Launch a scene in the clip launcher. Triggers all clips in the scene row across all tracks.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Scene index (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "device_selectNext",
+    "description": "Select the next device in the current track's device chain. The cursor device moves to the next device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_selectPrevious",
+    "description": "Select the previous device in the current track's device chain. The cursor device moves to the previous device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_setEnabled",
+    "description": "Enable or disable (bypass) the currently selected device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable the device, false to bypass it."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "device_selectPage",
+    "description": "Select a specific remote controls parameter page by index on the currently selected device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Parameter page index (0-based). Check session_snapshot for pageCount."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "device_nextPage",
+    "description": "Navigate to the next remote controls parameter page on the currently selected device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_previousPage",
+    "description": "Navigate to the previous remote controls parameter page on the currently selected device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_setParameterValue",
+    "description": "Set a remote control parameter value on the currently selected device's current parameter page. Value is normalized 0.0 to 1.0.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
+        },
+        "value": {
+          "type": "number",
+          "description": "Parameter value, normalized 0.0 to 1.0."
+        }
+      },
+      "required": ["index", "value"]
+    }
+  },
+  {
+    "name": "cursor_selectTrack",
+    "description": "Navigate the cursor track selection to the next or previous track. The cursor track follows the UI selection and determines which track's devices are shown.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "string",
+          "enum": ["next", "previous"],
+          "description": "Direction to move the cursor: 'next' for the track below, 'previous' for the track above."
+        }
+      },
+      "required": ["direction"]
+    }
+  }
+]

@@ -13,6 +13,9 @@ import com.bitwig.extension.controller.api.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StateCache {
 
     private static final int TRACK_COUNT = 64;
@@ -81,6 +84,14 @@ public class StateCache {
     private volatile boolean canUndo;
     private volatile boolean canRedo;
     private volatile boolean hasActiveEngine;
+
+    // Delta detection — previous section hashes
+    private int prevTransportHash;
+    private int prevTracksHash;
+    private int prevScenesHash;
+    private int prevDeviceHash;
+    private int prevMasterHash;
+    private int prevApplicationHash;
 
     public void registerObservers(Transport transport, TrackBank trackBank,
                                    MasterTrack masterTrack, Application application) {
@@ -290,6 +301,37 @@ public class StateCache {
         snapshot.add("master", getMasterState());
         snapshot.add("application", getApplicationState());
         return snapshot;
+    }
+
+    /**
+     * Compare current section hashes against previous flush.
+     * Returns a list of section names that changed, or empty if nothing changed.
+     * Updates the stored hashes for the next comparison.
+     */
+    public List<String> getChangedSections() {
+        List<String> changed = new ArrayList<>();
+
+        int h;
+
+        h = getTransportState().toString().hashCode();
+        if (h != prevTransportHash) { changed.add("transport"); prevTransportHash = h; }
+
+        h = getTracksState().toString().hashCode();
+        if (h != prevTracksHash) { changed.add("tracks"); prevTracksHash = h; }
+
+        h = getScenesState().toString().hashCode();
+        if (h != prevScenesHash) { changed.add("scenes"); prevScenesHash = h; }
+
+        h = getDeviceState().toString().hashCode();
+        if (h != prevDeviceHash) { changed.add("device"); prevDeviceHash = h; }
+
+        h = getMasterState().toString().hashCode();
+        if (h != prevMasterHash) { changed.add("master"); prevMasterHash = h; }
+
+        h = getApplicationState().toString().hashCode();
+        if (h != prevApplicationHash) { changed.add("application"); prevApplicationHash = h; }
+
+        return changed;
     }
 
     private JsonObject getTransportState() {

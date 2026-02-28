@@ -3,6 +3,7 @@ package dev.gregross.gig.extension;
 import com.bitwig.extension.controller.ControllerExtension;
 import com.bitwig.extension.controller.api.*;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.handlers.ApplicationHandler;
 import dev.gregross.gig.handlers.ClipHandler;
@@ -15,6 +16,7 @@ import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import dev.gregross.gig.server.ServerManager;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class GigMaestroExtension extends ControllerExtension {
@@ -27,6 +29,7 @@ public class GigMaestroExtension extends ControllerExtension {
     private JsonRpcDispatcher dispatcher;
     private CommandQueue commandQueue;
     private ServerManager serverManager;
+    private StateCache stateCache;
 
     protected GigMaestroExtension(GigMaestroDefinition definition, ControllerHost host) {
         super(definition, host);
@@ -51,7 +54,7 @@ public class GigMaestroExtension extends ControllerExtension {
         dispatcher = new JsonRpcDispatcher();
         commandQueue = new CommandQueue();
         serverManager = new ServerManager();
-        StateCache stateCache = new StateCache();
+        stateCache = new StateCache();
 
         // Register all observers into StateCache
         stateCache.registerObservers(transport, trackBank, masterTrack, application);
@@ -91,6 +94,24 @@ public class GigMaestroExtension extends ControllerExtension {
     @Override
     public void flush() {
         commandQueue.drainAndExecute(dispatcher);
+
+        // Broadcast state change notifications to WebSocket clients
+        if (serverManager.getWsClientCount() > 0) {
+            List<String> changed = stateCache.getChangedSections();
+            if (!changed.isEmpty()) {
+                JsonObject notification = new JsonObject();
+                notification.addProperty("jsonrpc", "2.0");
+                notification.addProperty("method", "state/changed");
+                JsonObject params = new JsonObject();
+                JsonArray changedArr = new JsonArray();
+                for (String section : changed) {
+                    changedArr.add(section);
+                }
+                params.add("changed", changedArr);
+                notification.add("params", params);
+                serverManager.broadcast(notification.toString());
+            }
+        }
     }
 
     @Override

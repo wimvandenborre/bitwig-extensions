@@ -20,3 +20,5 @@
 **Status:** PROPOSED | ACTIVE | AMENDED | REVISED
 **ID:** D-{batch}.{num}
 -->
+
+_Phase 3 decisions archived to `.gig/phases/v0.3-llm-cli-ws-push/DECISIONS.md`. Run `/gig:decide` to start Phase 4._

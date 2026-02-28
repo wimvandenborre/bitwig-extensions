@@ -14,6 +14,8 @@ repositories {
     mavenCentral()
 }
 
+// --- Main (extension) source set ---
+
 dependencies {
     compileOnly(files(bitwigApiPath))
     testImplementation(files(bitwigApiPath))
@@ -41,4 +43,31 @@ tasks.shadowJar {
 
 tasks.named("build") {
     dependsOn(tasks.shadowJar)
+}
+
+// --- CLI source set ---
+
+sourceSets {
+    create("cli") {
+        java.srcDir("src/cli/java")
+    }
+}
+
+val cliImplementation by configurations.getting
+val cliRuntimeOnly by configurations.getting
+
+dependencies {
+    cliImplementation(libs.picocli)
+    cliImplementation(libs.gson)
+}
+
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("cliShadowJar") {
+    from(sourceSets["cli"].output)
+    configurations = listOf(project.configurations["cliRuntimeClasspath"])
+    archiveFileName.set("gig-cli.jar")
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+    manifest {
+        attributes("Main-Class" to "dev.gregross.gig.cli.GigCli")
+    }
+    mergeServiceFiles()
 }

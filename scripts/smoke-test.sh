@@ -1,18 +1,27 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.2.x — Smoke Test Suite
+# Gig Maestro v0.3.x — Smoke Test Suite
 #
-# Requires: Bitwig Studio running with Gig Maestro extension loaded.
-# Usage: ./scripts/smoke-test.sh [port]
+# Usage:
+#   ./scripts/smoke-test.sh              — run all tests (requires Bitwig running)
+#   ./scripts/smoke-test.sh --offline    — run only offline tests (no Bitwig needed)
+#   ./scripts/smoke-test.sh [port]       — run all tests on specified port
 #
 
 set -euo pipefail
 
 PORT="${1:-8787}"
+OFFLINE=false
+if [ "${1:-}" = "--offline" ]; then
+  OFFLINE=true
+  PORT=8787
+fi
+
 BASE="http://localhost:${PORT}"
 PASS=0
 FAIL=0
 TOTAL=0
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # --- helpers ---
 
@@ -56,7 +65,148 @@ snapshot_field() {
 # --- tests ---
 
 echo ""
-echo "=== Gig Maestro Smoke Tests (port ${PORT}) ==="
+echo "=== Gig Maestro Smoke Tests ==="
+echo ""
+
+# =============================================
+# OFFLINE TESTS (no Bitwig required)
+# =============================================
+
+# O1. Tool schema validation
+echo "--- O1. Tool Schema Validation ---"
+TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
+TOOL_COUNT=$(jq length "$TOOLS_FILE")
+assert_equals "claude-tools.json has 36 tools" "$TOOL_COUNT" "36"
+
+# Every tool has name, description, input_schema
+MISSING_FIELDS=$(jq '[.[] | select(.name == null or .description == null or .input_schema == null)] | length' "$TOOLS_FILE")
+assert_equals "all tools have name, description, input_schema" "$MISSING_FIELDS" "0"
+
+# All tool names are unique
+UNIQUE_NAMES=$(jq '[.[].name] | unique | length' "$TOOLS_FILE")
+assert_equals "all tool names are unique" "$UNIQUE_NAMES" "36"
+
+# Tool names use underscore convention (no slashes)
+SLASH_NAMES=$(jq '[.[].name | select(contains("/"))] | length' "$TOOLS_FILE")
+assert_equals "no tool names contain slashes" "$SLASH_NAMES" "0"
+
+# Spot-check specific tools exist
+TOOLS_LIST=$(jq -r '.[].name' "$TOOLS_FILE")
+assert_contains "has session_snapshot tool" "$TOOLS_LIST" "session_snapshot"
+assert_contains "has transport_play tool" "$TOOLS_LIST" "transport_play"
+assert_contains "has track_setVolume tool" "$TOOLS_LIST" "track_setVolume"
+assert_contains "has clip_launch tool" "$TOOLS_LIST" "clip_launch"
+assert_contains "has device_setParameterValue tool" "$TOOLS_LIST" "device_setParameterValue"
+assert_contains "has cursor_selectTrack tool" "$TOOLS_LIST" "cursor_selectTrack"
+assert_contains "has master_setVolume tool" "$TOOLS_LIST" "master_setVolume"
+assert_contains "has scene_launch tool" "$TOOLS_LIST" "scene_launch"
+
+# Validate parameter types for key tools
+TEMPO_TYPE=$(jq -r '.[] | select(.name=="transport_setTempo") | .input_schema.properties.tempo.type' "$TOOLS_FILE")
+assert_equals "transport_setTempo tempo param is number" "$TEMPO_TYPE" "number"
+
+VOL_INDEX_TYPE=$(jq -r '.[] | select(.name=="track_setVolume") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "track_setVolume index param is integer" "$VOL_INDEX_TYPE" "integer"
+
+VOL_VALUE_TYPE=$(jq -r '.[] | select(.name=="track_setVolume") | .input_schema.properties.value.type' "$TOOLS_FILE")
+assert_equals "track_setVolume value param is number" "$VOL_VALUE_TYPE" "number"
+
+DIRECTION_ENUM=$(jq -r '.[] | select(.name=="cursor_selectTrack") | .input_schema.properties.direction.enum | join(",")' "$TOOLS_FILE")
+assert_equals "cursor_selectTrack direction has next,previous enum" "$DIRECTION_ENUM" "next,previous"
+
+CLIP_LENGTH_TYPE=$(jq -r '.[] | select(.name=="clip_create") | .input_schema.properties.lengthInBeats.type' "$TOOLS_FILE")
+assert_equals "clip_create lengthInBeats param is integer" "$CLIP_LENGTH_TYPE" "integer"
+
+# O2. System prompt validation
+echo "--- O2. System Prompt Validation ---"
+PROMPT_FILE="${PROJECT_ROOT}/tools/system-prompt.md"
+PROMPT=$(cat "$PROMPT_FILE")
+assert_contains "system prompt covers viewport model" "$PROMPT" "Track Bank"
+assert_contains "system prompt covers perception-action loop" "$PROMPT" "Perception-Action Loop"
+assert_contains "system prompt covers value ranges" "$PROMPT" "Value Ranges"
+assert_contains "system prompt covers cursor model" "$PROMPT" "Cursor Model"
+assert_contains "system prompt covers index conventions" "$PROMPT" "Index Conventions"
+assert_contains "system prompt has example workflow" "$PROMPT" "Example Workflow"
+assert_contains "system prompt mentions 0.0 to 1.0 range" "$PROMPT" "0.0 to 1.0"
+assert_contains "system prompt mentions session_snapshot" "$PROMPT" "session_snapshot"
+
+# O3. CLI build and help
+echo "--- O3. CLI Build & Help ---"
+CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
+
+# Build the CLI JAR
+(cd "$PROJECT_ROOT" && ./gradlew cliShadowJar -q 2>/dev/null)
+TOTAL=$((TOTAL + 1))
+if [ -f "$CLI_JAR" ]; then
+  echo "  PASS  gig-cli.jar exists after build"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL  gig-cli.jar not found after build"
+  FAIL=$((FAIL + 1))
+fi
+
+# Help output
+HELP=$(java -jar "$CLI_JAR" --help 2>&1)
+assert_contains "CLI help shows transport command" "$HELP" "transport"
+assert_contains "CLI help shows track command" "$HELP" "track"
+assert_contains "CLI help shows snapshot command" "$HELP" "snapshot"
+assert_contains "CLI help shows rpc command" "$HELP" "rpc"
+assert_contains "CLI help shows --pretty option" "$HELP" "--pretty"
+assert_contains "CLI help shows --port option" "$HELP" "--port"
+
+# Transport subcommand help
+TRANSPORT_HELP=$(java -jar "$CLI_JAR" transport --help 2>&1)
+assert_contains "transport help shows play" "$TRANSPORT_HELP" "play"
+assert_contains "transport help shows stop" "$TRANSPORT_HELP" "stop"
+assert_contains "transport help shows tempo" "$TRANSPORT_HELP" "tempo"
+assert_contains "transport help shows loop" "$TRANSPORT_HELP" "loop"
+
+# Track subcommand help
+TRACK_HELP=$(java -jar "$CLI_JAR" track --help 2>&1)
+assert_contains "track help shows set-volume" "$TRACK_HELP" "set-volume"
+assert_contains "track help shows set-mute" "$TRACK_HELP" "set-mute"
+assert_contains "track help shows set-solo" "$TRACK_HELP" "set-solo"
+
+# Version
+VERSION=$(java -jar "$CLI_JAR" --version 2>&1)
+assert_contains "CLI version output" "$VERSION" "gig-cli"
+
+# O4. Extension build verification
+echo "--- O4. Extension Build ---"
+(cd "$PROJECT_ROOT" && ./gradlew build -q 2>/dev/null)
+EXT_FILE="$HOME/Documents/Bitwig Studio/Extensions/GigMaestro.bwextension"
+TOTAL=$((TOTAL + 1))
+if [ -f "$EXT_FILE" ]; then
+  echo "  PASS  GigMaestro.bwextension exists"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL  GigMaestro.bwextension not found"
+  FAIL=$((FAIL + 1))
+fi
+
+# No Picocli in extension JAR
+PICOCLI_COUNT=$(jar tf "$EXT_FILE" | grep -c picocli || true)
+assert_equals "extension JAR has no Picocli classes" "$PICOCLI_COUNT" "0"
+
+# No CLI classes in extension JAR
+CLI_CLASSES=$(jar tf "$EXT_FILE" | grep -c "gig/cli" || true)
+assert_equals "extension JAR has no CLI classes" "$CLI_CLASSES" "0"
+
+# If offline mode, stop here
+if [ "$OFFLINE" = true ]; then
+  echo ""
+  echo "=== Offline Results: ${PASS} passed, ${FAIL} failed, ${TOTAL} total ==="
+  echo ""
+  if [ "$FAIL" -gt 0 ]; then exit 1; fi
+  exit 0
+fi
+
+# =============================================
+# ONLINE TESTS (Bitwig required)
+# =============================================
+
+echo ""
+echo "--- Online tests (port ${PORT}) ---"
 echo ""
 
 # 1. Health check
