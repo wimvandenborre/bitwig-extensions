@@ -122,6 +122,55 @@ public class DeviceHandler {
             return new JsonPrimitive("ok");
         });
 
+        // Per-parameter automation methods
+        dispatcher.register("device/hasAutomation", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+            RemoteControl param = remoteControlsPage.getParameter(index);
+            JsonObject result = new JsonObject();
+            result.addProperty("hasAutomation", param.hasAutomation().get());
+            return result;
+        });
+
+        dispatcher.register("device/deleteAllAutomation", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+            RemoteControl param = remoteControlsPage.getParameter(index);
+            param.deleteAllAutomation();
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            return result;
+        });
+
+        dispatcher.register("device/restoreAutomationControl", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+            RemoteControl param = remoteControlsPage.getParameter(index);
+            param.restoreAutomationControl();
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            return result;
+        });
+
+        dispatcher.register("device/touch", params -> {
+            int index = requireInt(params, "index");
+            boolean touched = requireBoolean(params, "touched");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+            RemoteControl param = remoteControlsPage.getParameter(index);
+            param.touch(touched);
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            return result;
+        });
+
         // Cursor track navigation
         dispatcher.register("cursor/selectTrack", params -> {
             String direction = requireString(params, "direction");

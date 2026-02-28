@@ -80,6 +80,7 @@ public class StateCache {
     private final String[] paramNames = new String[PARAM_COUNT];
     private final double[] paramValues = new double[PARAM_COUNT];
     private final String[] paramDisplayedValues = new String[PARAM_COUNT];
+    private final boolean[] paramHasAutomation = new boolean[PARAM_COUNT];
 
     // Cursor clip state
     private volatile int clipPlayingStep = -1;
@@ -335,6 +336,9 @@ public class StateCache {
 
             param.value().displayedValue().markInterested();
             param.value().displayedValue().addValueObserver((StringValueChangedCallback) v -> paramDisplayedValues[idx] = (String) v);
+
+            param.hasAutomation().markInterested();
+            param.hasAutomation().addValueObserver((BooleanValueChangedCallback) v -> paramHasAutomation[idx] = v);
         }
     }
 
@@ -609,6 +613,7 @@ public class StateCache {
             param.addProperty("name", paramNames[i] != null ? paramNames[i] : "");
             param.addProperty("value", paramValues[i]);
             param.addProperty("displayedValue", paramDisplayedValues[i] != null ? paramDisplayedValues[i] : "");
+            param.addProperty("hasAutomation", paramHasAutomation[i]);
             params.add(param);
         }
         remoteControls.add("parameters", params);
