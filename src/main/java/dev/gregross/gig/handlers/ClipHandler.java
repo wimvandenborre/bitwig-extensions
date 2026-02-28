@@ -1,5 +1,6 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.ClipLauncherSlot;
 import com.bitwig.extension.controller.api.ClipLauncherSlotBank;
 import com.bitwig.extension.controller.api.SceneBank;
 import com.bitwig.extension.controller.api.Track;
@@ -47,6 +48,24 @@ public class ClipHandler {
             int slotIndex = requireInt(params, "slotIndex");
             int lengthInBeats = requireInt(params, "lengthInBeats");
             getSlotBank(trackIndex).createEmptyClip(slotIndex, lengthInBeats);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/select", params -> {
+            int trackIndex = requireInt(params, "trackIndex");
+            int slotIndex = requireInt(params, "slotIndex");
+            ClipLauncherSlotBank slotBank = getSlotBank(trackIndex);
+            ClipLauncherSlot slot = (ClipLauncherSlot) slotBank.getItemAt(slotIndex);
+            slot.select();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/delete", params -> {
+            int trackIndex = requireInt(params, "trackIndex");
+            int slotIndex = requireInt(params, "slotIndex");
+            ClipLauncherSlotBank slotBank = getSlotBank(trackIndex);
+            ClipLauncherSlot slot = (ClipLauncherSlot) slotBank.getItemAt(slotIndex);
+            slot.deleteObject();
             return new JsonPrimitive("ok");
         });
 

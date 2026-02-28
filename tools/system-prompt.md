@@ -45,6 +45,33 @@ The extension tracks the user's UI selection through cursor objects:
 
 The snapshot's `device` section shows the current cursor track name, device name, and the 8 parameters on the current page.
 
+### Note Editing (Cursor Clip)
+
+The extension provides a **cursor clip** that follows the selected clip in the session view. You can write, read, and clear MIDI notes in the selected clip.
+
+**Step Grid Model:**
+- The clip's note content is exposed as a 2D grid: **x = step (time), y = key (MIDI note)**.
+- The grid viewport is **64 steps wide × 128 keys tall** (full MIDI range).
+- At the default step size of 0.25 (1/16 note), 64 steps = 4 bars.
+- Use `clip_scrollSteps` to navigate clips longer than the viewport.
+- Use `clip_setStepSize` to change resolution (0.25 = 1/16, 0.5 = 1/8, 1.0 = 1/4).
+
+**Coordinate System:**
+- **x (step):** 0-based step index. At 1/16 resolution: steps 0–3 = beat 1, steps 4–7 = beat 2, etc. Steps 0–15 = bar 1, 16–31 = bar 2.
+- **y (MIDI note):** Standard MIDI note numbers 0–127. Key values: 36=C2 (kick), 38=D2 (snare), 42=F#2 (closed hi-hat), 46=Bb2 (open hi-hat), 48=C3, 60=C4 (middle C), 72=C5.
+
+**Batch Operations:**
+- `clip_setNotes` — Write multiple notes at once. Pass an array of `{x, y, velocity, duration}` objects. Velocity (0.0–1.0) and duration (in beats) are optional.
+- `clip_getNotes` — Read all notes in the viewport. Returns a sparse array of only the cells that have notes.
+
+**Workflow for writing notes:**
+1. Select the target clip: `clip_select` with `trackIndex` + `slotIndex`.
+2. Optionally create an empty clip first: `clip_create` with `lengthInBeats`.
+3. Write notes: `clip_setNotes` with your note array.
+4. Verify: `clip_getNotes` to read back what was written.
+
+**Snapshot:** The `clip` section in `session_snapshot` shows cursor clip metadata: `trackName`, `playingStep`, `loopLength`, `playStart`, `playStop`, `stepSize`, `hasContent`. It does NOT include note data — use `clip_getNotes` for that.
+
 ### Index Conventions
 
 All indices are **0-based**:
@@ -70,3 +97,20 @@ All indices are **0-based**:
 2. Read the `device` section: `cursorTrackName` tells you which track, `deviceName` shows the current device, `remoteControls` shows parameters.
 3. Use `device_selectNext` to step through the device chain, calling `session_snapshot` after each navigation to read the next device name.
 4. Report all discovered devices.
+
+**Task:** "Write a 4-on-the-floor kick pattern in an empty clip on track 1."
+
+1. Call `session_snapshot` — check track 0 exists, find an empty slot.
+2. Call `clip_create` with `{"trackIndex": 0, "slotIndex": 0, "lengthInBeats": 16}` (4 bars).
+3. Call `clip_select` with `{"trackIndex": 0, "slotIndex": 0}`.
+4. Call `clip_setNotes` with:
+   ```json
+   {"notes": [
+     {"x": 0, "y": 36}, {"x": 4, "y": 36}, {"x": 8, "y": 36}, {"x": 12, "y": 36},
+     {"x": 16, "y": 36}, {"x": 20, "y": 36}, {"x": 24, "y": 36}, {"x": 28, "y": 36},
+     {"x": 32, "y": 36}, {"x": 36, "y": 36}, {"x": 40, "y": 36}, {"x": 44, "y": 36},
+     {"x": 48, "y": 36}, {"x": 52, "y": 36}, {"x": 56, "y": 36}, {"x": 60, "y": 36}
+   ]}
+   ```
+5. Call `clip_getNotes` to verify 16 kick notes were written.
+6. Call `clip_launch` to play the pattern.

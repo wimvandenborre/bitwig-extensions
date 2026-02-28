@@ -9,6 +9,7 @@ import dev.gregross.gig.handlers.ApplicationHandler;
 import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.MasterHandler;
+import dev.gregross.gig.handlers.NoteHandler;
 import dev.gregross.gig.handlers.TrackHandler;
 import dev.gregross.gig.handlers.TransportHandler;
 import dev.gregross.gig.rpc.CommandQueue;
@@ -24,6 +25,8 @@ public class GigMaestroExtension extends ControllerExtension {
     private static final int DEFAULT_PORT = 8787;
     private static final int TRACK_COUNT = 64;
     private static final int SCENE_COUNT = 8;
+    private static final int CLIP_GRID_WIDTH = 64;
+    private static final int CLIP_GRID_HEIGHT = 128;
 
     private final ControllerHost host;
     private JsonRpcDispatcher dispatcher;
@@ -50,6 +53,10 @@ public class GigMaestroExtension extends ControllerExtension {
             CursorDeviceFollowMode.FOLLOW_SELECTION);
         CursorRemoteControlsPage remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
 
+        // Create cursor clip for note editing
+        Clip cursorClip = cursorTrack.createLauncherCursorClip("gig-clip", "Gig Clip",
+            CLIP_GRID_WIDTH, CLIP_GRID_HEIGHT);
+
         // Create infrastructure
         dispatcher = new JsonRpcDispatcher();
         commandQueue = new CommandQueue();
@@ -60,6 +67,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerObservers(transport, trackBank, masterTrack, application);
         stateCache.registerClipObservers(trackBank);
         stateCache.registerDeviceObservers(cursorTrack, cursorDevice, remoteControlsPage);
+        stateCache.registerClipCursorObservers(cursorClip, cursorTrack);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
@@ -80,6 +88,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new MasterHandler(masterTrack).register(dispatcher);
         new ClipHandler(trackBank, trackBank.sceneBank()).register(dispatcher);
         new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage).register(dispatcher);
+        new NoteHandler(cursorClip).register(dispatcher);
 
         // Start servers
         try {

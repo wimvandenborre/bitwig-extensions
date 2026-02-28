@@ -463,5 +463,141 @@
       },
       "required": ["direction"]
     }
+  },
+  {
+    "name": "clip_delete",
+    "description": "Delete a clip from a clip launcher slot. Removes the clip and its contents entirely.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "clip_select",
+    "description": "Select a clip slot for note editing. The cursor clip will follow this selection, making it the target for setNotes, getNotes, clearNote, and clearAllNotes. Must be called before editing notes in a specific clip.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "clip_setNotes",
+    "description": "Write multiple notes into the selected clip in a single batch operation. Each note is placed at a grid position (x=step, y=MIDI note). Existing notes at the same positions are overwritten. Use this to write entire patterns, chords, basslines, or drum sequences in one call.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "array",
+          "description": "Array of notes to write. Each note has x (step position), y (MIDI note number), velocity (0.0-1.0, optional, default ~0.79), and duration (in beats, optional, default 0.25).",
+          "items": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer",
+                "description": "Step position in the grid (0-based). At 1/16 resolution: 0-15 = bar 1, 16-31 = bar 2, etc."
+              },
+              "y": {
+                "type": "integer",
+                "description": "MIDI note number (0-127). Common values: 36=C2 (kick), 38=D2 (snare), 42=F#2 (hi-hat), 60=C4 (middle C)."
+              },
+              "velocity": {
+                "type": "number",
+                "description": "Note velocity, 0.0 (silent) to 1.0 (maximum). Optional, defaults to ~0.79."
+              },
+              "duration": {
+                "type": "number",
+                "description": "Note duration in beats. 0.25 = 1/16 note, 0.5 = 1/8 note, 1.0 = 1/4 note. Optional, defaults to 0.25."
+              }
+            },
+            "required": ["x", "y"]
+          }
+        }
+      },
+      "required": ["notes"]
+    }
+  },
+  {
+    "name": "clip_clearNote",
+    "description": "Remove a single note at the specified grid position in the selected clip.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "integer",
+          "description": "Step position (0-based)."
+        },
+        "y": {
+          "type": "integer",
+          "description": "MIDI note number (0-127)."
+        }
+      },
+      "required": ["x", "y"]
+    }
+  },
+  {
+    "name": "clip_clearAllNotes",
+    "description": "Remove all notes from the selected clip. This clears the entire clip content.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "clip_getNotes",
+    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), and duration (beats). Use this to inspect clip content before or after editing.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "clip_setStepSize",
+    "description": "Set the step grid resolution for the cursor clip. This determines the time duration of each step in the grid. Common values: 0.25 = 1/16 note (default), 0.5 = 1/8 note, 1.0 = 1/4 note, 0.125 = 1/32 note.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "number",
+          "description": "Step size in beat time. 0.25 = 1/16, 0.5 = 1/8, 1.0 = 1/4, 0.125 = 1/32."
+        }
+      },
+      "required": ["size"]
+    }
+  },
+  {
+    "name": "clip_scrollSteps",
+    "description": "Scroll the step grid viewport to a specific step offset. The grid viewport is 64 steps wide. Use this to navigate to different sections of clips longer than 64 steps. Offset 0 = beginning, 64 = second page, etc.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "description": "Step offset to scroll to (0-based). The viewport will show 64 steps starting from this position."
+        }
+      },
+      "required": ["offset"]
+    }
   }
 ]

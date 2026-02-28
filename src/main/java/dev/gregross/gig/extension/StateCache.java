@@ -7,6 +7,7 @@ import com.bitwig.extension.callback.DoubleValueChangedCallback;
 import com.bitwig.extension.callback.IndexedBooleanValueChangedCallback;
 import com.bitwig.extension.callback.IndexedStringValueChangedCallback;
 import com.bitwig.extension.callback.IntegerValueChangedCallback;
+import com.bitwig.extension.callback.StepDataChangedCallback;
 import com.bitwig.extension.callback.StringArrayValueChangedCallback;
 import com.bitwig.extension.callback.StringValueChangedCallback;
 import com.bitwig.extension.controller.api.*;
@@ -79,6 +80,15 @@ public class StateCache {
     private final double[] paramValues = new double[PARAM_COUNT];
     private final String[] paramDisplayedValues = new String[PARAM_COUNT];
 
+    // Cursor clip state
+    private volatile int clipPlayingStep = -1;
+    private volatile double clipLoopLength;
+    private volatile double clipPlayStart;
+    private volatile double clipPlayStop;
+    private volatile boolean clipHasNotes;
+    private volatile String clipTrackName = "";
+    private volatile double clipStepSize = 0.25; // default 1/16
+
     // Application state
     private volatile String projectName = "";
     private volatile boolean canUndo;
@@ -91,6 +101,7 @@ public class StateCache {
     private int prevScenesHash;
     private int prevDeviceHash;
     private int prevMasterHash;
+    private int prevClipHash;
     private int prevApplicationHash;
 
     public void registerObservers(Transport transport, TrackBank trackBank,
@@ -292,12 +303,44 @@ public class StateCache {
         }
     }
 
+    public void registerClipCursorObservers(Clip cursorClip, CursorTrack cursorTrack) {
+        // Cursor track name (reuse existing field)
+        cursorTrack.name().addValueObserver((StringValueChangedCallback) v -> clipTrackName = (String) v);
+
+        // Playing step
+        cursorClip.playingStep().markInterested();
+        cursorClip.playingStep().addValueObserver((IntegerValueChangedCallback) v -> clipPlayingStep = v);
+
+        // Loop/play boundaries
+        cursorClip.getLoopLength().markInterested();
+        cursorClip.getLoopLength().addValueObserver((DoubleValueChangedCallback) v -> clipLoopLength = v);
+
+        cursorClip.getPlayStart().markInterested();
+        cursorClip.getPlayStart().addValueObserver((DoubleValueChangedCallback) v -> clipPlayStart = v);
+
+        cursorClip.getPlayStop().markInterested();
+        cursorClip.getPlayStop().addValueObserver((DoubleValueChangedCallback) v -> clipPlayStop = v);
+
+        // Step data observer for hasContent detection
+        cursorClip.addStepDataObserver((StepDataChangedCallback) (x, y, state) -> {
+            // state: 0=empty, 2=noteOn — any noteOn means clip has notes
+            if (state == 2) {
+                clipHasNotes = true;
+            }
+        });
+    }
+
+    public void setClipStepSize(double stepSize) {
+        this.clipStepSize = stepSize;
+    }
+
     public JsonObject getSnapshot() {
         JsonObject snapshot = new JsonObject();
         snapshot.add("transport", getTransportState());
         snapshot.add("tracks", getTracksState());
         snapshot.add("scenes", getScenesState());
         snapshot.add("device", getDeviceState());
+        snapshot.add("clip", getClipState());
         snapshot.add("master", getMasterState());
         snapshot.add("application", getApplicationState());
         return snapshot;
@@ -324,6 +367,9 @@ public class StateCache {
 
         h = getDeviceState().toString().hashCode();
         if (h != prevDeviceHash) { changed.add("device"); prevDeviceHash = h; }
+
+        h = getClipState().toString().hashCode();
+        if (h != prevClipHash) { changed.add("clip"); prevClipHash = h; }
 
         h = getMasterState().toString().hashCode();
         if (h != prevMasterHash) { changed.add("master"); prevMasterHash = h; }
@@ -442,6 +488,18 @@ public class StateCache {
         remoteControls.add("parameters", params);
 
         obj.add("remoteControls", remoteControls);
+        return obj;
+    }
+
+    private JsonObject getClipState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("trackName", clipTrackName);
+        obj.addProperty("playingStep", clipPlayingStep);
+        obj.addProperty("loopLength", clipLoopLength);
+        obj.addProperty("playStart", clipPlayStart);
+        obj.addProperty("playStop", clipPlayStop);
+        obj.addProperty("stepSize", clipStepSize);
+        obj.addProperty("hasContent", clipHasNotes);
         return obj;
     }
 

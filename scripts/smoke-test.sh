@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.3.x — Smoke Test Suite
+# Gig Maestro v0.4.x — Smoke Test Suite
 #
 # Usage:
 #   ./scripts/smoke-test.sh              — run all tests (requires Bitwig running)
@@ -76,7 +76,7 @@ echo ""
 echo "--- O1. Tool Schema Validation ---"
 TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
-assert_equals "claude-tools.json has 36 tools" "$TOOL_COUNT" "36"
+assert_equals "claude-tools.json has 44 tools" "$TOOL_COUNT" "44"
 
 # Every tool has name, description, input_schema
 MISSING_FIELDS=$(jq '[.[] | select(.name == null or .description == null or .input_schema == null)] | length' "$TOOLS_FILE")
@@ -84,7 +84,7 @@ assert_equals "all tools have name, description, input_schema" "$MISSING_FIELDS"
 
 # All tool names are unique
 UNIQUE_NAMES=$(jq '[.[].name] | unique | length' "$TOOLS_FILE")
-assert_equals "all tool names are unique" "$UNIQUE_NAMES" "36"
+assert_equals "all tool names are unique" "$UNIQUE_NAMES" "44"
 
 # Tool names use underscore convention (no slashes)
 SLASH_NAMES=$(jq '[.[].name | select(contains("/"))] | length' "$TOOLS_FILE")
@@ -117,6 +117,25 @@ assert_equals "cursor_selectTrack direction has next,previous enum" "$DIRECTION_
 CLIP_LENGTH_TYPE=$(jq -r '.[] | select(.name=="clip_create") | .input_schema.properties.lengthInBeats.type' "$TOOLS_FILE")
 assert_equals "clip_create lengthInBeats param is integer" "$CLIP_LENGTH_TYPE" "integer"
 
+# Phase 4 note tools
+assert_contains "has clip_select tool" "$TOOLS_LIST" "clip_select"
+assert_contains "has clip_setNotes tool" "$TOOLS_LIST" "clip_setNotes"
+assert_contains "has clip_clearNote tool" "$TOOLS_LIST" "clip_clearNote"
+assert_contains "has clip_clearAllNotes tool" "$TOOLS_LIST" "clip_clearAllNotes"
+assert_contains "has clip_getNotes tool" "$TOOLS_LIST" "clip_getNotes"
+assert_contains "has clip_setStepSize tool" "$TOOLS_LIST" "clip_setStepSize"
+assert_contains "has clip_scrollSteps tool" "$TOOLS_LIST" "clip_scrollSteps"
+assert_contains "has clip_delete tool" "$TOOLS_LIST" "clip_delete"
+
+NOTES_TYPE=$(jq -r '.[] | select(.name=="clip_setNotes") | .input_schema.properties.notes.type' "$TOOLS_FILE")
+assert_equals "clip_setNotes notes param is array" "$NOTES_TYPE" "array"
+
+STEPSIZE_TYPE=$(jq -r '.[] | select(.name=="clip_setStepSize") | .input_schema.properties.size.type' "$TOOLS_FILE")
+assert_equals "clip_setStepSize size param is number" "$STEPSIZE_TYPE" "number"
+
+OFFSET_TYPE=$(jq -r '.[] | select(.name=="clip_scrollSteps") | .input_schema.properties.offset.type' "$TOOLS_FILE")
+assert_equals "clip_scrollSteps offset param is integer" "$OFFSET_TYPE" "integer"
+
 # O2. System prompt validation
 echo "--- O2. System Prompt Validation ---"
 PROMPT_FILE="${PROJECT_ROOT}/tools/system-prompt.md"
@@ -129,6 +148,9 @@ assert_contains "system prompt covers index conventions" "$PROMPT" "Index Conven
 assert_contains "system prompt has example workflow" "$PROMPT" "Example Workflow"
 assert_contains "system prompt mentions 0.0 to 1.0 range" "$PROMPT" "0.0 to 1.0"
 assert_contains "system prompt mentions session_snapshot" "$PROMPT" "session_snapshot"
+assert_contains "system prompt covers note editing" "$PROMPT" "Note Editing"
+assert_contains "system prompt mentions MIDI note numbers" "$PROMPT" "MIDI note"
+assert_contains "system prompt mentions clip_setNotes" "$PROMPT" "clip_setNotes"
 
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
@@ -150,6 +172,7 @@ HELP=$(java -jar "$CLI_JAR" --help 2>&1)
 assert_contains "CLI help shows transport command" "$HELP" "transport"
 assert_contains "CLI help shows track command" "$HELP" "track"
 assert_contains "CLI help shows snapshot command" "$HELP" "snapshot"
+assert_contains "CLI help shows note command" "$HELP" "note"
 assert_contains "CLI help shows rpc command" "$HELP" "rpc"
 assert_contains "CLI help shows --pretty option" "$HELP" "--pretty"
 assert_contains "CLI help shows --port option" "$HELP" "--port"
@@ -166,6 +189,17 @@ TRACK_HELP=$(java -jar "$CLI_JAR" track --help 2>&1)
 assert_contains "track help shows set-volume" "$TRACK_HELP" "set-volume"
 assert_contains "track help shows set-mute" "$TRACK_HELP" "set-mute"
 assert_contains "track help shows set-solo" "$TRACK_HELP" "set-solo"
+
+# Note subcommand help
+NOTE_HELP=$(java -jar "$CLI_JAR" note --help 2>&1)
+assert_contains "note help shows select" "$NOTE_HELP" "select"
+assert_contains "note help shows set-notes" "$NOTE_HELP" "set-notes"
+assert_contains "note help shows clear-note" "$NOTE_HELP" "clear-note"
+assert_contains "note help shows clear-all" "$NOTE_HELP" "clear-all"
+assert_contains "note help shows get-notes" "$NOTE_HELP" "get-notes"
+assert_contains "note help shows set-step-size" "$NOTE_HELP" "set-step-size"
+assert_contains "note help shows scroll-steps" "$NOTE_HELP" "scroll-steps"
+assert_contains "note help shows delete" "$NOTE_HELP" "delete"
 
 # Version
 VERSION=$(java -jar "$CLI_JAR" --version 2>&1)
@@ -405,6 +439,13 @@ sleep 0.5
 rpc '{"jsonrpc":"2.0","method":"transport/stop","id":74}' > /dev/null
 sleep 0.3
 
+# Delete the clip we created on slot 7
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/delete","params":{"trackIndex":0,"slotIndex":7},"id":174}')
+assert_contains "clip/delete returns ok" "$RESP" '"ok"'
+sleep 0.5
+HAS=$(snapshot_field "['tracks'][0]['clips'][7]['hasContent']")
+assert_equals "slot 7 hasContent after delete" "$HAS" "False"
+
 # 13. Scene actions
 echo "--- 13. Scene Actions ---"
 RESP=$(rpc '{"jsonrpc":"2.0","method":"scene/launch","params":{"index":0},"id":75}')
@@ -420,6 +461,7 @@ assert_contains "api/list has clip/launch" "$LIST" '"clip/launch"'
 assert_contains "api/list has clip/stop" "$LIST" '"clip/stop"'
 assert_contains "api/list has clip/record" "$LIST" '"clip/record"'
 assert_contains "api/list has clip/create" "$LIST" '"clip/create"'
+assert_contains "api/list has clip/delete" "$LIST" '"clip/delete"'
 assert_contains "api/list has scene/launch" "$LIST" '"scene/launch"'
 
 # 15. Device snapshot
@@ -477,6 +519,86 @@ assert_contains "device invalid param index returns -32602" "$ERR" '-32602'
 
 ERR=$(rpc '{"jsonrpc":"2.0","method":"cursor/selectTrack","params":{"direction":"invalid"},"id":87}')
 assert_contains "cursor invalid direction returns -32602" "$ERR" '-32602'
+
+# 19. Note API list
+echo "--- 19. Note API List ---"
+LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":100}')
+assert_contains "api/list has clip/select" "$LIST" '"clip/select"'
+assert_contains "api/list has clip/setNotes" "$LIST" '"clip/setNotes"'
+assert_contains "api/list has clip/clearNote" "$LIST" '"clip/clearNote"'
+assert_contains "api/list has clip/clearAllNotes" "$LIST" '"clip/clearAllNotes"'
+assert_contains "api/list has clip/getNotes" "$LIST" '"clip/getNotes"'
+assert_contains "api/list has clip/setStepSize" "$LIST" '"clip/setStepSize"'
+assert_contains "api/list has clip/scrollSteps" "$LIST" '"clip/scrollSteps"'
+
+# Count total methods
+METHOD_COUNT=$(echo "$LIST" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
+assert_equals "api/list has 44 methods" "$METHOD_COUNT" "44"
+
+# 20. Clip snapshot section
+echo "--- 20. Clip Snapshot Section ---"
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":101}')
+assert_contains "snapshot has clip section" "$SNAP" '"clip"'
+assert_contains "clip has trackName" "$SNAP" '"trackName"'
+assert_contains "clip has playingStep" "$SNAP" '"playingStep"'
+assert_contains "clip has loopLength" "$SNAP" '"loopLength"'
+assert_contains "clip has stepSize" "$SNAP" '"stepSize"'
+assert_contains "clip has hasContent" "$SNAP" '"hasContent"'
+
+# 21. Note editing workflow
+echo "--- 21. Note Editing Workflow ---"
+
+# Select clip on track 0, slot 7 (created in test 12)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/select","params":{"trackIndex":0,"slotIndex":7},"id":110}')
+assert_contains "clip/select returns ok" "$RESP" '"ok"'
+sleep 0.5
+
+# Clear any existing notes
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/clearAllNotes","id":111}')
+assert_contains "clip/clearAllNotes returns ok" "$RESP" '"ok"'
+sleep 0.3
+
+# Write a 2-note pattern
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/setNotes","params":{"notes":[{"x":0,"y":60,"velocity":0.8,"duration":0.25},{"x":4,"y":64,"velocity":0.6,"duration":0.5}]},"id":112}')
+assert_contains "clip/setNotes returns count" "$RESP" '"count"'
+assert_contains "clip/setNotes wrote 2 notes" "$RESP" '"count":2'
+sleep 0.5
+
+# Read notes back
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/getNotes","id":113}')
+assert_contains "clip/getNotes returns note at y=60" "$RESP" '"y":60'
+assert_contains "clip/getNotes returns note at y=64" "$RESP" '"y":64'
+
+# Clear a single note
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/clearNote","params":{"x":0,"y":60},"id":114}')
+assert_contains "clip/clearNote returns ok" "$RESP" '"ok"'
+sleep 0.3
+
+# Verify only 1 note remains
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/getNotes","id":115}')
+NOTE_COUNT=$(echo "$RESP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
+assert_equals "1 note remains after clearNote" "$NOTE_COUNT" "1"
+
+# Clear all
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/clearAllNotes","id":116}')
+assert_contains "clip/clearAllNotes returns ok" "$RESP" '"ok"'
+sleep 0.3
+
+# Verify empty
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/getNotes","id":117}')
+NOTE_COUNT=$(echo "$RESP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
+assert_equals "0 notes after clearAllNotes" "$NOTE_COUNT" "0"
+
+# 22. Step size and scroll
+echo "--- 22. Step Size & Scroll ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/setStepSize","params":{"size":0.5},"id":120}')
+assert_contains "clip/setStepSize returns ok" "$RESP" '"ok"'
+
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/scrollSteps","params":{"offset":0},"id":121}')
+assert_contains "clip/scrollSteps returns ok" "$RESP" '"ok"'
+
+# Restore step size
+rpc '{"jsonrpc":"2.0","method":"clip/setStepSize","params":{"size":0.25},"id":122}' > /dev/null
 
 # --- summary ---
 echo ""
