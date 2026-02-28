@@ -4,6 +4,7 @@ import com.bitwig.extension.callback.BooleanValueChangedCallback;
 import com.bitwig.extension.callback.ClipLauncherSlotBankPlaybackStateChangedCallback;
 import com.bitwig.extension.callback.ColorValueChangedCallback;
 import com.bitwig.extension.callback.DoubleValueChangedCallback;
+import com.bitwig.extension.callback.EnumValueChangedCallback;
 import com.bitwig.extension.callback.IndexedBooleanValueChangedCallback;
 import com.bitwig.extension.callback.IndexedStringValueChangedCallback;
 import com.bitwig.extension.callback.IntegerValueChangedCallback;
@@ -95,6 +96,38 @@ public class StateCache {
     private volatile boolean canRedo;
     private volatile boolean hasActiveEngine;
 
+    // Arranger visibility state
+    private volatile boolean arrangerPlaybackFollow;
+    private volatile boolean arrangerClipLauncherVisible;
+    private volatile boolean arrangerTimelineVisible;
+    private volatile boolean arrangerCueMarkersVisible;
+    private volatile boolean arrangerEffectTracksVisible;
+    private volatile boolean arrangerIoSectionVisible;
+    private volatile boolean arrangerDoubleRowTrackHeight;
+
+    // Arrangement state — loop range
+    private volatile boolean arrangerLoopEnabled;
+    private volatile double arrangerLoopStart;
+    private volatile double arrangerLoopDuration;
+
+    // Arrangement state — punch
+    private volatile boolean punchInEnabled;
+    private volatile boolean punchOutEnabled;
+    private volatile double punchInPosition;
+    private volatile double punchOutPosition;
+
+    // Arrangement state — automation
+    private volatile String automationWriteMode = "";
+    private volatile boolean arrangerAutomationWriteEnabled;
+    private volatile boolean clipLauncherAutomationWriteEnabled;
+    private volatile boolean automationOverrideActive;
+
+    // Cue marker state
+    private static final int CUE_MARKER_COUNT = 16;
+    private final String[] cueMarkerNames = new String[CUE_MARKER_COUNT];
+    private final double[] cueMarkerPositions = new double[CUE_MARKER_COUNT];
+    private final float[][] cueMarkerColors = new float[CUE_MARKER_COUNT][3];
+
     // Delta detection — previous section hashes
     private int prevTransportHash;
     private int prevTracksHash;
@@ -103,6 +136,8 @@ public class StateCache {
     private int prevMasterHash;
     private int prevClipHash;
     private int prevApplicationHash;
+    private int prevArrangerHash;
+    private int prevArrangementHash;
 
     public void registerObservers(Transport transport, TrackBank trackBank,
                                    MasterTrack masterTrack, Application application) {
@@ -330,6 +365,89 @@ public class StateCache {
         });
     }
 
+    public void registerArrangerObservers(Arranger arranger) {
+        arranger.isPlaybackFollowEnabled().markInterested();
+        arranger.isPlaybackFollowEnabled().addValueObserver((BooleanValueChangedCallback) v -> arrangerPlaybackFollow = v);
+
+        arranger.isClipLauncherVisible().markInterested();
+        arranger.isClipLauncherVisible().addValueObserver((BooleanValueChangedCallback) v -> arrangerClipLauncherVisible = v);
+
+        arranger.isTimelineVisible().markInterested();
+        arranger.isTimelineVisible().addValueObserver((BooleanValueChangedCallback) v -> arrangerTimelineVisible = v);
+
+        arranger.areCueMarkersVisible().markInterested();
+        arranger.areCueMarkersVisible().addValueObserver((BooleanValueChangedCallback) v -> arrangerCueMarkersVisible = v);
+
+        arranger.areEffectTracksVisible().markInterested();
+        arranger.areEffectTracksVisible().addValueObserver((BooleanValueChangedCallback) v -> arrangerEffectTracksVisible = v);
+
+        arranger.isIoSectionVisible().markInterested();
+        arranger.isIoSectionVisible().addValueObserver((BooleanValueChangedCallback) v -> arrangerIoSectionVisible = v);
+
+        arranger.hasDoubleRowTrackHeight().markInterested();
+        arranger.hasDoubleRowTrackHeight().addValueObserver((BooleanValueChangedCallback) v -> arrangerDoubleRowTrackHeight = v);
+    }
+
+    public void registerArrangementObservers(Transport transport, CueMarkerBank cueMarkerBank) {
+        // Loop range
+        transport.isArrangerLoopEnabled().markInterested();
+        transport.isArrangerLoopEnabled().addValueObserver((BooleanValueChangedCallback) v -> arrangerLoopEnabled = v);
+
+        transport.arrangerLoopStart().markInterested();
+        transport.arrangerLoopStart().addValueObserver((DoubleValueChangedCallback) v -> arrangerLoopStart = v);
+
+        transport.arrangerLoopDuration().markInterested();
+        transport.arrangerLoopDuration().addValueObserver((DoubleValueChangedCallback) v -> arrangerLoopDuration = v);
+
+        // Punch
+        transport.isPunchInEnabled().markInterested();
+        transport.isPunchInEnabled().addValueObserver((BooleanValueChangedCallback) v -> punchInEnabled = v);
+
+        transport.isPunchOutEnabled().markInterested();
+        transport.isPunchOutEnabled().addValueObserver((BooleanValueChangedCallback) v -> punchOutEnabled = v);
+
+        transport.getInPosition().markInterested();
+        transport.getInPosition().addValueObserver((DoubleValueChangedCallback) v -> punchInPosition = v);
+
+        transport.getOutPosition().markInterested();
+        transport.getOutPosition().addValueObserver((DoubleValueChangedCallback) v -> punchOutPosition = v);
+
+        // Automation
+        transport.automationWriteMode().markInterested();
+        transport.automationWriteMode().addValueObserver((EnumValueChangedCallback) v -> automationWriteMode = (String) v);
+
+        transport.isArrangerAutomationWriteEnabled().markInterested();
+        transport.isArrangerAutomationWriteEnabled().addValueObserver((BooleanValueChangedCallback) v -> arrangerAutomationWriteEnabled = v);
+
+        transport.isClipLauncherAutomationWriteEnabled().markInterested();
+        transport.isClipLauncherAutomationWriteEnabled().addValueObserver((BooleanValueChangedCallback) v -> clipLauncherAutomationWriteEnabled = v);
+
+        transport.isAutomationOverrideActive().markInterested();
+        transport.isAutomationOverrideActive().addValueObserver((BooleanValueChangedCallback) v -> automationOverrideActive = v);
+
+        // Cue markers
+        for (int i = 0; i < CUE_MARKER_COUNT; i++) {
+            final int idx = i;
+            CueMarker marker = (CueMarker) cueMarkerBank.getItemAt(idx);
+            cueMarkerNames[idx] = "";
+
+            marker.exists().markInterested();
+
+            marker.name().markInterested();
+            marker.name().addValueObserver((StringValueChangedCallback) v -> cueMarkerNames[idx] = (String) v);
+
+            marker.position().markInterested();
+            marker.position().addValueObserver((DoubleValueChangedCallback) v -> cueMarkerPositions[idx] = v);
+
+            marker.getColor().markInterested();
+            marker.getColor().addValueObserver((ColorValueChangedCallback) (r, g, b) -> {
+                cueMarkerColors[idx][0] = r;
+                cueMarkerColors[idx][1] = g;
+                cueMarkerColors[idx][2] = b;
+            });
+        }
+    }
+
     public void setClipStepSize(double stepSize) {
         this.clipStepSize = stepSize;
     }
@@ -343,6 +461,8 @@ public class StateCache {
         snapshot.add("clip", getClipState());
         snapshot.add("master", getMasterState());
         snapshot.add("application", getApplicationState());
+        snapshot.add("arranger", getArrangerState());
+        snapshot.add("arrangement", getArrangementState());
         return snapshot;
     }
 
@@ -376,6 +496,12 @@ public class StateCache {
 
         h = getApplicationState().toString().hashCode();
         if (h != prevApplicationHash) { changed.add("application"); prevApplicationHash = h; }
+
+        h = getArrangerState().toString().hashCode();
+        if (h != prevArrangerHash) { changed.add("arranger"); prevArrangerHash = h; }
+
+        h = getArrangementState().toString().hashCode();
+        if (h != prevArrangementHash) { changed.add("arrangement"); prevArrangementHash = h; }
 
         return changed;
     }
@@ -516,6 +642,63 @@ public class StateCache {
         obj.addProperty("canUndo", canUndo);
         obj.addProperty("canRedo", canRedo);
         obj.addProperty("hasActiveEngine", hasActiveEngine);
+        return obj;
+    }
+
+    private JsonObject getArrangerState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("playbackFollow", arrangerPlaybackFollow);
+        obj.addProperty("clipLauncherVisible", arrangerClipLauncherVisible);
+        obj.addProperty("timelineVisible", arrangerTimelineVisible);
+        obj.addProperty("cueMarkersVisible", arrangerCueMarkersVisible);
+        obj.addProperty("effectTracksVisible", arrangerEffectTracksVisible);
+        obj.addProperty("ioSectionVisible", arrangerIoSectionVisible);
+        obj.addProperty("doubleRowTrackHeight", arrangerDoubleRowTrackHeight);
+        return obj;
+    }
+
+    private JsonObject getArrangementState() {
+        JsonObject obj = new JsonObject();
+
+        // Loop range
+        JsonObject loop = new JsonObject();
+        loop.addProperty("start", arrangerLoopStart);
+        loop.addProperty("duration", arrangerLoopDuration);
+        loop.addProperty("enabled", arrangerLoopEnabled);
+        obj.add("loop", loop);
+
+        // Punch
+        JsonObject punch = new JsonObject();
+        punch.addProperty("inPosition", punchInPosition);
+        punch.addProperty("inEnabled", punchInEnabled);
+        punch.addProperty("outPosition", punchOutPosition);
+        punch.addProperty("outEnabled", punchOutEnabled);
+        obj.add("punch", punch);
+
+        // Automation
+        JsonObject automation = new JsonObject();
+        automation.addProperty("writeMode", automationWriteMode);
+        automation.addProperty("arrangerWriteEnabled", arrangerAutomationWriteEnabled);
+        automation.addProperty("clipLauncherWriteEnabled", clipLauncherAutomationWriteEnabled);
+        automation.addProperty("overrideActive", automationOverrideActive);
+        obj.add("automation", automation);
+
+        // Cue markers
+        JsonArray markers = new JsonArray();
+        for (int i = 0; i < CUE_MARKER_COUNT; i++) {
+            JsonObject marker = new JsonObject();
+            marker.addProperty("index", i);
+            marker.addProperty("name", cueMarkerNames[i] != null ? cueMarkerNames[i] : "");
+            marker.addProperty("position", cueMarkerPositions[i]);
+            JsonObject color = new JsonObject();
+            color.addProperty("r", cueMarkerColors[i][0]);
+            color.addProperty("g", cueMarkerColors[i][1]);
+            color.addProperty("b", cueMarkerColors[i][2]);
+            marker.add("color", color);
+            markers.add(marker);
+        }
+        obj.add("cueMarkers", markers);
+
         return obj;
     }
 }

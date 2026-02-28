@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.8.0` |
+| **Version** | `0.8.6` |
 | **Phase** | 8 — Arrangement & Automation Control |
-| **Status** | `PLANNED` |
-| **Last Batch** | Phase 7 archived |
+| **Status** | `VERIFIED` |
+| **Last Batch** | Unit tests + smoke tests |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -18,6 +18,12 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.8.6 | 8 | Unit tests + smoke tests | PLANNED | done | 2026-02-28 |
+| 0.8.5 | 8 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
+| 0.8.4 | 8 | ArrangerHandler — cue marker operations | PLANNED | done | 2026-02-28 |
+| 0.8.3 | 8 | TransportHandler — loop range + punch range + automation | PLANNED | done | 2026-02-28 |
+| 0.8.2 | 8 | ArrangerHandler — visibility toggles | PLANNED | done | 2026-02-28 |
+| 0.8.1 | 8 | Arranger + CueMarkerBank creation + snapshot sections | PLANNED | done | 2026-02-28 |
 | 0.7.4 | 7 | Tool description warnings + smoke tests | PLANNED | done | 2026-02-28 |
 | 0.7.3 | 7 | Song building section + recommended call sequences | PLANNED | done | 2026-02-28 |
 | 0.7.2 | 7 | Operational music reference | PLANNED | done | 2026-02-28 |
@@ -107,11 +113,12 @@ _None._
 - `RangedValue.displayedValue()` returns `StringValue` with formatted param value ("1.2 kHz")
 - SceneBank: `trackBank.sceneBank()`, `sceneBank.getScene(i)` — Scene has `name()`, `clipCount()`
 - CursorClip: `cursorTrack.createLauncherCursorClip(id, name, 64, 128)` — 64-step viewport, full MIDI range, follows selected clip
+- `SettableEnumValue.addValueObserver()` requires `(EnumValueChangedCallback)` cast — NOT `StringValueChangedCallback`, even though both take String. Bitwig JAR generic erasure.
 - NoteStep: `getStep(channel, x, y)` → state, velocity, duration; `setStep(channel, x, y, vel, dur)`; `clearStep(channel, x, y)`
 - Batch note ops: `clip/setNotes` accepts array, loops internally; `clip/getNotes` returns sparse array
 - NoteHandler: `handlers/NoteHandler.java` — note-level operations on CursorClip
-- Total RPC methods: 55 (Phase 1: 23, Phase 2: 13, Phase 4: 8, Phase 5: 4, Phase 6: 7)
-- Tool schemas: `tools/claude-tools.json` — 48 Claude tool_use definitions, 1:1 with RPC methods (underscore naming)
+- Total RPC methods: 74 (Phase 1: 23, Phase 2: 13, Phase 4: 8, Phase 5: 4, Phase 6: 7, Phase 8: 19)
+- Tool schemas: `tools/claude-tools.json` — 74 Claude tool_use definitions, 1:1 with RPC methods (underscore naming)
 - System prompt: `tools/system-prompt.md` — viewport model, perception-action loop, value ranges, cursor model, indices
 - CLI source: `src/cli/java/dev/gregross/gig/cli/` — GigCli, RpcClient, RpcCommand, SnapshotCommand, TransportCommand, TrackCommand
 - CLI JAR: `build/libs/gig-cli.jar` via `./gradlew cliShadowJar` — Picocli 4.7.6
@@ -119,7 +126,7 @@ _None._
 - `StateCache.getChangedSections()` — per-section hash delta detection (transport, tracks, scenes, device, master, application)
 - WebSocket push: `state/changed` notification with `changed` array, broadcast only when `getWsClientCount() > 0`
 - Smoke test `--offline` flag for testing without Bitwig
-- Total tests: 51 unit + 101 offline smoke = 152 (online smoke tests require Bitwig)
+- Total tests: 83 unit + 152 offline smoke = 235 (online smoke tests require Bitwig)
 - Bitwig device library: `/Applications/Bitwig Studio.app/Contents/Resources/Library/devices/` — 151 `.bwdevice` files
 - InsertionPoint API: `endOfDeviceChainInsertionPoint()`, `beforeDeviceInsertionPoint()`, `afterDeviceInsertionPoint()` — all have `insertFile(String)`, `insertVST2Device(int)`, `insertVST3Device(String)`, `insertCLAPDevice(String)`
 - DeviceLibrary: new utility class in `handlers/` — name→path map, case-insensitive, close-match errors

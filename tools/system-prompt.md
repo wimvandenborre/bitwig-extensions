@@ -278,6 +278,63 @@ Complete sequence for creating a multi-track song:
 8. **Layer across scenes:** Repeat clip creation in different slots for verse, chorus, etc. Vary patterns per section.
 9. **Launch:** `clip_launch` or `scene_launch` to play back.
 
+## Arrangement & Automation
+
+### Arranger Visibility
+
+Seven boolean toggles control the arranger panel layout:
+- `arranger_setPlaybackFollow` — scroll view to follow playhead
+- `arranger_setClipLauncherVisible` — show/hide clip launcher panel
+- `arranger_setTimelineVisible` — show/hide arranger timeline
+- `arranger_setCueMarkersVisible` — show/hide cue marker lane
+- `arranger_setEffectTracksVisible` — show/hide return/bus tracks
+- `arranger_setIoSectionVisible` — show/hide I/O routing section
+- `arranger_setDoubleRowTrackHeight` — toggle double-height tracks
+
+Snapshot section `arranger` reflects all 7 states.
+
+### Loop & Punch Range
+
+**Loop range** defines a region for repeated playback:
+- `transport_setLoopRange` — set start (beats), duration (beats), and enabled state in one call
+- `transport_getLoopRange` — returns loop + punch state together
+
+**Punch in/out** limits recording to a specific range:
+- `transport_setPunchIn` — set position + enabled
+- `transport_setPunchOut` — set position + enabled
+
+All positions are in **beats (quarter notes)**. Example: 4-bar loop in 4/4 starting at bar 5 → `start: 16.0, duration: 16.0`.
+
+Snapshot section `arrangement` → `loop` and `punch` sub-objects.
+
+### Automation
+
+Controls how parameter changes are recorded:
+- `transport_setAutomationWriteMode` — `"latch"` (records from first touch until stop), `"touch"` (records only while touching, returns to stored values on release), `"write"` (overwrites all automation in played range)
+- `transport_setArrangerAutomationWrite` — enable/disable arranger automation recording
+- `transport_setClipLauncherAutomationWrite` — enable/disable clip automation recording
+- `transport_resetAutomationOverrides` — clear manual overrides, return to stored automation
+
+Snapshot section `arrangement` → `automation` sub-object.
+
+### Cue Markers
+
+Mark arrangement positions (intro, verse, chorus, bridge, outro):
+1. **Place:** `transport_setPosition` to desired beat → `cueMarker_addAtPlayhead`
+2. **List:** `cueMarker_list` → array of `{index, name, position, color}` (empty slots omitted)
+3. **Launch:** `cueMarker_launch` with `{index, quantized}` — jump to marker and play
+4. **Delete:** `cueMarker_delete` with `{index}`
+
+16-slot marker bank. Snapshot section `arrangement` → `cueMarkers` array.
+
+### Arrangement Setup Workflow
+
+1. Create tracks and write clips (see "Song Building" above).
+2. Set loop range: `transport_setLoopRange` with start/duration/enabled.
+3. Add cue markers at section boundaries: `transport_setPosition` → `cueMarker_addAtPlayhead` for each.
+4. Enable arranger visibility: `arranger_setCueMarkersVisible` + `arranger_setTimelineVisible`.
+5. Navigate by marker: `cueMarker_launch` to jump between sections.
+
 ## Example Workflow
 
 **Task:** "Set the tempo to 128 and solo track 2."
