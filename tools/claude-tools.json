@@ -283,7 +283,7 @@
   },
   {
     "name": "clip_launch",
-    "description": "Launch a clip in the clip launcher. The clip at the specified track and slot index will start playing.",
+    "description": "Launch a clip in the clip launcher. The clip at the specified track and slot index will start playing. Note: this starts the transport if it is currently stopped.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -451,7 +451,7 @@
   },
   {
     "name": "cursor_selectTrack",
-    "description": "Navigate the cursor track selection to the next or previous track. The cursor track follows the UI selection and determines which track's devices are shown.",
+    "description": "Navigate the cursor track selection to the next or previous track sequentially. The cursor track follows the UI selection and determines which track's devices are shown. For direct index access, use `track_select` instead.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -654,7 +654,7 @@
   },
   {
     "name": "device_remove",
-    "description": "Remove the currently selected device from the cursor track's device chain. Navigate to the target device first using `device_selectNext` / `device_selectPrevious`, then call this to delete it. This action cannot be undone via this API (but Bitwig's undo may work).",
+    "description": "Remove the currently selected device from the cursor track's device chain. Navigate to the target device first using `device_selectNext` / `device_selectPrevious`, then call this to delete it. Warning: the cursor device loses selection after removal — call `session_snapshot` to verify state. This action cannot be undone via this API (but Bitwig's undo may work).",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -663,7 +663,7 @@
   },
   {
     "name": "track_createAudio",
-    "description": "Create a new audio track in the project. Audio tracks can record and play audio clips. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track.",
+    "description": "Create a new audio track in the project. Audio tracks can record and play audio clips. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag — call `session_snapshot` to verify.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -677,7 +677,7 @@
   },
   {
     "name": "track_createInstrument",
-    "description": "Create a new instrument track in the project. Instrument tracks host virtual instruments and can record/play MIDI. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track.",
+    "description": "Create a new instrument track in the project. Instrument tracks host virtual instruments and can record/play MIDI. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag — call `session_snapshot` to verify.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -691,7 +691,7 @@
   },
   {
     "name": "track_createEffect",
-    "description": "Create a new effect track (return/bus track) in the project. Effect tracks receive audio from sends and apply effects. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track.",
+    "description": "Create a new effect track (return/bus track) in the project. Effect tracks receive audio from sends and apply effects. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag — call `session_snapshot` to verify.",
     "input_schema": {
       "type": "object",
       "properties": {

@@ -19,7 +19,7 @@
 | 4 | Clip Note Writing | v0.4.1–v0.4.6 | complete |
 | 5 | Device Insertion | v0.5.1–v0.5.5 | complete |
 | 6 | Track Management | v0.6.1–v0.6.4 | complete |
-| 7 | Agent Reliability + Musicality | v0.7.x | planned |
+| 7 | Agent Reliability + Musicality | v0.7.1–v0.7.4 | complete |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

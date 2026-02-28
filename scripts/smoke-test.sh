@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.6.x — Smoke Test Suite
+# Gig Maestro v0.7.x — Smoke Test Suite
 #
 # Usage:
 #   ./scripts/smoke-test.sh              — run all tests (requires Bitwig running)
@@ -197,6 +197,33 @@ assert_contains "system prompt mentions device_insertBitwigDevice" "$PROMPT" "de
 assert_contains "system prompt covers track management" "$PROMPT" "Track Management"
 assert_contains "system prompt mentions track_select" "$PROMPT" "track_select"
 assert_contains "system prompt mentions track_createInstrument" "$PROMPT" "track_createInstrument"
+
+# Phase 7 system prompt sections
+assert_contains "system prompt has Known Behaviors section" "$PROMPT" "Known Behaviors"
+assert_contains "system prompt has Error Recovery section" "$PROMPT" "Error Recovery"
+assert_contains "system prompt has Music Reference section" "$PROMPT" "Music Reference"
+assert_contains "system prompt has Song Building section" "$PROMPT" "Song Building"
+assert_contains "system prompt documents flush cycle" "$PROMPT" "flush cycle"
+assert_contains "system prompt documents error code -32602" "$PROMPT" "-32602"
+assert_contains "system prompt has snapshot before retry rule" "$PROMPT" "Snapshot Before Retry"
+assert_contains "system prompt has semitone offsets" "$PROMPT" "semitone offsets"
+assert_contains "system prompt has GM drum map" "$PROMPT" "Kick"
+assert_contains "system prompt has velocity bands" "$PROMPT" "Ghost"
+assert_contains "system prompt has default tempo" "$PROMPT" "120 BPM"
+assert_contains "system prompt has recommended call sequences" "$PROMPT" "Recommended Call Sequences"
+
+# Phase 7 tool description warnings
+DEVICE_REMOVE_DESC=$(jq -r '.[] | select(.name=="device_remove") | .description' "$TOOLS_FILE")
+assert_contains "device_remove warns about loses selection" "$DEVICE_REMOVE_DESC" "loses selection"
+
+TRACK_CREATE_AUDIO_DESC=$(jq -r '.[] | select(.name=="track_createAudio") | .description' "$TOOLS_FILE")
+assert_contains "track_createAudio warns snapshot to verify" "$TRACK_CREATE_AUDIO_DESC" "snapshot"
+
+CURSOR_SELECT_DESC=$(jq -r '.[] | select(.name=="cursor_selectTrack") | .description' "$TOOLS_FILE")
+assert_contains "cursor_selectTrack mentions track_select" "$CURSOR_SELECT_DESC" "track_select"
+
+CLIP_LAUNCH_DESC=$(jq -r '.[] | select(.name=="clip_launch") | .description' "$TOOLS_FILE")
+assert_contains "clip_launch warns about transport" "$CLIP_LAUNCH_DESC" "transport"
 
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"

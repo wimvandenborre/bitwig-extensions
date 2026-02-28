@@ -99,12 +99,7 @@ You can create, select, rename, delete, and duplicate tracks:
 
 **Responses:** Track creation, selection, rename, and duplicate return `{ok: true, cursorTrackName: "..."}` so you can confirm the operation without a full snapshot. `track_deleteSelected` returns `{ok: true}` only (the track is gone).
 
-**Workflow for creating a song structure:**
-1. Call `track_createInstrument` to add an instrument track.
-2. Call `track_rename` with `{"name": "Bass"}` to name it.
-3. Call `device_insertBitwigDevice` to add an instrument (e.g., "Polymer").
-4. Call `clip_create` + `clip_select` + `clip_setNotes` to write notes.
-5. Repeat for additional tracks (drums, lead, etc.).
+**Song structure workflow:** See the "Song Building" section below for a complete multi-track workflow with recommended call sequences.
 
 ### Index Conventions
 
@@ -113,6 +108,175 @@ All indices are **0-based**:
 - Scene 1 → index 0
 - First clip slot → index 0
 - First parameter → index 0
+
+## Known Behaviors
+
+### Async Cursor Lag
+
+After track creation, selection, or any mutation, the `cursorTrackName` field in the response may be stale. This is inherent to Bitwig's observer model — state updates propagate within one flush cycle (~50ms), but the response is assembled before observers fire.
+
+**Rule:** After any mutation (track create, track select, device insert, device remove), call `session_snapshot` and read the snapshot for authoritative state. Do NOT trust inline `cursorTrackName` or `deviceName` in mutation responses as the source of truth.
+
+### Cursor Device Loss After Removal
+
+Calling `device_remove` deletes the currently selected device, but the cursor device does not automatically re-select another device. After removal, `deviceName` in the snapshot may be empty or stale until you explicitly navigate with `device_selectNext` / `device_selectPrevious` or select a track (which resets the cursor to the first device).
+
+### Flush Cycle Timing
+
+The extension processes commands on Bitwig's session thread via a flush cycle. Commands are queued and executed in order, but observer callbacks (which update snapshot state) fire asynchronously. A `session_snapshot` immediately after a mutation is reliable — the snapshot is assembled on the same thread after the command executes.
+
+## Error Recovery
+
+### JSON-RPC Error Codes
+
+| Code | Meaning | Typical Cause |
+|------|---------|---------------|
+| `-32602` | Invalid params | Missing required field, wrong type, index out of range |
+| `-32601` | Method not found | Typo in method name, or calling a method that doesn't exist |
+| `-32603` | Internal error | Bitwig API threw an exception (e.g., no clip selected, device unavailable) |
+
+### Common Failures and Recovery
+
+| Failure | Recovery |
+|---------|----------|
+| Index out of range (track, slot, scene) | Call `session_snapshot` to find valid indices — bank is 0–63 for tracks, 0–7 for slots/scenes |
+| Device not found by name | Call `device_listBitwigDevices` to get exact available names |
+| Cursor device empty after removal | Call `device_selectNext` or `track_select` to re-acquire a device |
+| Clip operation fails ("no clip selected") | Call `clip_select` with explicit `trackIndex` + `slotIndex` first |
+| Track name mismatch after creation | Call `session_snapshot` — cursor lag means the response name may be stale |
+| Parameter set has no effect | Check `displayedValue` in snapshot — parameter may be at limit or mapped differently |
+
+### Snapshot Before Retry
+
+**Rule:** If an operation fails, always call `session_snapshot` before retrying. Never retry blindly — the snapshot reveals whether the state has changed, whether indices are still valid, and what the actual current state is. Blind retries cause cascading failures (e.g., retrying a device insert when the cursor track has changed).
+
+## Music Reference
+
+All values below are directly usable in `clip_setNotes` — no conversion needed.
+
+### MIDI Note Table
+
+| Note | C | C#/Db | D | D#/Eb | E | F | F#/Gb | G | G#/Ab | A | A#/Bb | B |
+|------|---|-------|---|-------|---|---|-------|---|-------|---|-------|---|
+| **Octave 1** | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 |
+| **Octave 2** | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 |
+| **Octave 3** | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 |
+| **Octave 4** | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 |
+| **Octave 5** | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 |
+| **Octave 6** | 84 | 85 | 86 | 87 | 88 | 89 | 90 | 91 | 92 | 93 | 94 | 95 |
+
+Middle C = C4 = 60. Bass instruments typically use C1–C3 (24–59). Lead/melody typically uses C3–C5 (48–83).
+
+### Scale Formulas (semitone offsets from root)
+
+| Scale | Offsets |
+|-------|---------|
+| Major | [0, 2, 4, 5, 7, 9, 11] |
+| Natural minor | [0, 2, 3, 5, 7, 8, 10] |
+| Pentatonic major | [0, 2, 4, 7, 9] |
+| Pentatonic minor | [0, 3, 5, 7, 10] |
+| Blues | [0, 3, 5, 6, 7, 10] |
+
+To get MIDI notes: pick a root (e.g., C3 = 48), add each offset. C3 major = [48, 50, 52, 53, 55, 57, 59].
+
+### Chord Templates (interval offsets from root)
+
+| Chord | Offsets |
+|-------|---------|
+| Major triad | [0, 4, 7] |
+| Minor triad | [0, 3, 7] |
+| Dominant 7th | [0, 4, 7, 10] |
+| Minor 7th | [0, 3, 7, 10] |
+| Major 7th | [0, 4, 7, 11] |
+| Diminished | [0, 3, 6] |
+| Augmented | [0, 4, 8] |
+
+To get MIDI notes: pick a root (e.g., C3 = 48), add each offset. C3 major triad = [48, 52, 55].
+
+### GM Drum Map
+
+| Instrument | MIDI Note |
+|------------|-----------|
+| Kick | 36 |
+| Snare | 38 |
+| Clap | 39 |
+| Closed hi-hat | 42 |
+| Open hi-hat | 46 |
+| Tom low | 45 |
+| Tom high | 48 |
+| Crash | 49 |
+| Ride | 51 |
+
+### Velocity Bands
+
+| Band | Range | Use |
+|------|-------|-----|
+| Ghost | 0.20–0.35 | Ghost notes, subtle texture |
+| Soft | 0.40–0.55 | Quiet passages, background |
+| Normal | 0.60–0.75 | Default playing level |
+| Accent | 0.80–0.95 | Emphasized beats, hits |
+
+## Song Building
+
+### Default Assumptions
+
+Unless the user specifies otherwise, use these defaults:
+- **Time signature:** 4/4
+- **Tempo:** 120 BPM
+- **Step size:** 0.25 (1/16 note resolution)
+- **Clip length:** 16 beats (4 bars). Use multiples of 4 bars (16, 32, 64 beats).
+
+### Song Structure Template
+
+| Section | Bars | Beats (at 4/4) | Purpose |
+|---------|------|-----------------|---------|
+| Intro | 4–8 | 16–32 | Establish feel, bring in elements gradually |
+| Verse | 8–16 | 32–64 | Main musical idea, lower energy than chorus |
+| Chorus | 8–16 | 32–64 | Peak energy, hook, full arrangement |
+| Bridge | 8 | 32 | Contrast, break from verse/chorus pattern |
+| Outro | 4–8 | 16–32 | Wind down, strip elements away |
+
+A minimal song: Intro → Verse → Chorus → Verse → Chorus → Outro. Map sections to scenes (scene 0 = intro, scene 1 = verse, etc.).
+
+### Track Ordering
+
+Create tracks in this order for a clean mix layout:
+1. **Drums** — instrument track with drum machine or sampler
+2. **Bass** — instrument track
+3. **Harmony** — instrument track (chords, pads)
+4. **Melody/Lead** — instrument track
+5. **Effects** — effect track (reverb, delay sends)
+
+### Recommended Call Sequences
+
+**Track creation (per track):**
+```
+track_createInstrument → track_rename → device_insertBitwigDevice → session_snapshot
+```
+
+**Note writing (per clip):**
+```
+clip_create → clip_select → clip_setNotes → clip_getNotes (verify)
+```
+
+**Device setup (on cursor track):**
+```
+session_snapshot → device_listBitwigDevices → device_insertBitwigDevice → session_snapshot (verify)
+```
+
+### Build From Scratch Workflow
+
+Complete sequence for creating a multi-track song:
+
+1. **Set tempo:** `transport_setTempo` with desired BPM.
+2. **Create drum track:** `track_createInstrument` → `track_rename` "Drums" → `device_insertBitwigDevice` (e.g., "Drum Machine").
+3. **Write drum pattern:** `clip_create` (16 beats) → `clip_select` → `clip_setNotes` with kick/snare/hi-hat pattern using GM drum map values.
+4. **Create bass track:** `track_createInstrument` → `track_rename` "Bass" → `device_insertBitwigDevice` (e.g., "Polymer").
+5. **Write bass line:** `clip_create` → `clip_select` → `clip_setNotes` using scale formula + root in octave 2–3.
+6. **Create lead track:** `track_createInstrument` → `track_rename` "Lead" → `device_insertBitwigDevice`.
+7. **Write melody:** `clip_create` → `clip_select` → `clip_setNotes` using scale formula + root in octave 4–5.
+8. **Layer across scenes:** Repeat clip creation in different slots for verse, chorus, etc. Vary patterns per section.
+9. **Launch:** `clip_launch` or `scene_launch` to play back.
 
 ## Example Workflow
 

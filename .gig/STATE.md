@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.7.0` |
-| **Phase** | 7 — Agent Reliability + Musicality |
-| **Status** | `PLANNED` |
-| **Last Batch** | Phase 6 archived |
+| **Version** | `0.8.0` |
+| **Phase** | 7 — Agent Reliability + Musicality (complete) |
+| **Status** | `VERIFIED` |
+| **Last Batch** | Phase 7 archived |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.7.4 | 7 | Tool description warnings + smoke tests | PLANNED | done | 2026-02-28 |
+| 0.7.3 | 7 | Song building section + recommended call sequences | PLANNED | done | 2026-02-28 |
+| 0.7.2 | 7 | Operational music reference | PLANNED | done | 2026-02-28 |
+| 0.7.1 | 7 | Known behaviors + error recovery sections | PLANNED | done | 2026-02-28 |
 | 0.6.4 | 6 | CLI TrackManageCommand + smoke tests | PLANNED | done | 2026-02-28 |
 | 0.6.3 | 6 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
 | 0.6.2 | 6 | Track management RPC handlers | PLANNED | done | 2026-02-28 |
