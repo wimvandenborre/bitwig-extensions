@@ -15,8 +15,8 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 8.1 | `0.8.1` | Arranger + CueMarkerBank creation + snapshot sections | in-session | pending |
-| 8.2 | `0.8.2` | ArrangerHandler — visibility toggles | in-session | pending |
+| 8.1 | `0.8.1` | Arranger + CueMarkerBank creation + snapshot sections | in-session | done |
+| 8.2 | `0.8.2` | ArrangerHandler — visibility toggles | in-session | done |
 | 8.3 | `0.8.3` | TransportHandler — loop range + punch range + automation | in-session | pending |
 | 8.4 | `0.8.4` | ArrangerHandler — cue marker operations | in-session | pending |
 | 8.5 | `0.8.5` | Tool schemas + system prompt update | in-session | pending |

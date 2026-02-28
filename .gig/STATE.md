@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.8.0` |
+| **Version** | `0.8.2` |
 | **Phase** | 8 — Arrangement & Automation Control |
-| **Status** | `PLANNED` |
-| **Last Batch** | Phase 7 archived |
+| **Status** | `IN-PROGRESS` |
+| **Last Batch** | ArrangerHandler — visibility toggles |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -18,6 +18,8 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.8.2 | 8 | ArrangerHandler — visibility toggles | PLANNED | done | 2026-02-28 |
+| 0.8.1 | 8 | Arranger + CueMarkerBank creation + snapshot sections | PLANNED | done | 2026-02-28 |
 | 0.7.4 | 7 | Tool description warnings + smoke tests | PLANNED | done | 2026-02-28 |
 | 0.7.3 | 7 | Song building section + recommended call sequences | PLANNED | done | 2026-02-28 |
 | 0.7.2 | 7 | Operational music reference | PLANNED | done | 2026-02-28 |

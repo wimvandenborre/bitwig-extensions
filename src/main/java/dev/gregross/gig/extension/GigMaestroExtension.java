@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.handlers.ApplicationHandler;
+import dev.gregross.gig.handlers.ArrangerHandler;
 import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
@@ -114,6 +115,7 @@ public class GigMaestroExtension extends ControllerExtension {
         }
         new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, deviceLibrary).register(dispatcher);
         new NoteHandler(cursorClip).register(dispatcher);
+        new ArrangerHandler(arranger).register(dispatcher);
 
         // Start servers
         try {
