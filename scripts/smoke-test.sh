@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.7.x — Smoke Test Suite
+# Gig Maestro v0.8.x — Smoke Test Suite
 #
 # Usage:
 #   ./scripts/smoke-test.sh              — run all tests (requires Bitwig running)
@@ -77,11 +77,11 @@ echo "--- O1. Tool Schema Validation ---"
 TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 55 ]; then
-  echo "  PASS  claude-tools.json has >= 55 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 74 ]; then
+  echo "  PASS  claude-tools.json has >= 74 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 55 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 74 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -176,6 +176,50 @@ assert_equals "track_rename name param is string" "$RENAME_NAME_TYPE" "string"
 CREATE_POS_TYPE=$(jq -r '.[] | select(.name=="track_createAudio") | .input_schema.properties.position.type' "$TOOLS_FILE")
 assert_equals "track_createAudio position param is integer" "$CREATE_POS_TYPE" "integer"
 
+# Phase 8 arranger tools
+assert_contains "has arranger_setPlaybackFollow tool" "$TOOLS_LIST" "arranger_setPlaybackFollow"
+assert_contains "has arranger_setClipLauncherVisible tool" "$TOOLS_LIST" "arranger_setClipLauncherVisible"
+assert_contains "has arranger_setTimelineVisible tool" "$TOOLS_LIST" "arranger_setTimelineVisible"
+assert_contains "has arranger_setCueMarkersVisible tool" "$TOOLS_LIST" "arranger_setCueMarkersVisible"
+assert_contains "has arranger_setEffectTracksVisible tool" "$TOOLS_LIST" "arranger_setEffectTracksVisible"
+assert_contains "has arranger_setIoSectionVisible tool" "$TOOLS_LIST" "arranger_setIoSectionVisible"
+assert_contains "has arranger_setDoubleRowTrackHeight tool" "$TOOLS_LIST" "arranger_setDoubleRowTrackHeight"
+
+# Phase 8 transport arrangement tools
+assert_contains "has transport_setLoopRange tool" "$TOOLS_LIST" "transport_setLoopRange"
+assert_contains "has transport_getLoopRange tool" "$TOOLS_LIST" "transport_getLoopRange"
+assert_contains "has transport_setPunchIn tool" "$TOOLS_LIST" "transport_setPunchIn"
+assert_contains "has transport_setPunchOut tool" "$TOOLS_LIST" "transport_setPunchOut"
+assert_contains "has transport_setAutomationWriteMode tool" "$TOOLS_LIST" "transport_setAutomationWriteMode"
+assert_contains "has transport_setArrangerAutomationWrite tool" "$TOOLS_LIST" "transport_setArrangerAutomationWrite"
+assert_contains "has transport_setClipLauncherAutomationWrite tool" "$TOOLS_LIST" "transport_setClipLauncherAutomationWrite"
+assert_contains "has transport_resetAutomationOverrides tool" "$TOOLS_LIST" "transport_resetAutomationOverrides"
+
+# Phase 8 cue marker tools
+assert_contains "has cueMarker_addAtPlayhead tool" "$TOOLS_LIST" "cueMarker_addAtPlayhead"
+assert_contains "has cueMarker_list tool" "$TOOLS_LIST" "cueMarker_list"
+assert_contains "has cueMarker_launch tool" "$TOOLS_LIST" "cueMarker_launch"
+assert_contains "has cueMarker_delete tool" "$TOOLS_LIST" "cueMarker_delete"
+
+# Phase 8 parameter type checks
+LOOP_START_TYPE=$(jq -r '.[] | select(.name=="transport_setLoopRange") | .input_schema.properties.start.type' "$TOOLS_FILE")
+assert_equals "transport_setLoopRange start param is number" "$LOOP_START_TYPE" "number"
+
+LOOP_DUR_TYPE=$(jq -r '.[] | select(.name=="transport_setLoopRange") | .input_schema.properties.duration.type' "$TOOLS_FILE")
+assert_equals "transport_setLoopRange duration param is number" "$LOOP_DUR_TYPE" "number"
+
+AUTO_MODE_ENUM=$(jq -r '.[] | select(.name=="transport_setAutomationWriteMode") | .input_schema.properties.mode.enum | join(",")' "$TOOLS_FILE")
+assert_equals "transport_setAutomationWriteMode mode has latch,touch,write enum" "$AUTO_MODE_ENUM" "latch,touch,write"
+
+PUNCH_POS_TYPE=$(jq -r '.[] | select(.name=="transport_setPunchIn") | .input_schema.properties.position.type' "$TOOLS_FILE")
+assert_equals "transport_setPunchIn position param is number" "$PUNCH_POS_TYPE" "number"
+
+CUE_LAUNCH_INDEX_TYPE=$(jq -r '.[] | select(.name=="cueMarker_launch") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "cueMarker_launch index param is integer" "$CUE_LAUNCH_INDEX_TYPE" "integer"
+
+CUE_DELETE_INDEX_TYPE=$(jq -r '.[] | select(.name=="cueMarker_delete") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "cueMarker_delete index param is integer" "$CUE_DELETE_INDEX_TYPE" "integer"
+
 # O2. System prompt validation
 echo "--- O2. System Prompt Validation ---"
 PROMPT_FILE="${PROJECT_ROOT}/tools/system-prompt.md"
@@ -211,6 +255,18 @@ assert_contains "system prompt has GM drum map" "$PROMPT" "Kick"
 assert_contains "system prompt has velocity bands" "$PROMPT" "Ghost"
 assert_contains "system prompt has default tempo" "$PROMPT" "120 BPM"
 assert_contains "system prompt has recommended call sequences" "$PROMPT" "Recommended Call Sequences"
+
+# Phase 8 system prompt sections
+assert_contains "system prompt has Arrangement & Automation section" "$PROMPT" "Arrangement & Automation"
+assert_contains "system prompt covers arranger visibility" "$PROMPT" "Arranger Visibility"
+assert_contains "system prompt covers loop and punch range" "$PROMPT" "Loop & Punch Range"
+assert_contains "system prompt covers automation" "$PROMPT" "Automation"
+assert_contains "system prompt covers cue markers" "$PROMPT" "Cue Markers"
+assert_contains "system prompt has arrangement setup workflow" "$PROMPT" "Arrangement Setup Workflow"
+assert_contains "system prompt mentions arranger_setPlaybackFollow" "$PROMPT" "arranger_setPlaybackFollow"
+assert_contains "system prompt mentions transport_setLoopRange" "$PROMPT" "transport_setLoopRange"
+assert_contains "system prompt mentions cueMarker_addAtPlayhead" "$PROMPT" "cueMarker_addAtPlayhead"
+assert_contains "system prompt mentions automation write modes" "$PROMPT" "latch"
 
 # Phase 7 tool description warnings
 DEVICE_REMOVE_DESC=$(jq -r '.[] | select(.name=="device_remove") | .description' "$TOOLS_FILE")
@@ -622,11 +678,11 @@ assert_contains "api/list has clip/scrollSteps" "$LIST" '"clip/scrollSteps"'
 # Count total methods
 METHOD_COUNT=$(echo "$LIST" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
 TOTAL=$((TOTAL + 1))
-if [ "$METHOD_COUNT" -ge 55 ]; then
-  echo "  PASS  api/list has >= 55 methods (found $METHOD_COUNT)"
+if [ "$METHOD_COUNT" -ge 74 ]; then
+  echo "  PASS  api/list has >= 74 methods (found $METHOD_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  api/list has >= 55 methods — found $METHOD_COUNT"
+  echo "  FAIL  api/list has >= 74 methods — found $METHOD_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -814,8 +870,114 @@ assert_contains "track/select error mentions bank width" "$ERR" '64'
 ERR=$(rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":-1},"id":149}')
 assert_contains "track/select negative index returns -32602" "$ERR" '-32602'
 
-# 30. Clean up — delete the duplicated track and undo rename
-echo "--- 30. Track Cleanup ---"
+# 30. Arranger API List
+echo "--- 30. Arranger API List ---"
+LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":160}')
+assert_contains "api/list has arranger/setPlaybackFollow" "$LIST" '"arranger/setPlaybackFollow"'
+assert_contains "api/list has arranger/setClipLauncherVisible" "$LIST" '"arranger/setClipLauncherVisible"'
+assert_contains "api/list has arranger/setTimelineVisible" "$LIST" '"arranger/setTimelineVisible"'
+assert_contains "api/list has arranger/setCueMarkersVisible" "$LIST" '"arranger/setCueMarkersVisible"'
+assert_contains "api/list has arranger/setEffectTracksVisible" "$LIST" '"arranger/setEffectTracksVisible"'
+assert_contains "api/list has arranger/setIoSectionVisible" "$LIST" '"arranger/setIoSectionVisible"'
+assert_contains "api/list has arranger/setDoubleRowTrackHeight" "$LIST" '"arranger/setDoubleRowTrackHeight"'
+assert_contains "api/list has cueMarker/addAtPlayhead" "$LIST" '"cueMarker/addAtPlayhead"'
+assert_contains "api/list has cueMarker/list" "$LIST" '"cueMarker/list"'
+assert_contains "api/list has cueMarker/launch" "$LIST" '"cueMarker/launch"'
+assert_contains "api/list has cueMarker/delete" "$LIST" '"cueMarker/delete"'
+assert_contains "api/list has transport/setLoopRange" "$LIST" '"transport/setLoopRange"'
+assert_contains "api/list has transport/getLoopRange" "$LIST" '"transport/getLoopRange"'
+assert_contains "api/list has transport/setPunchIn" "$LIST" '"transport/setPunchIn"'
+assert_contains "api/list has transport/setPunchOut" "$LIST" '"transport/setPunchOut"'
+assert_contains "api/list has transport/setAutomationWriteMode" "$LIST" '"transport/setAutomationWriteMode"'
+assert_contains "api/list has transport/setArrangerAutomationWrite" "$LIST" '"transport/setArrangerAutomationWrite"'
+assert_contains "api/list has transport/setClipLauncherAutomationWrite" "$LIST" '"transport/setClipLauncherAutomationWrite"'
+assert_contains "api/list has transport/resetAutomationOverrides" "$LIST" '"transport/resetAutomationOverrides"'
+
+# 31. Arranger Snapshot
+echo "--- 31. Arranger Snapshot ---"
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":161}')
+assert_contains "snapshot has arranger section" "$SNAP" '"arranger"'
+assert_contains "arranger has playbackFollow" "$SNAP" '"playbackFollow"'
+assert_contains "arranger has clipLauncherVisible" "$SNAP" '"clipLauncherVisible"'
+assert_contains "arranger has timelineVisible" "$SNAP" '"timelineVisible"'
+assert_contains "arranger has cueMarkersVisible" "$SNAP" '"cueMarkersVisible"'
+assert_contains "arranger has effectTracksVisible" "$SNAP" '"effectTracksVisible"'
+assert_contains "arranger has ioSectionVisible" "$SNAP" '"ioSectionVisible"'
+assert_contains "arranger has doubleRowTrackHeight" "$SNAP" '"doubleRowTrackHeight"'
+
+# 32. Arrangement Snapshot
+echo "--- 32. Arrangement Snapshot ---"
+assert_contains "snapshot has arrangement section" "$SNAP" '"arrangement"'
+assert_contains "arrangement has loop" "$SNAP" '"loop"'
+assert_contains "arrangement has punch" "$SNAP" '"punch"'
+assert_contains "arrangement has automation" "$SNAP" '"automation"'
+assert_contains "arrangement has cueMarkers" "$SNAP" '"cueMarkers"'
+
+# 33. Arranger Visibility Toggle
+echo "--- 33. Arranger Visibility Toggle ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"arranger/setPlaybackFollow","params":{"enabled":true},"id":162}')
+assert_contains "arranger/setPlaybackFollow returns ok" "$RESP" '"ok":true'
+sleep 0.3
+PF=$(snapshot_field "['arranger']['playbackFollow']")
+assert_equals "playbackFollow is True after set" "$PF" "True"
+
+RESP=$(rpc '{"jsonrpc":"2.0","method":"arranger/setPlaybackFollow","params":{"enabled":false},"id":163}')
+assert_contains "arranger/setPlaybackFollow false returns ok" "$RESP" '"ok":true'
+sleep 0.3
+PF=$(snapshot_field "['arranger']['playbackFollow']")
+assert_equals "playbackFollow is False after unset" "$PF" "False"
+
+# 34. Loop Range
+echo "--- 34. Loop Range ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/setLoopRange","params":{"start":8.0,"duration":16.0,"enabled":true},"id":164}')
+assert_contains "transport/setLoopRange returns ok" "$RESP" '"ok":true'
+sleep 0.3
+
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/getLoopRange","id":165}')
+assert_contains "getLoopRange has loopStart" "$RESP" '"loopStart"'
+assert_contains "getLoopRange has loopDuration" "$RESP" '"loopDuration"'
+assert_contains "getLoopRange has loopEnabled" "$RESP" '"loopEnabled"'
+
+# Restore loop
+rpc '{"jsonrpc":"2.0","method":"transport/setLoopRange","params":{"start":0.0,"duration":4.0,"enabled":false},"id":166}' > /dev/null
+sleep 0.3
+
+# 35. Automation Write Mode
+echo "--- 35. Automation Write Mode ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/setAutomationWriteMode","params":{"mode":"touch"},"id":167}')
+assert_contains "setAutomationWriteMode touch returns ok" "$RESP" '"ok":true'
+sleep 0.3
+MODE=$(snapshot_field "['arrangement']['automation']['writeMode']")
+assert_equals "automation writeMode is touch" "$MODE" "touch"
+
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/setAutomationWriteMode","params":{"mode":"latch"},"id":168}')
+assert_contains "setAutomationWriteMode latch returns ok" "$RESP" '"ok":true'
+sleep 0.3
+MODE=$(snapshot_field "['arrangement']['automation']['writeMode']")
+assert_equals "automation writeMode is latch" "$MODE" "latch"
+
+# Invalid mode
+ERR=$(rpc '{"jsonrpc":"2.0","method":"transport/setAutomationWriteMode","params":{"mode":"invalid"},"id":169}')
+assert_contains "setAutomationWriteMode invalid returns -32602" "$ERR" '-32602'
+
+# 36. Reset Automation Overrides
+echo "--- 36. Reset Automation Overrides ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/resetAutomationOverrides","id":170}')
+assert_contains "resetAutomationOverrides returns ok" "$RESP" '"ok":true'
+
+# 37. Cue marker error handling
+echo "--- 37. Cue Marker Errors ---"
+ERR=$(rpc '{"jsonrpc":"2.0","method":"cueMarker/launch","params":{"index":99},"id":171}')
+assert_contains "cueMarker/launch out-of-range returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"cueMarker/delete","params":{"index":-1},"id":172}')
+assert_contains "cueMarker/delete negative index returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"cueMarker/launch","params":{},"id":173}')
+assert_contains "cueMarker/launch missing index returns -32602" "$ERR" '-32602'
+
+# 38. Clean up — delete the duplicated track and undo rename
+echo "--- 38. Track Cleanup ---"
 # Select track 0 and restore original name
 rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
 sleep 0.3
