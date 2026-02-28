@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,9 +23,10 @@ class HttpRpcServerTest {
     void setUp() throws IOException {
         server = new HttpRpcServer(TEST_PORT, body -> {
             if (body.contains("\"echo\"")) {
-                return "{\"jsonrpc\":\"2.0\",\"result\":\"pong\",\"id\":1}";
+                return CompletableFuture.completedFuture(
+                    "{\"jsonrpc\":\"2.0\",\"result\":\"pong\",\"id\":1}");
             }
-            return null; // notification
+            return CompletableFuture.completedFuture(null); // notification
         });
         server.start();
     }

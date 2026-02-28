@@ -21,9 +21,10 @@ class WsRpcServerTest {
     void setUp() throws Exception {
         server = new WsRpcServer(TEST_PORT, body -> {
             if (body.contains("\"echo\"")) {
-                return "{\"jsonrpc\":\"2.0\",\"result\":\"pong\",\"id\":1}";
+                return CompletableFuture.completedFuture(
+                    "{\"jsonrpc\":\"2.0\",\"result\":\"pong\",\"id\":1}");
             }
-            return null; // notification
+            return CompletableFuture.completedFuture(null); // notification
         });
         server.start();
         Thread.sleep(200); // let server bind
@@ -67,7 +68,6 @@ class WsRpcServerTest {
         client.connectBlocking(2, TimeUnit.SECONDS);
         client.send("{\"jsonrpc\":\"2.0\",\"method\":\"notify\"}");
 
-        // Wait briefly — should NOT receive a response
         Thread.sleep(300);
         assertFalse(responseFuture.isDone());
         client.closeBlocking();
@@ -85,7 +85,7 @@ class WsRpcServerTest {
         };
 
         client.connectBlocking(2, TimeUnit.SECONDS);
-        Thread.sleep(100); // let server register client
+        Thread.sleep(100);
 
         server.broadcast("{\"jsonrpc\":\"2.0\",\"method\":\"state/changed\"}");
 

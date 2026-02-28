@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.1.3` |
+| **Version** | `0.1.4` |
 | **Phase** | 1 — Foundation |
 | **Status** | `IN-PROGRESS` |
-| **Last Batch** | HTTP + WebSocket servers |
+| **Last Batch** | Command queue + thread bridge |
 | **Last Updated** | 2026-02-27 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.1.4 | 1 | Command queue + thread bridge | PLANNED | done | 2026-02-27 |
 | 0.1.3 | 1 | HTTP + WebSocket servers | PLANNED | done | 2026-02-27 |
 | 0.1.2 | 1 | JSON-RPC 2.0 dispatcher | PLANNED | done | 2026-02-27 |
 | 0.1.1 | 1 | Gradle project scaffold | PLANNED | done | 2026-02-27 |

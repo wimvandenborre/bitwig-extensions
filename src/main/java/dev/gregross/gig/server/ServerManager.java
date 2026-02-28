@@ -1,6 +1,7 @@
 package dev.gregross.gig.server;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class ServerManager {
@@ -8,7 +9,7 @@ public class ServerManager {
     private HttpRpcServer httpServer;
     private WsRpcServer wsServer;
 
-    public void start(int httpPort, Function<String, String> requestHandler) throws IOException {
+    public void start(int httpPort, Function<String, CompletableFuture<String>> requestHandler) throws IOException {
         httpServer = new HttpRpcServer(httpPort, requestHandler);
         httpServer.start();
 

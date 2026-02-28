@@ -18,7 +18,7 @@
 | 1.1 | `0.1.1` | Gradle project scaffold | in-session | — | done |
 | 1.2 | `0.1.2` | JSON-RPC 2.0 dispatcher | in-session | — | done |
 | 1.3 | `0.1.3` | HTTP + WebSocket servers | in-session | 1.2 | done |
-| 1.4 | `0.1.4` | Command queue + thread bridge | in-session | 1.3 | pending |
+| 1.4 | `0.1.4` | Command queue + thread bridge | in-session | 1.3 | done |
 | 1.5 | `0.1.5` | Extension entry point + observers + snapshot + api.list + Application handler | in-session | 1.4 | pending |
 | 1.6 | `0.1.6` | Transport action handlers | in-session | 1.5 | pending |
 | 1.7 | `0.1.7` | Track + Master action handlers | in-session | 1.5 | pending |

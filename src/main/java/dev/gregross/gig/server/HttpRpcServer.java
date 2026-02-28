@@ -7,14 +7,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public class HttpRpcServer {
 
     private final HttpServer server;
+    private static final long TIMEOUT_MS = 5000;
 
-    public HttpRpcServer(int port, Function<String, String> requestHandler) throws IOException {
+    public HttpRpcServer(int port, Function<String, CompletableFuture<String>> requestHandler) throws IOException {
         server = HttpServer.create(new InetSocketAddress(port), 0);
         server.setExecutor(Executors.newFixedThreadPool(4));
 
@@ -30,7 +33,7 @@ public class HttpRpcServer {
         server.stop(1);
     }
 
-    private void handleRpc(HttpExchange exchange, Function<String, String> requestHandler) throws IOException {
+    private void handleRpc(HttpExchange exchange, Function<String, CompletableFuture<String>> requestHandler) throws IOException {
         addCorsHeaders(exchange);
 
         if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
@@ -50,15 +53,19 @@ public class HttpRpcServer {
             return;
         }
 
-        String response = requestHandler.apply(body);
-        if (response == null) {
-            // Notification — no response per JSON-RPC spec
-            exchange.sendResponseHeaders(204, -1);
-            exchange.close();
-            return;
-        }
+        try {
+            CompletableFuture<String> future = requestHandler.apply(body);
+            String response = future.get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
-        sendResponse(exchange, 200, response);
+            if (response == null) {
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+            } else {
+                sendResponse(exchange, 200, response);
+            }
+        } catch (Exception e) {
+            sendResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
     }
 
     private void handleHealth(HttpExchange exchange) throws IOException {

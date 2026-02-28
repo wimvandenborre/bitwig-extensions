@@ -6,15 +6,16 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Function;
 
 public class WsRpcServer extends WebSocketServer {
 
-    private final Function<String, String> requestHandler;
+    private final Function<String, CompletableFuture<String>> requestHandler;
     private final Set<WebSocket> clients = new CopyOnWriteArraySet<>();
 
-    public WsRpcServer(int port, Function<String, String> requestHandler) {
+    public WsRpcServer(int port, Function<String, CompletableFuture<String>> requestHandler) {
         super(new InetSocketAddress(port));
         this.requestHandler = requestHandler;
         setReuseAddr(true);
@@ -32,10 +33,12 @@ public class WsRpcServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        String response = requestHandler.apply(message);
-        if (response != null) {
-            conn.send(response);
-        }
+        CompletableFuture<String> future = requestHandler.apply(message);
+        future.thenAccept(response -> {
+            if (response != null && conn.isOpen()) {
+                conn.send(response);
+            }
+        });
     }
 
     @Override
