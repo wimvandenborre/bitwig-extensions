@@ -8,6 +8,7 @@ import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.handlers.ApplicationHandler;
 import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
+import dev.gregross.gig.handlers.DeviceLibrary;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
 import dev.gregross.gig.handlers.TrackHandler;
@@ -17,6 +18,8 @@ import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import dev.gregross.gig.server.ServerManager;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,6 +30,8 @@ public class GigMaestroExtension extends ControllerExtension {
     private static final int SCENE_COUNT = 8;
     private static final int CLIP_GRID_WIDTH = 64;
     private static final int CLIP_GRID_HEIGHT = 128;
+    private static final String BITWIG_DEVICE_LIBRARY =
+        "/Applications/Bitwig Studio.app/Contents/Resources/Library/devices";
 
     private final ControllerHost host;
     private JsonRpcDispatcher dispatcher;
@@ -87,7 +92,19 @@ public class GigMaestroExtension extends ControllerExtension {
         new TrackHandler(trackBank).register(dispatcher);
         new MasterHandler(masterTrack).register(dispatcher);
         new ClipHandler(trackBank, trackBank.sceneBank()).register(dispatcher);
-        new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage).register(dispatcher);
+        DeviceLibrary deviceLibrary;
+        try {
+            deviceLibrary = new DeviceLibrary(Paths.get(BITWIG_DEVICE_LIBRARY));
+            host.println("Device library loaded: " + deviceLibrary.size() + " devices");
+        } catch (IOException e) {
+            host.errorln("Failed to scan device library: " + e.getMessage());
+            try {
+                deviceLibrary = new DeviceLibrary(Paths.get(""));
+            } catch (IOException e2) {
+                throw new RuntimeException("Failed to create empty device library", e2);
+            }
+        }
+        new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, deviceLibrary).register(dispatcher);
         new NoteHandler(cursorClip).register(dispatcher);
 
         // Start servers

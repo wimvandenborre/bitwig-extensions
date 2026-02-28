@@ -12,6 +12,7 @@ import picocli.CommandLine.Option;
     subcommands = {
         TransportCommand.class,
         TrackCommand.class,
+        DeviceCommand.class,
         NoteCommand.class,
         SnapshotCommand.class,
         RpcCommand.class

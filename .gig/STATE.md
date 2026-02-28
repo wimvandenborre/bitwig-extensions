@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.5.0` |
-| **Phase** | 5 — Device Insertion |
-| **Status** | `PLANNED` |
-| **Last Batch** | — |
+| **Version** | `0.6.0` |
+| **Phase** | 5 — Device Insertion (complete) |
+| **Status** | `VERIFIED` |
+| **Last Batch** | Phase 5 archived |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.5.5 | 5 | CLI DeviceCommand + smoke tests | PLANNED | done | 2026-02-28 |
+| 0.5.4 | 5 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
+| 0.5.3 | 5 | Device insertion + removal RPC handlers | PLANNED | done | 2026-02-28 |
+| 0.5.2 | 5 | DeviceLibrary utility + unit tests | PLANNED | done | 2026-02-28 |
+| 0.5.1 | 5 | Spike: Validate insertFile() mechanism | PLANNED | done | 2026-02-28 |
 | 0.4.6 | 4 | Add clip/delete RPC method | UNPLANNED | done | 2026-02-28 |
 | 0.4.5 | 4 | CLI NoteCommand + smoke tests | PLANNED | done | 2026-02-28 |
 | 0.4.4 | 4 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
@@ -49,12 +54,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- **D-5.1** — Insertion via `insertFile()` with `.bwdevice` paths (spike required to validate)
-- **D-5.2** — Insert at end-of-chain (default) + before/after cursor device
-- **D-5.3a** — 4 RPC methods: insertBitwigDevice, insertPluginDevice, listBitwigDevices, device/remove
-- **D-5.4** — Pre-scan `.bwdevice` dir at init, case-insensitive name map, close-match errors
-- **D-5.5** — Add to DeviceHandler + new DeviceLibrary utility class
-- **D-5.6** — device/remove via cursorDevice.deleteObject()
+_None — Phase 5 archived._
 
 ---
 
@@ -96,8 +96,8 @@ _None._
 - NoteStep: `getStep(channel, x, y)` → state, velocity, duration; `setStep(channel, x, y, vel, dur)`; `clearStep(channel, x, y)`
 - Batch note ops: `clip/setNotes` accepts array, loops internally; `clip/getNotes` returns sparse array
 - NoteHandler: `handlers/NoteHandler.java` — note-level operations on CursorClip
-- Total RPC methods: 44 (Phase 1: 23, Phase 2: 13, Phase 4: 8)
-- Tool schemas: `tools/claude-tools.json` — 44 Claude tool_use definitions, 1:1 with RPC methods (underscore naming)
+- Total RPC methods: 48 (Phase 1: 23, Phase 2: 13, Phase 4: 8, Phase 5: 4)
+- Tool schemas: `tools/claude-tools.json` — 48 Claude tool_use definitions, 1:1 with RPC methods (underscore naming)
 - System prompt: `tools/system-prompt.md` — viewport model, perception-action loop, value ranges, cursor model, indices
 - CLI source: `src/cli/java/dev/gregross/gig/cli/` — GigCli, RpcClient, RpcCommand, SnapshotCommand, TransportCommand, TrackCommand
 - CLI JAR: `build/libs/gig-cli.jar` via `./gradlew cliShadowJar` — Picocli 4.7.6
@@ -105,11 +105,13 @@ _None._
 - `StateCache.getChangedSections()` — per-section hash delta detection (transport, tracks, scenes, device, master, application)
 - WebSocket push: `state/changed` notification with `changed` array, broadcast only when `getWsClientCount() > 0`
 - Smoke test `--offline` flag for testing without Bitwig
-- Total tests: 29 unit + 171 smoke = 200
+- Total tests: 40 unit + 203 smoke = 243
 - Bitwig device library: `/Applications/Bitwig Studio.app/Contents/Resources/Library/devices/` — 151 `.bwdevice` files
 - InsertionPoint API: `endOfDeviceChainInsertionPoint()`, `beforeDeviceInsertionPoint()`, `afterDeviceInsertionPoint()` — all have `insertFile(String)`, `insertVST2Device(int)`, `insertVST3Device(String)`, `insertCLAPDevice(String)`
 - DeviceLibrary: new utility class in `handlers/` — name→path map, case-insensitive, close-match errors
 - Phase 5 adds 4 RPC methods: device/insertBitwigDevice, device/insertPluginDevice, device/listBitwigDevices, device/remove
+- **Spike validated:** `insertFile()` works from Controller API — Polymer.bwdevice inserted successfully via `cursorTrack.endOfDeviceChainInsertionPoint().insertFile(path)`
+- **Known limitation:** CursorDevice loses selection after `deleteObject()` — `selectNext`/`selectPrevious` don't re-acquire. Future: `device/removeAll` with re-selection loop
 
 ---
 

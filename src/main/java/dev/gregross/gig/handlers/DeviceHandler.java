@@ -3,11 +3,15 @@ package dev.gregross.gig.handlers;
 import com.bitwig.extension.controller.api.CursorDevice;
 import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
 import com.bitwig.extension.controller.api.CursorTrack;
+import com.bitwig.extension.controller.api.InsertionPoint;
 import com.bitwig.extension.controller.api.RemoteControl;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+
+import java.nio.file.Path;
 
 public class DeviceHandler {
 
@@ -16,12 +20,15 @@ public class DeviceHandler {
     private final CursorTrack cursorTrack;
     private final CursorDevice cursorDevice;
     private final CursorRemoteControlsPage remoteControlsPage;
+    private final DeviceLibrary deviceLibrary;
 
     public DeviceHandler(CursorTrack cursorTrack, CursorDevice cursorDevice,
-                         CursorRemoteControlsPage remoteControlsPage) {
+                         CursorRemoteControlsPage remoteControlsPage,
+                         DeviceLibrary deviceLibrary) {
         this.cursorTrack = cursorTrack;
         this.cursorDevice = cursorDevice;
         this.remoteControlsPage = remoteControlsPage;
+        this.deviceLibrary = deviceLibrary;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -72,6 +79,49 @@ public class DeviceHandler {
             return new JsonPrimitive("ok");
         });
 
+        // Device insertion
+        dispatcher.register("device/insertBitwigDevice", params -> {
+            String name = requireString(params, "name");
+            String position = optionalString(params, "position", "end");
+            Path devicePath = deviceLibrary.resolve(name);
+            getInsertionPoint(position).insertFile(devicePath.toString());
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/insertPluginDevice", params -> {
+            String type = requireString(params, "type");
+            String id = requireString(params, "id");
+            String position = optionalString(params, "position", "end");
+            InsertionPoint ip = getInsertionPoint(position);
+            switch (type) {
+                case "vst2":
+                    ip.insertVST2Device(Integer.parseInt(id));
+                    break;
+                case "vst3":
+                    ip.insertVST3Device(id);
+                    break;
+                case "clap":
+                    ip.insertCLAPDevice(id);
+                    break;
+                default:
+                    throw new IllegalArgumentException("type must be 'vst2', 'vst3', or 'clap', got: " + type);
+            }
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/listBitwigDevices", params -> {
+            JsonArray arr = new JsonArray();
+            for (String name : deviceLibrary.listDevices()) {
+                arr.add(name);
+            }
+            return arr;
+        });
+
+        dispatcher.register("device/remove", params -> {
+            cursorDevice.deleteObject();
+            return new JsonPrimitive("ok");
+        });
+
         // Cursor track navigation
         dispatcher.register("cursor/selectTrack", params -> {
             String direction = requireString(params, "direction");
@@ -119,5 +169,26 @@ public class DeviceHandler {
             throw new IllegalArgumentException("missing '" + key + "' parameter");
         }
         return el.getAsString();
+    }
+
+    private String optionalString(JsonObject params, String key, String defaultValue) {
+        JsonElement el = params.get(key);
+        if (el == null || el.isJsonNull()) {
+            return defaultValue;
+        }
+        return el.getAsString();
+    }
+
+    private InsertionPoint getInsertionPoint(String position) {
+        switch (position) {
+            case "end":
+                return cursorTrack.endOfDeviceChainInsertionPoint();
+            case "before":
+                return cursorDevice.beforeDeviceInsertionPoint();
+            case "after":
+                return cursorDevice.afterDeviceInsertionPoint();
+            default:
+                throw new IllegalArgumentException("position must be 'end', 'before', or 'after', got: " + position);
+        }
     }
 }

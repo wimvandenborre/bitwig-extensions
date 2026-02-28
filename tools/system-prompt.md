@@ -72,6 +72,21 @@ The extension provides a **cursor clip** that follows the selected clip in the s
 
 **Snapshot:** The `clip` section in `session_snapshot` shows cursor clip metadata: `trackName`, `playingStep`, `loopLength`, `playStart`, `playStop`, `stepSize`, `hasContent`. It does NOT include note data — use `clip_getNotes` for that.
 
+### Device Insertion & Removal
+
+You can add and remove devices on the cursor track:
+
+- **Built-in devices:** Use `device_listBitwigDevices` to discover available devices (151 total), then `device_insertBitwigDevice` with the device name. Names are case-insensitive. If you misspell a name, the error will suggest close matches.
+- **Third-party plugins:** Use `device_insertPluginDevice` with the plugin `type` ("vst2", "vst3", "clap") and `id`.
+- **Positioning:** By default, devices are inserted at the **end** of the chain. Use `position: "before"` or `"after"` to insert relative to the currently selected device.
+- **Removal:** Navigate to the target device with `device_selectNext` / `device_selectPrevious`, then call `device_remove`.
+
+**Workflow for adding a device:**
+1. Call `session_snapshot` to see the current cursor track and device chain.
+2. Optionally call `device_listBitwigDevices` to find the right device name.
+3. Call `device_insertBitwigDevice` with the name (and optional position).
+4. Call `session_snapshot` to verify the device was added — it should appear in the `device` section.
+
 ### Index Conventions
 
 All indices are **0-based**:

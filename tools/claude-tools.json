@@ -599,5 +599,66 @@
       },
       "required": ["offset"]
     }
+  },
+  {
+    "name": "device_insertBitwigDevice",
+    "description": "Insert a built-in Bitwig device onto the cursor track by name. The name is resolved case-insensitively from the Bitwig device library (151 devices). If the name is not found, an error is returned with close-match suggestions. Use `device_listBitwigDevices` to discover available devices first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Device name (e.g., \"Polymer\", \"EQ-5\", \"Compressor\"). Case-insensitive."
+        },
+        "position": {
+          "type": "string",
+          "enum": ["end", "before", "after"],
+          "description": "Where to insert: \"end\" = end of device chain (default), \"before\" = before cursor device, \"after\" = after cursor device."
+        }
+      },
+      "required": ["name"]
+    }
+  },
+  {
+    "name": "device_insertPluginDevice",
+    "description": "Insert a third-party plugin (VST2, VST3, or CLAP) onto the cursor track. You must know the plugin ID — VST2 uses integer IDs, VST3 and CLAP use string IDs.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["vst2", "vst3", "clap"],
+          "description": "Plugin format type."
+        },
+        "id": {
+          "type": "string",
+          "description": "Plugin ID. For VST2: integer as string (e.g., \"1234567890\"). For VST3/CLAP: string ID."
+        },
+        "position": {
+          "type": "string",
+          "enum": ["end", "before", "after"],
+          "description": "Where to insert: \"end\" = end of device chain (default), \"before\" = before cursor device, \"after\" = after cursor device."
+        }
+      },
+      "required": ["type", "id"]
+    }
+  },
+  {
+    "name": "device_listBitwigDevices",
+    "description": "List all available built-in Bitwig devices. Returns a sorted array of device names that can be used with `device_insertBitwigDevice`. Includes instruments (Polymer, Poly Grid, FM-4, etc.), audio effects (EQ-5, Compressor, Delay-2, etc.), and note effects (Arpeggiator, Note Echo, etc.).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_remove",
+    "description": "Remove the currently selected device from the cursor track's device chain. Navigate to the target device first using `device_selectNext` / `device_selectPrevious`, then call this to delete it. This action cannot be undone via this API (but Bitwig's undo may work).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
   }
 ]

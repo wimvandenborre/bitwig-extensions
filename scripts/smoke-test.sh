@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.4.x — Smoke Test Suite
+# Gig Maestro v0.5.x — Smoke Test Suite
 #
 # Usage:
 #   ./scripts/smoke-test.sh              — run all tests (requires Bitwig running)
@@ -76,7 +76,7 @@ echo ""
 echo "--- O1. Tool Schema Validation ---"
 TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
-assert_equals "claude-tools.json has 44 tools" "$TOOL_COUNT" "44"
+assert_equals "claude-tools.json has 48 tools" "$TOOL_COUNT" "48"
 
 # Every tool has name, description, input_schema
 MISSING_FIELDS=$(jq '[.[] | select(.name == null or .description == null or .input_schema == null)] | length' "$TOOLS_FILE")
@@ -84,7 +84,7 @@ assert_equals "all tools have name, description, input_schema" "$MISSING_FIELDS"
 
 # All tool names are unique
 UNIQUE_NAMES=$(jq '[.[].name] | unique | length' "$TOOLS_FILE")
-assert_equals "all tool names are unique" "$UNIQUE_NAMES" "44"
+assert_equals "all tool names are unique" "$UNIQUE_NAMES" "48"
 
 # Tool names use underscore convention (no slashes)
 SLASH_NAMES=$(jq '[.[].name | select(contains("/"))] | length' "$TOOLS_FILE")
@@ -136,6 +136,21 @@ assert_equals "clip_setStepSize size param is number" "$STEPSIZE_TYPE" "number"
 OFFSET_TYPE=$(jq -r '.[] | select(.name=="clip_scrollSteps") | .input_schema.properties.offset.type' "$TOOLS_FILE")
 assert_equals "clip_scrollSteps offset param is integer" "$OFFSET_TYPE" "integer"
 
+# Phase 5 device tools
+assert_contains "has device_insertBitwigDevice tool" "$TOOLS_LIST" "device_insertBitwigDevice"
+assert_contains "has device_insertPluginDevice tool" "$TOOLS_LIST" "device_insertPluginDevice"
+assert_contains "has device_listBitwigDevices tool" "$TOOLS_LIST" "device_listBitwigDevices"
+assert_contains "has device_remove tool" "$TOOLS_LIST" "device_remove"
+
+INSERT_NAME_TYPE=$(jq -r '.[] | select(.name=="device_insertBitwigDevice") | .input_schema.properties.name.type' "$TOOLS_FILE")
+assert_equals "device_insertBitwigDevice name param is string" "$INSERT_NAME_TYPE" "string"
+
+INSERT_POS_ENUM=$(jq -r '.[] | select(.name=="device_insertBitwigDevice") | .input_schema.properties.position.enum | join(",")' "$TOOLS_FILE")
+assert_equals "device_insertBitwigDevice position has end,before,after enum" "$INSERT_POS_ENUM" "end,before,after"
+
+PLUGIN_TYPE_ENUM=$(jq -r '.[] | select(.name=="device_insertPluginDevice") | .input_schema.properties.type.enum | join(",")' "$TOOLS_FILE")
+assert_equals "device_insertPluginDevice type has vst2,vst3,clap enum" "$PLUGIN_TYPE_ENUM" "vst2,vst3,clap"
+
 # O2. System prompt validation
 echo "--- O2. System Prompt Validation ---"
 PROMPT_FILE="${PROJECT_ROOT}/tools/system-prompt.md"
@@ -151,6 +166,9 @@ assert_contains "system prompt mentions session_snapshot" "$PROMPT" "session_sna
 assert_contains "system prompt covers note editing" "$PROMPT" "Note Editing"
 assert_contains "system prompt mentions MIDI note numbers" "$PROMPT" "MIDI note"
 assert_contains "system prompt mentions clip_setNotes" "$PROMPT" "clip_setNotes"
+assert_contains "system prompt covers device insertion" "$PROMPT" "Device Insertion"
+assert_contains "system prompt mentions device_listBitwigDevices" "$PROMPT" "device_listBitwigDevices"
+assert_contains "system prompt mentions device_insertBitwigDevice" "$PROMPT" "device_insertBitwigDevice"
 
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
@@ -172,6 +190,7 @@ HELP=$(java -jar "$CLI_JAR" --help 2>&1)
 assert_contains "CLI help shows transport command" "$HELP" "transport"
 assert_contains "CLI help shows track command" "$HELP" "track"
 assert_contains "CLI help shows snapshot command" "$HELP" "snapshot"
+assert_contains "CLI help shows device command" "$HELP" "device"
 assert_contains "CLI help shows note command" "$HELP" "note"
 assert_contains "CLI help shows rpc command" "$HELP" "rpc"
 assert_contains "CLI help shows --pretty option" "$HELP" "--pretty"
@@ -189,6 +208,13 @@ TRACK_HELP=$(java -jar "$CLI_JAR" track --help 2>&1)
 assert_contains "track help shows set-volume" "$TRACK_HELP" "set-volume"
 assert_contains "track help shows set-mute" "$TRACK_HELP" "set-mute"
 assert_contains "track help shows set-solo" "$TRACK_HELP" "set-solo"
+
+# Device subcommand help
+DEVICE_HELP=$(java -jar "$CLI_JAR" device --help 2>&1)
+assert_contains "device help shows insert-bitwig" "$DEVICE_HELP" "insert-bitwig"
+assert_contains "device help shows insert-plugin" "$DEVICE_HELP" "insert-plugin"
+assert_contains "device help shows list-bitwig" "$DEVICE_HELP" "list-bitwig"
+assert_contains "device help shows remove" "$DEVICE_HELP" "remove"
 
 # Note subcommand help
 NOTE_HELP=$(java -jar "$CLI_JAR" note --help 2>&1)
@@ -533,7 +559,7 @@ assert_contains "api/list has clip/scrollSteps" "$LIST" '"clip/scrollSteps"'
 
 # Count total methods
 METHOD_COUNT=$(echo "$LIST" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
-assert_equals "api/list has 44 methods" "$METHOD_COUNT" "44"
+assert_equals "api/list has 48 methods" "$METHOD_COUNT" "48"
 
 # 20. Clip snapshot section
 echo "--- 20. Clip Snapshot Section ---"
@@ -599,6 +625,61 @@ assert_contains "clip/scrollSteps returns ok" "$RESP" '"ok"'
 
 # Restore step size
 rpc '{"jsonrpc":"2.0","method":"clip/setStepSize","params":{"size":0.25},"id":122}' > /dev/null
+
+# 23. Device Insertion API List
+echo "--- 23. Device Insertion API List ---"
+LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":130}')
+assert_contains "api/list has device/insertBitwigDevice" "$LIST" '"device/insertBitwigDevice"'
+assert_contains "api/list has device/insertPluginDevice" "$LIST" '"device/insertPluginDevice"'
+assert_contains "api/list has device/listBitwigDevices" "$LIST" '"device/listBitwigDevices"'
+assert_contains "api/list has device/remove" "$LIST" '"device/remove"'
+
+# 24. List Bitwig devices
+echo "--- 24. List Bitwig Devices ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/listBitwigDevices","id":131}')
+assert_contains "listBitwigDevices returns Polymer" "$RESP" '"Polymer"'
+assert_contains "listBitwigDevices returns EQ-5" "$RESP" '"EQ-5"'
+assert_contains "listBitwigDevices returns Compressor" "$RESP" '"Compressor"'
+DEVICE_COUNT=$(echo "$RESP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
+assert_equals "listBitwigDevices returns 151 devices" "$DEVICE_COUNT" "151"
+
+# 25. Insert + remove Bitwig device
+echo "--- 25. Insert + Remove Device ---"
+
+# Insert a device
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{"name":"EQ-5"},"id":132}')
+assert_contains "insertBitwigDevice returns ok" "$RESP" '"ok"'
+sleep 0.5
+
+# Insert with case-insensitive name
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{"name":"compressor"},"id":133}')
+assert_contains "insertBitwigDevice case-insensitive returns ok" "$RESP" '"ok"'
+sleep 0.5
+
+# Remove the device (removes cursor device)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/remove","id":134}')
+assert_contains "device/remove returns ok" "$RESP" '"ok"'
+sleep 0.5
+
+# Remove the other device we inserted
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/remove","id":135}')
+assert_contains "device/remove second returns ok" "$RESP" '"ok"'
+sleep 0.3
+
+# 26. Device insertion error handling
+echo "--- 26. Device Insertion Errors ---"
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{"name":"NonexistentDevice12345"},"id":136}')
+assert_contains "insertBitwigDevice unknown name returns -32602" "$ERR" '-32602'
+assert_contains "insertBitwigDevice unknown name has error message" "$ERR" 'Unknown device'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{"name":"Polymorph"},"id":137}')
+assert_contains "insertBitwigDevice close match suggests Polymer" "$ERR" 'Polymer'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/insertPluginDevice","params":{"type":"invalid","id":"123"},"id":138}')
+assert_contains "insertPluginDevice invalid type returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{},"id":139}')
+assert_contains "insertBitwigDevice missing name returns -32602" "$ERR" '-32602'
 
 # --- summary ---
 echo ""
