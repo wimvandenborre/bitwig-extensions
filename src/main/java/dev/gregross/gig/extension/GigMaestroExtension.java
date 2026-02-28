@@ -63,6 +63,10 @@ public class GigMaestroExtension extends ControllerExtension {
         Clip cursorClip = cursorTrack.createLauncherCursorClip("gig-clip", "Gig Clip",
             CLIP_GRID_WIDTH, CLIP_GRID_HEIGHT);
 
+        // Create arranger and cue marker bank
+        Arranger arranger = host.createArranger();
+        CueMarkerBank cueMarkerBank = arranger.createCueMarkerBank(16);
+
         // Create infrastructure
         dispatcher = new JsonRpcDispatcher();
         commandQueue = new CommandQueue();
@@ -74,6 +78,8 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerClipObservers(trackBank);
         stateCache.registerDeviceObservers(cursorTrack, cursorDevice, remoteControlsPage);
         stateCache.registerClipCursorObservers(cursorClip, cursorTrack);
+        stateCache.registerArrangerObservers(arranger);
+        stateCache.registerArrangementObservers(transport, cueMarkerBank);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
