@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.9.5` |
 | **Phase** | 9 — Envelope Writing |
-| **Status** | `APPLIED` |
+| **Status** | `VERIFIED` |
 | **Last Batch** | Unit tests + smoke tests |
 | **Last Updated** | 2026-02-28 |
 
