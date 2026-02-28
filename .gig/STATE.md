@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.8.2` |
+| **Version** | `0.8.3` |
 | **Phase** | 8 — Arrangement & Automation Control |
 | **Status** | `IN-PROGRESS` |
-| **Last Batch** | ArrangerHandler — visibility toggles |
+| **Last Batch** | TransportHandler — loop range + punch range + automation |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.8.3 | 8 | TransportHandler — loop range + punch range + automation | PLANNED | done | 2026-02-28 |
 | 0.8.2 | 8 | ArrangerHandler — visibility toggles | PLANNED | done | 2026-02-28 |
 | 0.8.1 | 8 | Arranger + CueMarkerBank creation + snapshot sections | PLANNED | done | 2026-02-28 |
 | 0.7.4 | 7 | Tool description warnings + smoke tests | PLANNED | done | 2026-02-28 |
@@ -109,6 +110,7 @@ _None._
 - `RangedValue.displayedValue()` returns `StringValue` with formatted param value ("1.2 kHz")
 - SceneBank: `trackBank.sceneBank()`, `sceneBank.getScene(i)` — Scene has `name()`, `clipCount()`
 - CursorClip: `cursorTrack.createLauncherCursorClip(id, name, 64, 128)` — 64-step viewport, full MIDI range, follows selected clip
+- `SettableEnumValue.addValueObserver()` requires `(EnumValueChangedCallback)` cast — NOT `StringValueChangedCallback`, even though both take String. Bitwig JAR generic erasure.
 - NoteStep: `getStep(channel, x, y)` → state, velocity, duration; `setStep(channel, x, y, vel, dur)`; `clearStep(channel, x, y)`
 - Batch note ops: `clip/setNotes` accepts array, loops internally; `clip/getNotes` returns sparse array
 - NoteHandler: `handlers/NoteHandler.java` — note-level operations on CursorClip
