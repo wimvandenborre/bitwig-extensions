@@ -1,0 +1,12 @@
+[versions]
+java-websocket = "1.6.0"
+gson = "2.12.1"
+junit-jupiter = "5.12.1"
+
+[libraries]
+java-websocket = { module = "org.java-websocket:Java-WebSocket", version.ref = "java-websocket" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version = "9.0.0-beta12" }
