@@ -113,7 +113,7 @@ public class GigMaestroExtension extends ControllerExtension {
                 throw new RuntimeException("Failed to create empty device library", e2);
             }
         }
-        new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, deviceLibrary).register(dispatcher);
+        new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, deviceLibrary, transport, host).register(dispatcher);
         new NoteHandler(cursorClip).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank).register(dispatcher);
 

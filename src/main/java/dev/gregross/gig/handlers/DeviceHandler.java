@@ -1,10 +1,12 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.ControllerHost;
 import com.bitwig.extension.controller.api.CursorDevice;
 import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
 import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.InsertionPoint;
 import com.bitwig.extension.controller.api.RemoteControl;
+import com.bitwig.extension.controller.api.Transport;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -12,6 +14,9 @@ import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class DeviceHandler {
 
@@ -21,14 +26,19 @@ public class DeviceHandler {
     private final CursorDevice cursorDevice;
     private final CursorRemoteControlsPage remoteControlsPage;
     private final DeviceLibrary deviceLibrary;
+    private final Transport transport;
+    private final ControllerHost host;
 
     public DeviceHandler(CursorTrack cursorTrack, CursorDevice cursorDevice,
                          CursorRemoteControlsPage remoteControlsPage,
-                         DeviceLibrary deviceLibrary) {
+                         DeviceLibrary deviceLibrary, Transport transport,
+                         ControllerHost host) {
         this.cursorTrack = cursorTrack;
         this.cursorDevice = cursorDevice;
         this.remoteControlsPage = remoteControlsPage;
         this.deviceLibrary = deviceLibrary;
+        this.transport = transport;
+        this.host = host;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -122,6 +132,148 @@ public class DeviceHandler {
             return new JsonPrimitive("ok");
         });
 
+        // Per-parameter automation methods
+        dispatcher.register("device/hasAutomation", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+            RemoteControl param = remoteControlsPage.getParameter(index);
+            JsonObject result = new JsonObject();
+            result.addProperty("hasAutomation", param.hasAutomation().get());
+            return result;
+        });
+
+        dispatcher.register("device/deleteAllAutomation", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+            RemoteControl param = remoteControlsPage.getParameter(index);
+            param.deleteAllAutomation();
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            return result;
+        });
+
+        dispatcher.register("device/restoreAutomationControl", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+            RemoteControl param = remoteControlsPage.getParameter(index);
+            param.restoreAutomationControl();
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            return result;
+        });
+
+        dispatcher.register("device/touch", params -> {
+            int index = requireInt(params, "index");
+            boolean touched = requireBoolean(params, "touched");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+            RemoteControl param = remoteControlsPage.getParameter(index);
+            param.touch(touched);
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            return result;
+        });
+
+        // Envelope writing
+        dispatcher.register("device/writeEnvelope", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("parameter index out of range: " + index);
+            }
+
+            // Precondition: arranger automation write must be enabled
+            if (!transport.isArrangerAutomationWriteEnabled().get()) {
+                throw new IllegalStateException("Arranger automation write must be enabled");
+            }
+
+            // Parse and validate points
+            JsonArray pointsArr = requireArray(params, "points");
+            if (pointsArr.isEmpty()) {
+                throw new IllegalArgumentException("points array must not be empty");
+            }
+
+            List<double[]> points = new ArrayList<>();
+            for (JsonElement el : pointsArr) {
+                JsonObject pt = el.getAsJsonObject();
+                if (!pt.has("position") || !pt.has("value")) {
+                    throw new IllegalArgumentException("each point must have 'position' and 'value'");
+                }
+                double position = pt.get("position").getAsDouble();
+                double value = pt.get("value").getAsDouble();
+                if (position < 0) {
+                    throw new IllegalArgumentException("position must be >= 0, got: " + position);
+                }
+                // Clamp value to [0, 1]
+                value = Math.max(0.0, Math.min(1.0, value));
+                points.add(new double[]{position, value});
+            }
+
+            // Sort by position ascending
+            points.sort(Comparator.comparingDouble(a -> a[0]));
+
+            // Deduplicate: last-wins for same position
+            List<double[]> deduped = new ArrayList<>();
+            for (int i = 0; i < points.size(); i++) {
+                if (i == points.size() - 1 || points.get(i)[0] != points.get(i + 1)[0]) {
+                    deduped.add(points.get(i));
+                }
+            }
+
+            int pointCount = deduped.size();
+            RemoteControl param = remoteControlsPage.getParameter(index);
+
+            // Save state
+            double savedPosition = transport.getPosition().get();
+            boolean wasPlaying = transport.isPlaying().get();
+
+            // Stop if playing, then start fresh playback
+            // (Bitwig requires active playback for touch automation recording — D-9.2a)
+            if (wasPlaying) {
+                transport.stop();
+            }
+            transport.play();
+
+            // Schedule point-writing as chained tasks across flush cycles.
+            // Each point needs its own flush cycle for the engine to process
+            // the position jump before recording the touch + value.
+            long delay = 100; // initial delay for playback to engage
+            for (int i = 0; i < deduped.size(); i++) {
+                final double[] pt = deduped.get(i);
+                final boolean isLast = (i == deduped.size() - 1);
+                host.scheduleTask(() -> {
+                    transport.getPosition().set(pt[0]);
+                    param.touch(true);
+                    param.value().setImmediately(pt[1]);
+                    param.touch(false);
+
+                    if (isLast) {
+                        // Final point: schedule cleanup
+                        host.scheduleTask(() -> {
+                            param.touch(false); // ensure untouched
+                            transport.stop();
+                            transport.getPosition().set(savedPosition);
+                            if (wasPlaying) {
+                                transport.play();
+                            }
+                        }, 50);
+                    }
+                }, delay);
+                delay += 100; // 100ms between points
+            }
+
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            result.addProperty("pointsWritten", pointCount);
+            return result;
+        });
+
         // Cursor track navigation
         dispatcher.register("cursor/selectTrack", params -> {
             String direction = requireString(params, "direction");
@@ -169,6 +321,17 @@ public class DeviceHandler {
             throw new IllegalArgumentException("missing '" + key + "' parameter");
         }
         return el.getAsString();
+    }
+
+    private JsonArray requireArray(JsonObject params, String key) {
+        JsonElement el = params.get(key);
+        if (el == null) {
+            throw new IllegalArgumentException("missing '" + key + "' parameter");
+        }
+        if (!el.isJsonArray()) {
+            throw new IllegalArgumentException("'" + key + "' must be an array");
+        }
+        return el.getAsJsonArray();
     }
 
     private String optionalString(JsonObject params, String key, String defaultValue) {

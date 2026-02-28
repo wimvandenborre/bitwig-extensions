@@ -317,6 +317,44 @@ Controls how parameter changes are recorded:
 
 Snapshot section `arrangement` → `automation` sub-object.
 
+### Envelope Writing
+
+Write automation curves programmatically using `device_writeEnvelope`. This inserts automation data into the arranger for any remote control parameter.
+
+**How it works:** The method internally simulates touch automation recording — it starts playback, jumps to each point's beat position, touches the parameter, sets the value, and untouches. This happens asynchronously after the RPC call returns (~100ms per point). Transport position and play/stop state are saved and restored.
+
+**Prerequisites (must be set before calling):**
+1. Enable arranger automation write: `transport_setArrangerAutomationWrite({enabled: true})`
+2. Set automation write mode: `transport_setAutomationWriteMode({mode: "touch"})` (or "write"/"latch")
+
+**Point format:**
+- `position` — beat position in the arranger (>= 0). E.g., 0 = bar 1 beat 1, 4.0 = bar 2 beat 1 in 4/4.
+- `value` — normalized 0.0 to 1.0 (same scale as `device_setParameterValue`). Values outside [0,1] are clamped.
+
+**Guardrails:** Points are auto-sorted by position. Duplicate positions use last-wins. Negative positions are rejected.
+
+**Per-parameter automation lifecycle:**
+1. **Write:** `device_writeEnvelope` to create/overwrite automation data
+2. **Check:** `device_hasAutomation` to see if a parameter has automation (also in snapshot: `hasAutomation` per parameter)
+3. **Delete:** `device_deleteAllAutomation` to remove the entire automation envelope
+4. **Restore:** `device_restoreAutomationControl` to return a manually-overridden parameter to its automation curve
+
+**Manual recording:** For fine-grained control, use `device_touch` to enter touch mode, then set values over time while playback is running, then untouch. This is the primitive that `device_writeEnvelope` uses internally.
+
+**Limitations:**
+- **Write-only:** There is no way to read back automation curve data — the API does not expose automation points.
+- **Async execution:** `device_writeEnvelope` returns immediately but recording completes asynchronously. Wait ~100ms per point before calling `session_snapshot` to verify `hasAutomation`.
+- **Position drift:** Transport position is approximately restored (small drift possible from the initial playback delay).
+
+**Workflow:**
+```
+transport_setArrangerAutomationWrite({enabled: true})
+transport_setAutomationWriteMode({mode: "touch"})
+device_writeEnvelope({index: 0, points: [{position: 0, value: 0.2}, {position: 4, value: 0.8}, {position: 8, value: 0.5}]})
+— wait ~300ms for 3 points —
+session_snapshot  (verify hasAutomation = true for parameter 0)
+```
+
 ### Cue Markers
 
 Mark arrangement positions (intro, verse, chorus, bridge, outro):

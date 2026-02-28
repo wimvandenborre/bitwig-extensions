@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm), master track, clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm), master track, clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -447,6 +447,98 @@
         }
       },
       "required": ["index", "value"]
+    }
+  },
+  {
+    "name": "device_hasAutomation",
+    "description": "Check whether a remote control parameter on the current device page has automation data recorded in the arranger. Returns {hasAutomation: boolean}.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "device_deleteAllAutomation",
+    "description": "Delete all automation data for a remote control parameter on the current device page. This removes the entire automation envelope from the arranger. Use `device_hasAutomation` first to check before deleting.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "device_restoreAutomationControl",
+    "description": "Restore a parameter to its automation curve after it has been manually overridden. When a parameter is changed during playback, it overrides automation until this is called or `transport_resetAutomationOverrides` clears all overrides globally.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "device_touch",
+    "description": "Touch or untouch a remote control parameter for automation recording. When touched during playback with automation write enabled, parameter value changes are recorded to the automation lane. Always untouch after recording to stop capturing changes. WARNING: Forgetting to untouch leaves the parameter in recording mode.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
+        },
+        "touched": {
+          "type": "boolean",
+          "description": "True to enter touch/recording mode, false to exit."
+        }
+      },
+      "required": ["index", "touched"]
+    }
+  },
+  {
+    "name": "device_writeEnvelope",
+    "description": "Write an automation envelope curve for a remote control parameter. Takes an array of {position, value} points and records them as automation data in the arranger. Internally uses simulated touch recording with playback — returns immediately but recording completes asynchronously (~100ms per point). PREREQUISITES: (1) Arranger automation write must be enabled via `transport_setArrangerAutomationWrite`. (2) Automation write mode should be set (e.g., 'touch' via `transport_setAutomationWriteMode`). Transport position and play/stop state are saved and restored after recording. Points are sorted by position, values clamped to [0,1], duplicate positions use last-wins.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
+        },
+        "points": {
+          "type": "array",
+          "description": "Array of automation points to write. Points are sorted by position automatically.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "number",
+                "description": "Beat position in the arranger (must be >= 0)."
+              },
+              "value": {
+                "type": "number",
+                "description": "Parameter value, normalized 0.0 to 1.0. Values outside this range are clamped."
+              }
+            },
+            "required": ["position", "value"]
+          }
+        }
+      },
+      "required": ["index", "points"]
     }
   },
   {

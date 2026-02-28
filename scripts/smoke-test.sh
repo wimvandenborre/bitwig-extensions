@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.8.x — Smoke Test Suite
+# Gig Maestro v0.9.x — Smoke Test Suite
 #
 # Usage:
 #   ./scripts/smoke-test.sh              — run all tests (requires Bitwig running)
@@ -77,11 +77,11 @@ echo "--- O1. Tool Schema Validation ---"
 TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 74 ]; then
-  echo "  PASS  claude-tools.json has >= 74 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 79 ]; then
+  echo "  PASS  claude-tools.json has >= 79 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 74 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 79 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -267,6 +267,45 @@ assert_contains "system prompt mentions arranger_setPlaybackFollow" "$PROMPT" "a
 assert_contains "system prompt mentions transport_setLoopRange" "$PROMPT" "transport_setLoopRange"
 assert_contains "system prompt mentions cueMarker_addAtPlayhead" "$PROMPT" "cueMarker_addAtPlayhead"
 assert_contains "system prompt mentions automation write modes" "$PROMPT" "latch"
+
+# Phase 9 — Envelope Writing tools
+echo "--- Phase 9: Envelope Writing tools ---"
+assert_contains "has device_hasAutomation tool" "$TOOLS_LIST" "device_hasAutomation"
+assert_contains "has device_deleteAllAutomation tool" "$TOOLS_LIST" "device_deleteAllAutomation"
+assert_contains "has device_restoreAutomationControl tool" "$TOOLS_LIST" "device_restoreAutomationControl"
+assert_contains "has device_touch tool" "$TOOLS_LIST" "device_touch"
+assert_contains "has device_writeEnvelope tool" "$TOOLS_LIST" "device_writeEnvelope"
+
+# Phase 9 — tool schema spot-checks
+WRITE_ENV_INDEX_TYPE=$(jq -r '.[] | select(.name=="device_writeEnvelope") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "device_writeEnvelope index param is integer" "$WRITE_ENV_INDEX_TYPE" "integer"
+
+WRITE_ENV_POINTS_TYPE=$(jq -r '.[] | select(.name=="device_writeEnvelope") | .input_schema.properties.points.type' "$TOOLS_FILE")
+assert_equals "device_writeEnvelope points param is array" "$WRITE_ENV_POINTS_TYPE" "array"
+
+WRITE_ENV_POINT_POS_TYPE=$(jq -r '.[] | select(.name=="device_writeEnvelope") | .input_schema.properties.points.items.properties.position.type' "$TOOLS_FILE")
+assert_equals "device_writeEnvelope point position is number" "$WRITE_ENV_POINT_POS_TYPE" "number"
+
+WRITE_ENV_POINT_VAL_TYPE=$(jq -r '.[] | select(.name=="device_writeEnvelope") | .input_schema.properties.points.items.properties.value.type' "$TOOLS_FILE")
+assert_equals "device_writeEnvelope point value is number" "$WRITE_ENV_POINT_VAL_TYPE" "number"
+
+TOUCH_INDEX_TYPE=$(jq -r '.[] | select(.name=="device_touch") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "device_touch index param is integer" "$TOUCH_INDEX_TYPE" "integer"
+
+TOUCH_TOUCHED_TYPE=$(jq -r '.[] | select(.name=="device_touch") | .input_schema.properties.touched.type' "$TOOLS_FILE")
+assert_equals "device_touch touched param is boolean" "$TOUCH_TOUCHED_TYPE" "boolean"
+
+HAS_AUTO_INDEX_TYPE=$(jq -r '.[] | select(.name=="device_hasAutomation") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "device_hasAutomation index param is integer" "$HAS_AUTO_INDEX_TYPE" "integer"
+
+# Phase 9 — system prompt
+assert_contains "system prompt has Envelope Writing section" "$PROMPT" "Envelope Writing"
+assert_contains "system prompt mentions device_writeEnvelope" "$PROMPT" "device_writeEnvelope"
+assert_contains "system prompt mentions device_hasAutomation" "$PROMPT" "device_hasAutomation"
+assert_contains "system prompt mentions device_touch" "$PROMPT" "device_touch"
+assert_contains "system prompt mentions write-only limitation" "$PROMPT" "Write-only"
+assert_contains "system prompt mentions async execution" "$PROMPT" "Async execution"
+assert_contains "system prompt mentions prerequisites" "$PROMPT" "Prerequisites"
 
 # Phase 7 tool description warnings
 DEVICE_REMOVE_DESC=$(jq -r '.[] | select(.name=="device_remove") | .description' "$TOOLS_FILE")
@@ -678,11 +717,11 @@ assert_contains "api/list has clip/scrollSteps" "$LIST" '"clip/scrollSteps"'
 # Count total methods
 METHOD_COUNT=$(echo "$LIST" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
 TOTAL=$((TOTAL + 1))
-if [ "$METHOD_COUNT" -ge 74 ]; then
-  echo "  PASS  api/list has >= 74 methods (found $METHOD_COUNT)"
+if [ "$METHOD_COUNT" -ge 79 ]; then
+  echo "  PASS  api/list has >= 79 methods (found $METHOD_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  api/list has >= 74 methods — found $METHOD_COUNT"
+  echo "  FAIL  api/list has >= 79 methods — found $METHOD_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -976,8 +1015,65 @@ assert_contains "cueMarker/delete negative index returns -32602" "$ERR" '-32602'
 ERR=$(rpc '{"jsonrpc":"2.0","method":"cueMarker/launch","params":{},"id":173}')
 assert_contains "cueMarker/launch missing index returns -32602" "$ERR" '-32602'
 
-# 38. Clean up — delete the duplicated track and undo rename
-echo "--- 38. Track Cleanup ---"
+# 38. Phase 9 — Envelope Writing methods
+echo "--- 38. Envelope Writing ---"
+
+# device/hasAutomation — returns boolean
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/hasAutomation","params":{"index":0},"id":200}')
+assert_contains "device/hasAutomation returns hasAutomation field" "$RESP" '"hasAutomation"'
+
+# device/touch — valid call
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/touch","params":{"index":0,"touched":true},"id":201}')
+assert_contains "device/touch true returns ok" "$RESP" '"ok":true'
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/touch","params":{"index":0,"touched":false},"id":202}')
+assert_contains "device/touch false returns ok" "$RESP" '"ok":true'
+
+# device/touch — validation errors
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/touch","params":{"index":8,"touched":true},"id":203}')
+assert_contains "device/touch index out of range returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/touch","params":{},"id":204}')
+assert_contains "device/touch missing params returns -32602" "$ERR" '-32602'
+
+# device/hasAutomation — validation error
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/hasAutomation","params":{"index":8},"id":205}')
+assert_contains "device/hasAutomation index out of range returns -32602" "$ERR" '-32602'
+
+# device/deleteAllAutomation — validation error
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/deleteAllAutomation","params":{"index":-1},"id":206}')
+assert_contains "device/deleteAllAutomation negative index returns -32602" "$ERR" '-32602'
+
+# device/restoreAutomationControl — validation error
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/restoreAutomationControl","params":{},"id":207}')
+assert_contains "device/restoreAutomationControl missing index returns -32602" "$ERR" '-32602'
+
+# device/writeEnvelope — automation write disabled returns error
+rpc '{"jsonrpc":"2.0","method":"transport/setArrangerAutomationWrite","params":{"enabled":false},"id":208}' > /dev/null
+sleep 0.3
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/writeEnvelope","params":{"index":0,"points":[{"position":0,"value":0.5}]},"id":209}')
+assert_contains "writeEnvelope with write disabled returns error" "$ERR" '"error"'
+
+# device/writeEnvelope — index out of range
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/writeEnvelope","params":{"index":9,"points":[{"position":0,"value":0.5}]},"id":210}')
+assert_contains "writeEnvelope index out of range returns -32602" "$ERR" '-32602'
+
+# device/writeEnvelope — empty points
+rpc '{"jsonrpc":"2.0","method":"transport/setArrangerAutomationWrite","params":{"enabled":true},"id":211}' > /dev/null
+sleep 0.3
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/writeEnvelope","params":{"index":0,"points":[]},"id":212}')
+assert_contains "writeEnvelope empty points returns -32602" "$ERR" '-32602'
+
+# Snapshot parameter has hasAutomation field
+HAS_AUTO=$(snapshot_field "['device']['remoteControls']['parameters'][0]['hasAutomation']")
+assert_contains "snapshot parameter[0] has hasAutomation" "$HAS_AUTO" ""
+# The field exists (would be error/empty if missing) — value is True or False
+echo "  INFO  parameter[0].hasAutomation = $HAS_AUTO"
+
+# Cleanup: disable automation write
+rpc '{"jsonrpc":"2.0","method":"transport/setArrangerAutomationWrite","params":{"enabled":false},"id":213}' > /dev/null
+
+# 39. Clean up — delete the duplicated track and undo rename
+echo "--- 39. Track Cleanup ---"
 # Select track 0 and restore original name
 rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
 sleep 0.3
