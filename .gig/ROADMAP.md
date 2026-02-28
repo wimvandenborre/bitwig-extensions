@@ -20,7 +20,8 @@
 | 5 | Device Insertion | v0.5.1–v0.5.5 | complete |
 | 6 | Track Management | v0.6.1–v0.6.4 | complete |
 | 7 | Agent Reliability + Musicality | v0.7.1–v0.7.4 | complete |
-| 8 | Arrangement & Automation Control | v0.8.x | planned |
+| 8 | Arrangement & Automation Control | v0.8.1–v0.8.6 | complete |
+| 9 | Envelope Writing | v0.9.x | planned |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

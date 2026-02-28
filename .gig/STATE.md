@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.8.6` |
-| **Phase** | 8 — Arrangement & Automation Control |
-| **Status** | `VERIFIED` |
-| **Last Batch** | Unit tests + smoke tests |
+| **Version** | `0.9.0` |
+| **Phase** | 9 — Envelope Writing |
+| **Status** | `PLANNED` |
+| **Last Batch** | — |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -68,13 +68,12 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- **D-8.1** — Phase 8: arranger visibility + loop/punch + cue markers + automation write. No envelope editing.
-- **D-8.2a** — One new handler: ArrangerHandler (visibility + cue markers). Loop/punch/automation go in existing TransportHandler.
-- **D-8.3** — 7 arranger visibility toggles + snapshot section.
-- **D-8.4** — 4 loop/punch RPC methods: setLoopRange, setPunchIn, setPunchOut, getLoopRange.
-- **D-8.5a** — 4 cue marker methods: addAtPlayhead, list, launch, delete. 16-marker bank. No separate jump.
-- **D-8.6** — 4 automation methods: setWriteMode, setArrangerWrite, setClipLauncherWrite, resetOverrides.
-- **D-8.7** — Two new snapshot sections: `arranger` (visibility) + `arrangement` (loop, punch, automation, cue markers).
+- **D-9.1a** — Scope: spike + writeEnvelope + per-param automation + touch + state restoration guardrails.
+- **D-9.2** — Spike: validate position-jump + touch + setValue before full implementation.
+- **D-9.3** — Architecture: add methods to existing DeviceHandler.
+- **D-9.4a** — writeEnvelope: preconditions (automation write enabled), input validation (sorted, >=0, [0,1]), state save/restore, finally untouch.
+- **D-9.5a** — 4 methods matching API v25: hasAutomation, deleteAllAutomation, restoreAutomationControl, touch.
+- **D-9.6** — Snapshot: add `hasAutomation` to existing parameter objects in device section.
 
 ---
 
