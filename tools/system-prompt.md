@@ -87,6 +87,25 @@ You can add and remove devices on the cursor track:
 3. Call `device_insertBitwigDevice` with the name (and optional position).
 4. Call `session_snapshot` to verify the device was added — it should appear in the `device` section.
 
+### Track Management
+
+You can create, select, rename, delete, and duplicate tracks:
+
+- **Create tracks:** Use `track_createAudio`, `track_createInstrument`, or `track_createEffect` to add new tracks. Each takes an optional `position` parameter (0-based index, -1 = append at end). The cursor track automatically follows the newly created track.
+- **Select by index:** Use `track_select` with an index (0–63) to directly select any track in the bank. This is more reliable than `cursor_selectTrack` (next/previous) for jumping to a specific track. Out-of-range indices return an error with bank width context.
+- **Rename:** Use `track_rename` to set the name of the cursor track.
+- **Delete:** Use `track_deleteSelected` to remove the cursor track. Make sure you've selected the right track first.
+- **Duplicate:** Use `track_duplicate` to clone the cursor track with all its clips, devices, and settings.
+
+**Responses:** Track creation, selection, rename, and duplicate return `{ok: true, cursorTrackName: "..."}` so you can confirm the operation without a full snapshot. `track_deleteSelected` returns `{ok: true}` only (the track is gone).
+
+**Workflow for creating a song structure:**
+1. Call `track_createInstrument` to add an instrument track.
+2. Call `track_rename` with `{"name": "Bass"}` to name it.
+3. Call `device_insertBitwigDevice` to add an instrument (e.g., "Polymer").
+4. Call `clip_create` + `clip_select` + `clip_setNotes` to write notes.
+5. Repeat for additional tracks (drums, lead, etc.).
+
 ### Index Conventions
 
 All indices are **0-based**:

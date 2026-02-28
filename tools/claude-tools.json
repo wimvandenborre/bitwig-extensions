@@ -660,5 +660,93 @@
       "properties": {},
       "required": []
     }
+  },
+  {
+    "name": "track_createAudio",
+    "description": "Create a new audio track in the project. Audio tracks can record and play audio clips. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "integer",
+          "description": "Insert position (0-based track index). Use -1 to append at the end (default)."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "track_createInstrument",
+    "description": "Create a new instrument track in the project. Instrument tracks host virtual instruments and can record/play MIDI. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "integer",
+          "description": "Insert position (0-based track index). Use -1 to append at the end (default)."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "track_createEffect",
+    "description": "Create a new effect track (return/bus track) in the project. Effect tracks receive audio from sends and apply effects. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "integer",
+          "description": "Insert position (0-based track index). Use -1 to append at the end (default)."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "track_select",
+    "description": "Select a track by its bank index. The cursor track will follow this selection, making subsequent cursor-based operations (rename, delete, insert device, note editing) target the selected track. Index must be in the range 0–63. Out-of-range indices return an error with bank width context.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index to select (0-based). Valid range: 0 to 63."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "track_rename",
+    "description": "Rename the currently selected (cursor) track. The cursor track must be pointing at the desired track first — use `track_select` or `cursor_selectTrack` to navigate.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "New name for the track."
+        }
+      },
+      "required": ["name"]
+    }
+  },
+  {
+    "name": "track_deleteSelected",
+    "description": "Delete the currently selected (cursor) track from the project. This permanently removes the track and all its clips, devices, and automation. The cursor track must be pointing at the track to delete. Use `track_select` to target a specific track first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_duplicate",
+    "description": "Duplicate the currently selected (cursor) track. Creates a copy of the track with all its clips, devices, and settings. The cursor track must be pointing at the track to duplicate.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
   }
 ]

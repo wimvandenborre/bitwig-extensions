@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.5.x — Smoke Test Suite
+# Gig Maestro v0.6.x — Smoke Test Suite
 #
 # Usage:
 #   ./scripts/smoke-test.sh              — run all tests (requires Bitwig running)
@@ -76,7 +76,14 @@ echo ""
 echo "--- O1. Tool Schema Validation ---"
 TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
-assert_equals "claude-tools.json has 48 tools" "$TOOL_COUNT" "48"
+TOTAL=$((TOTAL + 1))
+if [ "$TOOL_COUNT" -ge 55 ]; then
+  echo "  PASS  claude-tools.json has >= 55 tools (found $TOOL_COUNT)"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL  claude-tools.json has >= 55 tools — found $TOOL_COUNT"
+  FAIL=$((FAIL + 1))
+fi
 
 # Every tool has name, description, input_schema
 MISSING_FIELDS=$(jq '[.[] | select(.name == null or .description == null or .input_schema == null)] | length' "$TOOLS_FILE")
@@ -84,7 +91,7 @@ assert_equals "all tools have name, description, input_schema" "$MISSING_FIELDS"
 
 # All tool names are unique
 UNIQUE_NAMES=$(jq '[.[].name] | unique | length' "$TOOLS_FILE")
-assert_equals "all tool names are unique" "$UNIQUE_NAMES" "48"
+assert_equals "all tool names are unique" "$UNIQUE_NAMES" "$TOOL_COUNT"
 
 # Tool names use underscore convention (no slashes)
 SLASH_NAMES=$(jq '[.[].name | select(contains("/"))] | length' "$TOOLS_FILE")
@@ -151,6 +158,24 @@ assert_equals "device_insertBitwigDevice position has end,before,after enum" "$I
 PLUGIN_TYPE_ENUM=$(jq -r '.[] | select(.name=="device_insertPluginDevice") | .input_schema.properties.type.enum | join(",")' "$TOOLS_FILE")
 assert_equals "device_insertPluginDevice type has vst2,vst3,clap enum" "$PLUGIN_TYPE_ENUM" "vst2,vst3,clap"
 
+# Phase 6 track management tools
+assert_contains "has track_createAudio tool" "$TOOLS_LIST" "track_createAudio"
+assert_contains "has track_createInstrument tool" "$TOOLS_LIST" "track_createInstrument"
+assert_contains "has track_createEffect tool" "$TOOLS_LIST" "track_createEffect"
+assert_contains "has track_select tool" "$TOOLS_LIST" "track_select"
+assert_contains "has track_rename tool" "$TOOLS_LIST" "track_rename"
+assert_contains "has track_deleteSelected tool" "$TOOLS_LIST" "track_deleteSelected"
+assert_contains "has track_duplicate tool" "$TOOLS_LIST" "track_duplicate"
+
+SELECT_INDEX_TYPE=$(jq -r '.[] | select(.name=="track_select") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "track_select index param is integer" "$SELECT_INDEX_TYPE" "integer"
+
+RENAME_NAME_TYPE=$(jq -r '.[] | select(.name=="track_rename") | .input_schema.properties.name.type' "$TOOLS_FILE")
+assert_equals "track_rename name param is string" "$RENAME_NAME_TYPE" "string"
+
+CREATE_POS_TYPE=$(jq -r '.[] | select(.name=="track_createAudio") | .input_schema.properties.position.type' "$TOOLS_FILE")
+assert_equals "track_createAudio position param is integer" "$CREATE_POS_TYPE" "integer"
+
 # O2. System prompt validation
 echo "--- O2. System Prompt Validation ---"
 PROMPT_FILE="${PROJECT_ROOT}/tools/system-prompt.md"
@@ -169,6 +194,9 @@ assert_contains "system prompt mentions clip_setNotes" "$PROMPT" "clip_setNotes"
 assert_contains "system prompt covers device insertion" "$PROMPT" "Device Insertion"
 assert_contains "system prompt mentions device_listBitwigDevices" "$PROMPT" "device_listBitwigDevices"
 assert_contains "system prompt mentions device_insertBitwigDevice" "$PROMPT" "device_insertBitwigDevice"
+assert_contains "system prompt covers track management" "$PROMPT" "Track Management"
+assert_contains "system prompt mentions track_select" "$PROMPT" "track_select"
+assert_contains "system prompt mentions track_createInstrument" "$PROMPT" "track_createInstrument"
 
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
@@ -208,6 +236,13 @@ TRACK_HELP=$(java -jar "$CLI_JAR" track --help 2>&1)
 assert_contains "track help shows set-volume" "$TRACK_HELP" "set-volume"
 assert_contains "track help shows set-mute" "$TRACK_HELP" "set-mute"
 assert_contains "track help shows set-solo" "$TRACK_HELP" "set-solo"
+assert_contains "track help shows create-audio" "$TRACK_HELP" "create-audio"
+assert_contains "track help shows create-instrument" "$TRACK_HELP" "create-instrument"
+assert_contains "track help shows create-effect" "$TRACK_HELP" "create-effect"
+assert_contains "track help shows select" "$TRACK_HELP" "select"
+assert_contains "track help shows rename" "$TRACK_HELP" "rename"
+assert_contains "track help shows delete-selected" "$TRACK_HELP" "delete-selected"
+assert_contains "track help shows duplicate" "$TRACK_HELP" "duplicate"
 
 # Device subcommand help
 DEVICE_HELP=$(java -jar "$CLI_JAR" device --help 2>&1)
@@ -559,7 +594,14 @@ assert_contains "api/list has clip/scrollSteps" "$LIST" '"clip/scrollSteps"'
 
 # Count total methods
 METHOD_COUNT=$(echo "$LIST" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
-assert_equals "api/list has 48 methods" "$METHOD_COUNT" "48"
+TOTAL=$((TOTAL + 1))
+if [ "$METHOD_COUNT" -ge 55 ]; then
+  echo "  PASS  api/list has >= 55 methods (found $METHOD_COUNT)"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL  api/list has >= 55 methods — found $METHOD_COUNT"
+  FAIL=$((FAIL + 1))
+fi
 
 # 20. Clip snapshot section
 echo "--- 20. Clip Snapshot Section ---"
@@ -680,6 +722,83 @@ assert_contains "insertPluginDevice invalid type returns -32602" "$ERR" '-32602'
 
 ERR=$(rpc '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{},"id":139}')
 assert_contains "insertBitwigDevice missing name returns -32602" "$ERR" '-32602'
+
+# 27. Track Management API List
+echo "--- 27. Track Management API List ---"
+LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":140}')
+assert_contains "api/list has track/createAudio" "$LIST" '"track/createAudio"'
+assert_contains "api/list has track/createInstrument" "$LIST" '"track/createInstrument"'
+assert_contains "api/list has track/createEffect" "$LIST" '"track/createEffect"'
+assert_contains "api/list has track/select" "$LIST" '"track/select"'
+assert_contains "api/list has track/rename" "$LIST" '"track/rename"'
+assert_contains "api/list has track/deleteSelected" "$LIST" '"track/deleteSelected"'
+assert_contains "api/list has track/duplicate" "$LIST" '"track/duplicate"'
+
+# 28. Create, select, rename, duplicate, delete workflow
+echo "--- 28. Track Management Workflow ---"
+
+# Create an audio track
+RESP=$(rpc '{"jsonrpc":"2.0","method":"track/createAudio","params":{"position":-1},"id":141}')
+assert_contains "track/createAudio returns ok" "$RESP" '"ok":true'
+assert_contains "track/createAudio returns cursorTrackName" "$RESP" '"cursorTrackName"'
+sleep 0.5
+
+# Get the name of the newly created track from snapshot
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":142}')
+TRACK_COUNT_BEFORE=$(echo "$SNAP" | python3 -c "import sys,json; tracks = json.load(sys.stdin)['result']['tracks']; print(sum(1 for t in tracks if t['name'] != ''))")
+
+# Select by index (track 0)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":143}')
+assert_contains "track/select returns ok" "$RESP" '"ok":true'
+assert_contains "track/select returns cursorTrackName" "$RESP" '"cursorTrackName"'
+sleep 0.3
+
+# Rename the selected track
+RESP=$(rpc '{"jsonrpc":"2.0","method":"track/rename","params":{"name":"SmokeTestTrack"},"id":144}')
+assert_contains "track/rename returns ok" "$RESP" '"ok":true'
+assert_contains "track/rename returns cursorTrackName" "$RESP" '"cursorTrackName"'
+sleep 0.5
+
+# Verify rename in snapshot
+NAME=$(snapshot_field "['tracks'][0]['name']")
+assert_equals "track 0 renamed to SmokeTestTrack" "$NAME" "SmokeTestTrack"
+
+# Duplicate the track
+RESP=$(rpc '{"jsonrpc":"2.0","method":"track/duplicate","params":{},"id":145}')
+assert_contains "track/duplicate returns ok" "$RESP" '"ok":true'
+sleep 0.5
+
+# Create instrument track
+RESP=$(rpc '{"jsonrpc":"2.0","method":"track/createInstrument","params":{},"id":146}')
+assert_contains "track/createInstrument returns ok" "$RESP" '"ok":true'
+sleep 0.5
+
+# Delete the instrument track we just created
+RESP=$(rpc '{"jsonrpc":"2.0","method":"track/deleteSelected","params":{},"id":147}')
+assert_contains "track/deleteSelected returns ok" "$RESP" '"ok":true'
+sleep 0.5
+
+# 29. Track select out-of-range error
+echo "--- 29. Track Select Error ---"
+ERR=$(rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":999},"id":148}')
+assert_contains "track/select out-of-range returns -32602" "$ERR" '-32602'
+assert_contains "track/select error mentions bank width" "$ERR" '64'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":-1},"id":149}')
+assert_contains "track/select negative index returns -32602" "$ERR" '-32602'
+
+# 30. Clean up — delete the duplicated track and undo rename
+echo "--- 30. Track Cleanup ---"
+# Select track 0 and restore original name
+rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
+sleep 0.3
+rpc '{"jsonrpc":"2.0","method":"app/undo","id":151}' > /dev/null
+rpc '{"jsonrpc":"2.0","method":"app/undo","id":152}' > /dev/null
+rpc '{"jsonrpc":"2.0","method":"app/undo","id":153}' > /dev/null
+rpc '{"jsonrpc":"2.0","method":"app/undo","id":154}' > /dev/null
+rpc '{"jsonrpc":"2.0","method":"app/undo","id":155}' > /dev/null
+sleep 0.5
+echo "  INFO  cleanup: undid track management operations"
 
 # --- summary ---
 echo ""

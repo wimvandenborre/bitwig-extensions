@@ -11,6 +11,7 @@ import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
+import dev.gregross.gig.handlers.TrackBankManager;
 import dev.gregross.gig.handlers.TrackHandler;
 import dev.gregross.gig.handlers.TransportHandler;
 import dev.gregross.gig.rpc.CommandQueue;
@@ -89,7 +90,8 @@ public class GigMaestroExtension extends ControllerExtension {
         // Register handlers
         new ApplicationHandler(application).register(dispatcher);
         new TransportHandler(transport).register(dispatcher);
-        new TrackHandler(trackBank).register(dispatcher);
+        TrackBankManager trackBankManager = new TrackBankManager(trackBank, TRACK_COUNT);
+        new TrackHandler(trackBank, application, cursorTrack, trackBankManager).register(dispatcher);
         new MasterHandler(masterTrack).register(dispatcher);
         new ClipHandler(trackBank, trackBank.sceneBank()).register(dispatcher);
         DeviceLibrary deviceLibrary;

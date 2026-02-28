@@ -9,14 +9,21 @@ import picocli.CommandLine.ParentCommand;
 
 @Command(
     name = "track",
-    description = "Track controls (volume, pan, mute, solo, arm).",
+    description = "Track controls (volume, pan, mute, solo, arm, create, select, rename, delete, duplicate).",
     mixinStandardHelpOptions = true,
     subcommands = {
         TrackCommand.SetVolume.class,
         TrackCommand.SetPan.class,
         TrackCommand.SetMute.class,
         TrackCommand.SetSolo.class,
-        TrackCommand.SetArm.class
+        TrackCommand.SetArm.class,
+        TrackCommand.CreateAudio.class,
+        TrackCommand.CreateInstrument.class,
+        TrackCommand.CreateEffect.class,
+        TrackCommand.Select.class,
+        TrackCommand.Rename.class,
+        TrackCommand.DeleteSelected.class,
+        TrackCommand.Duplicate.class
     }
 )
 class TrackCommand {
@@ -116,6 +123,106 @@ class TrackCommand {
             params.addProperty("index", index);
             params.addProperty("armed", "on".equalsIgnoreCase(state));
             callRpc(track, "track/setArm", params);
+        }
+    }
+
+    // --- Phase 6: Track management subcommands ---
+
+    @Command(name = "create-audio", description = "Create a new audio track.")
+    static class CreateAudio implements Runnable {
+        @ParentCommand private TrackCommand track;
+
+        @Option(names = {"--position", "-p"}, description = "Insert position (0-based index, -1 = append).",
+                defaultValue = "-1")
+        int position;
+
+        @Override
+        public void run() {
+            JsonObject params = new JsonObject();
+            params.addProperty("position", position);
+            callRpc(track, "track/createAudio", params);
+        }
+    }
+
+    @Command(name = "create-instrument", description = "Create a new instrument track.")
+    static class CreateInstrument implements Runnable {
+        @ParentCommand private TrackCommand track;
+
+        @Option(names = {"--position", "-p"}, description = "Insert position (0-based index, -1 = append).",
+                defaultValue = "-1")
+        int position;
+
+        @Override
+        public void run() {
+            JsonObject params = new JsonObject();
+            params.addProperty("position", position);
+            callRpc(track, "track/createInstrument", params);
+        }
+    }
+
+    @Command(name = "create-effect", description = "Create a new effect track.")
+    static class CreateEffect implements Runnable {
+        @ParentCommand private TrackCommand track;
+
+        @Option(names = {"--position", "-p"}, description = "Insert position (0-based index, -1 = append).",
+                defaultValue = "-1")
+        int position;
+
+        @Override
+        public void run() {
+            JsonObject params = new JsonObject();
+            params.addProperty("position", position);
+            callRpc(track, "track/createEffect", params);
+        }
+    }
+
+    @Command(name = "select", description = "Select a track by index (0–63).")
+    static class Select implements Runnable {
+        @ParentCommand private TrackCommand track;
+
+        @Option(names = {"--index", "-i"}, required = true, description = "Track index (0-based).")
+        int index;
+
+        @Override
+        public void run() {
+            JsonObject params = new JsonObject();
+            params.addProperty("index", index);
+            callRpc(track, "track/select", params);
+        }
+    }
+
+    @Command(name = "rename", description = "Rename the currently selected track.")
+    static class Rename implements Runnable {
+        @ParentCommand private TrackCommand track;
+
+        @Parameters(index = "0", description = "New track name.")
+        String name;
+
+        @Override
+        public void run() {
+            JsonObject params = new JsonObject();
+            params.addProperty("name", name);
+            callRpc(track, "track/rename", params);
+        }
+    }
+
+    @Command(name = "delete-selected", description = "Delete the currently selected track.")
+    static class DeleteSelected implements Runnable {
+        @ParentCommand private TrackCommand track;
+
+        @Override
+        public void run() {
+            callRpc(track, "track/deleteSelected", new JsonObject());
+        }
+    }
+
+    @Command(name = "duplicate", description = "Duplicate the currently selected track.")
+    static class Duplicate implements Runnable {
+        @ParentCommand private TrackCommand track;
+
+        @Override
+        public void run() {
+            callRpc(track, "track/duplicate", new JsonObject());
         }
     }
 
