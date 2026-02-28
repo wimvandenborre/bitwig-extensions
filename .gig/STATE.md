@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.8.0` |
-| **Phase** | 7 — Agent Reliability + Musicality (complete) |
-| **Status** | `VERIFIED` |
+| **Phase** | 8 — Arrangement & Automation Control |
+| **Status** | `PLANNED` |
 | **Last Batch** | Phase 7 archived |
 | **Last Updated** | 2026-02-28 |
 
@@ -62,12 +62,13 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- **D-7.1a** — System prompt + tool description overhaul only. Doc aliases and recommended call sequences allowed.
-- **D-7.2** — Document async cursor lag as Known Behavior. Snapshot after mutations for authoritative state.
-- **D-7.3** — Error Recovery section: error codes, common failures + fixes, snapshot-before-retry rule.
-- **D-7.4a** — Operational music reference: MIDI table, semitone sets, interval sets, GM drum map, velocity bands.
-- **D-7.5** — Song Building section: structure template, build-from-scratch workflow, defaults.
-- **D-7.6** — Tool description warnings on 4 tools: device_remove, track creates, cursor_selectTrack, clip_launch.
+- **D-8.1** — Phase 8: arranger visibility + loop/punch + cue markers + automation write. No envelope editing.
+- **D-8.2a** — One new handler: ArrangerHandler (visibility + cue markers). Loop/punch/automation go in existing TransportHandler.
+- **D-8.3** — 7 arranger visibility toggles + snapshot section.
+- **D-8.4** — 4 loop/punch RPC methods: setLoopRange, setPunchIn, setPunchOut, getLoopRange.
+- **D-8.5a** — 4 cue marker methods: addAtPlayhead, list, launch, delete. 16-marker bank. No separate jump.
+- **D-8.6** — 4 automation methods: setWriteMode, setArrangerWrite, setClipLauncherWrite, resetOverrides.
+- **D-8.7** — Two new snapshot sections: `arranger` (visibility) + `arrangement` (loop, punch, automation, cue markers).
 
 ---
 
