@@ -5,6 +5,8 @@ import com.bitwig.extension.controller.api.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.handlers.ApplicationHandler;
+import dev.gregross.gig.handlers.MasterHandler;
+import dev.gregross.gig.handlers.TrackHandler;
 import dev.gregross.gig.handlers.TransportHandler;
 import dev.gregross.gig.rpc.CommandQueue;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
@@ -60,6 +62,8 @@ public class GigMaestroExtension extends ControllerExtension {
         // Register handlers
         new ApplicationHandler(application).register(dispatcher);
         new TransportHandler(transport).register(dispatcher);
+        new TrackHandler(trackBank).register(dispatcher);
+        new MasterHandler(masterTrack).register(dispatcher);
 
         // Start servers
         try {
