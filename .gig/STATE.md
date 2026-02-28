@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.8.6` |
 | **Phase** | 8 — Arrangement & Automation Control |
-| **Status** | `IN-PROGRESS` |
+| **Status** | `VERIFIED` |
 | **Last Batch** | Unit tests + smoke tests |
 | **Last Updated** | 2026-02-28 |
 
