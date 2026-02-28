@@ -4,6 +4,7 @@ import com.bitwig.extension.callback.BooleanValueChangedCallback;
 import com.bitwig.extension.callback.ClipLauncherSlotBankPlaybackStateChangedCallback;
 import com.bitwig.extension.callback.ColorValueChangedCallback;
 import com.bitwig.extension.callback.DoubleValueChangedCallback;
+import com.bitwig.extension.callback.EnumValueChangedCallback;
 import com.bitwig.extension.callback.IndexedBooleanValueChangedCallback;
 import com.bitwig.extension.callback.IndexedStringValueChangedCallback;
 import com.bitwig.extension.callback.IntegerValueChangedCallback;
@@ -413,7 +414,7 @@ public class StateCache {
 
         // Automation
         transport.automationWriteMode().markInterested();
-        transport.automationWriteMode().addValueObserver((StringValueChangedCallback) v -> automationWriteMode = (String) v);
+        transport.automationWriteMode().addValueObserver((EnumValueChangedCallback) v -> automationWriteMode = (String) v);
 
         transport.isArrangerAutomationWriteEnabled().markInterested();
         transport.isArrangerAutomationWriteEnabled().addValueObserver((BooleanValueChangedCallback) v -> arrangerAutomationWriteEnabled = v);
