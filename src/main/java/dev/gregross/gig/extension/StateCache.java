@@ -431,6 +431,8 @@ public class StateCache {
             CueMarker marker = (CueMarker) cueMarkerBank.getItemAt(idx);
             cueMarkerNames[idx] = "";
 
+            marker.exists().markInterested();
+
             marker.name().markInterested();
             marker.name().addValueObserver((StringValueChangedCallback) v -> cueMarkerNames[idx] = (String) v);
 
