@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.9.0` |
+| **Version** | `0.9.5` |
 | **Phase** | 9 — Envelope Writing |
-| **Status** | `PLANNED` |
-| **Last Batch** | — |
+| **Status** | `APPLIED` |
+| **Last Batch** | Unit tests + smoke tests |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.9.5 | 9 | Unit tests + smoke tests | PLANNED | done | 2026-02-28 |
+| 0.9.4 | 9 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
+| 0.9.3 | 9 | writeEnvelope with state save/restore | PLANNED | done | 2026-02-28 |
+| 0.9.1 | 9 | Spike: validate position-jump envelope writing | PLANNED | done | 2026-02-28 |
+| 0.9.2 | 9 | Per-parameter automation methods + snapshot | PLANNED | done | 2026-02-28 |
 | 0.8.6 | 8 | Unit tests + smoke tests | PLANNED | done | 2026-02-28 |
 | 0.8.5 | 8 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
 | 0.8.4 | 8 | ArrangerHandler — cue marker operations | PLANNED | done | 2026-02-28 |
@@ -81,7 +86,8 @@
 
 <!-- Items that need human attention -->
 
-_None._
+- **FLAG-1** — Bitwig Controller API v25 has no project save, save-as, or audio export/bounce methods. These are not available for programmatic control. Users must use Bitwig UI (`Cmd+S`, `File → Export Audio Mixdown`).
+- **FLAG-2** — `cueMarker/addAtPlayhead` creates markers at wrong positions. The Bitwig API's `addCueMarkerAtPlaybackPosition()` doesn't accept a name param (always "Untitled") and the transport position may not have settled when the marker is created, causing positional drift. Future phase should add a `cueMarker/addAtPosition` method that sets transport position, waits via `scheduleTask`, then adds the marker — similar pattern to `writeEnvelope`. Also need `cueMarker/rename` (CueMarker.getName() is a SettableStringValue).
 
 ---
 
@@ -125,7 +131,14 @@ _None._
 - `StateCache.getChangedSections()` — per-section hash delta detection (transport, tracks, scenes, device, master, application)
 - WebSocket push: `state/changed` notification with `changed` array, broadcast only when `getWsClientCount() > 0`
 - Smoke test `--offline` flag for testing without Bitwig
-- Total tests: 83 unit + 152 offline smoke = 235 (online smoke tests require Bitwig)
+- Total tests: 103 unit + 171 offline smoke = 274 (online smoke tests require Bitwig)
+- **Spike D-9.2a:** Position-jump at stopped transport does NOT create automation. Continuous playback + position jumps between points DOES work. writeEnvelope must: play → (jump + touch + set + untouch) per point → stop. ~100ms sleep between jump and touch/set is sufficient.
+- `deleteAllAutomation()` does NOT reset arranger automation write state
+- `transport/setPosition` param name is `beats` (not `position`)
+- **Threading:** RPC handlers run inside `flush()` — calling `transport.play()` then `param.touch()` in the same handler doesn't work because the engine hasn't processed `play()` yet. Must use `host.scheduleTask()` to chain operations across flush cycles.
+- writeEnvelope returns immediately; actual recording happens asynchronously via scheduled tasks (~100ms per point)
+- DeviceHandler constructor: `(CursorTrack, CursorDevice, CursorRemoteControlsPage, DeviceLibrary, Transport, ControllerHost)`
+- Total RPC methods: 79 (74 + 5 new: hasAutomation, deleteAllAutomation, restoreAutomationControl, touch, writeEnvelope)
 - Bitwig device library: `/Applications/Bitwig Studio.app/Contents/Resources/Library/devices/` — 151 `.bwdevice` files
 - InsertionPoint API: `endOfDeviceChainInsertionPoint()`, `beforeDeviceInsertionPoint()`, `afterDeviceInsertionPoint()` — all have `insertFile(String)`, `insertVST2Device(int)`, `insertVST3Device(String)`, `insertCLAPDevice(String)`
 - DeviceLibrary: new utility class in `handlers/` — name→path map, case-insensitive, close-match errors

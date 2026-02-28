@@ -19,6 +19,10 @@ The full Bitwig Controller API v25 reference is at `docs/bitwig-api-reference.tx
 - Smoke tests: `scripts/smoke-test.sh`
 - Gig state: `.gig/STATE.md`, `.gig/PLAN.md`, `.gig/DECISIONS.md`
 
+## Git Preferences
+
+- **Merge strategy:** Always use regular merge (`--no-ff`), never squash. Do not ask.
+
 ## Build Commands
 
 - `./gradlew shadowJar` — build extension (outputs to Bitwig Extensions dir)
