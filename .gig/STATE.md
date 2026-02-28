@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.7.0` |
-| **Phase** | 6 — Track Management |
-| **Status** | `VERIFIED` |
+| **Phase** | 7 — Agent Reliability + Musicality |
+| **Status** | `PLANNED` |
 | **Last Batch** | Phase 6 archived |
 | **Last Updated** | 2026-02-28 |
 
@@ -58,11 +58,12 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- **D-6.1a** — 7 explicit RPC methods: createAudio, createInstrument, createEffect, deleteSelected, rename, select, duplicate
-- **D-6.2a** — track/select via selectInEditor() with TRACK_OUT_OF_RANGE error + bank width
-- **D-6.3a** — TrackHandler + TrackBankManager utility class
-- **D-6.4a** — Richer responses: {ok, cursorTrackName, cursorTrackIndex}
-- **D-6.5** — Defer Action system to later phase
+- **D-7.1a** — System prompt + tool description overhaul only. Doc aliases and recommended call sequences allowed.
+- **D-7.2** — Document async cursor lag as Known Behavior. Snapshot after mutations for authoritative state.
+- **D-7.3** — Error Recovery section: error codes, common failures + fixes, snapshot-before-retry rule.
+- **D-7.4a** — Operational music reference: MIDI table, semitone sets, interval sets, GM drum map, velocity bands.
+- **D-7.5** — Song Building section: structure template, build-from-scratch workflow, defaults.
+- **D-7.6** — Tool description warnings on 4 tools: device_remove, track creates, cursor_selectTrack, clip_launch.
 
 ---
 
