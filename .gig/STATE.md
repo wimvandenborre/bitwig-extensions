@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.3.5` |
-| **Phase** | 3 — LLM + CLI + WebSocket Push |
-| **Status** | `APPLIED` |
-| **Last Batch** | Smoke test extension + LLM validation |
+| **Version** | `0.5.0` |
+| **Phase** | 5 — Device Insertion |
+| **Status** | `PLANNED` |
+| **Last Batch** | — |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -18,6 +18,12 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.4.6 | 4 | Add clip/delete RPC method | UNPLANNED | done | 2026-02-28 |
+| 0.4.5 | 4 | CLI NoteCommand + smoke tests | PLANNED | done | 2026-02-28 |
+| 0.4.4 | 4 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
+| 0.4.3 | 4 | NoteHandler + clip/select + batch note operations | PLANNED | done | 2026-02-28 |
+| 0.4.2 | 4 | Fix deprecated BeatTimeValue.addRawValueObserver | UNPLANNED | done | 2026-02-28 |
+| 0.4.1 | 4 | CursorClip creation + clip observers + snapshot | PLANNED | done | 2026-02-28 |
 | 0.3.5 | 3 | Smoke test extension + LLM validation | PLANNED | done | 2026-02-28 |
 | 0.3.4 | 3 | WebSocket push notifications | PLANNED | done | 2026-02-28 |
 | 0.3.3 | 3 | CLI project setup + core commands | PLANNED | done | 2026-02-28 |
@@ -43,14 +49,12 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-| ID | Decision | Status |
-|----|----------|--------|
-| D-3.1 | Claude `tool_use` format schemas in `tools/claude-tools.json`, 1:1 RPC mapping, generated from handler source | ACTIVE |
-| D-3.2 | System prompt fragment in `tools/system-prompt.md` — viewport model, perception-action loop, value ranges, cursor model, indices | ACTIVE |
-| D-3.3a | Interactive testing with Claude (no scripted harness) — load schemas + prompt, verify tool selection and params manually | ACTIVE |
-| D-3.4 | Picocli CLI in separate `src/cli/` source set, standalone JAR, mirrors RPC surface, `gig rpc` escape hatch | ACTIVE |
-| D-3.5 | Delta detection via per-section hash in `StateCache`, `state/changed` notification with section names only, client fetches via snapshot | ACTIVE |
-| D-3.6 | New dirs: `tools/`, `src/cli/`. Modified: `StateCache`, `GigMaestroExtension`. Two build artifacts: `.bwextension` + CLI JAR | ACTIVE |
+- **D-5.1** — Insertion via `insertFile()` with `.bwdevice` paths (spike required to validate)
+- **D-5.2** — Insert at end-of-chain (default) + before/after cursor device
+- **D-5.3a** — 4 RPC methods: insertBitwigDevice, insertPluginDevice, listBitwigDevices, device/remove
+- **D-5.4** — Pre-scan `.bwdevice` dir at init, case-insensitive name map, close-match errors
+- **D-5.5** — Add to DeviceHandler + new DeviceLibrary utility class
+- **D-5.6** — device/remove via cursorDevice.deleteObject()
 
 ---
 
@@ -78,7 +82,7 @@ _None._
 - Transport: `play()`, `stop()`, `record()`, `tempo()`, `getPosition()`, `playPosition()`, `timeSignature()`, `isPlaying()`, `isArrangerRecordEnabled()`
 - Threading: network threads → CommandQueue → `host.requestFlush()` → `flush()` drains queue on session thread
 - MasterTrack extends Track with no additional methods
-- Bitwig API quirks: JAR strips generic type signatures — need explicit callback casts; `Parameter.addRawValueObserver()` deprecated — use `Parameter.value().addRawValueObserver()`; `Parameter.value().set()` has take-over — use `setImmediately()` for RPC
+- Bitwig API quirks: JAR strips generic type signatures — need explicit callback casts; `Parameter.addRawValueObserver()` deprecated — use `Parameter.value().addRawValueObserver()`; `Parameter.value().set()` has take-over — use `setImmediately()` for RPC; `SettableBeatTimeValue.addRawValueObserver()` deprecated since API v2 — use `addValueObserver()` instead; `NoteStep.State` inner enum not resolvable via `NoteStep.State.NoteOn` — use `step.state().name().equals("NoteOn")` string comparison
 - Service loader: `META-INF/services/com.bitwig.extension.ExtensionDefinition` required for Bitwig to discover the extension
 - ClipLauncherSlotBank: bank-level indexed callbacks (`IndexedBooleanValueChangedCallback`, `IndexedStringValueChangedCallback`) more efficient than per-slot observers
 - `ClipLauncherSlotBankPlaybackStateChangedCallback`: `(slotIndex, playbackState, isQueued)` — playbackState: 0=stopped, 1=playing, 2=recording
@@ -88,7 +92,24 @@ _None._
 - CursorRemoteControlsPage: `cursorDevice.createCursorRemoteControlsPage(8)` — 8 params per page
 - `RangedValue.displayedValue()` returns `StringValue` with formatted param value ("1.2 kHz")
 - SceneBank: `trackBank.sceneBank()`, `sceneBank.getScene(i)` — Scene has `name()`, `clipCount()`
-- Total RPC methods: 36 (Phase 1: 23, Phase 2: 13)
+- CursorClip: `cursorTrack.createLauncherCursorClip(id, name, 64, 128)` — 64-step viewport, full MIDI range, follows selected clip
+- NoteStep: `getStep(channel, x, y)` → state, velocity, duration; `setStep(channel, x, y, vel, dur)`; `clearStep(channel, x, y)`
+- Batch note ops: `clip/setNotes` accepts array, loops internally; `clip/getNotes` returns sparse array
+- NoteHandler: `handlers/NoteHandler.java` — note-level operations on CursorClip
+- Total RPC methods: 44 (Phase 1: 23, Phase 2: 13, Phase 4: 8)
+- Tool schemas: `tools/claude-tools.json` — 44 Claude tool_use definitions, 1:1 with RPC methods (underscore naming)
+- System prompt: `tools/system-prompt.md` — viewport model, perception-action loop, value ranges, cursor model, indices
+- CLI source: `src/cli/java/dev/gregross/gig/cli/` — GigCli, RpcClient, RpcCommand, SnapshotCommand, TransportCommand, TrackCommand
+- CLI JAR: `build/libs/gig-cli.jar` via `./gradlew cliShadowJar` — Picocli 4.7.6
+- CLI posts to `http://{host}:{port}/rpc` (not root URL)
+- `StateCache.getChangedSections()` — per-section hash delta detection (transport, tracks, scenes, device, master, application)
+- WebSocket push: `state/changed` notification with `changed` array, broadcast only when `getWsClientCount() > 0`
+- Smoke test `--offline` flag for testing without Bitwig
+- Total tests: 29 unit + 171 smoke = 200
+- Bitwig device library: `/Applications/Bitwig Studio.app/Contents/Resources/Library/devices/` — 151 `.bwdevice` files
+- InsertionPoint API: `endOfDeviceChainInsertionPoint()`, `beforeDeviceInsertionPoint()`, `afterDeviceInsertionPoint()` — all have `insertFile(String)`, `insertVST2Device(int)`, `insertVST3Device(String)`, `insertCLAPDevice(String)`
+- DeviceLibrary: new utility class in `handlers/` — name→path map, case-insensitive, close-match errors
+- Phase 5 adds 4 RPC methods: device/insertBitwigDevice, device/insertPluginDevice, device/listBitwigDevices, device/remove
 
 ---
 
