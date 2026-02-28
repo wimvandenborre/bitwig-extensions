@@ -115,7 +115,7 @@ public class GigMaestroExtension extends ControllerExtension {
         }
         new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, deviceLibrary).register(dispatcher);
         new NoteHandler(cursorClip).register(dispatcher);
-        new ArrangerHandler(arranger).register(dispatcher);
+        new ArrangerHandler(arranger, transport, cueMarkerBank).register(dispatcher);
 
         // Start servers
         try {

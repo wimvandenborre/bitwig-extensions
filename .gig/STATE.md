@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.8.3` |
+| **Version** | `0.8.4` |
 | **Phase** | 8 — Arrangement & Automation Control |
 | **Status** | `IN-PROGRESS` |
-| **Last Batch** | TransportHandler — loop range + punch range + automation |
+| **Last Batch** | ArrangerHandler — cue marker operations |
 | **Last Updated** | 2026-02-28 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.8.4 | 8 | ArrangerHandler — cue marker operations | PLANNED | done | 2026-02-28 |
 | 0.8.3 | 8 | TransportHandler — loop range + punch range + automation | PLANNED | done | 2026-02-28 |
 | 0.8.2 | 8 | ArrangerHandler — visibility toggles | PLANNED | done | 2026-02-28 |
 | 0.8.1 | 8 | Arranger + CueMarkerBank creation + snapshot sections | PLANNED | done | 2026-02-28 |
