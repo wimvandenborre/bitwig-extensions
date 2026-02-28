@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm), master track, clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters), and application state (project name, undo/redo). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm), master track, clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -747,6 +747,273 @@
       "type": "object",
       "properties": {},
       "required": []
+    }
+  },
+  {
+    "name": "arranger_setPlaybackFollow",
+    "description": "Enable or disable playback follow in the arranger. When enabled, the arranger view scrolls to follow the playhead during playback.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable playback follow, false to disable."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "arranger_setClipLauncherVisible",
+    "description": "Show or hide the clip launcher panel in the arranger view.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to show the clip launcher, false to hide."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "arranger_setTimelineVisible",
+    "description": "Show or hide the arranger timeline. The timeline displays clips arranged linearly for song composition.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to show the timeline, false to hide."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "arranger_setCueMarkersVisible",
+    "description": "Show or hide cue markers in the arranger timeline. Cue markers mark positions in the arrangement (intro, verse, chorus, etc.).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to show cue markers, false to hide."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "arranger_setEffectTracksVisible",
+    "description": "Show or hide effect (return/bus) tracks in the arranger view.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to show effect tracks, false to hide."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "arranger_setIoSectionVisible",
+    "description": "Show or hide the I/O section in the arranger. The I/O section shows input/output routing for each track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to show the I/O section, false to hide."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "arranger_setDoubleRowTrackHeight",
+    "description": "Toggle double-row track height in the arranger. When enabled, tracks display at double height for better visibility.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True for double-row height, false for single-row."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "transport_setLoopRange",
+    "description": "Set the arranger loop range and enable/disable looping. Defines a loop region by start position and duration in beats (quarter notes). Use with `transport_setPosition` to position playback at loop start.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "number",
+          "description": "Loop start position in beats (quarter notes). 0.0 = bar 1 beat 1."
+        },
+        "duration": {
+          "type": "number",
+          "description": "Loop duration in beats (quarter notes). e.g. 16.0 = 4 bars in 4/4."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable looping, false to disable."
+        }
+      },
+      "required": ["start", "duration", "enabled"]
+    }
+  },
+  {
+    "name": "transport_getLoopRange",
+    "description": "Get the current loop range, punch in/out positions, and their enabled states. Returns loopStart, loopDuration, loopEnabled, punchInPosition, punchInEnabled, punchOutPosition, punchOutEnabled.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_setPunchIn",
+    "description": "Set the punch-in position and enable/disable punch-in recording. When enabled, recording only starts at the punch-in position.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "number",
+          "description": "Punch-in position in beats (quarter notes)."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable punch-in, false to disable."
+        }
+      },
+      "required": ["position", "enabled"]
+    }
+  },
+  {
+    "name": "transport_setPunchOut",
+    "description": "Set the punch-out position and enable/disable punch-out recording. When enabled, recording automatically stops at the punch-out position.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "number",
+          "description": "Punch-out position in beats (quarter notes)."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable punch-out, false to disable."
+        }
+      },
+      "required": ["position", "enabled"]
+    }
+  },
+  {
+    "name": "transport_setAutomationWriteMode",
+    "description": "Set the automation write mode. Controls how parameter changes are recorded as automation. 'latch' records from first touch until stop, 'touch' records only while touching and returns to existing automation on release, 'write' overwrites all automation in the played range.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["latch", "touch", "write"],
+          "description": "Automation write mode: latch, touch, or write."
+        }
+      },
+      "required": ["mode"]
+    }
+  },
+  {
+    "name": "transport_setArrangerAutomationWrite",
+    "description": "Enable or disable automation writing in the arranger. When enabled, parameter changes during playback are recorded as arranger automation.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable arranger automation write, false to disable."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "transport_setClipLauncherAutomationWrite",
+    "description": "Enable or disable automation writing in the clip launcher. When enabled, parameter changes during clip playback are recorded as clip automation.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable clip launcher automation write, false to disable."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "transport_resetAutomationOverrides",
+    "description": "Reset all automation overrides. Clears any manual parameter adjustments made during playback, returning all automated parameters to their stored automation values.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "cueMarker_addAtPlayhead",
+    "description": "Add a cue marker at the current playhead position. To place a marker at a specific beat, first use `transport_setPosition` to move the playhead, then call this. Cue markers are used to label arrangement sections (intro, verse, chorus, etc.).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "cueMarker_list",
+    "description": "List all cue markers in the 16-slot cue marker bank. Returns an array of existing markers with index, name, position (in beats), and color (RGB array). Empty slots are omitted.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "cueMarker_launch",
+    "description": "Launch playback from a cue marker position. Moves the playhead to the marker and starts playback. Use `cueMarker_list` first to find valid marker indices.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Cue marker index (0-15) from the marker bank."
+        },
+        "quantized": {
+          "type": "boolean",
+          "description": "If true, launch is quantized to the grid. If false, launches immediately. Defaults to false."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "cueMarker_delete",
+    "description": "Delete a cue marker by its bank index. Use `cueMarker_list` first to find the marker index to delete.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Cue marker index (0-15) to delete."
+        }
+      },
+      "required": ["index"]
     }
   }
 ]
