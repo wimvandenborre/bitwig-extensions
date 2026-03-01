@@ -30,23 +30,9 @@ Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
-### ISS-005: Deferred macro writes are fire-and-forget (no error reporting)
+### ~~ISS-005: Deferred macro writes are fire-and-forget (no error reporting)~~ → RESOLVED
 
-**Severity:** Medium
-**Discovered:** 2026-03-01 (architecture review)
-**Affects:** `macro/writeClip`, `macro/buildSection`
-
-**Symptom:** If a deferred note write fails (e.g., cursor didn't follow, invalid params), the error is silently swallowed. The RPC response already returned an optimistic `count` value that may be wrong.
-
-**Root cause:** `host.scheduleTask()` callbacks can't propagate errors back to the original RPC response (it's already sent). The `catch` block in the scheduled task only logs — there's no feedback channel.
-
-**Impact:** Agent thinks notes were written successfully when they may not have been. Verification requires a follow-up `clip/getNotes` call with delay.
-
-**Possible fixes:**
-1. Add a `macro/verify` method that checks the last macro's deferred writes completed
-2. Emit a WebSocket notification when deferred writes complete (success or failure)
-3. Track pending deferred writes in StateCache with completion status
-4. Document in tool schemas that `count` is optimistic and verification is recommended
+Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
@@ -75,3 +61,9 @@ Moved to [Resolved Issues](#resolved-issues).
 **Severity:** Low → **Resolved:** 2026-03-01
 **Fix:** Changed `track/select` response from `cursorTrackName` (stale — cursor hasn't moved yet) to `trackName` + `trackIndex` sourced from the track bank's cached state (accurate immediately). Added `StateCache.getTrackName(index)` method. Updated tool schema to document async cursor movement.
 **Files:** `TrackHandler.java`, `StateCache.java`, `claude-tools.json`
+
+### ISS-005: Deferred macro writes are fire-and-forget (no error reporting)
+
+**Severity:** Medium → **Resolved:** 2026-03-01
+**Fix:** Documented optimistic return values in tool schemas for `macro/writeClip` and `macro/buildSection`. Both descriptions now explicitly state that `count`/`clipCount` are optimistic (writes deferred to future flush cycles) and recommend `clip/getNotes` for verification after a delay. This is an inherent limitation of Bitwig's `scheduleTask()` — errors in scheduled callbacks can't propagate back to already-sent RPC responses.
+**Files:** `claude-tools.json`

@@ -1483,7 +1483,7 @@
   },
   {
     "name": "macro_writeClip",
-    "description": "Create a clip, select it, set step size, and write notes in a single call. Composes clip/create + clip/select + clip/setStepSize + clip/setNotes + optional clip/rename. Use instead of the 4-step manual workflow. Returns { count } with the number of notes written.",
+    "description": "Create a clip, select it, set step size, and write notes in a single call. Composes clip/create + clip/select + clip/setStepSize + clip/setNotes + optional clip/rename. Returns { count } with the number of notes (optimistic — note writes are deferred to next flush cycle). To verify notes were actually written, call clip/getNotes after a 1-2 second delay.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1527,7 +1527,7 @@
   },
   {
     "name": "macro_buildSection",
-    "description": "Build a song section: create/rename a scene and write clips across multiple tracks. If sceneIndex is provided, uses that existing scene slot directly (recommended after manual scene creation or bulk deletion). If omitted, auto-creates a new scene (may fail if scene count cache is stale — see ISS-002). Returns { sceneIndex, clipCount }.",
+    "description": "Build a song section: create/rename a scene and write clips across multiple tracks. If sceneIndex is provided, uses that existing scene slot directly (recommended after manual scene creation or bulk deletion). If omitted, auto-creates a new scene (may fail if scene count cache is stale). Returns { sceneIndex, clipCount } (optimistic — note writes are deferred across multiple flush cycles). To verify, use clip/select + clip/getNotes on individual clips after a few seconds.",
     "input_schema": {
       "type": "object",
       "properties": {
