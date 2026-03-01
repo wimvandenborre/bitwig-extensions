@@ -126,7 +126,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
-        new MacroHandler(dispatcher).register(dispatcher);
+        new MacroHandler(dispatcher, stateCache).register(dispatcher);
 
         // Start servers
         try {
