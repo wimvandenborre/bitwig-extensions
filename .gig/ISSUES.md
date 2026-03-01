@@ -12,22 +12,9 @@ Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
-### ISS-002: `macro/buildSection` fails after bulk scene deletion
+### ~~ISS-002: `macro/buildSection` fails after bulk scene deletion~~ → RESOLVED
 
-**Severity:** Medium
-**Discovered:** 2026-03-01 (song writing test)
-**Affects:** `macro/buildSection`
-
-**Symptom:** After deleting all scenes and immediately calling `buildSection`, the scenes are created but clips have `loopLength=0.0` and no content. Scene names may not stick. Manual scene creation + individual `writeClip` calls work correctly.
-
-**Root cause:** After bulk scene deletion, Bitwig auto-creates empty default scenes. `stateCache.getSceneItemCount()` may return stale values (0 when defaults exist, or old count before deletion). The `buildSection` logic for calculating `newSceneBankIndex` depends on accurate scene counts. Stale cache + race between Bitwig auto-creation and macro execution causes clips to target wrong scene slots.
-
-**Workaround:** Create scenes manually with `scene/create` + `scene/rename`, wait for observer sync, then use `macro/writeClip` per clip.
-
-**Possible fixes:**
-1. Add a `requestFlush()` + delay before reading scene count in `buildSection`
-2. Have `buildSection` verify the scene was created by checking the bank state after creation
-3. Accept a `sceneIndex` param instead of always appending (skip the create + scroll logic)
+Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
@@ -93,3 +80,9 @@ Moved to [Resolved Issues](#resolved-issues).
 **Severity:** Critical → **Resolved:** 2026-03-01
 **Fix:** Increased `CLIP_GRID_WIDTH` from 64 to 256 in `GigMaestroExtension.java` and `GRID_WIDTH` in `NoteHandler.java`. Grid now covers 256 steps — at `stepSize=0.25` that's 64 beats (16 bars). Also added x/y bounds validation in `clip/setNotes` so out-of-range notes throw an error instead of being silently dropped.
 **Files:** `GigMaestroExtension.java`, `NoteHandler.java`
+
+### ISS-002: `macro/buildSection` fails after bulk scene deletion
+
+**Severity:** Medium → **Resolved:** 2026-03-01
+**Fix:** Added optional `sceneIndex` parameter to `macro/buildSection`. When provided, skips scene creation and scroll logic entirely — uses the given index as the slot index directly. This bypasses the stale `stateCache.getSceneItemCount()` issue. The auto-create path (no `sceneIndex`) is preserved but documented as unreliable after bulk deletion. Updated tool schema to recommend `sceneIndex` after manual scene creation.
+**Files:** `MacroHandler.java`, `MacroHandlerTest.java`, `claude-tools.json`

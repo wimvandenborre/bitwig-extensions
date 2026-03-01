@@ -117,35 +117,54 @@ public class MacroHandler {
             throw new IllegalArgumentException("'clips' array must not be empty");
         }
 
-        int sceneCountBefore = stateCache.getSceneItemCount();
+        int slotIndex;
+        int sceneIndexResult;
 
-        dispatcher.handleInternal("scene/create", new JsonObject());
+        if (params.has("sceneIndex") && !params.get("sceneIndex").isJsonNull()) {
+            // Caller-provided scene index — skip scene creation, use directly as slot index.
+            // Scene must already exist and be visible in the current scene bank window.
+            slotIndex = params.get("sceneIndex").getAsInt();
+            sceneIndexResult = slotIndex;
 
-        JsonObject scrollParams = new JsonObject();
-        scrollParams.addProperty("amount", sceneCountBefore);
-        dispatcher.handleInternal("sceneBank/scrollBy", scrollParams);
+            // Rename the existing scene if it's within bank bounds
+            JsonObject renameParams = new JsonObject();
+            renameParams.addProperty("index", slotIndex);
+            renameParams.addProperty("name", sceneName);
+            dispatcher.handleInternal("scene/rename", renameParams);
+        } else {
+            // Auto-create scene — relies on stateCache.getSceneItemCount() being accurate.
+            // WARNING: This path may fail after bulk scene deletion (see ISS-002).
+            int sceneCountBefore = stateCache.getSceneItemCount();
 
-        int bankSize = 5; // matches SCENE_COUNT
-        int totalScenes = sceneCountBefore + 1;
-        int scrollPosition = Math.max(0, totalScenes - bankSize);
-        int newSceneBankIndex = (totalScenes - 1) - scrollPosition;
+            dispatcher.handleInternal("scene/create", new JsonObject());
 
-        JsonObject renameParams = new JsonObject();
-        renameParams.addProperty("index", newSceneBankIndex);
-        renameParams.addProperty("name", sceneName);
-        dispatcher.handleInternal("scene/rename", renameParams);
+            JsonObject scrollParams = new JsonObject();
+            scrollParams.addProperty("amount", sceneCountBefore);
+            dispatcher.handleInternal("sceneBank/scrollBy", scrollParams);
+
+            int bankSize = 5; // matches SCENE_COUNT
+            int totalScenes = sceneCountBefore + 1;
+            int scrollPosition = Math.max(0, totalScenes - bankSize);
+            slotIndex = (totalScenes - 1) - scrollPosition;
+            sceneIndexResult = sceneCountBefore;
+
+            JsonObject renameParams = new JsonObject();
+            renameParams.addProperty("index", slotIndex);
+            renameParams.addProperty("name", sceneName);
+            dispatcher.handleInternal("scene/rename", renameParams);
+        }
 
         // Phase 1 (this flush cycle): create all clips and select the first one
         for (JsonElement clipEl : clips) {
             JsonObject clip = clipEl.getAsJsonObject();
             int trackIndex = requireInt(clip, "trackIndex");
             int lengthBeats = requireInt(clip, "lengthBeats");
-            createClip(trackIndex, newSceneBankIndex, lengthBeats);
+            createClip(trackIndex, slotIndex, lengthBeats);
         }
 
         // Select the first clip — cursor will follow in next flush cycle
         JsonObject firstClip = clips.get(0).getAsJsonObject();
-        forceSelectClip(requireInt(firstClip, "trackIndex"), newSceneBankIndex);
+        forceSelectClip(requireInt(firstClip, "trackIndex"), slotIndex);
 
         // Phase 2+: chain clip writes across flush cycles
         // Each clip needs: (flush N) write notes + select next clip → (flush N+1) write next
@@ -161,7 +180,7 @@ public class MacroHandler {
                 : requireInt(clips.get(i + 1).getAsJsonObject(), "trackIndex");
 
             long writeDelay = FLUSH_DELAY_MS * (2L * i + 1);
-            final int sceneIdx = newSceneBankIndex;
+            final int sceneIdx = slotIndex;
             final int nextTrack = nextClipTrackIndex;
             scheduler.schedule(() -> {
                 try {
@@ -176,7 +195,7 @@ public class MacroHandler {
         }
 
         JsonObject result = new JsonObject();
-        result.addProperty("sceneIndex", sceneCountBefore);
+        result.addProperty("sceneIndex", sceneIndexResult);
         result.addProperty("clipCount", clips.size());
         return result;
     }

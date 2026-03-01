@@ -267,6 +267,43 @@ class MacroHandlerTest {
         assertTrue(response.contains("error"));
     }
 
+    @Test
+    void buildSection_withExplicitSceneIndex() {
+        handle("macro/buildSection", """
+            {"sceneName":"Verse 1","sceneIndex":2,"clips":[
+                {"trackIndex":0,"lengthBeats":16,"stepSize":0.25,
+                 "notes":[{"x":0,"y":60,"velocity":100,"duration":1}],"name":"Lead"},
+                {"trackIndex":1,"lengthBeats":16,"stepSize":0.25,
+                 "notes":[{"x":0,"y":48,"velocity":80,"duration":2}],"name":"Bass"}
+            ]}""");
+        // No scene/create or sceneBank/scrollBy — uses sceneIndex directly
+        assertEquals(List.of(
+            "scene/rename:Verse 1",
+            "clip/create:t0s2l16",
+            "clip/create:t1s2l16",
+            "clip/select:t0s2",
+            "clip/setStepSize:0.25",
+            "clip/setNotes:1",
+            "clip/rename:Lead",
+            "clip/select:t1s2",
+            "clip/setStepSize:0.25",
+            "clip/setNotes:1",
+            "clip/rename:Bass"
+        ), callLog);
+    }
+
+    @Test
+    void buildSection_withExplicitSceneIndex_returnsIndex() {
+        String response = handle("macro/buildSection", """
+            {"sceneName":"Chorus","sceneIndex":3,"clips":[
+                {"trackIndex":0,"lengthBeats":8,"stepSize":0.5,
+                 "notes":[{"x":0,"y":60,"velocity":100,"duration":1}]}
+            ]}""");
+        JsonObject result = parseResult(response);
+        assertEquals(3, result.get("sceneIndex").getAsInt());
+        assertEquals(1, result.get("clipCount").getAsInt());
+    }
+
     // --- Helpers ---
 
     private String handle(String method, String params) {

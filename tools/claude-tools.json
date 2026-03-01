@@ -1527,13 +1527,17 @@
   },
   {
     "name": "macro_buildSection",
-    "description": "Create a new scene, rename it, and write clips across multiple tracks in a single call. This is the highest-impact macro — building a 4-track song section that previously required 12+ individual calls now takes 1. Creates the scene, scrolls the scene bank to make it visible, renames it, then for each clip: creates, selects, sets step size, writes notes, and optionally renames. Returns { sceneIndex, clipCount }.",
+    "description": "Build a song section: create/rename a scene and write clips across multiple tracks. If sceneIndex is provided, uses that existing scene slot directly (recommended after manual scene creation or bulk deletion). If omitted, auto-creates a new scene (may fail if scene count cache is stale — see ISS-002). Returns { sceneIndex, clipCount }.",
     "input_schema": {
       "type": "object",
       "properties": {
         "sceneName": {
           "type": "string",
-          "description": "Name for the new scene (e.g., 'Verse 1', 'Chorus')."
+          "description": "Name for the scene (e.g., 'Verse 1', 'Chorus')."
+        },
+        "sceneIndex": {
+          "type": "integer",
+          "description": "Optional bank-relative scene slot index (0–4). If provided, skips scene creation and uses this slot directly. The scene must already exist and be visible in the current scene bank window. Recommended after manual scene creation or bulk deletion."
         },
         "clips": {
           "type": "array",
