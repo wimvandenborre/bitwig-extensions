@@ -22,6 +22,8 @@
 | 7 | Agent Reliability + Musicality | v0.7.1–v0.7.4 | complete |
 | 8 | Arrangement & Automation Control | v0.8.1–v0.8.6 | complete |
 | 9 | Envelope Writing | v0.9.1–v0.9.5 | complete |
+| 10 | Clip, Scene & Cue Marker Lifecycle | v0.10.x | complete |
+| 11 | Bank Scrolling | v0.11.1–v0.11.9 | complete |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

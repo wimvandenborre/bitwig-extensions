@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.9.5` |
-| **Phase** | 9 — Envelope Writing |
+| **Version** | `0.11.9` |
+| **Phase** | 11 — Bank Scrolling |
 | **Status** | `VERIFIED` |
-| **Last Batch** | Unit tests + smoke tests |
-| **Last Updated** | 2026-02-28 |
+| **Last Batch** | 8×5 APC40-style grid + clip launcher feedback [UNPLANNED] |
+| **Last Updated** | 2026-03-01 |
 
 ---
 
@@ -18,6 +18,21 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.11.9 | 11 | 8×5 APC40-style grid + clip launcher feedback | UNPLANNED | done | 2026-03-01 |
+| 0.11.8 | 11 | Fix clip operation reliability | UNPLANNED | done | 2026-03-01 |
+| 0.11.7 | 11 | Smoke tests | PLANNED | done | 2026-03-01 |
+| 0.11.6 | 11 | Unit tests | PLANNED | done | 2026-03-01 |
+| 0.11.5 | 11 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
+| 0.11.4 | 11 | TrackHandler trackBank scroll methods | PLANNED | done | 2026-03-01 |
+| 0.11.3 | 11 | ArrangerHandler cueMarkerBank scroll methods | PLANNED | done | 2026-03-01 |
+| 0.11.2 | 11 | SceneHandler scroll methods | PLANNED | done | 2026-03-01 |
+| 0.11.1 | 11 | StateCache observers + snapshot restructuring | PLANNED | done | 2026-02-28 |
+| 0.10.6 | 10 | Smoke tests (schema + docs) | PLANNED | done | 2026-02-28 |
+| 0.10.5 | 10 | Unit tests (handler code) | PLANNED | done | 2026-02-28 |
+| 0.10.4 | 10 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
+| 0.10.3 | 10 | ArrangerHandler cue marker operations | PLANNED | done | 2026-02-28 |
+| 0.10.2 | 10 | ClipHandler lifecycle methods | PLANNED | done | 2026-02-28 |
+| 0.10.1 | 10 | SceneHandler + snapshot enhancement + extension wiring | PLANNED | done | 2026-02-28 |
 | 0.9.5 | 9 | Unit tests + smoke tests | PLANNED | done | 2026-02-28 |
 | 0.9.4 | 9 | Tool schemas + system prompt update | PLANNED | done | 2026-02-28 |
 | 0.9.3 | 9 | writeEnvelope with state save/restore | PLANNED | done | 2026-02-28 |
@@ -73,12 +88,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- **D-9.1a** — Scope: spike + writeEnvelope + per-param automation + touch + state restoration guardrails.
-- **D-9.2** — Spike: validate position-jump + touch + setValue before full implementation.
-- **D-9.3** — Architecture: add methods to existing DeviceHandler.
-- **D-9.4a** — writeEnvelope: preconditions (automation write enabled), input validation (sorted, >=0, [0,1]), state save/restore, finally untouch.
-- **D-9.5a** — 4 methods matching API v25: hasAutomation, deleteAllAutomation, restoreAutomationControl, touch.
-- **D-9.6** — Snapshot: add `hasAutomation` to existing parameter objects in device section.
+Phase 11 decisions archived to `.gig/phases/v0.11-bank-scrolling/DECISIONS.md`.
 
 ---
 
@@ -87,6 +97,7 @@
 <!-- Items that need human attention -->
 
 - **FLAG-1** — Bitwig Controller API v25 has no project save, save-as, or audio export/bounce methods. These are not available for programmatic control. Users must use Bitwig UI (`Cmd+S`, `File → Export Audio Mixdown`).
+- **FLAG-3** — Bitwig Controller API v25 has no methods to copy/move clips from the clip launcher to the arranger timeline. `Arranger` only exposes visibility toggles, cue markers, and timeline zoom. `InsertionPoint.copySlotsOrScenes()` only works between launcher slots, not to the arranger. Programmatic arrangement building is not possible.
 - **FLAG-2** — `cueMarker/addAtPlayhead` creates markers at wrong positions. The Bitwig API's `addCueMarkerAtPlaybackPosition()` doesn't accept a name param (always "Untitled") and the transport position may not have settled when the marker is created, causing positional drift. Future phase should add a `cueMarker/addAtPosition` method that sets transport position, waits via `scheduleTask`, then adds the marker — similar pattern to `writeEnvelope`. Also need `cueMarker/rename` (CueMarker.getName() is a SettableStringValue).
 
 ---
@@ -138,7 +149,20 @@
 - **Threading:** RPC handlers run inside `flush()` — calling `transport.play()` then `param.touch()` in the same handler doesn't work because the engine hasn't processed `play()` yet. Must use `host.scheduleTask()` to chain operations across flush cycles.
 - writeEnvelope returns immediately; actual recording happens asynchronously via scheduled tasks (~100ms per point)
 - DeviceHandler constructor: `(CursorTrack, CursorDevice, CursorRemoteControlsPage, DeviceLibrary, Transport, ControllerHost)`
-- Total RPC methods: 79 (74 + 5 new: hasAutomation, deleteAllAutomation, restoreAutomationControl, touch, writeEnvelope)
+- Total RPC methods: 99 (90 + 9 Phase 11: 3 sceneBank scroll + 3 cueMarkerBank scroll + 3 trackBank scroll)
+- Total tests: 154 unit + 216 offline smoke = 370
+- Bank dimensions: TrackBank=8, SceneBank=5, CueMarkerBank=16 (8×5 APC40-style grid)
+- `trackBank.setShouldShowClipLauncherFeedback(true)` — shows clip launcher rectangle in Bitwig UI
+- `sceneBank.setIndication(true)` — indicates current scene bank window
+- `clip/clearAllNotes` fix: widens viewport to stepSize=4.0 (256 beats) before clearing, then restores
+- `clip/select` guard: checks `stateCache.clipHasContent()` before selecting, returns -32602 if empty
+- **No master track CursorDevice** — device insertion only works on regular tracks. Need `masterTrack.createCursorDevice()` for master bus FX. Candidate for future phase.
+- Phase 10 new handler: SceneHandler(SceneBank, Project) — 5 methods
+- Phase 10 ClipHandler additions: clip/rename (via cursorClip.setName), clip/duplicate (bank-level), clip/duplicateToSlot (InsertionPoint.copySlotsOrScenes)
+- Phase 10 ArrangerHandler additions: cueMarker/rename, cueMarker/setPosition, cueMarker/duplicate
+- Project API: `host.getProject()` — needed for `createScene()`, `createSceneFromPlayingLauncherClips()`
+- Scene absolute index: `Scene.sceneIndex()` returns IntegerValue (API v2) — add to StateCache + snapshot
+- ClipLauncherSlot as source for copySlotsOrScenes: cast from `slotBank.getItemAt(index)` — same pattern as clip/select and clip/delete
 - Bitwig device library: `/Applications/Bitwig Studio.app/Contents/Resources/Library/devices/` — 151 `.bwdevice` files
 - InsertionPoint API: `endOfDeviceChainInsertionPoint()`, `beforeDeviceInsertionPoint()`, `afterDeviceInsertionPoint()` — all have `insertFile(String)`, `insertVST2Device(int)`, `insertVST3Device(String)`, `insertCLAPDevice(String)`
 - DeviceLibrary: new utility class in `handlers/` — name→path map, case-insensitive, close-match errors

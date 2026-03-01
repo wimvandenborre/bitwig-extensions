@@ -7,13 +7,4 @@
 
 ## Active Phase
 
-_No active phase. Run `/gig:decide` to start the next phase._
-
----
-
-## Plan Amendments
-
-<!-- Log any changes to the plan after creation -->
-
-| Date | Version | Amendment | Reason |
-|------|---------|-----------|--------|
+No active phase. Run `/gig:decide` to start the next phase.
