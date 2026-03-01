@@ -20,8 +20,8 @@ import java.util.List;
 
 public class StateCache {
 
-    private static final int TRACK_COUNT = 64;
-    private static final int SCENE_COUNT = 8;
+    private static final int TRACK_COUNT = 8;
+    private static final int SCENE_COUNT = 5;
 
     // Transport state
     private volatile boolean isPlaying;
@@ -55,6 +55,16 @@ public class StateCache {
     // Scene state
     private final String[] sceneNames = new String[SCENE_COUNT];
     private final int[] sceneClipCounts = new int[SCENE_COUNT];
+    private volatile int sceneBankOffset;
+    private volatile int sceneItemCount;
+    private volatile boolean sceneCanScrollForwards;
+    private volatile boolean sceneCanScrollBackwards;
+
+    // Track bank scroll state
+    private volatile int trackScrollPosition;
+    private volatile int trackItemCount;
+    private volatile boolean trackCanScrollForwards;
+    private volatile boolean trackCanScrollBackwards;
 
     // Master state
     private volatile double masterVolume;
@@ -128,6 +138,10 @@ public class StateCache {
     private final String[] cueMarkerNames = new String[CUE_MARKER_COUNT];
     private final double[] cueMarkerPositions = new double[CUE_MARKER_COUNT];
     private final float[][] cueMarkerColors = new float[CUE_MARKER_COUNT][3];
+    private volatile int cueMarkerScrollPosition;
+    private volatile int cueMarkerItemCount;
+    private volatile boolean cueMarkerCanScrollForwards;
+    private volatile boolean cueMarkerCanScrollBackwards;
 
     // Delta detection — previous section hashes
     private int prevTransportHash;
@@ -218,6 +232,19 @@ public class StateCache {
 
         application.hasActiveEngine().markInterested();
         application.hasActiveEngine().addValueObserver((BooleanValueChangedCallback) v -> hasActiveEngine = v);
+
+        // Track bank scroll state
+        trackBank.scrollPosition().markInterested();
+        trackBank.scrollPosition().addValueObserver((IntegerValueChangedCallback) v -> trackScrollPosition = v);
+
+        trackBank.itemCount().markInterested();
+        trackBank.itemCount().addValueObserver((IntegerValueChangedCallback) v -> trackItemCount = v);
+
+        trackBank.canScrollForwards().markInterested();
+        trackBank.canScrollForwards().addValueObserver((BooleanValueChangedCallback) v -> trackCanScrollForwards = v);
+
+        trackBank.canScrollBackwards().markInterested();
+        trackBank.canScrollBackwards().addValueObserver((BooleanValueChangedCallback) v -> trackCanScrollBackwards = v);
     }
 
     public void registerClipObservers(TrackBank trackBank) {
@@ -262,6 +289,18 @@ public class StateCache {
 
         // Scene observers
         SceneBank sceneBank = trackBank.sceneBank();
+        sceneBank.scrollPosition().markInterested();
+        sceneBank.scrollPosition().addValueObserver((IntegerValueChangedCallback) v -> sceneBankOffset = v);
+
+        sceneBank.itemCount().markInterested();
+        sceneBank.itemCount().addValueObserver((IntegerValueChangedCallback) v -> sceneItemCount = v);
+
+        sceneBank.canScrollForwards().markInterested();
+        sceneBank.canScrollForwards().addValueObserver((BooleanValueChangedCallback) v -> sceneCanScrollForwards = v);
+
+        sceneBank.canScrollBackwards().markInterested();
+        sceneBank.canScrollBackwards().addValueObserver((BooleanValueChangedCallback) v -> sceneCanScrollBackwards = v);
+
         for (int i = 0; i < SCENE_COUNT; i++) {
             final int sceneIdx = i;
             Scene scene = sceneBank.getScene(sceneIdx);
@@ -429,6 +468,19 @@ public class StateCache {
         transport.isAutomationOverrideActive().markInterested();
         transport.isAutomationOverrideActive().addValueObserver((BooleanValueChangedCallback) v -> automationOverrideActive = v);
 
+        // Cue marker bank scroll state
+        cueMarkerBank.scrollPosition().markInterested();
+        cueMarkerBank.scrollPosition().addValueObserver((IntegerValueChangedCallback) v -> cueMarkerScrollPosition = v);
+
+        cueMarkerBank.itemCount().markInterested();
+        cueMarkerBank.itemCount().addValueObserver((IntegerValueChangedCallback) v -> cueMarkerItemCount = v);
+
+        cueMarkerBank.canScrollForwards().markInterested();
+        cueMarkerBank.canScrollForwards().addValueObserver((BooleanValueChangedCallback) v -> cueMarkerCanScrollForwards = v);
+
+        cueMarkerBank.canScrollBackwards().markInterested();
+        cueMarkerBank.canScrollBackwards().addValueObserver((BooleanValueChangedCallback) v -> cueMarkerCanScrollBackwards = v);
+
         // Cue markers
         for (int i = 0; i < CUE_MARKER_COUNT; i++) {
             final int idx = i;
@@ -450,6 +502,17 @@ public class StateCache {
                 cueMarkerColors[idx][2] = b;
             });
         }
+    }
+
+    public double getClipStepSize() {
+        return clipStepSize;
+    }
+
+    public boolean clipHasContent(int trackIndex, int slotIndex) {
+        if (trackIndex < 0 || trackIndex >= TRACK_COUNT || slotIndex < 0 || slotIndex >= SCENE_COUNT) {
+            return false;
+        }
+        return clipHasContent[trackIndex][slotIndex];
     }
 
     public void setClipStepSize(double stepSize) {
@@ -523,7 +586,14 @@ public class StateCache {
         return obj;
     }
 
-    private JsonArray getTracksState() {
+    private JsonObject getTracksState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("bankSize", TRACK_COUNT);
+        obj.addProperty("scrollPosition", trackScrollPosition);
+        obj.addProperty("itemCount", trackItemCount);
+        obj.addProperty("canScrollBackwards", trackCanScrollBackwards);
+        obj.addProperty("canScrollForwards", trackCanScrollForwards);
+
         JsonArray arr = new JsonArray();
         for (int i = 0; i < TRACK_COUNT; i++) {
             JsonObject track = new JsonObject();
@@ -565,19 +635,27 @@ public class StateCache {
 
             arr.add(track);
         }
-        return arr;
+        obj.add("tracks", arr);
+        return obj;
     }
 
-    private JsonArray getScenesState() {
-        JsonArray arr = new JsonArray();
+    private JsonObject getScenesState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("bankSize", SCENE_COUNT);
+        obj.addProperty("scrollPosition", sceneBankOffset);
+        obj.addProperty("itemCount", sceneItemCount);
+        obj.addProperty("canScrollBackwards", sceneCanScrollBackwards);
+        obj.addProperty("canScrollForwards", sceneCanScrollForwards);
+        JsonArray scenes = new JsonArray();
         for (int i = 0; i < SCENE_COUNT; i++) {
             JsonObject scene = new JsonObject();
             scene.addProperty("index", i);
             scene.addProperty("name", sceneNames[i] != null ? sceneNames[i] : "");
             scene.addProperty("clipCount", sceneClipCounts[i]);
-            arr.add(scene);
+            scenes.add(scene);
         }
-        return arr;
+        obj.add("scenes", scenes);
+        return obj;
     }
 
     private JsonObject getDeviceState() {
@@ -688,7 +766,13 @@ public class StateCache {
         automation.addProperty("overrideActive", automationOverrideActive);
         obj.add("automation", automation);
 
-        // Cue markers
+        // Cue markers — bank-window object
+        JsonObject cueMarkerObj = new JsonObject();
+        cueMarkerObj.addProperty("bankSize", CUE_MARKER_COUNT);
+        cueMarkerObj.addProperty("scrollPosition", cueMarkerScrollPosition);
+        cueMarkerObj.addProperty("itemCount", cueMarkerItemCount);
+        cueMarkerObj.addProperty("canScrollBackwards", cueMarkerCanScrollBackwards);
+        cueMarkerObj.addProperty("canScrollForwards", cueMarkerCanScrollForwards);
         JsonArray markers = new JsonArray();
         for (int i = 0; i < CUE_MARKER_COUNT; i++) {
             JsonObject marker = new JsonObject();
@@ -702,8 +786,47 @@ public class StateCache {
             marker.add("color", color);
             markers.add(marker);
         }
-        obj.add("cueMarkers", markers);
+        cueMarkerObj.add("items", markers);
+        obj.add("cueMarkers", cueMarkerObj);
 
         return obj;
     }
+
+    // ── Public getters for bank scroll info (used by handlers) ──
+
+    public JsonObject getSceneBankScrollInfo() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("scrollPosition", sceneBankOffset);
+        obj.addProperty("itemCount", sceneItemCount);
+        obj.addProperty("bankSize", SCENE_COUNT);
+        obj.addProperty("canScrollBackwards", sceneCanScrollBackwards);
+        obj.addProperty("canScrollForwards", sceneCanScrollForwards);
+        return obj;
+    }
+
+    public int getSceneItemCount() { return sceneItemCount; }
+
+    public JsonObject getCueMarkerBankScrollInfo() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("scrollPosition", cueMarkerScrollPosition);
+        obj.addProperty("itemCount", cueMarkerItemCount);
+        obj.addProperty("bankSize", CUE_MARKER_COUNT);
+        obj.addProperty("canScrollBackwards", cueMarkerCanScrollBackwards);
+        obj.addProperty("canScrollForwards", cueMarkerCanScrollForwards);
+        return obj;
+    }
+
+    public int getCueMarkerItemCount() { return cueMarkerItemCount; }
+
+    public JsonObject getTrackBankScrollInfo() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("scrollPosition", trackScrollPosition);
+        obj.addProperty("itemCount", trackItemCount);
+        obj.addProperty("bankSize", TRACK_COUNT);
+        obj.addProperty("canScrollBackwards", trackCanScrollBackwards);
+        obj.addProperty("canScrollForwards", trackCanScrollForwards);
+        return obj;
+    }
+
+    public int getTrackItemCount() { return trackItemCount; }
 }

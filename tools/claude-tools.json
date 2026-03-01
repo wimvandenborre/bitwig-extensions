@@ -1107,5 +1107,288 @@
       },
       "required": ["index"]
     }
+  },
+  {
+    "name": "scene_create",
+    "description": "Create a new empty scene at the end of the project. The scene will have no clips. Use `scene_rename` afterward to give it a name.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "scene_createFromPlaying",
+    "description": "Create a new scene from all currently playing launcher clips. Captures the current clip launcher state into a new scene row. Useful for saving a live performance moment as a reusable scene.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "scene_duplicate",
+    "description": "Duplicate a scene by its bank index. Creates a copy of the scene including all its clips. The duplicate appears after the original.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Scene index (0-7) within the current scene bank window."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "scene_rename",
+    "description": "Rename a scene by its bank index. Use `session_snapshot` to see current scene names.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Scene index (0-7) within the current scene bank window."
+        },
+        "name": {
+          "type": "string",
+          "description": "New name for the scene (e.g., 'Verse 1', 'Chorus', 'Bridge')."
+        }
+      },
+      "required": ["index", "name"]
+    }
+  },
+  {
+    "name": "scene_delete",
+    "description": "Delete a scene by its bank index. Removes the scene and all its clips. WARNING: This is destructive and cannot be undone via the API — use `application_undo` if needed.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Scene index (0-7) within the current scene bank window."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "clip_rename",
+    "description": "Rename the currently selected clip (cursor clip). You must first select the clip with `clip_select`, then call this to set its name. Useful for versioning clips (e.g., 'Verse A', 'Verse B') or labeling iterations.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "New name for the clip."
+        }
+      },
+      "required": ["name"]
+    }
+  },
+  {
+    "name": "clip_duplicate",
+    "description": "Duplicate a clip in-place within its slot bank. The duplicate appears in the next available slot on the same track. Use for A/B versioning or iterating on a clip.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-63)."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-7) to duplicate."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "clip_duplicateToSlot",
+    "description": "Copy a clip from one slot to another, replacing the destination slot's content. Works across tracks. Use for copying a pattern to a different track or scene slot.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "srcTrackIndex": {
+          "type": "integer",
+          "description": "Source track index (0-63)."
+        },
+        "srcSlotIndex": {
+          "type": "integer",
+          "description": "Source clip slot index (0-7)."
+        },
+        "destTrackIndex": {
+          "type": "integer",
+          "description": "Destination track index (0-63)."
+        },
+        "destSlotIndex": {
+          "type": "integer",
+          "description": "Destination clip slot index (0-7). Existing content will be replaced."
+        }
+      },
+      "required": ["srcTrackIndex", "srcSlotIndex", "destTrackIndex", "destSlotIndex"]
+    }
+  },
+  {
+    "name": "cueMarker_rename",
+    "description": "Rename a cue marker by its bank index. Use `cueMarker_list` first to find valid marker indices. Markers created with `cueMarker_addAtPlayhead` default to 'Untitled' — use this to give them meaningful names like 'Intro', 'Verse 1', 'Chorus'.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Cue marker index (0-15) from the marker bank."
+        },
+        "name": {
+          "type": "string",
+          "description": "New name for the cue marker."
+        }
+      },
+      "required": ["index", "name"]
+    }
+  },
+  {
+    "name": "cueMarker_setPosition",
+    "description": "Move a cue marker to a new position in beats. Use `cueMarker_list` first to see current positions. Position is in beat time (e.g., 0.0 = bar 1, 4.0 = bar 2 in 4/4).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Cue marker index (0-15) from the marker bank."
+        },
+        "beats": {
+          "type": "number",
+          "description": "New position in beats (must be >= 0)."
+        }
+      },
+      "required": ["index", "beats"]
+    }
+  },
+  {
+    "name": "cueMarker_duplicate",
+    "description": "Duplicate a cue marker. Creates a copy at the same position. Use `cueMarker_setPosition` afterward to move the duplicate to a new location.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Cue marker index (0-15) to duplicate."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "sceneBank_scrollTo",
+    "description": "Scroll the scene bank to an absolute position. The position is a global scene index (not bank-relative). After scrolling, the bank window shows scenes starting from this position. Returns POSITION_OUT_OF_RANGE error if position is out of bounds.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "integer",
+          "description": "Absolute global scene index to scroll to (0-based). Must be >= 0 and < itemCount."
+        }
+      },
+      "required": ["position"]
+    }
+  },
+  {
+    "name": "sceneBank_scrollBy",
+    "description": "Scroll the scene bank by a relative amount. Positive values scroll forward (toward higher indices), negative values scroll backward. The bank window shifts by the specified amount.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "description": "Number of positions to scroll. Positive = forward, negative = backward. Use bankSize (5) to scroll by one full page."
+        }
+      },
+      "required": ["amount"]
+    }
+  },
+  {
+    "name": "sceneBank_getScrollInfo",
+    "description": "Get the current scroll state of the scene bank. Returns snapshot-backed cached values: scrollPosition (current offset), itemCount (total scenes in project), bankSize (window size, always 5), canScrollBackwards, canScrollForwards. Check canScrollForwards before scrolling to avoid no-ops.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "cueMarkerBank_scrollTo",
+    "description": "Scroll the cue marker bank to an absolute position. The position is a global cue marker index (not bank-relative). After scrolling, the bank window shows markers starting from this position. Returns POSITION_OUT_OF_RANGE error if position is out of bounds.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "integer",
+          "description": "Absolute global cue marker index to scroll to (0-based). Must be >= 0 and < itemCount."
+        }
+      },
+      "required": ["position"]
+    }
+  },
+  {
+    "name": "cueMarkerBank_scrollBy",
+    "description": "Scroll the cue marker bank by a relative amount. Positive values scroll forward, negative values scroll backward. The bank window shifts by the specified amount.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "description": "Number of positions to scroll. Positive = forward, negative = backward. Use bankSize (16) to scroll by one full page."
+        }
+      },
+      "required": ["amount"]
+    }
+  },
+  {
+    "name": "cueMarkerBank_getScrollInfo",
+    "description": "Get the current scroll state of the cue marker bank. Returns snapshot-backed cached values: scrollPosition, itemCount (total markers in project), bankSize (window size, always 16), canScrollBackwards, canScrollForwards.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "trackBank_scrollTo",
+    "description": "Scroll the track bank to an absolute position. The position is a global track index (not bank-relative). After scrolling, the bank window shows tracks starting from this position. Returns POSITION_OUT_OF_RANGE error if position is out of bounds.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "integer",
+          "description": "Absolute global track index to scroll to (0-based). Must be >= 0 and < itemCount."
+        }
+      },
+      "required": ["position"]
+    }
+  },
+  {
+    "name": "trackBank_scrollBy",
+    "description": "Scroll the track bank by a relative amount. Positive values scroll forward, negative values scroll backward. The bank window shifts by the specified amount.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "description": "Number of positions to scroll. Positive = forward, negative = backward. Use bankSize (8) to scroll by one full page."
+        }
+      },
+      "required": ["amount"]
+    }
+  },
+  {
+    "name": "trackBank_getScrollInfo",
+    "description": "Get the current scroll state of the track bank. Returns snapshot-backed cached values: scrollPosition, itemCount (total tracks in project), bankSize (window size, always 8), canScrollBackwards, canScrollForwards.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
   }
 ]

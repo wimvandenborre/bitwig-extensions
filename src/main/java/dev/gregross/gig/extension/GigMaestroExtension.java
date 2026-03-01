@@ -12,6 +12,7 @@ import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
+import dev.gregross.gig.handlers.SceneHandler;
 import dev.gregross.gig.handlers.TrackBankManager;
 import dev.gregross.gig.handlers.TrackHandler;
 import dev.gregross.gig.handlers.TransportHandler;
@@ -28,8 +29,8 @@ import java.util.concurrent.CompletableFuture;
 public class GigMaestroExtension extends ControllerExtension {
 
     private static final int DEFAULT_PORT = 8787;
-    private static final int TRACK_COUNT = 64;
-    private static final int SCENE_COUNT = 8;
+    private static final int TRACK_COUNT = 8;
+    private static final int SCENE_COUNT = 5;
     private static final int CLIP_GRID_WIDTH = 64;
     private static final int CLIP_GRID_HEIGHT = 128;
     private static final String BITWIG_DEVICE_LIBRARY =
@@ -51,6 +52,8 @@ public class GigMaestroExtension extends ControllerExtension {
         // Create Bitwig API objects
         Transport transport = host.createTransport();
         TrackBank trackBank = host.createMainTrackBank(TRACK_COUNT, 0, SCENE_COUNT);
+        trackBank.setShouldShowClipLauncherFeedback(true);
+        trackBank.sceneBank().setIndication(true);
         MasterTrack masterTrack = host.createMasterTrack(0);
         Application application = host.createApplication();
 
@@ -63,6 +66,9 @@ public class GigMaestroExtension extends ControllerExtension {
         // Create cursor clip for note editing
         Clip cursorClip = cursorTrack.createLauncherCursorClip("gig-clip", "Gig Clip",
             CLIP_GRID_WIDTH, CLIP_GRID_HEIGHT);
+
+        // Create project reference
+        Project project = host.getProject();
 
         // Create arranger and cue marker bank
         Arranger arranger = host.createArranger();
@@ -98,9 +104,9 @@ public class GigMaestroExtension extends ControllerExtension {
         new ApplicationHandler(application).register(dispatcher);
         new TransportHandler(transport).register(dispatcher);
         TrackBankManager trackBankManager = new TrackBankManager(trackBank, TRACK_COUNT);
-        new TrackHandler(trackBank, application, cursorTrack, trackBankManager).register(dispatcher);
+        new TrackHandler(trackBank, application, cursorTrack, trackBankManager, stateCache).register(dispatcher);
         new MasterHandler(masterTrack).register(dispatcher);
-        new ClipHandler(trackBank, trackBank.sceneBank()).register(dispatcher);
+        new ClipHandler(trackBank, trackBank.sceneBank(), cursorClip, stateCache).register(dispatcher);
         DeviceLibrary deviceLibrary;
         try {
             deviceLibrary = new DeviceLibrary(Paths.get(BITWIG_DEVICE_LIBRARY));
@@ -114,8 +120,9 @@ public class GigMaestroExtension extends ControllerExtension {
             }
         }
         new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, deviceLibrary, transport, host).register(dispatcher);
-        new NoteHandler(cursorClip).register(dispatcher);
-        new ArrangerHandler(arranger, transport, cueMarkerBank).register(dispatcher);
+        new NoteHandler(cursorClip, stateCache).register(dispatcher);
+        new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
+        new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);
 
         // Start servers
         try {

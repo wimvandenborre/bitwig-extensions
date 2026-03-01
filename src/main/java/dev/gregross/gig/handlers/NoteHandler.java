@@ -6,17 +6,22 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 
 public class NoteHandler {
 
     private static final int GRID_WIDTH = 64;
     private static final int GRID_HEIGHT = 128;
+    // Step size that makes 64 grid steps cover 256 beats (64 bars in 4/4)
+    private static final double WIDE_STEP_SIZE = 4.0;
 
     private final Clip cursorClip;
+    private final StateCache stateCache;
 
-    public NoteHandler(Clip cursorClip) {
+    public NoteHandler(Clip cursorClip, StateCache stateCache) {
         this.cursorClip = cursorClip;
+        this.stateCache = stateCache;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -50,7 +55,14 @@ public class NoteHandler {
         });
 
         dispatcher.register("clip/clearAllNotes", params -> {
+            double savedStepSize = stateCache.getClipStepSize();
+            // Widen viewport: 64 steps × 4.0 = 256 beats (64 bars)
+            cursorClip.setStepSize(WIDE_STEP_SIZE);
+            cursorClip.scrollToStep(0);
             cursorClip.clearSteps();
+            // Restore original step size and scroll position
+            cursorClip.setStepSize(savedStepSize);
+            cursorClip.scrollToStep(0);
             return new JsonPrimitive("ok");
         });
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Gig Maestro v0.9.x — Smoke Test Suite
+# Gig Maestro v0.11.x — Smoke Test Suite
 #
 # Usage:
 #   ./scripts/smoke-test.sh              — run all tests (requires Bitwig running)
@@ -77,11 +77,11 @@ echo "--- O1. Tool Schema Validation ---"
 TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 79 ]; then
-  echo "  PASS  claude-tools.json has >= 79 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 99 ]; then
+  echo "  PASS  claude-tools.json has >= 99 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 79 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 99 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -307,6 +307,56 @@ assert_contains "system prompt mentions write-only limitation" "$PROMPT" "Write-
 assert_contains "system prompt mentions async execution" "$PROMPT" "Async execution"
 assert_contains "system prompt mentions prerequisites" "$PROMPT" "Prerequisites"
 
+# Phase 10 — Clip, Scene & Cue Marker Lifecycle tools
+echo "--- Phase 10: Lifecycle tools ---"
+assert_contains "has scene_create tool" "$TOOLS_LIST" "scene_create"
+assert_contains "has scene_createFromPlaying tool" "$TOOLS_LIST" "scene_createFromPlaying"
+assert_contains "has scene_duplicate tool" "$TOOLS_LIST" "scene_duplicate"
+assert_contains "has scene_rename tool" "$TOOLS_LIST" "scene_rename"
+assert_contains "has scene_delete tool" "$TOOLS_LIST" "scene_delete"
+assert_contains "has clip_rename tool" "$TOOLS_LIST" "clip_rename"
+assert_contains "has clip_duplicate tool" "$TOOLS_LIST" "clip_duplicate"
+assert_contains "has clip_duplicateToSlot tool" "$TOOLS_LIST" "clip_duplicateToSlot"
+assert_contains "has cueMarker_rename tool" "$TOOLS_LIST" "cueMarker_rename"
+assert_contains "has cueMarker_setPosition tool" "$TOOLS_LIST" "cueMarker_setPosition"
+assert_contains "has cueMarker_duplicate tool" "$TOOLS_LIST" "cueMarker_duplicate"
+
+# Phase 10 — tool schema spot-checks
+SCENE_RENAME_INDEX_TYPE=$(jq -r '.[] | select(.name=="scene_rename") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "scene_rename index param is integer" "$SCENE_RENAME_INDEX_TYPE" "integer"
+
+SCENE_RENAME_NAME_TYPE=$(jq -r '.[] | select(.name=="scene_rename") | .input_schema.properties.name.type' "$TOOLS_FILE")
+assert_equals "scene_rename name param is string" "$SCENE_RENAME_NAME_TYPE" "string"
+
+CLIP_RENAME_NAME_TYPE=$(jq -r '.[] | select(.name=="clip_rename") | .input_schema.properties.name.type' "$TOOLS_FILE")
+assert_equals "clip_rename name param is string" "$CLIP_RENAME_NAME_TYPE" "string"
+
+DUP_SRC_TYPE=$(jq -r '.[] | select(.name=="clip_duplicateToSlot") | .input_schema.properties.srcTrackIndex.type' "$TOOLS_FILE")
+assert_equals "clip_duplicateToSlot srcTrackIndex param is integer" "$DUP_SRC_TYPE" "integer"
+
+DUP_DEST_TYPE=$(jq -r '.[] | select(.name=="clip_duplicateToSlot") | .input_schema.properties.destSlotIndex.type' "$TOOLS_FILE")
+assert_equals "clip_duplicateToSlot destSlotIndex param is integer" "$DUP_DEST_TYPE" "integer"
+
+CUE_RENAME_NAME_TYPE=$(jq -r '.[] | select(.name=="cueMarker_rename") | .input_schema.properties.name.type' "$TOOLS_FILE")
+assert_equals "cueMarker_rename name param is string" "$CUE_RENAME_NAME_TYPE" "string"
+
+CUE_POS_BEATS_TYPE=$(jq -r '.[] | select(.name=="cueMarker_setPosition") | .input_schema.properties.beats.type' "$TOOLS_FILE")
+assert_equals "cueMarker_setPosition beats param is number" "$CUE_POS_BEATS_TYPE" "number"
+
+CUE_DUP_INDEX_TYPE=$(jq -r '.[] | select(.name=="cueMarker_duplicate") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "cueMarker_duplicate index param is integer" "$CUE_DUP_INDEX_TYPE" "integer"
+
+# Phase 10 — system prompt
+assert_contains "system prompt has Lifecycle Operations section" "$PROMPT" "Lifecycle Operations"
+assert_contains "system prompt covers Clip Lifecycle" "$PROMPT" "Clip Lifecycle"
+assert_contains "system prompt covers Scene Lifecycle" "$PROMPT" "Scene Lifecycle"
+assert_contains "system prompt covers Cue Marker Lifecycle" "$PROMPT" "Cue Marker Lifecycle"
+assert_contains "system prompt mentions clip_rename" "$PROMPT" "clip_rename"
+assert_contains "system prompt mentions scene_create" "$PROMPT" "scene_create"
+assert_contains "system prompt mentions scene_createFromPlaying" "$PROMPT" "scene_createFromPlaying"
+assert_contains "system prompt mentions cueMarker_rename" "$PROMPT" "cueMarker_rename"
+assert_contains "system prompt mentions cueMarker_setPosition" "$PROMPT" "cueMarker_setPosition"
+
 # Phase 7 tool description warnings
 DEVICE_REMOVE_DESC=$(jq -r '.[] | select(.name=="device_remove") | .description' "$TOOLS_FILE")
 assert_contains "device_remove warns about loses selection" "$DEVICE_REMOVE_DESC" "loses selection"
@@ -319,6 +369,35 @@ assert_contains "cursor_selectTrack mentions track_select" "$CURSOR_SELECT_DESC"
 
 CLIP_LAUNCH_DESC=$(jq -r '.[] | select(.name=="clip_launch") | .description' "$TOOLS_FILE")
 assert_contains "clip_launch warns about transport" "$CLIP_LAUNCH_DESC" "transport"
+
+# Phase 11 — Bank Scrolling tools
+echo "--- Phase 11: Bank Scrolling tools ---"
+assert_contains "has sceneBank_scrollTo tool" "$TOOLS_LIST" "sceneBank_scrollTo"
+assert_contains "has sceneBank_scrollBy tool" "$TOOLS_LIST" "sceneBank_scrollBy"
+assert_contains "has sceneBank_getScrollInfo tool" "$TOOLS_LIST" "sceneBank_getScrollInfo"
+assert_contains "has cueMarkerBank_scrollTo tool" "$TOOLS_LIST" "cueMarkerBank_scrollTo"
+assert_contains "has cueMarkerBank_scrollBy tool" "$TOOLS_LIST" "cueMarkerBank_scrollBy"
+assert_contains "has cueMarkerBank_getScrollInfo tool" "$TOOLS_LIST" "cueMarkerBank_getScrollInfo"
+assert_contains "has trackBank_scrollTo tool" "$TOOLS_LIST" "trackBank_scrollTo"
+assert_contains "has trackBank_scrollBy tool" "$TOOLS_LIST" "trackBank_scrollBy"
+assert_contains "has trackBank_getScrollInfo tool" "$TOOLS_LIST" "trackBank_getScrollInfo"
+
+# Phase 11 — tool schema spot-checks
+SCENE_SCROLL_POS_TYPE=$(jq -r '.[] | select(.name=="sceneBank_scrollTo") | .input_schema.properties.position.type' "$TOOLS_FILE")
+assert_equals "sceneBank_scrollTo position param is integer" "$SCENE_SCROLL_POS_TYPE" "integer"
+
+TRACK_SCROLL_AMT_TYPE=$(jq -r '.[] | select(.name=="trackBank_scrollBy") | .input_schema.properties.amount.type' "$TOOLS_FILE")
+assert_equals "trackBank_scrollBy amount param is integer" "$TRACK_SCROLL_AMT_TYPE" "integer"
+
+CUE_SCROLL_POS_TYPE=$(jq -r '.[] | select(.name=="cueMarkerBank_scrollTo") | .input_schema.properties.position.type' "$TOOLS_FILE")
+assert_equals "cueMarkerBank_scrollTo position param is integer" "$CUE_SCROLL_POS_TYPE" "integer"
+
+# Phase 11 — system prompt
+assert_contains "system prompt has Bank Navigation section" "$PROMPT" "Bank Navigation"
+assert_contains "system prompt mentions sceneBank tools" "$PROMPT" "sceneBank_"
+assert_contains "system prompt mentions trackBank tools" "$PROMPT" "trackBank_"
+assert_contains "system prompt mentions cueMarkerBank tools" "$PROMPT" "cueMarkerBank_"
+assert_contains "system prompt documents v0.11 migration" "$PROMPT" "v0.11"
 
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
@@ -590,9 +669,9 @@ echo "--- 11. Clip Snapshot ---"
 SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":70}')
 assert_contains "snapshot has scenes" "$SNAP" '"scenes"'
 CLIP_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['tracks'][0]['clips']))")
-assert_equals "track 0 has 8 clip slots" "$CLIP_COUNT" "8"
+assert_equals "track 0 has 5 clip slots" "$CLIP_COUNT" "5"
 SCENE_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['scenes']))")
-assert_equals "snapshot has 8 scenes" "$SCENE_COUNT" "8"
+assert_equals "snapshot has 5 scenes" "$SCENE_COUNT" "5"
 assert_contains "clips have hasContent" "$SNAP" '"hasContent"'
 assert_contains "clips have isPlaying" "$SNAP" '"isPlaying"'
 
@@ -717,11 +796,11 @@ assert_contains "api/list has clip/scrollSteps" "$LIST" '"clip/scrollSteps"'
 # Count total methods
 METHOD_COUNT=$(echo "$LIST" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
 TOTAL=$((TOTAL + 1))
-if [ "$METHOD_COUNT" -ge 79 ]; then
-  echo "  PASS  api/list has >= 79 methods (found $METHOD_COUNT)"
+if [ "$METHOD_COUNT" -ge 99 ]; then
+  echo "  PASS  api/list has >= 99 methods (found $METHOD_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  api/list has >= 79 methods — found $METHOD_COUNT"
+  echo "  FAIL  api/list has >= 99 methods — found $METHOD_COUNT"
   FAIL=$((FAIL + 1))
 fi
 

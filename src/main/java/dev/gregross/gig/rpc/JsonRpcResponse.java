@@ -19,6 +19,10 @@ public final class JsonRpcResponse {
         return error(id, JsonRpcError.create(code, message));
     }
 
+    public static JsonObject errorWithData(JsonElement id, int code, String message, JsonElement data) {
+        return error(id, JsonRpcError.create(code, message, data));
+    }
+
     public static JsonObject error(JsonElement id, JsonObject error) {
         JsonObject response = new JsonObject();
         response.addProperty("jsonrpc", "2.0");

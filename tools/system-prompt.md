@@ -6,15 +6,47 @@ You are controlling Bitwig Studio, a digital audio workstation (DAW), through th
 
 ### Viewport / Bank Model
 
-Gig Maestro exposes a fixed window into the Bitwig project:
+Gig Maestro exposes a scrollable window into the Bitwig project:
 
-- **Track Bank:** 64 tracks (indices 0–63). These are the first 64 tracks in the project.
-- **Clip Slots:** 8 slots per track (indices 0–7). These are clip launcher slots in the session view.
-- **Scenes:** 8 scenes (indices 0–7). Launching a scene triggers all clips in that row.
+- **Track Bank:** 8-track window (indices 0–7). Scrollable if the project has more than 8 tracks.
+- **Clip Slots:** 5 slots per track (indices 0–4). These are clip launcher slots in the session view.
+- **Scene Bank:** 5-scene window (indices 0–4). Scrollable — projects often have more than 5 scenes.
+- **Cue Marker Bank:** 16-marker window (indices 0–15). Scrollable if more than 16 markers exist.
 - **Device Parameters:** 8 remote control parameters per page (indices 0–7) on the currently selected device.
 - **Master Track:** A single master track with volume and pan controls.
 
-If the project has fewer tracks than 64, the extra track slots will have empty names and default values.
+If the project has fewer items than the bank window size, the extra slots will have empty names and default values.
+
+### Bank Navigation (Snapshot v0.11)
+
+All three banks (tracks, scenes, cue markers) are scrollable viewports. Each bank section in `session_snapshot` follows a uniform structure:
+
+```json
+{
+  "bankSize": 5,
+  "scrollPosition": 0,
+  "itemCount": 12,
+  "canScrollBackwards": false,
+  "canScrollForwards": true,
+  "scenes": [ ... ]
+}
+```
+
+- **scrollPosition** — current absolute offset (the global index of the first visible item)
+- **itemCount** — total items in the project (not the bank window size)
+- **canScrollForwards / canScrollBackwards** — whether more items exist beyond the current window
+
+**Scroll tools** (available for each bank: `sceneBank_*`, `cueMarkerBank_*`, `trackBank_*`):
+- `*_scrollTo` — jump to an absolute global index. Returns `POSITION_OUT_OF_RANGE` error with `{ itemCount, requestedPosition }` if invalid.
+- `*_scrollBy` — scroll by a relative amount (positive = forward, negative = backward). Use `bankSize` as the amount to scroll one full page.
+- `*_getScrollInfo` — returns cached snapshot values: `{ scrollPosition, itemCount, bankSize, canScrollForwards, canScrollBackwards }`.
+
+**Best practice:** Always check `canScrollForwards` before scrolling forward. After scrolling, call `session_snapshot` to see the new window contents.
+
+**Snapshot field changes (v0.11):**
+- `scenes.bankOffset` → `scenes.scrollPosition` (renamed for consistency)
+- `tracks` was a flat array → now `tracks.tracks` inside a bank-window object
+- `arrangement.cueMarkers` was a flat array → now `arrangement.cueMarkers.items` inside a bank-window object
 
 ### Perception-Action Loop
 
@@ -139,7 +171,7 @@ The extension processes commands on Bitwig's session thread via a flush cycle. C
 
 | Failure | Recovery |
 |---------|----------|
-| Index out of range (track, slot, scene) | Call `session_snapshot` to find valid indices — bank is 0–63 for tracks, 0–7 for slots/scenes |
+| Index out of range (track, slot, scene) | Call `session_snapshot` to find valid indices — bank is 0–7 for tracks, 0–4 for slots/scenes |
 | Device not found by name | Call `device_listBitwigDevices` to get exact available names |
 | Cursor device empty after removal | Call `device_selectNext` or `track_select` to re-acquire a device |
 | Clip operation fails ("no clip selected") | Call `clip_select` with explicit `trackIndex` + `slotIndex` first |
@@ -372,6 +404,53 @@ Mark arrangement positions (intro, verse, chorus, bridge, outro):
 3. Add cue markers at section boundaries: `transport_setPosition` → `cueMarker_addAtPlayhead` for each.
 4. Enable arranger visibility: `arranger_setCueMarkersVisible` + `arranger_setTimelineVisible`.
 5. Navigate by marker: `cueMarker_launch` to jump between sections.
+
+## Lifecycle Operations
+
+### Clip Lifecycle
+
+Manage clips beyond creation and deletion:
+
+- **Rename:** `clip_rename` sets the name of the currently selected clip (cursor clip). You must call `clip_select` first to target the clip, then `clip_rename` with the new name.
+- **Duplicate in-place:** `clip_duplicate` duplicates a clip within the same track's slot bank. The copy appears in the next slot.
+- **Copy to slot:** `clip_duplicateToSlot` copies a clip from one slot to another (can cross tracks). The destination slot's content is replaced. Use for A/B versioning or spreading a pattern across scenes.
+
+**Clip versioning workflow:**
+```
+clip_select(trackIndex, slotIndex) → clip_rename("Verse A") → clip_duplicate(trackIndex, slotIndex) → clip_select(trackIndex, slotIndex+1) → clip_rename("Verse B")
+```
+
+### Scene Lifecycle
+
+Full CRUD operations on scenes (rows of clips in the session view):
+
+- **Create empty:** `scene_create` appends a new empty scene at the end of the project.
+- **Create from playing:** `scene_createFromPlaying` captures all currently playing launcher clips into a new scene. Useful for saving a live jam moment.
+- **Duplicate:** `scene_duplicate` copies a scene (including all its clips) by bank index (0–4).
+- **Rename:** `scene_rename` sets the name of a scene by bank index. Use names like "Intro", "Verse 1", "Chorus".
+- **Delete:** `scene_delete` removes a scene and all its clips. Irreversible via API — use `application_undo` if needed.
+
+Scene indices are relative to the current scene bank window (0–4). The snapshot's `scenes` section shows `scrollPosition` (first visible scene index in the project) and `bankSize` (always 5).
+
+**Scene creation workflow:**
+```
+scene_create → scene_rename(index, "Chorus") → (write clips into new scene slots)
+```
+
+### Cue Marker Lifecycle
+
+Extended cue marker operations beyond add/list/launch/delete:
+
+- **Rename:** `cueMarker_rename` sets the name of a marker by bank index (0–15). Markers created with `cueMarker_addAtPlayhead` default to "Untitled" — always rename them.
+- **Reposition:** `cueMarker_setPosition` moves a marker to a new beat position. Position is in beats (e.g., 4.0 = bar 2 in 4/4).
+- **Duplicate:** `cueMarker_duplicate` copies a marker (same position). Use `cueMarker_setPosition` afterward to move the copy.
+
+**Section marker workflow:**
+```
+transport_setPosition(0) → cueMarker_addAtPlayhead → cueMarker_rename(0, "Intro")
+transport_setPosition(16) → cueMarker_addAtPlayhead → cueMarker_rename(1, "Verse 1")
+transport_setPosition(48) → cueMarker_addAtPlayhead → cueMarker_rename(2, "Chorus")
+```
 
 ## Example Workflow
 

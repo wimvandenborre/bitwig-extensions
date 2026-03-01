@@ -2,6 +2,7 @@ package dev.gregross.gig.handlers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,8 @@ class ArrangerHandlerTest {
 
     @BeforeEach
     void setUp() {
-        // Pass null for Bitwig API objects — we only test parameter validation,
-        // not actual API calls (those would NPE on null objects)
         dispatcher = new JsonRpcDispatcher();
-        new ArrangerHandler(null, null, null).register(dispatcher);
+        new ArrangerHandler(null, null, null, new StateCache()).register(dispatcher);
     }
 
     // --- Registration ---
@@ -35,17 +34,20 @@ class ArrangerHandlerTest {
     }
 
     @Test
-    void registersFourCueMarkerMethods() {
+    void registersSevenCueMarkerMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("cueMarker/addAtPlayhead"));
         assertTrue(methods.contains("cueMarker/list"));
         assertTrue(methods.contains("cueMarker/launch"));
         assertTrue(methods.contains("cueMarker/delete"));
+        assertTrue(methods.contains("cueMarker/rename"));
+        assertTrue(methods.contains("cueMarker/setPosition"));
+        assertTrue(methods.contains("cueMarker/duplicate"));
     }
 
     @Test
-    void registersExactlyElevenMethods() {
-        assertEquals(11, dispatcher.getRegisteredMethods().size());
+    void registersExactlySeventeenMethods() {
+        assertEquals(17, dispatcher.getRegisteredMethods().size());
     }
 
     // --- Visibility toggle validation ---
@@ -131,6 +133,139 @@ class ArrangerHandlerTest {
     void cueMarkerDelete_indexTooHigh_returnsError() {
         String response = dispatcher.handle(rpc("cueMarker/delete", "{\"index\": 16}"));
         assertContains(response, "-32602");
+    }
+
+    // --- Cue marker rename validation ---
+
+    @Test
+    void cueMarkerRename_missingIndex_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/rename", "{\"name\": \"Test\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "index");
+    }
+
+    @Test
+    void cueMarkerRename_missingName_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/rename", "{\"index\": 0}"));
+        assertContains(response, "-32602");
+        assertContains(response, "name");
+    }
+
+    @Test
+    void cueMarkerRename_negativeIndex_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/rename", "{\"index\": -1, \"name\": \"Test\"}"));
+        assertContains(response, "-32602");
+    }
+
+    @Test
+    void cueMarkerRename_indexTooHigh_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/rename", "{\"index\": 16, \"name\": \"Test\"}"));
+        assertContains(response, "-32602");
+    }
+
+    // --- Cue marker setPosition validation ---
+
+    @Test
+    void cueMarkerSetPosition_missingIndex_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/setPosition", "{\"beats\": 4.0}"));
+        assertContains(response, "-32602");
+        assertContains(response, "index");
+    }
+
+    @Test
+    void cueMarkerSetPosition_missingBeats_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/setPosition", "{\"index\": 0}"));
+        assertContains(response, "-32602");
+        assertContains(response, "beats");
+    }
+
+    @Test
+    void cueMarkerSetPosition_negativeIndex_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/setPosition", "{\"index\": -1, \"beats\": 4.0}"));
+        assertContains(response, "-32602");
+    }
+
+    @Test
+    void cueMarkerSetPosition_indexTooHigh_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/setPosition", "{\"index\": 16, \"beats\": 4.0}"));
+        assertContains(response, "-32602");
+    }
+
+    // --- Cue marker duplicate validation ---
+
+    @Test
+    void cueMarkerDuplicate_missingIndex_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/duplicate", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "index");
+    }
+
+    @Test
+    void cueMarkerDuplicate_negativeIndex_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/duplicate", "{\"index\": -1}"));
+        assertContains(response, "-32602");
+    }
+
+    @Test
+    void cueMarkerDuplicate_indexTooHigh_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarker/duplicate", "{\"index\": 16}"));
+        assertContains(response, "-32602");
+    }
+
+    // --- cueMarkerBank scroll registration ---
+
+    @Test
+    void registersThreeCueMarkerBankScrollMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("cueMarkerBank/scrollTo"));
+        assertTrue(methods.contains("cueMarkerBank/scrollBy"));
+        assertTrue(methods.contains("cueMarkerBank/getScrollInfo"));
+    }
+
+    // --- cueMarkerBank/scrollTo validation ---
+
+    @Test
+    void cueMarkerBankScrollTo_missingPosition_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarkerBank/scrollTo", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "position");
+    }
+
+    @Test
+    void cueMarkerBankScrollTo_negativePosition_returnsOutOfRange() {
+        String response = dispatcher.handle(rpc("cueMarkerBank/scrollTo", "{\"position\": -1}"));
+        assertContains(response, "-32001");
+        assertContains(response, "POSITION_OUT_OF_RANGE");
+    }
+
+    @Test
+    void cueMarkerBankScrollTo_positionBeyondItemCount_returnsOutOfRange() {
+        // StateCache defaults to itemCount=0, so position 0 is out of range
+        String response = dispatcher.handle(rpc("cueMarkerBank/scrollTo", "{\"position\": 0}"));
+        assertContains(response, "-32001");
+        assertContains(response, "itemCount");
+        assertContains(response, "requestedPosition");
+    }
+
+    // --- cueMarkerBank/scrollBy validation ---
+
+    @Test
+    void cueMarkerBankScrollBy_missingAmount_returnsError() {
+        String response = dispatcher.handle(rpc("cueMarkerBank/scrollBy", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "amount");
+    }
+
+    // --- cueMarkerBank/getScrollInfo ---
+
+    @Test
+    void cueMarkerBankGetScrollInfo_returnsAllFields() {
+        String response = dispatcher.handle(rpc("cueMarkerBank/getScrollInfo", "{}"));
+        assertContains(response, "scrollPosition");
+        assertContains(response, "itemCount");
+        assertContains(response, "bankSize");
+        assertContains(response, "canScrollForwards");
+        assertContains(response, "canScrollBackwards");
     }
 
     // --- Helpers ---

@@ -118,6 +118,9 @@ public class JsonRpcDispatcher {
             JsonElement result = handler.handle(params);
             if (isNotification) return null;
             return JsonRpcResponse.success(idField, result);
+        } catch (RpcException e) {
+            if (isNotification) return null;
+            return JsonRpcResponse.errorWithData(idField, e.getCode(), e.getMessage(), e.getData());
         } catch (IllegalArgumentException e) {
             if (isNotification) return null;
             return JsonRpcResponse.error(idField, JsonRpcError.INVALID_PARAMS,

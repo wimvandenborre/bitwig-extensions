@@ -6,7 +6,9 @@ import com.bitwig.extension.controller.api.CueMarkerBank;
 import com.bitwig.extension.controller.api.Transport;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+import dev.gregross.gig.rpc.RpcException;
 
 public class ArrangerHandler {
 
@@ -15,11 +17,14 @@ public class ArrangerHandler {
     private final Arranger arranger;
     private final Transport transport;
     private final CueMarkerBank cueMarkerBank;
+    private final StateCache stateCache;
 
-    public ArrangerHandler(Arranger arranger, Transport transport, CueMarkerBank cueMarkerBank) {
+    public ArrangerHandler(Arranger arranger, Transport transport, CueMarkerBank cueMarkerBank,
+                           StateCache stateCache) {
         this.arranger = arranger;
         this.transport = transport;
         this.cueMarkerBank = cueMarkerBank;
+        this.stateCache = stateCache;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -122,6 +127,52 @@ public class ArrangerHandler {
             return ok();
         });
 
+        dispatcher.register("cueMarker/rename", params -> {
+            if (!params.has("index")) {
+                throw new IllegalArgumentException("missing 'index' parameter");
+            }
+            if (!params.has("name")) {
+                throw new IllegalArgumentException("missing 'name' parameter");
+            }
+            int index = params.get("index").getAsInt();
+            if (index < 0 || index >= CUE_MARKER_COUNT) {
+                throw new IllegalArgumentException("index must be 0-" + (CUE_MARKER_COUNT - 1));
+            }
+            CueMarker marker = (CueMarker) cueMarkerBank.getItemAt(index);
+            marker.name().set(params.get("name").getAsString());
+            return ok();
+        });
+
+        dispatcher.register("cueMarker/setPosition", params -> {
+            if (!params.has("index")) {
+                throw new IllegalArgumentException("missing 'index' parameter");
+            }
+            if (!params.has("beats")) {
+                throw new IllegalArgumentException("missing 'beats' parameter");
+            }
+            int index = params.get("index").getAsInt();
+            if (index < 0 || index >= CUE_MARKER_COUNT) {
+                throw new IllegalArgumentException("index must be 0-" + (CUE_MARKER_COUNT - 1));
+            }
+            double beats = params.get("beats").getAsDouble();
+            CueMarker marker = (CueMarker) cueMarkerBank.getItemAt(index);
+            marker.position().set(beats);
+            return ok();
+        });
+
+        dispatcher.register("cueMarker/duplicate", params -> {
+            if (!params.has("index")) {
+                throw new IllegalArgumentException("missing 'index' parameter");
+            }
+            int index = params.get("index").getAsInt();
+            if (index < 0 || index >= CUE_MARKER_COUNT) {
+                throw new IllegalArgumentException("index must be 0-" + (CUE_MARKER_COUNT - 1));
+            }
+            CueMarker marker = (CueMarker) cueMarkerBank.getItemAt(index);
+            marker.duplicateObject();
+            return ok();
+        });
+
         dispatcher.register("cueMarker/delete", params -> {
             if (!params.has("index")) {
                 throw new IllegalArgumentException("missing 'index' parameter");
@@ -133,6 +184,37 @@ public class ArrangerHandler {
             CueMarker marker = (CueMarker) cueMarkerBank.getItemAt(index);
             marker.deleteObject();
             return ok();
+        });
+
+        // --- Cue marker bank scroll methods ---
+
+        dispatcher.register("cueMarkerBank/scrollTo", params -> {
+            if (!params.has("position")) {
+                throw new IllegalArgumentException("missing 'position' parameter");
+            }
+            int position = params.get("position").getAsInt();
+            int itemCount = stateCache.getCueMarkerItemCount();
+            if (position < 0 || position >= itemCount) {
+                JsonObject error = new JsonObject();
+                error.addProperty("itemCount", itemCount);
+                error.addProperty("requestedPosition", position);
+                throw new RpcException(-32001, "POSITION_OUT_OF_RANGE", error);
+            }
+            cueMarkerBank.scrollPosition().set(position);
+            return ok();
+        });
+
+        dispatcher.register("cueMarkerBank/scrollBy", params -> {
+            if (!params.has("amount")) {
+                throw new IllegalArgumentException("missing 'amount' parameter");
+            }
+            int amount = params.get("amount").getAsInt();
+            cueMarkerBank.scrollBy(amount);
+            return ok();
+        });
+
+        dispatcher.register("cueMarkerBank/getScrollInfo", params -> {
+            return stateCache.getCueMarkerBankScrollInfo();
         });
     }
 

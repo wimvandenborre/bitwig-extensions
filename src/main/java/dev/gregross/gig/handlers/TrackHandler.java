@@ -7,7 +7,9 @@ import com.bitwig.extension.controller.api.TrackBank;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+import dev.gregross.gig.rpc.RpcException;
 
 public class TrackHandler {
 
@@ -15,13 +17,16 @@ public class TrackHandler {
     private final Application application;
     private final CursorTrack cursorTrack;
     private final TrackBankManager trackBankManager;
+    private final StateCache stateCache;
 
     public TrackHandler(TrackBank trackBank, Application application,
-                        CursorTrack cursorTrack, TrackBankManager trackBankManager) {
+                        CursorTrack cursorTrack, TrackBankManager trackBankManager,
+                        StateCache stateCache) {
         this.trackBank = trackBank;
         this.application = application;
         this.cursorTrack = cursorTrack;
         this.trackBankManager = trackBankManager;
+        this.stateCache = stateCache;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -103,6 +108,31 @@ public class TrackHandler {
             cursorTrack.duplicate();
             return cursorResponse();
         });
+
+        // --- Track bank scroll methods ---
+
+        dispatcher.register("trackBank/scrollTo", params -> {
+            int position = requireInt(params, "position");
+            int itemCount = stateCache.getTrackItemCount();
+            if (position < 0 || position >= itemCount) {
+                JsonObject error = new JsonObject();
+                error.addProperty("itemCount", itemCount);
+                error.addProperty("requestedPosition", position);
+                throw new RpcException(-32001, "POSITION_OUT_OF_RANGE", error);
+            }
+            trackBank.scrollPosition().set(position);
+            return ok();
+        });
+
+        dispatcher.register("trackBank/scrollBy", params -> {
+            int amount = requireInt(params, "amount");
+            trackBank.scrollBy(amount);
+            return ok();
+        });
+
+        dispatcher.register("trackBank/getScrollInfo", params -> {
+            return stateCache.getTrackBankScrollInfo();
+        });
     }
 
     private Track getTrack(int index) {
@@ -110,6 +140,12 @@ public class TrackHandler {
             throw new IllegalArgumentException("track index out of range: " + index);
         }
         return (Track) trackBank.getItemAt(index);
+    }
+
+    private JsonObject ok() {
+        JsonObject result = new JsonObject();
+        result.addProperty("ok", true);
+        return result;
     }
 
     private JsonObject cursorResponse() {
