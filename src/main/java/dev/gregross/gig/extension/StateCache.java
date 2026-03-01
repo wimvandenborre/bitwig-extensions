@@ -829,4 +829,9 @@ public class StateCache {
     }
 
     public int getTrackItemCount() { return trackItemCount; }
+
+    public String getTrackName(int index) {
+        if (index < 0 || index >= TRACK_COUNT) return "";
+        return trackNames[index] != null ? trackNames[index] : "";
+    }
 }

@@ -24,19 +24,9 @@ Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
-### ISS-004: `track/select` cursor mapping doesn't match track bank indices
+### ~~ISS-004: `track/select` cursor mapping doesn't match track bank indices~~ → RESOLVED
 
-**Severity:** Low
-**Discovered:** 2026-03-01 (device insertion)
-**Affects:** `track/select`, `device/insertBitwigDevice`
-
-**Symptom:** `track/select` with `index: 0` reported `cursorTrackName: "Arp"` instead of "Pad". Subsequent device insertions may land on wrong tracks.
-
-**Root cause:** `track/select` navigates the CursorTrack, which follows its own selection order (possibly most-recently-selected). The track bank index and cursor track selection are loosely coupled — selecting bank index 0 doesn't guarantee the cursor moves to the first track.
-
-**Workaround:** Verify `cursorTrackName` in the response and retry if wrong. Or use `macro/createTrack` with `device` param which handles device insertion during track creation.
-
-**Impact:** Low — devices were inserted (all 4 tracks got instruments), just potentially on wrong tracks. User can reassign in Bitwig UI.
+Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
@@ -79,3 +69,9 @@ Moved to [Resolved Issues](#resolved-issues).
 **Severity:** Low → **Resolved:** 2026-03-01
 **Fix:** Documented the async cursor settle delay in tool schemas for both `clip/select` and `clip/getNotes`. `clip/select` now warns that cursor movement is async and a 1-2 second wait is needed before `getNotes`. `clip/getNotes` schema warns about stale/empty results if called too soon after `clip/select`. This is a Bitwig API limitation — writing is not affected (uses deferred scheduling).
 **Files:** `claude-tools.json`
+
+### ISS-004: `track/select` cursor mapping doesn't match track bank indices
+
+**Severity:** Low → **Resolved:** 2026-03-01
+**Fix:** Changed `track/select` response from `cursorTrackName` (stale — cursor hasn't moved yet) to `trackName` + `trackIndex` sourced from the track bank's cached state (accurate immediately). Added `StateCache.getTrackName(index)` method. Updated tool schema to document async cursor movement.
+**Files:** `TrackHandler.java`, `StateCache.java`, `claude-tools.json`

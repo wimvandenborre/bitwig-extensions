@@ -797,7 +797,7 @@
   },
   {
     "name": "track_select",
-    "description": "Select a track by its bank index. The cursor track will follow this selection, making subsequent cursor-based operations (rename, delete, insert device, note editing) target the selected track. Index must be in the range 0–63. Out-of-range indices return an error with bank width context.",
+    "description": "Select a track by its bank index. The cursor track will follow this selection, making subsequent cursor-based operations (rename, delete, insert device, note editing) target the selected track. Returns { ok, trackName, trackIndex } with the bank track name (accurate immediately). IMPORTANT: Cursor movement is async — cursorTrack-dependent operations in the same flush cycle may still target the previous track.",
     "input_schema": {
       "type": "object",
       "properties": {
