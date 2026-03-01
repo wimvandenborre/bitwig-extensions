@@ -24,7 +24,6 @@ public class MacroHandler {
     private JsonElement handleCreateTrack(JsonObject params) throws Exception {
         String type = requireString(params, "type");
 
-        // Determine the track creation method
         String createMethod;
         switch (type) {
             case "audio":
@@ -41,23 +40,19 @@ public class MacroHandler {
                     + " — must be 'audio', 'instrument', or 'effect'");
         }
 
-        // Build create params
         JsonObject createParams = new JsonObject();
         if (params.has("position")) {
             createParams.addProperty("position", params.get("position").getAsInt());
         }
 
-        // Create the track
         dispatcher.handleInternal(createMethod, createParams);
 
-        // Rename if name provided
         if (params.has("name") && !params.get("name").isJsonNull()) {
             JsonObject renameParams = new JsonObject();
             renameParams.addProperty("name", params.get("name").getAsString());
             dispatcher.handleInternal("track/rename", renameParams);
         }
 
-        // Insert device if provided
         if (params.has("device") && !params.get("device").isJsonNull()) {
             JsonObject deviceParams = new JsonObject();
             deviceParams.addProperty("name", params.get("device").getAsString());
@@ -74,18 +69,8 @@ public class MacroHandler {
         int sceneIndex = requireInt(params, "sceneIndex");
         int lengthBeats = requireInt(params, "lengthBeats");
 
-        // Create the clip
-        JsonObject createParams = new JsonObject();
-        createParams.addProperty("trackIndex", trackIndex);
-        createParams.addProperty("slotIndex", sceneIndex);
-        createParams.addProperty("lengthInBeats", lengthBeats);
-        dispatcher.handleInternal("clip/create", createParams);
-
-        // Select the clip (cursor clip ready for note writing)
-        JsonObject selectParams = new JsonObject();
-        selectParams.addProperty("trackIndex", trackIndex);
-        selectParams.addProperty("slotIndex", sceneIndex);
-        dispatcher.handleInternal("clip/select", selectParams);
+        createClip(trackIndex, sceneIndex, lengthBeats);
+        forceSelectClip(trackIndex, sceneIndex);
 
         JsonObject result = new JsonObject();
         result.addProperty("ok", true);
@@ -99,30 +84,17 @@ public class MacroHandler {
         double stepSize = requireDouble(params, "stepSize");
         JsonArray notes = requireArray(params, "notes");
 
-        // Create the clip
-        JsonObject createParams = new JsonObject();
-        createParams.addProperty("trackIndex", trackIndex);
-        createParams.addProperty("slotIndex", sceneIndex);
-        createParams.addProperty("lengthInBeats", lengthBeats);
-        dispatcher.handleInternal("clip/create", createParams);
+        createClip(trackIndex, sceneIndex, lengthBeats);
+        forceSelectClip(trackIndex, sceneIndex);
 
-        // Select the clip
-        JsonObject selectParams = new JsonObject();
-        selectParams.addProperty("trackIndex", trackIndex);
-        selectParams.addProperty("slotIndex", sceneIndex);
-        dispatcher.handleInternal("clip/select", selectParams);
-
-        // Set step size
         JsonObject stepSizeParams = new JsonObject();
         stepSizeParams.addProperty("size", stepSize);
         dispatcher.handleInternal("clip/setStepSize", stepSizeParams);
 
-        // Write notes
         JsonObject noteParams = new JsonObject();
         noteParams.add("notes", notes);
         dispatcher.handleInternal("clip/setNotes", noteParams);
 
-        // Rename if provided
         if (params.has("name") && !params.get("name").isJsonNull()) {
             JsonObject renameParams = new JsonObject();
             renameParams.addProperty("name", params.get("name").getAsString());
@@ -142,28 +114,31 @@ public class MacroHandler {
             throw new IllegalArgumentException("'clips' array must not be empty");
         }
 
-        // Record scene count before creation to find the new scene's absolute index
         int sceneCountBefore = stateCache.getSceneItemCount();
 
-        // Create a new scene
         dispatcher.handleInternal("scene/create", new JsonObject());
 
-        // Scroll scene bank so the new scene is visible
-        // New scene is at absolute index = sceneCountBefore (0-based)
+        // Scroll scene bank to the end so the new scene is visible.
+        // Use scrollBy with a large positive amount — Bitwig clamps to valid range.
+        // We can't use scrollTo because the itemCount observer hasn't updated yet.
         JsonObject scrollParams = new JsonObject();
-        scrollParams.addProperty("position", sceneCountBefore);
-        dispatcher.handleInternal("sceneBank/scrollTo", scrollParams);
+        scrollParams.addProperty("amount", sceneCountBefore);
+        dispatcher.handleInternal("sceneBank/scrollBy", scrollParams);
 
-        // The new scene's bank-relative index is 0 (first in the scrolled window)
-        int newSceneBankIndex = 0;
+        // The new scene is the last one. After scrolling to the end,
+        // its bank-relative index depends on how many scenes fit in the window.
+        // With bankSize=5 and N+1 total scenes, the last scene is at offset (N+1)-1 - scrollPosition.
+        // Since scrollBy clamps, we calculate the bank-relative index from the scene count.
+        int bankSize = 5; // matches SCENE_COUNT
+        int totalScenes = sceneCountBefore + 1;
+        int scrollPosition = Math.max(0, totalScenes - bankSize);
+        int newSceneBankIndex = (totalScenes - 1) - scrollPosition;
 
-        // Rename the scene
         JsonObject renameParams = new JsonObject();
         renameParams.addProperty("index", newSceneBankIndex);
         renameParams.addProperty("name", sceneName);
         dispatcher.handleInternal("scene/rename", renameParams);
 
-        // Write clips into the new scene
         int clipCount = 0;
         for (JsonElement clipEl : clips) {
             JsonObject clip = clipEl.getAsJsonObject();
@@ -172,30 +147,17 @@ public class MacroHandler {
             double stepSize = requireDouble(clip, "stepSize");
             JsonArray notes = requireArray(clip, "notes");
 
-            // Create clip in this track at the new scene's slot
-            JsonObject createParams = new JsonObject();
-            createParams.addProperty("trackIndex", trackIndex);
-            createParams.addProperty("slotIndex", newSceneBankIndex);
-            createParams.addProperty("lengthInBeats", lengthBeats);
-            dispatcher.handleInternal("clip/create", createParams);
+            createClip(trackIndex, newSceneBankIndex, lengthBeats);
+            forceSelectClip(trackIndex, newSceneBankIndex);
 
-            // Select clip
-            JsonObject selectParams = new JsonObject();
-            selectParams.addProperty("trackIndex", trackIndex);
-            selectParams.addProperty("slotIndex", newSceneBankIndex);
-            dispatcher.handleInternal("clip/select", selectParams);
-
-            // Set step size
             JsonObject stepSizeParams = new JsonObject();
             stepSizeParams.addProperty("size", stepSize);
             dispatcher.handleInternal("clip/setStepSize", stepSizeParams);
 
-            // Write notes
             JsonObject noteParams = new JsonObject();
             noteParams.add("notes", notes);
             dispatcher.handleInternal("clip/setNotes", noteParams);
 
-            // Rename clip if provided
             if (clip.has("name") && !clip.get("name").isJsonNull()) {
                 JsonObject clipRenameParams = new JsonObject();
                 clipRenameParams.addProperty("name", clip.get("name").getAsString());
@@ -209,6 +171,24 @@ public class MacroHandler {
         result.addProperty("sceneIndex", sceneCountBefore);
         result.addProperty("clipCount", clipCount);
         return result;
+    }
+
+    // --- Internal helpers ---
+
+    private void createClip(int trackIndex, int slotIndex, int lengthBeats) throws Exception {
+        JsonObject params = new JsonObject();
+        params.addProperty("trackIndex", trackIndex);
+        params.addProperty("slotIndex", slotIndex);
+        params.addProperty("lengthInBeats", lengthBeats);
+        dispatcher.handleInternal("clip/create", params);
+    }
+
+    private void forceSelectClip(int trackIndex, int slotIndex) throws Exception {
+        JsonObject params = new JsonObject();
+        params.addProperty("trackIndex", trackIndex);
+        params.addProperty("slotIndex", slotIndex);
+        params.addProperty("force", true);
+        dispatcher.handleInternal("clip/select", params);
     }
 
     // --- Parameter helpers ---

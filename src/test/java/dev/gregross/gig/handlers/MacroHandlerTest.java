@@ -74,8 +74,8 @@ class MacroHandlerTest {
             callLog.add("scene/rename:" + params.get("name").getAsString());
             return new JsonPrimitive("ok");
         });
-        dispatcher.register("sceneBank/scrollTo", params -> {
-            callLog.add("sceneBank/scrollTo:" + params.get("position").getAsInt());
+        dispatcher.register("sceneBank/scrollBy", params -> {
+            callLog.add("sceneBank/scrollBy:" + params.get("amount").getAsInt());
             return new JsonPrimitive("ok");
         });
 
@@ -213,7 +213,7 @@ class MacroHandlerTest {
             ]}""");
         assertEquals(List.of(
             "scene/create",
-            "sceneBank/scrollTo:0",
+            "sceneBank/scrollBy:0",
             "scene/rename:Verse 1",
             "clip/create:t0s0l16",
             "clip/select:t0s0",
