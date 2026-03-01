@@ -15,12 +15,12 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 12.1 | `0.12.1` | Dispatcher `handleInternal()` + `session/transaction` | in-session | pending |
-| 12.2 | `0.12.2` | MacroHandler + `macro/createTrack` + `macro/createClip` | in-session | pending |
-| 12.3 | `0.12.3` | `macro/writeClip` + `macro/buildSection` | in-session | pending |
-| 12.4 | `0.12.4` | Unit tests | in-session | pending |
-| 12.5 | `0.12.5` | Tool schemas + system prompt update | in-session | pending |
-| 12.6 | `0.12.6` | Smoke tests | in-session | pending |
+| 12.1 | `0.12.1` | Dispatcher `handleInternal()` + `session/transaction` | in-session | done |
+| 12.2 | `0.12.2` | MacroHandler + `macro/createTrack` + `macro/createClip` | in-session | done |
+| 12.3 | `0.12.3` | `macro/writeClip` + `macro/buildSection` | in-session | done |
+| 12.4 | `0.12.4` | Unit tests | in-session | done |
+| 12.5 | `0.12.5` | Tool schemas + system prompt update | in-session | done |
+| 12.6 | `0.12.6` | Smoke tests | in-session | done |
 
 ### Batch 12.1 — Dispatcher `handleInternal()` + `session/transaction`
 

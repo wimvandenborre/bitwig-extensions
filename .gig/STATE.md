@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.12.0` |
+| **Version** | `0.12.6` |
 | **Phase** | 12 — Transaction + Macro Layer |
-| **Status** | `PLANNED` |
-| **Last Batch** | — |
+| **Status** | `APPLIED` |
+| **Last Batch** | Smoke tests |
 | **Last Updated** | 2026-03-01 |
 
 ---
@@ -18,6 +18,12 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.12.6 | 12 | Smoke tests | PLANNED | done | 2026-03-01 |
+| 0.12.5 | 12 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
+| 0.12.4 | 12 | Unit tests | PLANNED | done | 2026-03-01 |
+| 0.12.3 | 12 | macro/writeClip + macro/buildSection | PLANNED | done | 2026-03-01 |
+| 0.12.2 | 12 | MacroHandler + macro/createTrack + macro/createClip | PLANNED | done | 2026-03-01 |
+| 0.12.1 | 12 | Dispatcher handleInternal() + session/transaction | PLANNED | done | 2026-03-01 |
 | 0.11.9 | 11 | 8×5 APC40-style grid + clip launcher feedback | UNPLANNED | done | 2026-03-01 |
 | 0.11.8 | 11 | Fix clip operation reliability | UNPLANNED | done | 2026-03-01 |
 | 0.11.7 | 11 | Smoke tests | PLANNED | done | 2026-03-01 |
