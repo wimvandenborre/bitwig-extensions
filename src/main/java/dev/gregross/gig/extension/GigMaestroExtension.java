@@ -15,6 +15,7 @@ import dev.gregross.gig.handlers.NoteHandler;
 import dev.gregross.gig.handlers.SceneHandler;
 import dev.gregross.gig.handlers.TrackBankManager;
 import dev.gregross.gig.handlers.TrackHandler;
+import dev.gregross.gig.handlers.TransactionHandler;
 import dev.gregross.gig.handlers.TransportHandler;
 import dev.gregross.gig.rpc.CommandQueue;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
@@ -123,6 +124,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new NoteHandler(cursorClip, stateCache).register(dispatcher);
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);
+        new TransactionHandler(dispatcher, stateCache).register(dispatcher);
 
         // Start servers
         try {

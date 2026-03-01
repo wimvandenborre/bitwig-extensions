@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.11.9` |
-| **Phase** | 11 — Bank Scrolling |
-| **Status** | `VERIFIED` |
-| **Last Batch** | 8×5 APC40-style grid + clip launcher feedback [UNPLANNED] |
+| **Version** | `0.12.0` |
+| **Phase** | 12 — Transaction + Macro Layer |
+| **Status** | `PLANNED` |
+| **Last Batch** | — |
 | **Last Updated** | 2026-03-01 |
 
 ---
@@ -88,7 +88,13 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-Phase 11 decisions archived to `.gig/phases/v0.11-bank-scrolling/DECISIONS.md`.
+Phase 12 decisions locked (9 entries: D-12.1, D-12.2→D-12.2a, D-12.3→D-12.3a, D-12.4→D-12.4a, D-12.5, D-12.6):
+- **D-12.1** — Scope: transaction layer + macro layer to reduce agent round-trips
+- **D-12.2a** — `session/transaction` with `preSnapshot`/`postSnapshot` booleans, controller-thread safety
+- **D-12.3a** — Stop-on-error default, optional `rollback: "undoAll"` (best-effort via app/undo)
+- **D-12.4a** — 4 macros with explicit params: `createTrack`, `createClip`, `writeClip`, `buildSection`
+- **D-12.5** — Transaction in dispatcher, macros in MacroHandler with `handleInternal()`
+- **D-12.6** — 6 new tool schemas, system prompt update recommending macros
 
 ---
 

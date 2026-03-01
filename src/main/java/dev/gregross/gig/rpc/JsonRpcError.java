@@ -10,6 +10,7 @@ public final class JsonRpcError {
     public static final int METHOD_NOT_FOUND = -32601;
     public static final int INVALID_PARAMS = -32602;
     public static final int INTERNAL_ERROR = -32603;
+    public static final int TRANSACTION_STEP_FAILED = -32010;
 
     private JsonRpcError() {}
 
