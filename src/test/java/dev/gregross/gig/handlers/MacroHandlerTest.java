@@ -3,6 +3,7 @@ package dev.gregross.gig.handlers;
 import com.google.gson.*;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+import dev.gregross.gig.rpc.TaskScheduler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +16,9 @@ class MacroHandlerTest {
 
     private JsonRpcDispatcher dispatcher;
     private List<String> callLog;
+
+    /** Runs scheduled tasks immediately — simulates instant flush cycles for testing. */
+    private static final TaskScheduler IMMEDIATE_SCHEDULER = (task, delayMs) -> task.run();
 
     @BeforeEach
     void setUp() {
@@ -79,7 +83,7 @@ class MacroHandlerTest {
             return new JsonPrimitive("ok");
         });
 
-        new MacroHandler(dispatcher, new StateCache()).register(dispatcher);
+        new MacroHandler(dispatcher, new StateCache(), IMMEDIATE_SCHEDULER).register(dispatcher);
     }
 
     // --- Registration ---
@@ -159,6 +163,7 @@ class MacroHandlerTest {
             {"trackIndex":0,"sceneIndex":1,"lengthBeats":8,"stepSize":0.25,
              "notes":[{"x":0,"y":60,"velocity":100,"duration":1},
                       {"x":4,"y":64,"velocity":80,"duration":1}]}""");
+        // Phase 1: create + select; Phase 2 (deferred): setStepSize + setNotes
         assertEquals(List.of(
             "clip/create:t0s1l8",
             "clip/select:t0s1",
@@ -211,16 +216,18 @@ class MacroHandlerTest {
                 {"trackIndex":1,"lengthBeats":16,"stepSize":0.25,
                  "notes":[{"x":0,"y":48,"velocity":80,"duration":2}],"name":"Bass"}
             ]}""");
+        // Phase 1: scene create + scroll + rename + create all clips + select first
+        // Phase 2+ (deferred): write notes per clip with select-next chaining
         assertEquals(List.of(
             "scene/create",
             "sceneBank/scrollBy:0",
             "scene/rename:Verse 1",
             "clip/create:t0s0l16",
+            "clip/create:t1s0l16",
             "clip/select:t0s0",
             "clip/setStepSize:0.25",
             "clip/setNotes:1",
             "clip/rename:Lead",
-            "clip/create:t1s0l16",
             "clip/select:t1s0",
             "clip/setStepSize:0.25",
             "clip/setNotes:1",
@@ -240,7 +247,7 @@ class MacroHandlerTest {
                  "notes":[{"x":0,"y":36,"velocity":90,"duration":1}]}
             ]}""");
         JsonObject result = parseResult(response);
-        assertEquals(0, result.get("sceneIndex").getAsInt()); // StateCache default itemCount=0
+        assertEquals(0, result.get("sceneIndex").getAsInt());
         assertEquals(3, result.get("clipCount").getAsInt());
     }
 

@@ -3,15 +3,20 @@ package dev.gregross.gig.handlers;
 import com.google.gson.*;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+import dev.gregross.gig.rpc.TaskScheduler;
 
 public class MacroHandler {
 
+    private static final long FLUSH_DELAY_MS = 100;
+
     private final JsonRpcDispatcher dispatcher;
     private final StateCache stateCache;
+    private final TaskScheduler scheduler;
 
-    public MacroHandler(JsonRpcDispatcher dispatcher, StateCache stateCache) {
+    public MacroHandler(JsonRpcDispatcher dispatcher, StateCache stateCache, TaskScheduler scheduler) {
         this.dispatcher = dispatcher;
         this.stateCache = stateCache;
+        this.scheduler = scheduler;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -83,23 +88,21 @@ public class MacroHandler {
         int lengthBeats = requireInt(params, "lengthBeats");
         double stepSize = requireDouble(params, "stepSize");
         JsonArray notes = requireArray(params, "notes");
+        String name = params.has("name") && !params.get("name").isJsonNull()
+            ? params.get("name").getAsString() : null;
 
+        // Phase 1 (this flush cycle): create clip and request cursor move
         createClip(trackIndex, sceneIndex, lengthBeats);
         forceSelectClip(trackIndex, sceneIndex);
 
-        JsonObject stepSizeParams = new JsonObject();
-        stepSizeParams.addProperty("size", stepSize);
-        dispatcher.handleInternal("clip/setStepSize", stepSizeParams);
-
-        JsonObject noteParams = new JsonObject();
-        noteParams.add("notes", notes);
-        dispatcher.handleInternal("clip/setNotes", noteParams);
-
-        if (params.has("name") && !params.get("name").isJsonNull()) {
-            JsonObject renameParams = new JsonObject();
-            renameParams.addProperty("name", params.get("name").getAsString());
-            dispatcher.handleInternal("clip/rename", renameParams);
-        }
+        // Phase 2 (next flush cycle): cursor has followed, now write notes
+        scheduler.schedule(() -> {
+            try {
+                writeNotesToCursor(stepSize, notes, name);
+            } catch (Exception e) {
+                // Deferred write failed — logged but not propagated to caller
+            }
+        }, FLUSH_DELAY_MS);
 
         JsonObject result = new JsonObject();
         result.addProperty("count", notes.size());
@@ -118,17 +121,10 @@ public class MacroHandler {
 
         dispatcher.handleInternal("scene/create", new JsonObject());
 
-        // Scroll scene bank to the end so the new scene is visible.
-        // Use scrollBy with a large positive amount — Bitwig clamps to valid range.
-        // We can't use scrollTo because the itemCount observer hasn't updated yet.
         JsonObject scrollParams = new JsonObject();
         scrollParams.addProperty("amount", sceneCountBefore);
         dispatcher.handleInternal("sceneBank/scrollBy", scrollParams);
 
-        // The new scene is the last one. After scrolling to the end,
-        // its bank-relative index depends on how many scenes fit in the window.
-        // With bankSize=5 and N+1 total scenes, the last scene is at offset (N+1)-1 - scrollPosition.
-        // Since scrollBy clamps, we calculate the bank-relative index from the scene count.
         int bankSize = 5; // matches SCENE_COUNT
         int totalScenes = sceneCountBefore + 1;
         int scrollPosition = Math.max(0, totalScenes - bankSize);
@@ -139,41 +135,69 @@ public class MacroHandler {
         renameParams.addProperty("name", sceneName);
         dispatcher.handleInternal("scene/rename", renameParams);
 
-        int clipCount = 0;
+        // Phase 1 (this flush cycle): create all clips and select the first one
         for (JsonElement clipEl : clips) {
             JsonObject clip = clipEl.getAsJsonObject();
             int trackIndex = requireInt(clip, "trackIndex");
             int lengthBeats = requireInt(clip, "lengthBeats");
+            createClip(trackIndex, newSceneBankIndex, lengthBeats);
+        }
+
+        // Select the first clip — cursor will follow in next flush cycle
+        JsonObject firstClip = clips.get(0).getAsJsonObject();
+        forceSelectClip(requireInt(firstClip, "trackIndex"), newSceneBankIndex);
+
+        // Phase 2+: chain clip writes across flush cycles
+        // Each clip needs: (flush N) write notes + select next clip → (flush N+1) write next
+        for (int i = 0; i < clips.size(); i++) {
+            JsonObject clip = clips.get(i).getAsJsonObject();
             double stepSize = requireDouble(clip, "stepSize");
             JsonArray notes = requireArray(clip, "notes");
+            String clipName = clip.has("name") && !clip.get("name").isJsonNull()
+                ? clip.get("name").getAsString() : null;
 
-            createClip(trackIndex, newSceneBankIndex, lengthBeats);
-            forceSelectClip(trackIndex, newSceneBankIndex);
+            boolean isLast = (i == clips.size() - 1);
+            int nextClipTrackIndex = isLast ? -1
+                : requireInt(clips.get(i + 1).getAsJsonObject(), "trackIndex");
 
-            JsonObject stepSizeParams = new JsonObject();
-            stepSizeParams.addProperty("size", stepSize);
-            dispatcher.handleInternal("clip/setStepSize", stepSizeParams);
-
-            JsonObject noteParams = new JsonObject();
-            noteParams.add("notes", notes);
-            dispatcher.handleInternal("clip/setNotes", noteParams);
-
-            if (clip.has("name") && !clip.get("name").isJsonNull()) {
-                JsonObject clipRenameParams = new JsonObject();
-                clipRenameParams.addProperty("name", clip.get("name").getAsString());
-                dispatcher.handleInternal("clip/rename", clipRenameParams);
-            }
-
-            clipCount++;
+            long writeDelay = FLUSH_DELAY_MS * (2L * i + 1);
+            final int sceneIdx = newSceneBankIndex;
+            final int nextTrack = nextClipTrackIndex;
+            scheduler.schedule(() -> {
+                try {
+                    writeNotesToCursor(stepSize, notes, clipName);
+                    if (nextTrack >= 0) {
+                        forceSelectClip(nextTrack, sceneIdx);
+                    }
+                } catch (Exception e) {
+                    // Deferred write failed
+                }
+            }, writeDelay);
         }
 
         JsonObject result = new JsonObject();
         result.addProperty("sceneIndex", sceneCountBefore);
-        result.addProperty("clipCount", clipCount);
+        result.addProperty("clipCount", clips.size());
         return result;
     }
 
     // --- Internal helpers ---
+
+    private void writeNotesToCursor(double stepSize, JsonArray notes, String name) throws Exception {
+        JsonObject stepSizeParams = new JsonObject();
+        stepSizeParams.addProperty("size", stepSize);
+        dispatcher.handleInternal("clip/setStepSize", stepSizeParams);
+
+        JsonObject noteParams = new JsonObject();
+        noteParams.add("notes", notes);
+        dispatcher.handleInternal("clip/setNotes", noteParams);
+
+        if (name != null) {
+            JsonObject renameP = new JsonObject();
+            renameP.addProperty("name", name);
+            dispatcher.handleInternal("clip/rename", renameP);
+        }
+    }
 
     private void createClip(int trackIndex, int slotIndex, int lengthBeats) throws Exception {
         JsonObject params = new JsonObject();
