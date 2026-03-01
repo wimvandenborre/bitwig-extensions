@@ -18,22 +18,9 @@ Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
-### ISS-003: `clip/getNotes` requires manual cursor settle delay
+### ~~ISS-003: `clip/getNotes` requires manual cursor settle delay~~ → RESOLVED
 
-**Severity:** Low
-**Discovered:** 2026-03-01 (live testing)
-**Affects:** `clip/getNotes`, any read-after-select workflow
-
-**Symptom:** After `clip/select`, calling `clip/getNotes` immediately returns empty or stale data. A 1-2 second wait is needed for the cursor clip to settle on the new clip and load its step data.
-
-**Root cause:** `clip/select` calls `slot.select()` which triggers async cursor movement. The cursor clip's step data observer fires incrementally as data loads from the engine. `getNotes` reads from the live grid (`cursorClip.getStep()`), which reflects whatever has loaded so far.
-
-**Impact:** Agent workflows that write then verify notes need artificial delays. Not a correctness issue for writing (deferred writes handle this), but makes read-back verification unreliable without waiting.
-
-**Possible fixes:**
-1. Add a "cursor settled" flag in StateCache that tracks when step data observer has received a full refresh
-2. Have `getNotes` return a warning if cursor recently changed
-3. Document the delay requirement in tool schema descriptions
+Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
@@ -86,3 +73,9 @@ Moved to [Resolved Issues](#resolved-issues).
 **Severity:** Medium → **Resolved:** 2026-03-01
 **Fix:** Added optional `sceneIndex` parameter to `macro/buildSection`. When provided, skips scene creation and scroll logic entirely — uses the given index as the slot index directly. This bypasses the stale `stateCache.getSceneItemCount()` issue. The auto-create path (no `sceneIndex`) is preserved but documented as unreliable after bulk deletion. Updated tool schema to recommend `sceneIndex` after manual scene creation.
 **Files:** `MacroHandler.java`, `MacroHandlerTest.java`, `claude-tools.json`
+
+### ISS-003: `clip/getNotes` requires manual cursor settle delay
+
+**Severity:** Low → **Resolved:** 2026-03-01
+**Fix:** Documented the async cursor settle delay in tool schemas for both `clip/select` and `clip/getNotes`. `clip/select` now warns that cursor movement is async and a 1-2 second wait is needed before `getNotes`. `clip/getNotes` schema warns about stale/empty results if called too soon after `clip/select`. This is a Bitwig API limitation — writing is not affected (uses deferred scheduling).
+**Files:** `claude-tools.json`

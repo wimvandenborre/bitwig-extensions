@@ -576,7 +576,7 @@
   },
   {
     "name": "clip_select",
-    "description": "Select a clip slot for note editing. The cursor clip will follow this selection, making it the target for setNotes, getNotes, clearNote, and clearAllNotes. Must be called before editing notes in a specific clip.",
+    "description": "Select a clip slot for note editing. The cursor clip will follow this selection, making it the target for setNotes, getNotes, clearNote, and clearAllNotes. Must be called before editing notes in a specific clip. IMPORTANT: Cursor movement is async — after selecting, wait 1-2 seconds before calling getNotes to allow step data to load. Writing (setNotes) uses deferred scheduling and is not affected.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -657,7 +657,7 @@
   },
   {
     "name": "clip_getNotes",
-    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), and duration (beats). Use this to inspect clip content before or after editing.",
+    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), and duration (beats). IMPORTANT: After clip/select, wait 1-2 seconds before calling this — the cursor clip loads step data asynchronously, and reading too soon returns empty or stale results.",
     "input_schema": {
       "type": "object",
       "properties": {},
