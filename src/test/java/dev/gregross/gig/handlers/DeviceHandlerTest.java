@@ -48,9 +48,22 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlySeventeenMethods() {
-        // 12 existing + 5 new automation methods
-        assertEquals(17, dispatcher.getRegisteredMethods().size());
+    void registersPresetAndChainNavMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("device/nextPreset"));
+        assertTrue(methods.contains("device/previousPreset"));
+        assertTrue(methods.contains("device/nextPresetCategory"));
+        assertTrue(methods.contains("device/previousPresetCategory"));
+        assertTrue(methods.contains("device/nextPresetCreator"));
+        assertTrue(methods.contains("device/previousPresetCreator"));
+        assertTrue(methods.contains("device/enterSlot"));
+        assertTrue(methods.contains("device/exitToParent"));
+    }
+
+    @Test
+    void registersExactlyTwentyFiveMethods() {
+        // 17 existing + 8 new preset/chain methods
+        assertEquals(25, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---
@@ -164,6 +177,15 @@ class DeviceHandlerTest {
         String response = dispatcher.handle(rpc("device/writeEnvelope", "{\"index\": 0}"));
         // With null transport, this NPEs at the precondition check (after index validation passes)
         assertContains(response, "-32603"); // internal error from NPE
+    }
+
+    // --- device/enterSlot validation ---
+
+    @Test
+    void enterSlot_missingName_returnsError() {
+        String response = dispatcher.handle(rpc("device/enterSlot", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "name");
     }
 
     // --- device/setParameterValue validation (existing) ---

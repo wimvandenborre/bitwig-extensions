@@ -19,7 +19,7 @@ class MasterDeviceHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersTenMethods() {
+    void registersFourteenMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("masterDevice/selectNext"));
         assertTrue(methods.contains("masterDevice/selectPrevious"));
@@ -31,7 +31,11 @@ class MasterDeviceHandlerTest {
         assertTrue(methods.contains("masterDevice/nextPage"));
         assertTrue(methods.contains("masterDevice/previousPage"));
         assertTrue(methods.contains("masterDevice/setParameterValue"));
-        assertEquals(10, methods.size());
+        assertTrue(methods.contains("masterDevice/nextPreset"));
+        assertTrue(methods.contains("masterDevice/previousPreset"));
+        assertTrue(methods.contains("masterDevice/enterSlot"));
+        assertTrue(methods.contains("masterDevice/exitToParent"));
+        assertEquals(14, methods.size());
     }
 
     // --- setEnabled validation ---
@@ -66,6 +70,15 @@ class MasterDeviceHandlerTest {
         String response = dispatcher.handle(rpc("masterDevice/insertPluginDevice", "{\"type\":\"vst3\"}"));
         assertContains(response, "-32602");
         assertContains(response, "id");
+    }
+
+    // --- enterSlot validation ---
+
+    @Test
+    void enterSlot_missingName_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/enterSlot", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "name");
     }
 
     // --- selectPage validation ---
