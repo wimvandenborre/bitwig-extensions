@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.14.5` |
 | **Phase** | 14 — Master Bus FX & Device Routing |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | Smoke tests |
 | **Last Updated** | 2026-03-01 |
 | **Last Updated** | 2026-03-01 |
