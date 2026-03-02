@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm), master track, clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag), masterDevice state (master bus device chain, parameters), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -393,6 +393,140 @@
         }
       },
       "required": ["r", "g", "b"]
+    }
+  },
+  {
+    "name": "masterDevice_selectNext",
+    "description": "Select the next device in the master track's device chain. Moves the master device cursor forward.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_selectPrevious",
+    "description": "Select the previous device in the master track's device chain. Moves the master device cursor backward.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_setEnabled",
+    "description": "Enable or disable (bypass) the currently selected device on the master track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true to enable the device, false to bypass it."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "masterDevice_insertBitwigDevice",
+    "description": "Insert a built-in Bitwig device onto the master track by name. The name is resolved case-insensitively from the Bitwig device library. Use `device_listBitwigDevices` to discover available devices. Common master bus devices: EQ-5, Compressor, Peak Limiter, Dynamics.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Device name (e.g., \"EQ-5\", \"Compressor\", \"Peak Limiter\"). Case-insensitive."
+        },
+        "position": {
+          "type": "string",
+          "enum": ["end", "before", "after"],
+          "description": "Where to insert: \"end\" = end of chain (default), \"before\" = before master cursor device, \"after\" = after master cursor device."
+        }
+      },
+      "required": ["name"]
+    }
+  },
+  {
+    "name": "masterDevice_insertPluginDevice",
+    "description": "Insert a third-party plugin (VST2, VST3, or CLAP) onto the master track. You must know the plugin ID.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["vst2", "vst3", "clap"],
+          "description": "Plugin format."
+        },
+        "id": {
+          "type": "string",
+          "description": "Plugin ID. VST2: integer as string. VST3/CLAP: string ID."
+        },
+        "position": {
+          "type": "string",
+          "enum": ["end", "before", "after"],
+          "description": "Where to insert: \"end\" = end of chain (default), \"before\" = before master cursor device, \"after\" = after master cursor device."
+        }
+      },
+      "required": ["type", "id"]
+    }
+  },
+  {
+    "name": "masterDevice_remove",
+    "description": "Remove the currently selected device from the master track's device chain.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_selectPage",
+    "description": "Select a remote controls parameter page by index on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Page index (0-based)."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "masterDevice_nextPage",
+    "description": "Select the next remote controls parameter page on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_previousPage",
+    "description": "Select the previous remote controls parameter page on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_setParameterValue",
+    "description": "Set a remote control parameter value on the currently selected master device's current parameter page. Value is normalized 0.0 to 1.0.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
+        },
+        "value": {
+          "type": "number",
+          "description": "Parameter value, normalized 0.0 to 1.0."
+        }
+      },
+      "required": ["index", "value"]
     }
   },
   {
