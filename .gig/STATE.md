@@ -4,10 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.13.0` |
+| **Version** | `0.13.7` |
 | **Phase** | 13 — Mixer & Routing Intelligence |
-| **Status** | `GATHERED` |
-| **Last Batch** | — (not started) |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | Smoke tests |
+| **Last Updated** | 2026-03-01 |
 | **Last Updated** | 2026-03-01 |
 
 ---
@@ -18,6 +19,13 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.13.7 | 13 | Smoke tests | PLANNED | done | 2026-03-01 |
+| 0.13.6 | 13 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
+| 0.13.5 | 13 | Unit tests | PLANNED | done | 2026-03-01 |
+| 0.13.4 | 13 | MasterHandler — master/setMute, master/setSolo, master/setColor | PLANNED | done | 2026-03-01 |
+| 0.13.3 | 13 | TrackHandler — track/setColor, track/setCrossfade, track/setMonitor | PLANNED | done | 2026-03-01 |
+| 0.13.2 | 13 | SendHandler — send/setLevel, send/setMode, send/setEnabled | PLANNED | done | 2026-03-01 |
+| 0.13.1 | 13 | Send infrastructure — StateCache observers + snapshot | PLANNED | done | 2026-03-01 |
 | 0.12.14 | 12 | Add macro/setupScenes (ISS-006 fix) | UNPLANNED | done | 2026-03-01 |
 | 0.12.13 | 12 | Document optimistic macro returns (ISS-005) | UNPLANNED | done | 2026-03-01 |
 | 0.12.12 | 12 | Return bank track name in track/select (ISS-004) | UNPLANNED | done | 2026-03-01 |

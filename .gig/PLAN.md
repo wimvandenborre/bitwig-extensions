@@ -15,13 +15,13 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 13.1 | `0.13.1` | Send infrastructure — StateCache observers + snapshot | in-session | pending |
-| 13.2 | `0.13.2` | SendHandler — send/setLevel, send/setMode, send/setEnabled | in-session | pending |
-| 13.3 | `0.13.3` | TrackHandler — track/setColor, track/setCrossfade, track/setMonitor + observers | in-session | pending |
-| 13.4 | `0.13.4` | MasterHandler — master/setMute, master/setSolo, master/setColor | in-session | pending |
-| 13.5 | `0.13.5` | Unit tests | in-session | pending |
-| 13.6 | `0.13.6` | Tool schemas + system prompt update | in-session | pending |
-| 13.7 | `0.13.7` | Smoke tests | in-session | pending |
+| 13.1 | `0.13.1` | Send infrastructure — StateCache observers + snapshot | in-session | done |
+| 13.2 | `0.13.2` | SendHandler — send/setLevel, send/setMode, send/setEnabled | in-session | done |
+| 13.3 | `0.13.3` | TrackHandler — track/setColor, track/setCrossfade, track/setMonitor + observers | in-session | done |
+| 13.4 | `0.13.4` | MasterHandler — master/setMute, master/setSolo, master/setColor | in-session | done |
+| 13.5 | `0.13.5` | Unit tests | in-session | done |
+| 13.6 | `0.13.6` | Tool schemas + system prompt update | in-session | done |
+| 13.7 | `0.13.7` | Smoke tests | in-session | done |
 
 ### Batch 13.1 — Send infrastructure — StateCache observers + snapshot
 
