@@ -97,6 +97,13 @@ public class StateCache {
     private volatile boolean isWindowOpen;
     private volatile boolean isExpanded;
 
+    // Device nesting state
+    private volatile boolean deviceIsNested;
+    private volatile boolean deviceHasSlots;
+    private volatile String[] deviceSlotNames = new String[0];
+    private volatile boolean deviceHasLayers;
+    private volatile boolean deviceHasDrumPads;
+
     // Remote controls state
     private volatile int pageIndex;
     private volatile int pageCount;
@@ -114,6 +121,13 @@ public class StateCache {
     private volatile String masterPresetName = "";
     private volatile String masterPresetCategory = "";
     private volatile String masterPresetCreator = "";
+
+    // Master device nesting state
+    private volatile boolean masterDeviceIsNested;
+    private volatile boolean masterDeviceHasSlots;
+    private volatile String[] masterDeviceSlotNames = new String[0];
+    private volatile boolean masterDeviceHasLayers;
+    private volatile boolean masterDeviceHasDrumPads;
 
     // Master remote controls state
     private volatile int masterPageIndex;
@@ -397,6 +411,22 @@ public class StateCache {
         cursorDevice.isExpanded().markInterested();
         cursorDevice.isExpanded().addValueObserver((BooleanValueChangedCallback) v -> isExpanded = v);
 
+        // Device nesting state
+        cursorDevice.isNested().markInterested();
+        cursorDevice.isNested().addValueObserver((BooleanValueChangedCallback) v -> deviceIsNested = v);
+
+        cursorDevice.hasSlots().markInterested();
+        cursorDevice.hasSlots().addValueObserver((BooleanValueChangedCallback) v -> deviceHasSlots = v);
+
+        cursorDevice.slotNames().markInterested();
+        cursorDevice.slotNames().addValueObserver((StringArrayValueChangedCallback) v -> deviceSlotNames = (String[]) v);
+
+        cursorDevice.hasLayers().markInterested();
+        cursorDevice.hasLayers().addValueObserver((BooleanValueChangedCallback) v -> deviceHasLayers = v);
+
+        cursorDevice.hasDrumPads().markInterested();
+        cursorDevice.hasDrumPads().addValueObserver((BooleanValueChangedCallback) v -> deviceHasDrumPads = v);
+
         // Remote controls page state
         remoteControlsPage.selectedPageIndex().markInterested();
         remoteControlsPage.selectedPageIndex().addValueObserver((IntegerValueChangedCallback) v -> pageIndex = v);
@@ -627,6 +657,22 @@ public class StateCache {
         masterCursorDevice.presetCreator().markInterested();
         masterCursorDevice.presetCreator().addValueObserver((StringValueChangedCallback) v -> masterPresetCreator = (String) v);
 
+        // Master device nesting state
+        masterCursorDevice.isNested().markInterested();
+        masterCursorDevice.isNested().addValueObserver((BooleanValueChangedCallback) v -> masterDeviceIsNested = v);
+
+        masterCursorDevice.hasSlots().markInterested();
+        masterCursorDevice.hasSlots().addValueObserver((BooleanValueChangedCallback) v -> masterDeviceHasSlots = v);
+
+        masterCursorDevice.slotNames().markInterested();
+        masterCursorDevice.slotNames().addValueObserver((StringArrayValueChangedCallback) v -> masterDeviceSlotNames = (String[]) v);
+
+        masterCursorDevice.hasLayers().markInterested();
+        masterCursorDevice.hasLayers().addValueObserver((BooleanValueChangedCallback) v -> masterDeviceHasLayers = v);
+
+        masterCursorDevice.hasDrumPads().markInterested();
+        masterCursorDevice.hasDrumPads().addValueObserver((BooleanValueChangedCallback) v -> masterDeviceHasDrumPads = v);
+
         // Remote controls page state
         masterRemoteControlsPage.selectedPageIndex().markInterested();
         masterRemoteControlsPage.selectedPageIndex().addValueObserver((IntegerValueChangedCallback) v -> masterPageIndex = v);
@@ -843,6 +889,18 @@ public class StateCache {
         obj.addProperty("presetCreator", presetCreator);
         obj.addProperty("isWindowOpen", isWindowOpen);
         obj.addProperty("isExpanded", isExpanded);
+        obj.addProperty("isNested", deviceIsNested);
+        obj.addProperty("hasSlots", deviceHasSlots);
+        JsonArray slotNamesArr = new JsonArray();
+        String[] slots = deviceSlotNames;
+        if (slots != null) {
+            for (String s : slots) {
+                slotNamesArr.add(s != null ? s : "");
+            }
+        }
+        obj.add("slotNames", slotNamesArr);
+        obj.addProperty("hasLayers", deviceHasLayers);
+        obj.addProperty("hasDrumPads", deviceHasDrumPads);
 
         JsonObject remoteControls = new JsonObject();
         remoteControls.addProperty("pageIndex", pageIndex);
@@ -882,6 +940,18 @@ public class StateCache {
         obj.addProperty("presetName", masterPresetName);
         obj.addProperty("presetCategory", masterPresetCategory);
         obj.addProperty("presetCreator", masterPresetCreator);
+        obj.addProperty("isNested", masterDeviceIsNested);
+        obj.addProperty("hasSlots", masterDeviceHasSlots);
+        JsonArray masterSlotNamesArr = new JsonArray();
+        String[] masterSlots = masterDeviceSlotNames;
+        if (masterSlots != null) {
+            for (String s : masterSlots) {
+                masterSlotNamesArr.add(s != null ? s : "");
+            }
+        }
+        obj.add("slotNames", masterSlotNamesArr);
+        obj.addProperty("hasLayers", masterDeviceHasLayers);
+        obj.addProperty("hasDrumPads", masterDeviceHasDrumPads);
 
         JsonObject remoteControls = new JsonObject();
         remoteControls.addProperty("pageIndex", masterPageIndex);
