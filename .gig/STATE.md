@@ -4,8 +4,8 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.13.8` |
-| **Phase** | 13 — Mixer & Routing Intelligence |
+| **Version** | `0.14.5` |
+| **Phase** | 14 — Master Bus FX & Device Routing |
 | **Status** | `GOVERNED` |
 | **Last Batch** | Smoke tests |
 | **Last Updated** | 2026-03-01 |
@@ -19,6 +19,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.14.5 | 14 | Smoke tests | PLANNED | done | 2026-03-01 |
+| 0.14.4 | 14 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
+| 0.14.3 | 14 | Unit tests | PLANNED | done | 2026-03-01 |
+| 0.14.2 | 14 | MasterDeviceHandler — 10 RPC methods | PLANNED | done | 2026-03-01 |
+| 0.14.1 | 14 | Master cursor infrastructure — CursorDevice + observers + snapshot | PLANNED | done | 2026-03-01 |
 | 0.13.8 | 13 | [UNPLANNED] Fix master snapshot — add mute/solo/color | UNPLANNED | done | 2026-03-01 |
 | 0.13.7 | 13 | Smoke tests | PLANNED | done | 2026-03-01 |
 | 0.13.6 | 13 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
@@ -111,13 +116,13 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-D-13.1: Phase 13 scope — sends, color, crossfade, monitor, master controls
-D-13.2a: Send infrastructure — 3 RPC methods (level/mode/enable), 4 sends/track, snapshot with isPreFader + sendChannelColor
-D-13.3: Track/master color setter — RGB 0.0–1.0
-D-13.4: Master expanded — setMute, setSolo
-D-13.5: Crossfade (A/B/AB) + monitor mode (ON/OFF/AUTO) with observers
-D-13.6: SendHandler new class, TrackHandler/MasterHandler extended
-D-13.7: 9 new tool schemas (114 total), system prompt "Mixer & Routing" section
+D-14.1: Phase 14 scope — master bus device control (insert, remove, navigate, parameters)
+D-14.2: Second CursorDevice + RemoteControlsPage on masterTrack
+D-14.3: `masterDevice/` RPC prefix
+D-14.4: 10 methods — navigate, enable, insert, remove, pages, set param (no automation)
+D-14.5: New MasterDeviceHandler class, reuses DeviceLibrary
+D-14.6: `masterDevice` snapshot section with device state + 8 parameters
+D-14.7: 10 new tool schemas (124 total), system prompt "Master Bus FX" subsection
 
 ---
 

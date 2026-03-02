@@ -451,6 +451,34 @@ assert_contains "system prompt mentions crossfade modes" "$PROMPT" "crossfadeMod
 assert_contains "system prompt mentions monitor mode" "$PROMPT" "monitorMode"
 assert_contains "system prompt mentions master_setMute" "$PROMPT" "master_setMute"
 
+# Phase 14 — master device tool schemas (grep file directly)
+PHASE14_TOOLS="masterDevice_selectNext masterDevice_selectPrevious masterDevice_setEnabled masterDevice_insertBitwigDevice masterDevice_insertPluginDevice masterDevice_remove masterDevice_selectPage masterDevice_nextPage masterDevice_previousPage masterDevice_setParameterValue"
+for tool in $PHASE14_TOOLS; do
+  TOTAL=$((TOTAL + 1))
+  if grep -qF "\"$tool\"" "$TOOLS_FILE"; then
+    echo "  PASS  tool schema exists: $tool"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL  tool schema missing: $tool"
+    FAIL=$((FAIL + 1))
+  fi
+done
+
+# Phase 14 — tool schema field checks
+MASTER_ENABLED_TYPE=$(jq -r '.[] | select(.name=="masterDevice_setEnabled") | .input_schema.properties.enabled.type' "$TOOLS_FILE")
+assert_equals "masterDevice_setEnabled enabled is boolean" "$MASTER_ENABLED_TYPE" "boolean"
+MASTER_PARAM_INDEX_TYPE=$(jq -r '.[] | select(.name=="masterDevice_setParameterValue") | .input_schema.properties.index.type' "$TOOLS_FILE")
+assert_equals "masterDevice_setParameterValue index is integer" "$MASTER_PARAM_INDEX_TYPE" "integer"
+MASTER_PARAM_VALUE_TYPE=$(jq -r '.[] | select(.name=="masterDevice_setParameterValue") | .input_schema.properties.value.type' "$TOOLS_FILE")
+assert_equals "masterDevice_setParameterValue value is number" "$MASTER_PARAM_VALUE_TYPE" "number"
+MASTER_INSERT_POS_ENUM=$(jq -r '.[] | select(.name=="masterDevice_insertBitwigDevice") | .input_schema.properties.position.enum | join(",")' "$TOOLS_FILE")
+assert_equals "masterDevice_insertBitwigDevice position enum" "$MASTER_INSERT_POS_ENUM" "end,before,after"
+
+# Phase 14 — system prompt
+assert_contains "system prompt has Master Bus FX section" "$PROMPT" "Master Bus FX"
+assert_contains "system prompt mentions masterDevice_insertBitwigDevice" "$PROMPT" "masterDevice_insertBitwigDevice"
+assert_contains "system prompt mentions masterDevice vs device distinction" "$PROMPT" "masterDevice_"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
@@ -1269,8 +1297,53 @@ assert_contains "track/setCrossfade invalid mode returns -32602" "$ERR" '-32602'
 ERR=$(rpc '{"jsonrpc":"2.0","method":"track/setMonitor","params":{"index":0,"mode":"INVALID"},"id":311}')
 assert_contains "track/setMonitor invalid mode returns -32602" "$ERR" '-32602'
 
-# 44. Clean up — delete the duplicated track and undo rename
-echo "--- 44. Track Cleanup ---"
+# 44. Phase 14 — Master device API
+echo "--- 44. Master Device ---"
+
+# Verify masterDevice methods in api/list
+RESP=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":400}')
+assert_contains "api/list includes masterDevice/selectNext" "$RESP" 'masterDevice/selectNext'
+assert_contains "api/list includes masterDevice/insertBitwigDevice" "$RESP" 'masterDevice/insertBitwigDevice'
+assert_contains "api/list includes masterDevice/setParameterValue" "$RESP" 'masterDevice/setParameterValue'
+
+# Verify snapshot has masterDevice section
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":401}')
+assert_contains "snapshot has masterDevice section" "$SNAP" '"masterDevice"'
+assert_contains "snapshot masterDevice has remoteControls" "$SNAP" '"remoteControls"'
+
+# Insert a device on master
+RESP=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/insertBitwigDevice","params":{"name":"EQ-5"},"id":402}')
+assert_contains "masterDevice/insertBitwigDevice returns ok" "$RESP" '"ok"'
+sleep 0.5
+
+# Verify device shows in snapshot
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":403}')
+assert_contains "masterDevice snapshot shows EQ-5" "$SNAP" 'EQ-5'
+
+# Navigate and set parameter
+RESP=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/setParameterValue","params":{"index":0,"value":0.75},"id":404}')
+assert_contains "masterDevice/setParameterValue returns ok" "$RESP" '"ok"'
+
+# Enable/disable
+RESP=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/setEnabled","params":{"enabled":false},"id":405}')
+assert_contains "masterDevice/setEnabled returns ok" "$RESP" '"ok"'
+RESP=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/setEnabled","params":{"enabled":true},"id":406}')
+assert_contains "masterDevice/setEnabled re-enable returns ok" "$RESP" '"ok"'
+
+# Remove master device
+RESP=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/remove","id":407}')
+assert_contains "masterDevice/remove returns ok" "$RESP" '"ok"'
+sleep 0.3
+
+# Error handling
+ERR=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/setParameterValue","params":{"index":8,"value":0.5},"id":408}')
+assert_contains "masterDevice/setParameterValue index out of range returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/insertBitwigDevice","params":{},"id":409}')
+assert_contains "masterDevice/insertBitwigDevice missing name returns -32602" "$ERR" '-32602'
+
+# 45. Clean up — delete the duplicated track and undo rename
+echo "--- 45. Track Cleanup ---"
 # Select track 0 and restore original name
 rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
 sleep 0.3

@@ -26,6 +26,7 @@
 | 11 | Bank Scrolling | v0.11.1–v0.11.9 | complete |
 | 12 | Transaction + Macro Layer | v0.12.1–v0.12.14 | complete |
 | 13 | Mixer & Routing Intelligence | v0.13.1–v0.13.8 | complete |
+| 14 | Master Bus FX & Device Routing | v0.14.1–v0.14.5 | complete |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

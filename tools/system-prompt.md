@@ -411,6 +411,23 @@ The master track supports volume, pan, mute, solo, and color:
 - `master_setSolo({ value: true })` — solo master
 - `master_setColor({ r, g, b })` — color-code master track
 
+### Master Bus FX
+
+The master track has its own device chain, independent from track devices. Use `masterDevice_` methods (not `device_`) for master bus effects:
+
+- **Insert:** `masterDevice_insertBitwigDevice({ name: "EQ-5" })` or `masterDevice_insertPluginDevice({ type, id })`
+- **Navigate:** `masterDevice_selectNext`, `masterDevice_selectPrevious` — move through master device chain
+- **Enable/Bypass:** `masterDevice_setEnabled({ enabled: false })` — bypass a master device
+- **Parameters:** `masterDevice_setParameterValue({ index, value })` — set remote control param (0.0–1.0)
+- **Pages:** `masterDevice_selectPage`, `masterDevice_nextPage`, `masterDevice_previousPage`
+- **Remove:** `masterDevice_remove` — delete selected master device
+
+**Snapshot:** The `masterDevice` section shows the selected master device's name, enabled state, plugin status, preset info, and 8 remote control parameters with names, values, and displayed values.
+
+**Typical master chain:** EQ → Compressor → Peak Limiter (insert in this order with `masterDevice_insertBitwigDevice`).
+
+**Important:** `device_` methods control devices on the *cursor track* (regular tracks). `masterDevice_` methods control devices on the *master track*. They are independent — selecting a device on one does not affect the other.
+
 ### Mix Setup Workflow
 
 ```

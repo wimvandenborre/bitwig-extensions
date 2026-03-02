@@ -106,6 +106,23 @@ public class StateCache {
     private final String[] paramDisplayedValues = new String[PARAM_COUNT];
     private final boolean[] paramHasAutomation = new boolean[PARAM_COUNT];
 
+    // Master device state (master cursor device)
+    private volatile String masterDeviceName = "";
+    private volatile boolean masterDeviceEnabled;
+    private volatile boolean masterDeviceIsPlugin;
+    private volatile int masterDevicePosition;
+    private volatile String masterPresetName = "";
+    private volatile String masterPresetCategory = "";
+    private volatile String masterPresetCreator = "";
+
+    // Master remote controls state
+    private volatile int masterPageIndex;
+    private volatile int masterPageCount;
+    private volatile String[] masterDevicePageNames = new String[0];
+    private final String[] masterParamNames = new String[PARAM_COUNT];
+    private final double[] masterParamValues = new double[PARAM_COUNT];
+    private final String[] masterParamDisplayedValues = new String[PARAM_COUNT];
+
     // Cursor clip state
     private volatile int clipPlayingStep = -1;
     private volatile double clipLoopLength;
@@ -167,6 +184,7 @@ public class StateCache {
     private int prevApplicationHash;
     private int prevArrangerHash;
     private int prevArrangementHash;
+    private int prevMasterDeviceHash;
 
     public void registerObservers(Transport transport, TrackBank trackBank,
                                    MasterTrack masterTrack, Application application) {
@@ -579,6 +597,62 @@ public class StateCache {
         }
     }
 
+    public void registerMasterDeviceObservers(CursorDevice masterCursorDevice,
+                                               CursorRemoteControlsPage masterRemoteControlsPage) {
+        // Initialize param arrays
+        for (int i = 0; i < PARAM_COUNT; i++) {
+            masterParamNames[i] = "";
+            masterParamDisplayedValues[i] = "";
+        }
+
+        // Device properties
+        masterCursorDevice.name().markInterested();
+        masterCursorDevice.name().addValueObserver((StringValueChangedCallback) v -> masterDeviceName = (String) v);
+
+        masterCursorDevice.isEnabled().markInterested();
+        masterCursorDevice.isEnabled().addValueObserver((BooleanValueChangedCallback) v -> masterDeviceEnabled = v);
+
+        masterCursorDevice.isPlugin().markInterested();
+        masterCursorDevice.isPlugin().addValueObserver((BooleanValueChangedCallback) v -> masterDeviceIsPlugin = v);
+
+        masterCursorDevice.position().markInterested();
+        masterCursorDevice.position().addValueObserver((IntegerValueChangedCallback) v -> masterDevicePosition = v);
+
+        masterCursorDevice.presetName().markInterested();
+        masterCursorDevice.presetName().addValueObserver((StringValueChangedCallback) v -> masterPresetName = (String) v);
+
+        masterCursorDevice.presetCategory().markInterested();
+        masterCursorDevice.presetCategory().addValueObserver((StringValueChangedCallback) v -> masterPresetCategory = (String) v);
+
+        masterCursorDevice.presetCreator().markInterested();
+        masterCursorDevice.presetCreator().addValueObserver((StringValueChangedCallback) v -> masterPresetCreator = (String) v);
+
+        // Remote controls page state
+        masterRemoteControlsPage.selectedPageIndex().markInterested();
+        masterRemoteControlsPage.selectedPageIndex().addValueObserver((IntegerValueChangedCallback) v -> masterPageIndex = v);
+
+        masterRemoteControlsPage.pageCount().markInterested();
+        masterRemoteControlsPage.pageCount().addValueObserver((IntegerValueChangedCallback) v -> masterPageCount = v);
+
+        masterRemoteControlsPage.pageNames().markInterested();
+        masterRemoteControlsPage.pageNames().addValueObserver((StringArrayValueChangedCallback) v -> masterDevicePageNames = (String[]) v);
+
+        // Per-parameter observers
+        for (int i = 0; i < PARAM_COUNT; i++) {
+            final int idx = i;
+            RemoteControl param = masterRemoteControlsPage.getParameter(i);
+
+            param.name().markInterested();
+            param.name().addValueObserver((StringValueChangedCallback) v -> masterParamNames[idx] = (String) v);
+
+            param.value().markInterested();
+            param.value().addValueObserver((DoubleValueChangedCallback) v -> masterParamValues[idx] = v);
+
+            param.value().displayedValue().markInterested();
+            param.value().displayedValue().addValueObserver((StringValueChangedCallback) v -> masterParamDisplayedValues[idx] = (String) v);
+        }
+    }
+
     public double getClipStepSize() {
         return clipStepSize;
     }
@@ -605,6 +679,7 @@ public class StateCache {
         snapshot.add("application", getApplicationState());
         snapshot.add("arranger", getArrangerState());
         snapshot.add("arrangement", getArrangementState());
+        snapshot.add("masterDevice", getMasterDeviceState());
         return snapshot;
     }
 
@@ -644,6 +719,9 @@ public class StateCache {
 
         h = getArrangementState().toString().hashCode();
         if (h != prevArrangementHash) { changed.add("arrangement"); prevArrangementHash = h; }
+
+        h = getMasterDeviceState().toString().hashCode();
+        if (h != prevMasterDeviceHash) { changed.add("masterDevice"); prevMasterDeviceHash = h; }
 
         return changed;
     }
@@ -787,6 +865,44 @@ public class StateCache {
             param.addProperty("value", paramValues[i]);
             param.addProperty("displayedValue", paramDisplayedValues[i] != null ? paramDisplayedValues[i] : "");
             param.addProperty("hasAutomation", paramHasAutomation[i]);
+            params.add(param);
+        }
+        remoteControls.add("parameters", params);
+
+        obj.add("remoteControls", remoteControls);
+        return obj;
+    }
+
+    private JsonObject getMasterDeviceState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("name", masterDeviceName);
+        obj.addProperty("isEnabled", masterDeviceEnabled);
+        obj.addProperty("isPlugin", masterDeviceIsPlugin);
+        obj.addProperty("position", masterDevicePosition);
+        obj.addProperty("presetName", masterPresetName);
+        obj.addProperty("presetCategory", masterPresetCategory);
+        obj.addProperty("presetCreator", masterPresetCreator);
+
+        JsonObject remoteControls = new JsonObject();
+        remoteControls.addProperty("pageIndex", masterPageIndex);
+        remoteControls.addProperty("pageCount", masterPageCount);
+
+        JsonArray pageNamesArr = new JsonArray();
+        String[] names = masterDevicePageNames;
+        if (names != null) {
+            for (String name : names) {
+                pageNamesArr.add(name != null ? name : "");
+            }
+        }
+        remoteControls.add("pageNames", pageNamesArr);
+
+        JsonArray params = new JsonArray();
+        for (int i = 0; i < PARAM_COUNT; i++) {
+            JsonObject param = new JsonObject();
+            param.addProperty("index", i);
+            param.addProperty("name", masterParamNames[i] != null ? masterParamNames[i] : "");
+            param.addProperty("value", masterParamValues[i]);
+            param.addProperty("displayedValue", masterParamDisplayedValues[i] != null ? masterParamDisplayedValues[i] : "");
             params.add(param);
         }
         remoteControls.add("parameters", params);

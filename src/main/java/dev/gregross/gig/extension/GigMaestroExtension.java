@@ -11,6 +11,7 @@ import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
 import dev.gregross.gig.handlers.MacroHandler;
+import dev.gregross.gig.handlers.MasterDeviceHandler;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
 import dev.gregross.gig.handlers.SceneHandler;
@@ -67,6 +68,10 @@ public class GigMaestroExtension extends ControllerExtension {
             CursorDeviceFollowMode.FOLLOW_SELECTION);
         CursorRemoteControlsPage remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
 
+        // Create master cursor device for master bus FX
+        CursorDevice masterCursorDevice = masterTrack.createCursorDevice("gig-master-device", 0);
+        CursorRemoteControlsPage masterRemoteControlsPage = masterCursorDevice.createCursorRemoteControlsPage(8);
+
         // Create cursor clip for note editing
         Clip cursorClip = cursorTrack.createLauncherCursorClip("gig-clip", "Gig Clip",
             CLIP_GRID_WIDTH, CLIP_GRID_HEIGHT);
@@ -93,6 +98,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerArrangementObservers(transport, cueMarkerBank);
         stateCache.registerSendObservers(trackBank, SEND_COUNT);
         stateCache.registerMixerObservers(trackBank);
+        stateCache.registerMasterDeviceObservers(masterCursorDevice, masterRemoteControlsPage);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
@@ -129,6 +135,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new NoteHandler(cursorClip, stateCache).register(dispatcher);
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);
+        new MasterDeviceHandler(masterTrack, masterCursorDevice, masterRemoteControlsPage, deviceLibrary).register(dispatcher);
         new SendHandler(trackBank, SEND_COUNT).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
