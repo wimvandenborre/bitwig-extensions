@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.handlers.ApplicationHandler;
 import dev.gregross.gig.handlers.ArrangerHandler;
+import dev.gregross.gig.handlers.BrowserHandler;
 import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
@@ -80,6 +81,9 @@ public class GigMaestroExtension extends ControllerExtension {
         // Create project reference
         Project project = host.getProject();
 
+        // Create popup browser for preset/device/sample browsing
+        PopupBrowser popupBrowser = host.createPopupBrowser();
+
         // Create arranger and cue marker bank
         Arranger arranger = host.createArranger();
         CueMarkerBank cueMarkerBank = arranger.createCueMarkerBank(16);
@@ -100,6 +104,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerSendObservers(trackBank, SEND_COUNT);
         stateCache.registerMixerObservers(trackBank);
         stateCache.registerMasterDeviceObservers(masterCursorDevice, masterRemoteControlsPage);
+        stateCache.registerBrowserObservers(popupBrowser);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
@@ -140,6 +145,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new SendHandler(trackBank, SEND_COUNT).register(dispatcher);
         new ProjectHandler(project, stateCache).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
+        new BrowserHandler(popupBrowser, cursorDevice, stateCache).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 
         // Start servers

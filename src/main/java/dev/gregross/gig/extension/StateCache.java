@@ -189,6 +189,16 @@ public class StateCache {
     private volatile boolean clipLauncherAutomationWriteEnabled;
     private volatile boolean automationOverrideActive;
 
+    // Browser state
+    private volatile boolean browserExists;
+    private volatile String browserTitle = "";
+    private volatile String browserSelectedContentType = "";
+    private volatile String[] browserContentTypeNames = new String[0];
+    private volatile boolean browserCanAudition;
+    private volatile boolean browserShouldAudition;
+    private volatile String browserResultName = "";
+    private volatile boolean browserResultIsSelected;
+
     // Cue marker state
     private static final int CUE_MARKER_COUNT = 16;
     private final String[] cueMarkerNames = new String[CUE_MARKER_COUNT];
@@ -210,6 +220,7 @@ public class StateCache {
     private int prevArrangerHash;
     private int prevArrangementHash;
     private int prevMasterDeviceHash;
+    private int prevBrowserHash;
 
     public void registerObservers(Transport transport, TrackBank trackBank,
                                    MasterTrack masterTrack, Application application,
@@ -734,6 +745,34 @@ public class StateCache {
         }
     }
 
+    public void registerBrowserObservers(PopupBrowser popupBrowser) {
+        popupBrowser.exists().markInterested();
+        popupBrowser.exists().addValueObserver((BooleanValueChangedCallback) v -> browserExists = v);
+
+        popupBrowser.title().markInterested();
+        popupBrowser.title().addValueObserver((StringValueChangedCallback) v -> browserTitle = (String) v);
+
+        popupBrowser.selectedContentTypeName().markInterested();
+        popupBrowser.selectedContentTypeName().addValueObserver((StringValueChangedCallback) v -> browserSelectedContentType = (String) v);
+
+        popupBrowser.contentTypeNames().markInterested();
+        popupBrowser.contentTypeNames().addValueObserver((StringArrayValueChangedCallback) v -> browserContentTypeNames = (String[]) v);
+
+        popupBrowser.canAudition().markInterested();
+        popupBrowser.canAudition().addValueObserver((BooleanValueChangedCallback) v -> browserCanAudition = v);
+
+        popupBrowser.shouldAudition().markInterested();
+        popupBrowser.shouldAudition().addValueObserver((BooleanValueChangedCallback) v -> browserShouldAudition = v);
+
+        // Create cursor item for result tracking
+        BrowserResultsItem resultCursor = popupBrowser.resultsColumn().createCursorItem();
+        resultCursor.name().markInterested();
+        resultCursor.name().addValueObserver((StringValueChangedCallback) v -> browserResultName = (String) v);
+
+        resultCursor.isSelected().markInterested();
+        resultCursor.isSelected().addValueObserver((BooleanValueChangedCallback) v -> browserResultIsSelected = v);
+    }
+
     public double getClipStepSize() {
         return clipStepSize;
     }
@@ -761,6 +800,7 @@ public class StateCache {
         snapshot.add("arranger", getArrangerState());
         snapshot.add("arrangement", getArrangementState());
         snapshot.add("masterDevice", getMasterDeviceState());
+        snapshot.add("browser", getBrowserState());
         return snapshot;
     }
 
@@ -803,6 +843,9 @@ public class StateCache {
 
         h = getMasterDeviceState().toString().hashCode();
         if (h != prevMasterDeviceHash) { changed.add("masterDevice"); prevMasterDeviceHash = h; }
+
+        h = getBrowserState().toString().hashCode();
+        if (h != prevBrowserHash) { changed.add("browser"); prevBrowserHash = h; }
 
         return changed;
     }
@@ -1119,6 +1162,28 @@ public class StateCache {
         cueMarkerObj.add("items", markers);
         obj.add("cueMarkers", cueMarkerObj);
 
+        return obj;
+    }
+
+    public JsonObject getBrowserState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("exists", browserExists);
+        obj.addProperty("title", browserTitle);
+        obj.addProperty("selectedContentType", browserSelectedContentType);
+
+        JsonArray contentTypes = new JsonArray();
+        String[] names = browserContentTypeNames;
+        if (names != null) {
+            for (String name : names) {
+                contentTypes.add(name != null ? name : "");
+            }
+        }
+        obj.add("contentTypeNames", contentTypes);
+
+        obj.addProperty("canAudition", browserCanAudition);
+        obj.addProperty("shouldAudition", browserShouldAudition);
+        obj.addProperty("resultName", browserResultName);
+        obj.addProperty("resultIsSelected", browserResultIsSelected);
         return obj;
     }
 

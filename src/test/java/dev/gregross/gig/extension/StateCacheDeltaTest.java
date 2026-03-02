@@ -22,7 +22,7 @@ class StateCacheDeltaTest {
         // On first call, hashes are all 0 (default int), but the serialized
         // JSON of default state will have a non-zero hash, so all sections
         // should be reported as changed.
-        assertEquals(10, changed.size());
+        assertEquals(11, changed.size());
         assertTrue(changed.contains("transport"));
         assertTrue(changed.contains("tracks"));
         assertTrue(changed.contains("scenes"));
@@ -33,6 +33,7 @@ class StateCacheDeltaTest {
         assertTrue(changed.contains("arranger"));
         assertTrue(changed.contains("arrangement"));
         assertTrue(changed.contains("masterDevice"));
+        assertTrue(changed.contains("browser"));
     }
 
     @Test
@@ -59,6 +60,7 @@ class StateCacheDeltaTest {
         assertTrue(snapshot.has("arranger"));
         assertTrue(snapshot.has("arrangement"));
         assertTrue(snapshot.has("masterDevice"));
+        assertTrue(snapshot.has("browser"));
     }
 
     @Test

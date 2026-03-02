@@ -29,6 +29,7 @@
 | 14 | Master Bus FX & Device Routing | v0.14.1–v0.14.5 | complete |
 | 15 | Preset Cycling & Device Chain Navigation | v0.15.1–v0.15.6 | complete |
 | 16 | Project & Session Management | v0.16.1–v0.16.5 | complete |
+| 17 | PopupBrowser API Integration | v0.17.1–v0.17.6 | complete |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

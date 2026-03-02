@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), and browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -2460,6 +2460,119 @@
       "required": [
         "value"
       ]
+    }
+  },
+  {
+    "name": "browser_browsePresets",
+    "description": "Open the Bitwig browser for preset replacement on the currently selected device. The browser must be opened before using navigation methods (selectNextFile, selectPreviousFile, etc.). After browsing, use browser_commit to load the selected preset or browser_cancel to close without changes.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_browseInsertDevice",
+    "description": "Open the Bitwig browser for inserting a new device after the currently selected device. After browsing, use browser_commit to insert the selected device or browser_cancel to close without changes.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_selectNextFile",
+    "description": "Select the next result in the browser. The browser must be open (via browser_browsePresets or browser_browseInsertDevice) for this to have any effect. Result name updates after ~500ms delay.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_selectPreviousFile",
+    "description": "Select the previous result in the browser. The browser must be open for this to have any effect.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_selectFirstFile",
+    "description": "Jump to the first result in the browser. The browser must be open for this to have any effect.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_selectLastFile",
+    "description": "Jump to the last result in the browser. The browser must be open for this to have any effect.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_commit",
+    "description": "Commit the current browser selection \u2014 loads the selected preset or inserts the selected device. Closes the browser after committing.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_cancel",
+    "description": "Cancel the browser and close it without applying any selection.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_setContentType",
+    "description": "Switch the browser content type tab by index. Content types vary by context (e.g., Devices, Presets, Samples).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Zero-based index of the content type to select."
+        }
+      },
+      "required": [
+        "index"
+      ]
+    }
+  },
+  {
+    "name": "browser_setShouldAudition",
+    "description": "Enable or disable audition mode in the browser. When enabled, selecting a preset will preview it in place.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable audition, false to disable."
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    }
+  },
+  {
+    "name": "browser_getState",
+    "description": "Get the current browser state: exists (whether browser is open), title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName (currently highlighted result), resultIsSelected.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
     }
   }
 ]

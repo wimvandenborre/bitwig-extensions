@@ -547,6 +547,35 @@ assert_contains "system prompt mentions activateEngine" "$PROMPT" "activateEngin
 assert_contains "system prompt mentions returnToArrangement" "$PROMPT" "returnToArrangement"
 assert_contains "system prompt mentions setPreRoll" "$PROMPT" "setPreRoll"
 
+# Phase 17 — browser tool schemas
+PHASE17_TOOLS="browser_browsePresets browser_browseInsertDevice browser_selectNextFile browser_selectPreviousFile browser_selectFirstFile browser_selectLastFile browser_commit browser_cancel browser_setContentType browser_setShouldAudition browser_getState"
+for tool in $PHASE17_TOOLS; do
+  TOTAL=$((TOTAL + 1))
+  if grep -qF "\"$tool\"" "$TOOLS_FILE"; then
+    echo "  PASS  tool schema exists: $tool"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL  tool schema missing: $tool"
+    FAIL=$((FAIL + 1))
+  fi
+done
+
+# Phase 17 — tool schema field checks
+CONTENT_REQ=$(jq -r '.[] | select(.name=="browser_setContentType") | .input_schema.required[0]' "$TOOLS_FILE")
+assert_equals "browser_setContentType requires index" "$CONTENT_REQ" "index"
+AUDITION_REQ=$(jq -r '.[] | select(.name=="browser_setShouldAudition") | .input_schema.required[0]' "$TOOLS_FILE")
+assert_equals "browser_setShouldAudition requires enabled" "$AUDITION_REQ" "enabled"
+
+# Phase 17 — snapshot description mentions browser
+SNAP_DESC=$(jq -r '.[] | select(.name=="session_snapshot") | .description' "$TOOLS_FILE")
+assert_contains "session_snapshot mentions browser" "$SNAP_DESC" "browser state"
+
+# Phase 17 — system prompt
+assert_contains "system prompt has Browser section" "$PROMPT" "Browser & Preset Navigation"
+assert_contains "system prompt mentions browsePresets" "$PROMPT" "browsePresets"
+assert_contains "system prompt mentions commit" "$PROMPT" "browser_commit"
+assert_contains "system prompt mentions audition" "$PROMPT" "setShouldAudition"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
@@ -1534,8 +1563,52 @@ assert_contains "transport/setMetronomeVolume returns ok" "$RESP" '"ok"'
 # Restore pre-roll to none
 rpc '{"jsonrpc":"2.0","method":"transport/setPreRoll","params":{"value":"none"},"id":613}' > /dev/null
 
-# 47. Clean up — delete the duplicated track and undo rename
-echo "--- 47. Track Cleanup ---"
+# 47. Phase 17 — Browser API
+echo "--- 47. Browser API ---"
+
+# Verify api/list includes browser methods
+API_LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":700}')
+BROWSER_METHODS="browser/browsePresets browser/browseInsertDevice browser/selectNextFile browser/selectPreviousFile browser/selectFirstFile browser/selectLastFile browser/commit browser/cancel browser/setContentType browser/setShouldAudition browser/getState"
+for method in $BROWSER_METHODS; do
+  assert_contains "api/list includes $method" "$API_LIST" "$method"
+done
+
+# Verify snapshot includes browser section
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":701}')
+assert_contains "snapshot has browser.exists" "$SNAP" '"exists"'
+assert_contains "snapshot has browser.title" "$SNAP" '"title"'
+assert_contains "snapshot has browser.resultName" "$SNAP" '"resultName"'
+assert_contains "snapshot has browser.shouldAudition" "$SNAP" '"shouldAudition"'
+assert_contains "snapshot has browser.canAudition" "$SNAP" '"canAudition"'
+assert_contains "snapshot has browser.contentTypeNames" "$SNAP" '"contentTypeNames"'
+assert_contains "snapshot has browser.selectedContentType" "$SNAP" '"selectedContentType"'
+assert_contains "snapshot has browser.resultIsSelected" "$SNAP" '"resultIsSelected"'
+
+# Test browser/getState returns state object
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/getState","id":702}')
+assert_contains "browser/getState returns exists field" "$RESP" '"exists"'
+assert_contains "browser/getState returns resultName field" "$RESP" '"resultName"'
+
+# Test browser/setShouldAudition
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/setShouldAudition","params":{"enabled":true},"id":703}')
+assert_contains "browser/setShouldAudition returns ok" "$RESP" '"ok"'
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/setShouldAudition","params":{"enabled":false},"id":704}')
+assert_contains "browser/setShouldAudition false returns ok" "$RESP" '"ok"'
+
+# Test browser/setContentType (index 0 should be safe)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/setContentType","params":{"index":0},"id":705}')
+assert_contains "browser/setContentType returns ok" "$RESP" '"ok"'
+
+# Test browser/selectNextFile (no-op when browser closed, but should not error)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/selectNextFile","id":706}')
+assert_contains "browser/selectNextFile returns ok" "$RESP" '"ok"'
+
+# Test browser/selectPreviousFile
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/selectPreviousFile","id":707}')
+assert_contains "browser/selectPreviousFile returns ok" "$RESP" '"ok"'
+
+# 48. Clean up — delete the duplicated track and undo rename
+echo "--- 48. Track Cleanup ---"
 # Select track 0 and restore original name
 rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
 sleep 0.3
