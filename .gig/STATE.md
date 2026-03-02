@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.14.5` |
-| **Phase** | 14 — Master Bus FX & Device Routing |
+| **Version** | `0.15.6` |
+| **Phase** | 15 — Preset Cycling & Device Chain Navigation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | Smoke tests |
+| **Last Batch** | [UNPLANNED] Remove broken preset methods (ISS-007) |
 | **Last Updated** | 2026-03-01 |
 | **Last Updated** | 2026-03-01 |
 
@@ -19,6 +19,12 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.15.6 | 15 | [UNPLANNED] Remove broken preset methods (ISS-007) | UNPLANNED | done | 2026-03-02 |
+| 0.15.5 | 15 | Smoke tests | PLANNED | done | 2026-03-02 |
+| 0.15.4 | 15 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
+| 0.15.3 | 15 | Unit tests | PLANNED | done | 2026-03-01 |
+| 0.15.2 | 15 | 12 RPC methods (8 device + 4 masterDevice) | PLANNED | done | 2026-03-01 |
+| 0.15.1 | 15 | Snapshot nesting observers | PLANNED | done | 2026-03-01 |
 | 0.14.5 | 14 | Smoke tests | PLANNED | done | 2026-03-01 |
 | 0.14.4 | 14 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
 | 0.14.3 | 14 | Unit tests | PLANNED | done | 2026-03-01 |
@@ -116,13 +122,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-D-14.1: Phase 14 scope — master bus device control (insert, remove, navigate, parameters)
-D-14.2: Second CursorDevice + RemoteControlsPage on masterTrack
-D-14.3: `masterDevice/` RPC prefix
-D-14.4: 10 methods — navigate, enable, insert, remove, pages, set param (no automation)
-D-14.5: New MasterDeviceHandler class, reuses DeviceLibrary
-D-14.6: `masterDevice` snapshot section with device state + 8 parameters
-D-14.7: 10 new tool schemas (124 total), system prompt "Master Bus FX" subsection
+_Phase 15 archived. See `.gig/phases/v0.15-preset-cycling-chain-navigation/`._
 
 ---
 
