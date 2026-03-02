@@ -17,6 +17,8 @@
 **Decision:** What was decided.
 **Rationale:** Why this choice was made.
 **Alternatives considered:** What else was evaluated.
-**Status:** PROPOSED | ACTIVE | AMENDED | REVISED
+**Status:** ACTIVE | ACTIVE | AMENDED | REVISED
 **ID:** D-{batch}.{num}
 -->
+
+_No active decisions. Run `/gig:gather` to start the next phase._

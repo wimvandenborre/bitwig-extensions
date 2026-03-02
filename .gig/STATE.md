@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.17.6` |
 | **Phase** | 17 — PopupBrowser API Integration |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | Smoke tests |
 | **Last Updated** | 2026-03-02 |
 
