@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.handlers.ApplicationHandler;
 import dev.gregross.gig.handlers.ArrangerHandler;
+import dev.gregross.gig.handlers.BrowserHandler;
 import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
@@ -144,6 +145,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new SendHandler(trackBank, SEND_COUNT).register(dispatcher);
         new ProjectHandler(project, stateCache).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
+        new BrowserHandler(popupBrowser, cursorDevice, stateCache).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 
         // Start servers

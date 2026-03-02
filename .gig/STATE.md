@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.17.2` |
+| **Version** | `0.17.3` |
 | **Phase** | 17 — PopupBrowser API Integration |
 | **Status** | `IMPLEMENTING` |
-| **Last Batch** | Browser snapshot observers |
+| **Last Batch** | BrowserHandler — RPC methods |
 | **Last Updated** | 2026-03-02 |
 
 ---

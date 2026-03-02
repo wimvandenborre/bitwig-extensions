@@ -1165,7 +1165,7 @@ public class StateCache {
         return obj;
     }
 
-    private JsonObject getBrowserState() {
+    public JsonObject getBrowserState() {
         JsonObject obj = new JsonObject();
         obj.addProperty("exists", browserExists);
         obj.addProperty("title", browserTitle);
