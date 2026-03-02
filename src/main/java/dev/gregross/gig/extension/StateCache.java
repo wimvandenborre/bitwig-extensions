@@ -22,6 +22,7 @@ public class StateCache {
 
     private static final int TRACK_COUNT = 8;
     private static final int SCENE_COUNT = 5;
+    private static final int DEFAULT_SEND_COUNT = 4;
 
     // Transport state
     private volatile boolean isPlaying;
@@ -41,6 +42,16 @@ public class StateCache {
     private final boolean[] trackSolos = new boolean[TRACK_COUNT];
     private final boolean[] trackArms = new boolean[TRACK_COUNT];
     private final float[][] trackColors = new float[TRACK_COUNT][3]; // r, g, b
+    private final String[] trackCrossfadeModes = new String[TRACK_COUNT];
+    private final String[] trackMonitorModes = new String[TRACK_COUNT];
+
+    // Send state — [trackIndex][sendIndex]
+    private volatile int sendCount = DEFAULT_SEND_COUNT;
+    private final String[][] sendNames = new String[TRACK_COUNT][DEFAULT_SEND_COUNT];
+    private final double[][] sendLevels = new double[TRACK_COUNT][DEFAULT_SEND_COUNT];
+    private final boolean[][] sendIsPreFader = new boolean[TRACK_COUNT][DEFAULT_SEND_COUNT];
+    private final boolean[][] sendEnabled = new boolean[TRACK_COUNT][DEFAULT_SEND_COUNT];
+    private final float[][][] sendColors = new float[TRACK_COUNT][DEFAULT_SEND_COUNT][3];
 
     // Clip state — [trackIndex][slotIndex]
     private final boolean[][] clipHasContent = new boolean[TRACK_COUNT][SCENE_COUNT];
@@ -504,6 +515,54 @@ public class StateCache {
         }
     }
 
+    public void registerSendObservers(TrackBank trackBank, int numSends) {
+        this.sendCount = numSends;
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            final int trackIdx = i;
+            Track track = (Track) trackBank.getItemAt(i);
+            SendBank bank = track.sendBank();
+            for (int s = 0; s < numSends; s++) {
+                final int sendIdx = s;
+                Send send = (Send) bank.getItemAt(s);
+                sendNames[trackIdx][sendIdx] = "";
+
+                send.name().markInterested();
+                send.name().addValueObserver((StringValueChangedCallback) v -> sendNames[trackIdx][sendIdx] = (String) v);
+
+                send.value().markInterested();
+                send.value().addValueObserver((DoubleValueChangedCallback) v -> sendLevels[trackIdx][sendIdx] = v);
+
+                send.isPreFader().markInterested();
+                send.isPreFader().addValueObserver((BooleanValueChangedCallback) v -> sendIsPreFader[trackIdx][sendIdx] = v);
+
+                send.isEnabled().markInterested();
+                send.isEnabled().addValueObserver((BooleanValueChangedCallback) v -> sendEnabled[trackIdx][sendIdx] = v);
+
+                send.sendChannelColor().markInterested();
+                send.sendChannelColor().addValueObserver((ColorValueChangedCallback) (r, g, b) -> {
+                    sendColors[trackIdx][sendIdx][0] = r;
+                    sendColors[trackIdx][sendIdx][1] = g;
+                    sendColors[trackIdx][sendIdx][2] = b;
+                });
+            }
+        }
+    }
+
+    public void registerMixerObservers(TrackBank trackBank) {
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            final int idx = i;
+            Track track = (Track) trackBank.getItemAt(i);
+            trackCrossfadeModes[idx] = "";
+            trackMonitorModes[idx] = "";
+
+            track.crossFadeMode().markInterested();
+            track.crossFadeMode().addValueObserver((EnumValueChangedCallback) v -> trackCrossfadeModes[idx] = (String) v);
+
+            track.monitorMode().markInterested();
+            track.monitorMode().addValueObserver((EnumValueChangedCallback) v -> trackMonitorModes[idx] = (String) v);
+        }
+    }
+
     public double getClipStepSize() {
         return clipStepSize;
     }
@@ -610,6 +669,26 @@ public class StateCache {
             color.addProperty("g", trackColors[i][1]);
             color.addProperty("b", trackColors[i][2]);
             track.add("color", color);
+
+            track.addProperty("crossfadeMode", trackCrossfadeModes[i] != null ? trackCrossfadeModes[i] : "");
+            track.addProperty("monitorMode", trackMonitorModes[i] != null ? trackMonitorModes[i] : "");
+
+            JsonArray sends = new JsonArray();
+            for (int s = 0; s < sendCount; s++) {
+                JsonObject send = new JsonObject();
+                send.addProperty("index", s);
+                send.addProperty("name", sendNames[i][s] != null ? sendNames[i][s] : "");
+                send.addProperty("level", sendLevels[i][s]);
+                send.addProperty("isPreFader", sendIsPreFader[i][s]);
+                send.addProperty("enabled", sendEnabled[i][s]);
+                JsonObject sendColor = new JsonObject();
+                sendColor.addProperty("r", sendColors[i][s][0]);
+                sendColor.addProperty("g", sendColors[i][s][1]);
+                sendColor.addProperty("b", sendColors[i][s][2]);
+                send.add("color", sendColor);
+                sends.add(send);
+            }
+            track.add("sends", sends);
 
             JsonArray clips = new JsonArray();
             for (int j = 0; j < SCENE_COUNT; j++) {
