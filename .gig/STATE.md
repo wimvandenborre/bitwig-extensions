@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.17.4` |
+| **Version** | `0.17.5` |
 | **Phase** | 17 — PopupBrowser API Integration |
 | **Status** | `IMPLEMENTING` |
-| **Last Batch** | Unit tests |
+| **Last Batch** | Tool schemas + system prompt update |
 | **Last Updated** | 2026-03-02 |
 
 ---

@@ -623,6 +623,46 @@ transport_setPosition(16) → cueMarker_addAtPlayhead → cueMarker_rename(1, "V
 transport_setPosition(48) → cueMarker_addAtPlayhead → cueMarker_rename(2, "Chorus")
 ```
 
+## Browser & Preset Navigation
+
+The browser is Bitwig's built-in interface for selecting presets, devices, and samples. It must be explicitly opened before navigation works.
+
+### Opening the Browser
+
+- **`browser_browsePresets`** — Opens the browser to replace the current device's preset. Title: "Select replacement content".
+- **`browser_browseInsertDevice`** — Opens the browser to insert a new device after the current one. Title: "Select content to insert into device chain".
+
+**Important:** `selectNextFile`/`selectPreviousFile` are no-ops when the browser is closed. Always open the browser first.
+
+### Navigating Results
+
+- **`browser_selectNextFile`** / **`browser_selectPreviousFile`** — Step through results one at a time.
+- **`browser_selectFirstFile`** / **`browser_selectLastFile`** — Jump to first/last result.
+- Result name updates in the snapshot after ~500ms. Call `session_snapshot` or `browser_getState` after navigation to see the current selection.
+
+### Committing or Cancelling
+
+- **`browser_commit`** — Loads the selected preset or inserts the selected device. Closes the browser.
+- **`browser_cancel`** — Closes the browser without applying changes.
+
+### Additional Controls
+
+- **`browser_setContentType`** — Switch between content type tabs (e.g., Devices, Presets, Samples) by index.
+- **`browser_setShouldAudition`** — Enable/disable audition mode (preview presets in place while browsing).
+- **`browser_getState`** — Returns current browser state (exists, title, selectedContentType, resultName, etc.).
+
+### Browser State in Snapshot
+
+The `browser` section in `session_snapshot` contains: `exists` (boolean — browser is open), `title`, `selectedContentType`, `contentTypeNames` (available tabs), `canAudition`, `shouldAudition`, `resultName` (current selection), `resultIsSelected`.
+
+### Preset Cycling Workflow
+
+```
+browser_browsePresets → browser_selectNextFile → session_snapshot (check resultName) → browser_commit
+```
+
+To cycle through multiple presets: open once, call `selectNextFile` repeatedly (checking state between calls), then `commit` when satisfied or `cancel` to revert.
+
 ## Example Workflow
 
 **Task:** "Set the tempo to 128 and solo track 2."
