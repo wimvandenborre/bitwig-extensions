@@ -4,9 +4,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.13.7` |
+| **Version** | `0.13.8` |
 | **Phase** | 13 — Mixer & Routing Intelligence |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | Smoke tests |
 | **Last Updated** | 2026-03-01 |
 | **Last Updated** | 2026-03-01 |
@@ -19,6 +19,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.13.8 | 13 | [UNPLANNED] Fix master snapshot — add mute/solo/color | UNPLANNED | done | 2026-03-01 |
 | 0.13.7 | 13 | Smoke tests | PLANNED | done | 2026-03-01 |
 | 0.13.6 | 13 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
 | 0.13.5 | 13 | Unit tests | PLANNED | done | 2026-03-01 |
