@@ -103,6 +103,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerSendObservers(trackBank, SEND_COUNT);
         stateCache.registerMixerObservers(trackBank);
         stateCache.registerMasterDeviceObservers(masterCursorDevice, masterRemoteControlsPage);
+        stateCache.registerBrowserObservers(popupBrowser);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());

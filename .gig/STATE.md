@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.16.5` |
-| **Phase** | 16 — Project & Session Management |
-| **Status** | `GOVERNED` |
-| **Last Batch** | Smoke tests |
+| **Version** | `0.17.2` |
+| **Phase** | 17 — PopupBrowser API Integration |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | Browser snapshot observers |
 | **Last Updated** | 2026-03-02 |
 
 ---
