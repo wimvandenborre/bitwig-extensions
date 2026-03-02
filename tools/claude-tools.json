@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -2283,6 +2283,182 @@
       },
       "required": [
         "scenes"
+      ]
+    }
+  },
+  {
+    "name": "app_activateEngine",
+    "description": "Activate the Bitwig audio engine. Use when the engine has been deactivated and needs to be restarted.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_deactivateEngine",
+    "description": "Deactivate the Bitwig audio engine. Stops all audio processing. Use for troubleshooting audio issues.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_showNotification",
+    "description": "Show a temporary popup notification in Bitwig Studio's UI. Useful for communicating status or completion to the user.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The notification text to display."
+        }
+      },
+      "required": [
+        "text"
+      ]
+    }
+  },
+  {
+    "name": "app_setPanelLayout",
+    "description": "Switch Bitwig Studio's panel layout. Valid layouts: ARRANGE, MIX, EDIT.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "layout": {
+          "type": "string",
+          "enum": [
+            "ARRANGE",
+            "MIX",
+            "EDIT"
+          ],
+          "description": "Panel layout to switch to."
+        }
+      },
+      "required": [
+        "layout"
+      ]
+    }
+  },
+  {
+    "name": "project_unsoloAll",
+    "description": "Unsolo all tracks in the project. Clears all solo states at once.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "project_unmuteAll",
+    "description": "Unmute all tracks in the project. Clears all mute states at once.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "project_unarmAll",
+    "description": "Disarm all tracks in the project. Clears all record-arm states at once.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "project_getState",
+    "description": "Get project-wide state: hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified. Use to check if any tracks are soloed/muted/armed, or if the project has unsaved changes.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_continuePlayback",
+    "description": "Continue playback from the current position. Unlike transport_play which resets to the play-start position, this resumes from where playback was stopped.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_restart",
+    "description": "Restart playback from the play-start position. Equivalent to stopping and then playing.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_returnToArrangement",
+    "description": "Return to the arrangement from clip launcher playback. Restores arranger timeline control after clip launcher clips have overridden track playback.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_jumpToPreviousCueMarker",
+    "description": "Jump the playback position to the previous cue marker. Complements cue marker creation/editing in the arranger handler.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_jumpToNextCueMarker",
+    "description": "Jump the playback position to the next cue marker. Complements cue marker creation/editing in the arranger handler.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_setPreRoll",
+    "description": "Set the pre-roll (count-in) mode for recording. Valid values: none, one_bar, two_bars, four_bars.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "enum": [
+            "none",
+            "one_bar",
+            "two_bars",
+            "four_bars"
+          ],
+          "description": "Pre-roll mode."
+        }
+      },
+      "required": [
+        "value"
+      ]
+    }
+  },
+  {
+    "name": "transport_setMetronomeVolume",
+    "description": "Set the metronome (click) volume. Value is normalized 0.0 to 1.0.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Metronome volume (0.0\u20131.0)."
+        }
+      },
+      "required": [
+        "value"
       ]
     }
   }

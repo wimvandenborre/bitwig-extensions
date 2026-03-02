@@ -448,6 +448,27 @@ Same pattern works for master bus: `masterDevice_enterSlot` / `masterDevice_exit
 - `hasLayers` (boolean) — device has indexed layers (future capability)
 - `hasDrumPads` (boolean) — device has drum pads (future capability)
 
+### Project & Session Management
+
+**Engine control:** Use `app_activateEngine` / `app_deactivateEngine` to restart the audio engine when troubleshooting audio issues. Check `application.hasActiveEngine` in snapshot first.
+
+**Project state:** Use `project_getState` to check hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified. Bulk reset with `project_unsoloAll`, `project_unmuteAll`, `project_unarmAll`.
+
+**Panel layout:** `app_setPanelLayout({ layout: "ARRANGE" })` switches between ARRANGE, MIX, EDIT views. Current layout is in `application.panelLayout` in snapshot.
+
+**Notifications:** `app_showNotification({ text: "Done!" })` shows a temporary popup in Bitwig's UI — the only way to communicate status to the user inside the DAW.
+
+**Transport navigation:**
+- `transport_continuePlayback` — resume from current position (vs `transport_play` which resets to play-start)
+- `transport_restart` — restart from play-start position
+- `transport_returnToArrangement` — exit clip launcher override, restore arranger playback
+- `transport_jumpToPreviousCueMarker` / `transport_jumpToNextCueMarker` — navigate between cue markers
+
+**Recording setup:**
+- `transport_setPreRoll({ value: "two_bars" })` — set count-in: none, one_bar, two_bars, four_bars
+- `transport_setMetronomeVolume({ value: 0.7 })` — click volume 0.0–1.0
+- Current values in snapshot: `transport.metronomeVolume`, `transport.preRoll`
+
 ### Mix Setup Workflow
 
 ```

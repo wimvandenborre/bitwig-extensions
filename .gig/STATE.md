@@ -4,12 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.15.6` |
-| **Phase** | 15 — Preset Cycling & Device Chain Navigation |
+| **Version** | `0.16.5` |
+| **Phase** | 16 — Project & Session Management |
 | **Status** | `GOVERNED` |
-| **Last Batch** | [UNPLANNED] Remove broken preset methods (ISS-007) |
-| **Last Updated** | 2026-03-01 |
-| **Last Updated** | 2026-03-01 |
+| **Last Batch** | Smoke tests |
+| **Last Updated** | 2026-03-02 |
 
 ---
 
@@ -122,7 +121,11 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-_Phase 15 archived. See `.gig/phases/v0.15-preset-cycling-chain-navigation/`._
+- D-16.1: Scope — state management + transport nav (defer zoom/panels)
+- D-16.2: Architecture — extend App (+4), new Project (+6), extend Transport (+7) = 17 methods
+- D-16.3: Snapshot — 7 new fields (project state + transport settings + panelLayout)
+- D-16.4: Notifications — app/showNotification via host.showPopupNotification()
+- D-16.5: Transport — continue, restart, returnToArrangement, cue marker nav, preRoll, metronomeVolume
 
 ---
 

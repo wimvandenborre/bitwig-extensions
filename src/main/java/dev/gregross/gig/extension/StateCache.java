@@ -151,6 +151,17 @@ public class StateCache {
     private volatile boolean canUndo;
     private volatile boolean canRedo;
     private volatile boolean hasActiveEngine;
+    private volatile String panelLayout = "";
+
+    // Project state
+    private volatile boolean hasSoloedTracks;
+    private volatile boolean hasMutedTracks;
+    private volatile boolean hasArmedTracks;
+    private volatile boolean isModified;
+
+    // Transport — metronome & pre-roll
+    private volatile double metronomeVolume;
+    private volatile String preRoll = "";
 
     // Arranger visibility state
     private volatile boolean arrangerPlaybackFollow;
@@ -201,7 +212,8 @@ public class StateCache {
     private int prevMasterDeviceHash;
 
     public void registerObservers(Transport transport, TrackBank trackBank,
-                                   MasterTrack masterTrack, Application application) {
+                                   MasterTrack masterTrack, Application application,
+                                   Project project) {
         // Transport observers
         transport.isPlaying().markInterested();
         transport.isPlaying().addValueObserver((BooleanValueChangedCallback) v -> isPlaying = v);
@@ -291,6 +303,29 @@ public class StateCache {
 
         application.hasActiveEngine().markInterested();
         application.hasActiveEngine().addValueObserver((BooleanValueChangedCallback) v -> hasActiveEngine = v);
+
+        application.panelLayout().markInterested();
+        application.panelLayout().addValueObserver((StringValueChangedCallback) v -> panelLayout = (String) v);
+
+        // Project observers
+        project.hasSoloedTracks().markInterested();
+        project.hasSoloedTracks().addValueObserver((BooleanValueChangedCallback) v -> hasSoloedTracks = v);
+
+        project.hasMutedTracks().markInterested();
+        project.hasMutedTracks().addValueObserver((BooleanValueChangedCallback) v -> hasMutedTracks = v);
+
+        project.hasArmedTracks().markInterested();
+        project.hasArmedTracks().addValueObserver((BooleanValueChangedCallback) v -> hasArmedTracks = v);
+
+        project.isModified().markInterested();
+        project.isModified().addValueObserver((BooleanValueChangedCallback) v -> isModified = v);
+
+        // Transport — metronome volume & pre-roll
+        transport.metronomeVolume().markInterested();
+        transport.metronomeVolume().addRawValueObserver((DoubleValueChangedCallback) v -> metronomeVolume = v);
+
+        transport.preRoll().markInterested();
+        transport.preRoll().addValueObserver((EnumValueChangedCallback) v -> preRoll = (String) v);
 
         // Track bank scroll state
         trackBank.scrollPosition().markInterested();
@@ -782,6 +817,8 @@ public class StateCache {
         obj.addProperty("timeSignatureDenominator", timeSignatureDenominator);
         obj.addProperty("isLoopEnabled", isLoopEnabled);
         obj.addProperty("isMetronomeEnabled", isMetronomeEnabled);
+        obj.addProperty("metronomeVolume", metronomeVolume);
+        obj.addProperty("preRoll", preRoll);
         return obj;
     }
 
@@ -1013,6 +1050,11 @@ public class StateCache {
         obj.addProperty("canUndo", canUndo);
         obj.addProperty("canRedo", canRedo);
         obj.addProperty("hasActiveEngine", hasActiveEngine);
+        obj.addProperty("panelLayout", panelLayout);
+        obj.addProperty("hasSoloedTracks", hasSoloedTracks);
+        obj.addProperty("hasMutedTracks", hasMutedTracks);
+        obj.addProperty("hasArmedTracks", hasArmedTracks);
+        obj.addProperty("isModified", isModified);
         return obj;
     }
 
@@ -1122,4 +1164,9 @@ public class StateCache {
         if (index < 0 || index >= TRACK_COUNT) return "";
         return trackNames[index] != null ? trackNames[index] : "";
     }
+
+    public boolean hasSoloedTracks() { return hasSoloedTracks; }
+    public boolean hasMutedTracks() { return hasMutedTracks; }
+    public boolean hasArmedTracks() { return hasArmedTracks; }
+    public boolean isModified() { return isModified; }
 }

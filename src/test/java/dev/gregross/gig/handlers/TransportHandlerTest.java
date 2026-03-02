@@ -42,9 +42,26 @@ class TransportHandlerTest {
     }
 
     @Test
-    void registersNineteenMethodsTotal() {
-        // 11 original + 8 new = 19
-        assertEquals(19, dispatcher.getRegisteredMethods().size());
+    void registersNavigationMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("transport/continuePlayback"));
+        assertTrue(methods.contains("transport/restart"));
+        assertTrue(methods.contains("transport/returnToArrangement"));
+        assertTrue(methods.contains("transport/jumpToPreviousCueMarker"));
+        assertTrue(methods.contains("transport/jumpToNextCueMarker"));
+    }
+
+    @Test
+    void registersMetronomeAndPreRollMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("transport/setPreRoll"));
+        assertTrue(methods.contains("transport/setMetronomeVolume"));
+    }
+
+    @Test
+    void registersTwentySixMethodsTotal() {
+        // 19 original + 7 new = 26
+        assertEquals(26, dispatcher.getRegisteredMethods().size());
     }
 
     // --- setLoopRange validation ---
@@ -149,6 +166,32 @@ class TransportHandlerTest {
         String response = dispatcher.handle(rpc("transport/setClipLauncherAutomationWrite", "{}"));
         assertContains(response, "-32602");
         assertContains(response, "enabled");
+    }
+
+    // --- setPreRoll validation ---
+
+    @Test
+    void setPreRoll_missingValue_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setPreRoll", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "value");
+    }
+
+    @Test
+    void setPreRoll_invalidValue_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setPreRoll",
+            "{\"value\": \"three_bars\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "three_bars");
+    }
+
+    // --- setMetronomeVolume validation ---
+
+    @Test
+    void setMetronomeVolume_missingValue_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setMetronomeVolume", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "value");
     }
 
     // --- Helpers ---

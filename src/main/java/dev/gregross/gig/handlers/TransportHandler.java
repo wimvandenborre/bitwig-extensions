@@ -177,9 +177,60 @@ public class TransportHandler {
             transport.resetAutomationOverrides();
             return ok();
         });
+
+        // --- Navigation ---
+
+        dispatcher.register("transport/continuePlayback", params -> {
+            transport.continuePlayback();
+            return ok();
+        });
+
+        dispatcher.register("transport/restart", params -> {
+            transport.restart();
+            return ok();
+        });
+
+        dispatcher.register("transport/returnToArrangement", params -> {
+            transport.returnToArrangement();
+            return ok();
+        });
+
+        dispatcher.register("transport/jumpToPreviousCueMarker", params -> {
+            transport.jumpToPreviousCueMarker();
+            return ok();
+        });
+
+        dispatcher.register("transport/jumpToNextCueMarker", params -> {
+            transport.jumpToNextCueMarker();
+            return ok();
+        });
+
+        // --- Metronome & Pre-roll ---
+
+        dispatcher.register("transport/setPreRoll", params -> {
+            if (!params.has("value")) {
+                throw new IllegalArgumentException("missing 'value' parameter");
+            }
+            String value = params.get("value").getAsString();
+            if (!PRE_ROLL_VALUES.contains(value)) {
+                throw new IllegalArgumentException("invalid value '" + value + "', expected: none, one_bar, two_bars, four_bars");
+            }
+            transport.preRoll().set(value);
+            return ok();
+        });
+
+        dispatcher.register("transport/setMetronomeVolume", params -> {
+            if (!params.has("value")) {
+                throw new IllegalArgumentException("missing 'value' parameter");
+            }
+            double value = params.get("value").getAsDouble();
+            transport.metronomeVolume().setImmediately(value);
+            return ok();
+        });
     }
 
     private static final Set<String> AUTOMATION_MODES = Set.of("latch", "touch", "write");
+    private static final Set<String> PRE_ROLL_VALUES = Set.of("none", "one_bar", "two_bars", "four_bars");
 
     private JsonObject ok() {
         JsonObject result = new JsonObject();
