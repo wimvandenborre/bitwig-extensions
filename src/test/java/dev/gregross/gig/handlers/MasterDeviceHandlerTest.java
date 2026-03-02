@@ -19,7 +19,7 @@ class MasterDeviceHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersFourteenMethods() {
+    void registersTwelveMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("masterDevice/selectNext"));
         assertTrue(methods.contains("masterDevice/selectPrevious"));
@@ -31,11 +31,9 @@ class MasterDeviceHandlerTest {
         assertTrue(methods.contains("masterDevice/nextPage"));
         assertTrue(methods.contains("masterDevice/previousPage"));
         assertTrue(methods.contains("masterDevice/setParameterValue"));
-        assertTrue(methods.contains("masterDevice/nextPreset"));
-        assertTrue(methods.contains("masterDevice/previousPreset"));
         assertTrue(methods.contains("masterDevice/enterSlot"));
         assertTrue(methods.contains("masterDevice/exitToParent"));
-        assertEquals(14, methods.size());
+        assertEquals(12, methods.size());
     }
 
     // --- setEnabled validation ---

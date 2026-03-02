@@ -48,22 +48,16 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersPresetAndChainNavMethods() {
+    void registersChainNavMethods() {
         var methods = dispatcher.getRegisteredMethods();
-        assertTrue(methods.contains("device/nextPreset"));
-        assertTrue(methods.contains("device/previousPreset"));
-        assertTrue(methods.contains("device/nextPresetCategory"));
-        assertTrue(methods.contains("device/previousPresetCategory"));
-        assertTrue(methods.contains("device/nextPresetCreator"));
-        assertTrue(methods.contains("device/previousPresetCreator"));
         assertTrue(methods.contains("device/enterSlot"));
         assertTrue(methods.contains("device/exitToParent"));
     }
 
     @Test
-    void registersExactlyTwentyFiveMethods() {
-        // 17 existing + 8 new preset/chain methods
-        assertEquals(25, dispatcher.getRegisteredMethods().size());
+    void registersExactlyNineteenMethods() {
+        // 17 existing + 2 chain nav methods
+        assertEquals(19, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---

@@ -428,18 +428,9 @@ The master track has its own device chain, independent from track devices. Use `
 
 **Important:** `device_` methods control devices on the *cursor track* (regular tracks). `masterDevice_` methods control devices on the *master track*. They are independent — selecting a device on one does not affect the other.
 
-### Preset Cycling & Chain Navigation
+### Device Chain Navigation
 
-**Preset cycling** lets you browse through device presets without opening the browser UI:
-
-- `device_nextPreset` / `device_previousPreset` — cycle through presets for the current track device
-- `device_nextPresetCategory` / `device_previousPresetCategory` — jump to next/previous preset category (e.g., Bass → Lead → Pad)
-- `device_nextPresetCreator` / `device_previousPresetCreator` — cycle by preset creator/author
-- `masterDevice_nextPreset` / `masterDevice_previousPreset` — same for master bus device
-
-The `presetName`, `presetCategory`, and `presetCreator` fields in the device/masterDevice snapshot sections update after cycling.
-
-**Chain navigation** lets you enter and exit nested device chains (container devices like Instrument Layer, FX Layer, Note FX Layer):
+**Chain navigation** lets you enter and exit nested device chains (container devices like Instrument Layer, FX Layer, Polymer):
 
 1. Check `device.hasSlots` in snapshot — if `true`, the device has nested chains
 2. Read `device.slotNames` — array of available slot names (e.g., `["Chain 1", "Chain 2"]`)

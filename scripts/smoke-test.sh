@@ -399,13 +399,18 @@ assert_contains "system prompt mentions trackBank tools" "$PROMPT" "trackBank_"
 assert_contains "system prompt mentions cueMarkerBank tools" "$PROMPT" "cueMarkerBank_"
 assert_contains "system prompt documents v0.11 migration" "$PROMPT" "v0.11"
 
-# Phase 12 — tool schemas
-TOOLS=$(cat "$TOOLS_FILE")
-assert_contains "tool schema has session_transaction" "$TOOLS" '"session_transaction"'
-assert_contains "tool schema has macro_createTrack" "$TOOLS" '"macro_createTrack"'
-assert_contains "tool schema has macro_createClip" "$TOOLS" '"macro_createClip"'
-assert_contains "tool schema has macro_writeClip" "$TOOLS" '"macro_writeClip"'
-assert_contains "tool schema has macro_buildSection" "$TOOLS" '"macro_buildSection"'
+# Phase 12 — tool schemas (grep file directly to avoid shell variable size limits)
+PHASE12_TOOLS="session_transaction macro_createTrack macro_createClip macro_writeClip macro_buildSection"
+for tool in $PHASE12_TOOLS; do
+  TOTAL=$((TOTAL + 1))
+  if grep -qF "\"$tool\"" "$TOOLS_FILE"; then
+    echo "  PASS  tool schema exists: $tool"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL  tool schema missing: $tool"
+    FAIL=$((FAIL + 1))
+  fi
+done
 
 # Phase 12 — system prompt
 assert_contains "system prompt has Transactions & Macros section" "$PROMPT" "Transactions & Macros"
@@ -480,7 +485,7 @@ assert_contains "system prompt mentions masterDevice_insertBitwigDevice" "$PROMP
 assert_contains "system prompt mentions masterDevice vs device distinction" "$PROMPT" "masterDevice_"
 
 # Phase 15 — preset cycling + chain navigation tool schemas
-PHASE15_TOOLS="device_nextPreset device_previousPreset device_nextPresetCategory device_previousPresetCategory device_nextPresetCreator device_previousPresetCreator device_enterSlot device_exitToParent masterDevice_nextPreset masterDevice_previousPreset masterDevice_enterSlot masterDevice_exitToParent"
+PHASE15_TOOLS="device_enterSlot device_exitToParent masterDevice_enterSlot masterDevice_exitToParent"
 for tool in $PHASE15_TOOLS; do
   TOTAL=$((TOTAL + 1))
   if grep -qF "\"$tool\"" "$TOOLS_FILE"; then
@@ -505,7 +510,7 @@ SNAP_DESC=$(jq -r '.[] | select(.name=="session_snapshot") | .description' "$TOO
 assert_contains "session_snapshot mentions nesting info" "$SNAP_DESC" "nesting info"
 
 # Phase 15 — system prompt
-assert_contains "system prompt has Preset Cycling section" "$PROMPT" "Preset Cycling"
+assert_contains "system prompt has Chain Navigation section" "$PROMPT" "Chain Navigation"
 assert_contains "system prompt mentions enterSlot" "$PROMPT" "enterSlot"
 assert_contains "system prompt mentions exitToParent" "$PROMPT" "exitToParent"
 assert_contains "system prompt mentions hasSlots" "$PROMPT" "hasSlots"
@@ -1373,16 +1378,15 @@ assert_contains "masterDevice/setParameterValue index out of range returns -3260
 ERR=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/insertBitwigDevice","params":{},"id":409}')
 assert_contains "masterDevice/insertBitwigDevice missing name returns -32602" "$ERR" '-32602'
 
-# 45. Phase 15 — Preset cycling & chain navigation
-echo "--- 45. Preset Cycling & Chain Navigation ---"
+# 45. Phase 15 — Device chain navigation
+echo "--- 45. Device Chain Navigation ---"
 
 # Verify new methods in api/list
 RESP=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":500}')
-assert_contains "api/list includes device/nextPreset" "$RESP" 'device/nextPreset'
 assert_contains "api/list includes device/enterSlot" "$RESP" 'device/enterSlot'
 assert_contains "api/list includes device/exitToParent" "$RESP" 'device/exitToParent'
-assert_contains "api/list includes masterDevice/nextPreset" "$RESP" 'masterDevice/nextPreset'
 assert_contains "api/list includes masterDevice/enterSlot" "$RESP" 'masterDevice/enterSlot'
+assert_contains "api/list includes masterDevice/exitToParent" "$RESP" 'masterDevice/exitToParent'
 
 # Verify snapshot has nesting fields
 SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":501}')

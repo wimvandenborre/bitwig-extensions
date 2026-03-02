@@ -608,24 +608,6 @@
     }
   },
   {
-    "name": "masterDevice_nextPreset",
-    "description": "Load the next preset for the current master bus device. The preset name in the masterDevice snapshot section updates after cycling. Deprecated Bitwig API but functional.",
-    "input_schema": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    }
-  },
-  {
-    "name": "masterDevice_previousPreset",
-    "description": "Load the previous preset for the current master bus device. The preset name in the masterDevice snapshot section updates after cycling. Deprecated Bitwig API but functional.",
-    "input_schema": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    }
-  },
-  {
     "name": "masterDevice_enterSlot",
     "description": "Navigate into a nested device chain (slot) of the current master bus device. Check masterDevice snapshot hasSlots and slotNames before calling. After entering, the masterDevice cursor points to the first device inside that slot.",
     "input_schema": {
@@ -1275,60 +1257,6 @@
   {
     "name": "device_remove",
     "description": "Remove the currently selected device from the cursor track's device chain. Navigate to the target device first using `device_selectNext` / `device_selectPrevious`, then call this to delete it. Warning: the cursor device loses selection after removal \u2014 call `session_snapshot` to verify state. This action cannot be undone via this API (but Bitwig's undo may work).",
-    "input_schema": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    }
-  },
-  {
-    "name": "device_nextPreset",
-    "description": "Load the next preset for the current device. The preset name in the device snapshot section updates after cycling. Deprecated Bitwig API but functional.",
-    "input_schema": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    }
-  },
-  {
-    "name": "device_previousPreset",
-    "description": "Load the previous preset for the current device. The preset name in the device snapshot section updates after cycling. Deprecated Bitwig API but functional.",
-    "input_schema": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    }
-  },
-  {
-    "name": "device_nextPresetCategory",
-    "description": "Switch to the next preset category for the current device. The preset category in the device snapshot updates after cycling. Useful for browsing presets by category (e.g., Bass, Lead, Pad). Deprecated Bitwig API but functional.",
-    "input_schema": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    }
-  },
-  {
-    "name": "device_previousPresetCategory",
-    "description": "Switch to the previous preset category for the current device. The preset category in the device snapshot updates after cycling. Deprecated Bitwig API but functional.",
-    "input_schema": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    }
-  },
-  {
-    "name": "device_nextPresetCreator",
-    "description": "Switch to the next preset creator for the current device. The preset creator in the device snapshot updates after cycling. Deprecated Bitwig API but functional.",
-    "input_schema": {
-      "type": "object",
-      "properties": {},
-      "required": []
-    }
-  },
-  {
-    "name": "device_previousPresetCreator",
-    "description": "Switch to the previous preset creator for the current device. The preset creator in the device snapshot updates after cycling. Deprecated Bitwig API but functional.",
     "input_schema": {
       "type": "object",
       "properties": {},
