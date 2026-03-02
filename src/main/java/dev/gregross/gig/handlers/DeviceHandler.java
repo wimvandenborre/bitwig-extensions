@@ -274,6 +274,49 @@ public class DeviceHandler {
             return result;
         });
 
+        // Preset cycling (deprecated but functional in Bitwig 6.0)
+        dispatcher.register("device/nextPreset", params -> {
+            cursorDevice.switchToNextPreset();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/previousPreset", params -> {
+            cursorDevice.switchToPreviousPreset();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/nextPresetCategory", params -> {
+            cursorDevice.switchToNextPresetCategory();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/previousPresetCategory", params -> {
+            cursorDevice.switchToPreviousPresetCategory();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/nextPresetCreator", params -> {
+            cursorDevice.switchToNextPresetCreator();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/previousPresetCreator", params -> {
+            cursorDevice.switchToPreviousPresetCreator();
+            return new JsonPrimitive("ok");
+        });
+
+        // Nested device chain navigation
+        dispatcher.register("device/enterSlot", params -> {
+            String name = requireString(params, "name");
+            cursorDevice.selectFirstInSlot(name);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/exitToParent", params -> {
+            cursorDevice.selectParent();
+            return new JsonPrimitive("ok");
+        });
+
         // Cursor track navigation
         dispatcher.register("cursor/selectTrack", params -> {
             String direction = requireString(params, "direction");

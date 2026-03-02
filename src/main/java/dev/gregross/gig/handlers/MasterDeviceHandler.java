@@ -102,6 +102,29 @@ public class MasterDeviceHandler {
             return new JsonPrimitive("ok");
         });
 
+        // Preset cycling (deprecated but functional in Bitwig 6.0)
+        dispatcher.register("masterDevice/nextPreset", params -> {
+            cursorDevice.switchToNextPreset();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/previousPreset", params -> {
+            cursorDevice.switchToPreviousPreset();
+            return new JsonPrimitive("ok");
+        });
+
+        // Nested device chain navigation
+        dispatcher.register("masterDevice/enterSlot", params -> {
+            String name = requireString(params, "name");
+            cursorDevice.selectFirstInSlot(name);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/exitToParent", params -> {
+            cursorDevice.selectParent();
+            return new JsonPrimitive("ok");
+        });
+
         // Parameter mutation
         dispatcher.register("masterDevice/setParameterValue", params -> {
             int index = requireInt(params, "index");
