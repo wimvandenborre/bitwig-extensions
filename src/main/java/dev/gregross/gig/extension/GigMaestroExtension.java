@@ -14,6 +14,7 @@ import dev.gregross.gig.handlers.MacroHandler;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
 import dev.gregross.gig.handlers.SceneHandler;
+import dev.gregross.gig.handlers.SendHandler;
 import dev.gregross.gig.handlers.TrackBankManager;
 import dev.gregross.gig.handlers.TrackHandler;
 import dev.gregross.gig.handlers.TransactionHandler;
@@ -32,6 +33,7 @@ public class GigMaestroExtension extends ControllerExtension {
 
     private static final int DEFAULT_PORT = 8787;
     private static final int TRACK_COUNT = 8;
+    private static final int SEND_COUNT = 4;
     private static final int SCENE_COUNT = 5;
     private static final int CLIP_GRID_WIDTH = 256;
     private static final int CLIP_GRID_HEIGHT = 128;
@@ -53,7 +55,7 @@ public class GigMaestroExtension extends ControllerExtension {
     public void init() {
         // Create Bitwig API objects
         Transport transport = host.createTransport();
-        TrackBank trackBank = host.createMainTrackBank(TRACK_COUNT, 0, SCENE_COUNT);
+        TrackBank trackBank = host.createMainTrackBank(TRACK_COUNT, SEND_COUNT, SCENE_COUNT);
         trackBank.setShouldShowClipLauncherFeedback(true);
         trackBank.sceneBank().setIndication(true);
         MasterTrack masterTrack = host.createMasterTrack(0);
@@ -89,6 +91,8 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerClipCursorObservers(cursorClip, cursorTrack);
         stateCache.registerArrangerObservers(arranger);
         stateCache.registerArrangementObservers(transport, cueMarkerBank);
+        stateCache.registerSendObservers(trackBank, SEND_COUNT);
+        stateCache.registerMixerObservers(trackBank);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
@@ -125,6 +129,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new NoteHandler(cursorClip, stateCache).register(dispatcher);
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);
+        new SendHandler(trackBank, SEND_COUNT).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 

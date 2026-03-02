@@ -77,11 +77,11 @@ echo "--- O1. Tool Schema Validation ---"
 TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 104 ]; then
-  echo "  PASS  claude-tools.json has >= 104 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 113 ]; then
+  echo "  PASS  claude-tools.json has >= 113 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 104 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 113 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -416,6 +416,40 @@ assert_contains "system prompt mentions macro_buildSection" "$PROMPT" "macro_bui
 assert_contains "system prompt documents rollback" "$PROMPT" "undoAll"
 assert_contains "system prompt documents pre/post snapshots" "$PROMPT" "pre/post snapshots"
 assert_contains "system prompt documents postSnapshot option" "$PROMPT" "postSnapshot"
+
+# Phase 13 — tool schemas (grep file directly to avoid shell variable size issues)
+for TOOL_NAME in send_setLevel send_setMode send_setEnabled track_setColor track_setCrossfade track_setMonitor master_setMute master_setSolo master_setColor; do
+  TOTAL=$((TOTAL + 1))
+  if grep -qF "\"$TOOL_NAME\"" "$TOOLS_FILE"; then
+    echo "  PASS  tool schema has $TOOL_NAME"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL  tool schema has $TOOL_NAME — not found in $TOOLS_FILE"
+    FAIL=$((FAIL + 1))
+  fi
+done
+
+# Phase 13 — tool schema field checks
+SEND_LEVEL_TRACK_TYPE=$(jq -r '.[] | select(.name=="send_setLevel") | .input_schema.properties.trackIndex.type' "$TOOLS_FILE")
+assert_equals "send_setLevel trackIndex is integer" "$SEND_LEVEL_TRACK_TYPE" "integer"
+SEND_LEVEL_VALUE_TYPE=$(jq -r '.[] | select(.name=="send_setLevel") | .input_schema.properties.value.type' "$TOOLS_FILE")
+assert_equals "send_setLevel value is number" "$SEND_LEVEL_VALUE_TYPE" "number"
+SEND_MODE_ENUM=$(jq -r '.[] | select(.name=="send_setMode") | .input_schema.properties.mode.enum | join(",")' "$TOOLS_FILE")
+assert_equals "send_setMode mode enum is AUTO,PRE,POST" "$SEND_MODE_ENUM" "AUTO,PRE,POST"
+CROSSFADE_ENUM=$(jq -r '.[] | select(.name=="track_setCrossfade") | .input_schema.properties.mode.enum | join(",")' "$TOOLS_FILE")
+assert_equals "track_setCrossfade mode enum is A,B,AB" "$CROSSFADE_ENUM" "A,B,AB"
+MONITOR_ENUM=$(jq -r '.[] | select(.name=="track_setMonitor") | .input_schema.properties.mode.enum | join(",")' "$TOOLS_FILE")
+assert_equals "track_setMonitor mode enum is ON,OFF,AUTO" "$MONITOR_ENUM" "ON,OFF,AUTO"
+COLOR_R_TYPE=$(jq -r '.[] | select(.name=="track_setColor") | .input_schema.properties.r.type' "$TOOLS_FILE")
+assert_equals "track_setColor r is number" "$COLOR_R_TYPE" "number"
+
+# Phase 13 — system prompt
+assert_contains "system prompt has Mixer & Routing section" "$PROMPT" "Mixer & Routing"
+assert_contains "system prompt mentions send_setLevel" "$PROMPT" "send_setLevel"
+assert_contains "system prompt mentions track_setColor" "$PROMPT" "track_setColor"
+assert_contains "system prompt mentions crossfade modes" "$PROMPT" "crossfadeMode"
+assert_contains "system prompt mentions monitor mode" "$PROMPT" "monitorMode"
+assert_contains "system prompt mentions master_setMute" "$PROMPT" "master_setMute"
 
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
@@ -821,11 +855,11 @@ assert_contains "api/list has macro/buildSection" "$LIST" '"macro/buildSection"'
 # Count total methods
 METHOD_COUNT=$(echo "$LIST" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
 TOTAL=$((TOTAL + 1))
-if [ "$METHOD_COUNT" -ge 104 ]; then
-  echo "  PASS  api/list has >= 104 methods (found $METHOD_COUNT)"
+if [ "$METHOD_COUNT" -ge 113 ]; then
+  echo "  PASS  api/list has >= 113 methods (found $METHOD_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  api/list has >= 104 methods — found $METHOD_COUNT"
+  echo "  FAIL  api/list has >= 113 methods — found $METHOD_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -1176,8 +1210,67 @@ echo "  INFO  parameter[0].hasAutomation = $HAS_AUTO"
 # Cleanup: disable automation write
 rpc '{"jsonrpc":"2.0","method":"transport/setArrangerAutomationWrite","params":{"enabled":false},"id":213}' > /dev/null
 
-# 39. Clean up — delete the duplicated track and undo rename
-echo "--- 39. Track Cleanup ---"
+# 39. Phase 13 — Mixer & Routing API list
+echo "--- 39. Mixer & Routing API List ---"
+LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":300}')
+assert_contains "api/list has send/setLevel" "$LIST" '"send/setLevel"'
+assert_contains "api/list has send/setMode" "$LIST" '"send/setMode"'
+assert_contains "api/list has send/setEnabled" "$LIST" '"send/setEnabled"'
+assert_contains "api/list has track/setColor" "$LIST" '"track/setColor"'
+assert_contains "api/list has track/setCrossfade" "$LIST" '"track/setCrossfade"'
+assert_contains "api/list has track/setMonitor" "$LIST" '"track/setMonitor"'
+assert_contains "api/list has master/setMute" "$LIST" '"master/setMute"'
+assert_contains "api/list has master/setSolo" "$LIST" '"master/setSolo"'
+assert_contains "api/list has master/setColor" "$LIST" '"master/setColor"'
+
+# 40. Phase 13 — Snapshot sends + mixer fields
+echo "--- 40. Mixer Snapshot Fields ---"
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":301}')
+assert_contains "snapshot track has sends array" "$SNAP" '"sends"'
+assert_contains "snapshot track has crossfadeMode" "$SNAP" '"crossfadeMode"'
+assert_contains "snapshot track has monitorMode" "$SNAP" '"monitorMode"'
+assert_contains "snapshot send has isPreFader" "$SNAP" '"isPreFader"'
+SEND_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['tracks']['tracks'][0]['sends']))")
+assert_equals "track 0 has 4 sends" "$SEND_COUNT" "4"
+
+# 41. Phase 13 — Track color
+echo "--- 41. Track Color ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"track/setColor","params":{"index":0,"r":0.8,"g":0.2,"b":0.4},"id":302}')
+assert_contains "track/setColor returns ok" "$RESP" '"ok":true'
+sleep 0.3
+R=$(echo "$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":303}')" | python3 -c "import sys,json; c = json.load(sys.stdin)['result']['tracks']['tracks'][0]['color']; print(round(c['r'], 1))")
+assert_equals "track 0 color.r is 0.8 after setColor" "$R" "0.8"
+
+# 42. Phase 13 — Master mute/solo
+echo "--- 42. Master Mute/Solo ---"
+RESP=$(rpc '{"jsonrpc":"2.0","method":"master/setMute","params":{"value":true},"id":304}')
+assert_contains "master/setMute returns ok" "$RESP" '"ok"'
+sleep 0.3
+RESP=$(rpc '{"jsonrpc":"2.0","method":"master/setMute","params":{"value":false},"id":305}')
+assert_contains "master/setMute false returns ok" "$RESP" '"ok"'
+
+RESP=$(rpc '{"jsonrpc":"2.0","method":"master/setSolo","params":{"value":true},"id":306}')
+assert_contains "master/setSolo returns ok" "$RESP" '"ok"'
+sleep 0.3
+RESP=$(rpc '{"jsonrpc":"2.0","method":"master/setSolo","params":{"value":false},"id":307}')
+assert_contains "master/setSolo false returns ok" "$RESP" '"ok"'
+
+# 43. Phase 13 — Send error handling
+echo "--- 43. Send Errors ---"
+ERR=$(rpc '{"jsonrpc":"2.0","method":"send/setLevel","params":{"sendIndex":0,"value":0.5},"id":308}')
+assert_contains "send/setLevel missing trackIndex returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"send/setMode","params":{"trackIndex":0,"sendIndex":0,"mode":"INVALID"},"id":309}')
+assert_contains "send/setMode invalid mode returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"track/setCrossfade","params":{"index":0,"mode":"INVALID"},"id":310}')
+assert_contains "track/setCrossfade invalid mode returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"track/setMonitor","params":{"index":0,"mode":"INVALID"},"id":311}')
+assert_contains "track/setMonitor invalid mode returns -32602" "$ERR" '-32602'
+
+# 44. Clean up — delete the duplicated track and undo rename
+echo "--- 44. Track Cleanup ---"
 # Select track 0 and restore original name
 rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
 sleep 0.3

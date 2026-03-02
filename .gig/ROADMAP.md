@@ -25,6 +25,7 @@
 | 10 | Clip, Scene & Cue Marker Lifecycle | v0.10.x | complete |
 | 11 | Bank Scrolling | v0.11.1–v0.11.9 | complete |
 | 12 | Transaction + Macro Layer | v0.12.1–v0.12.14 | complete |
+| 13 | Mixer & Routing Intelligence | v0.13.1–v0.13.8 | complete |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

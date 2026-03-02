@@ -20,5 +20,3 @@
 **Status:** PROPOSED | ACTIVE | AMENDED | REVISED
 **ID:** D-{batch}.{num}
 -->
-
-No active decisions. Run `/gig:decide` to start the next phase.

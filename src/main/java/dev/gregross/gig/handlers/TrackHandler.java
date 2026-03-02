@@ -114,6 +114,37 @@ public class TrackHandler {
             return cursorResponse();
         });
 
+        // --- Phase 13: Mixer methods ---
+
+        dispatcher.register("track/setColor", params -> {
+            Track track = getTrack(requireInt(params, "index"));
+            float r = params.get("r").getAsFloat();
+            float g = params.get("g").getAsFloat();
+            float b = params.get("b").getAsFloat();
+            track.color().set(r, g, b);
+            return ok();
+        });
+
+        dispatcher.register("track/setCrossfade", params -> {
+            Track track = getTrack(requireInt(params, "index"));
+            String mode = requireString(params, "mode").toUpperCase();
+            if (!mode.equals("A") && !mode.equals("B") && !mode.equals("AB")) {
+                throw new IllegalArgumentException("invalid crossfade mode: " + mode + " (expected A, B, or AB)");
+            }
+            track.crossFadeMode().set(mode);
+            return ok();
+        });
+
+        dispatcher.register("track/setMonitor", params -> {
+            Track track = getTrack(requireInt(params, "index"));
+            String mode = requireString(params, "mode").toUpperCase();
+            if (!mode.equals("ON") && !mode.equals("OFF") && !mode.equals("AUTO")) {
+                throw new IllegalArgumentException("invalid monitor mode: " + mode + " (expected ON, OFF, or AUTO)");
+            }
+            track.monitorMode().set(mode);
+            return ok();
+        });
+
         // --- Track bank scroll methods ---
 
         dispatcher.register("trackBank/scrollTo", params -> {

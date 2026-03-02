@@ -4,10 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.12.14` |
-| **Phase** | 12 — Transaction + Macro Layer |
-| **Status** | `VERIFIED` |
-| **Last Batch** | Phase 12 archived and merged to main |
+| **Version** | `0.13.8` |
+| **Phase** | 13 — Mixer & Routing Intelligence |
+| **Status** | `GOVERNED` |
+| **Last Batch** | Smoke tests |
+| **Last Updated** | 2026-03-01 |
 | **Last Updated** | 2026-03-01 |
 
 ---
@@ -18,6 +19,14 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.13.8 | 13 | [UNPLANNED] Fix master snapshot — add mute/solo/color | UNPLANNED | done | 2026-03-01 |
+| 0.13.7 | 13 | Smoke tests | PLANNED | done | 2026-03-01 |
+| 0.13.6 | 13 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
+| 0.13.5 | 13 | Unit tests | PLANNED | done | 2026-03-01 |
+| 0.13.4 | 13 | MasterHandler — master/setMute, master/setSolo, master/setColor | PLANNED | done | 2026-03-01 |
+| 0.13.3 | 13 | TrackHandler — track/setColor, track/setCrossfade, track/setMonitor | PLANNED | done | 2026-03-01 |
+| 0.13.2 | 13 | SendHandler — send/setLevel, send/setMode, send/setEnabled | PLANNED | done | 2026-03-01 |
+| 0.13.1 | 13 | Send infrastructure — StateCache observers + snapshot | PLANNED | done | 2026-03-01 |
 | 0.12.14 | 12 | Add macro/setupScenes (ISS-006 fix) | UNPLANNED | done | 2026-03-01 |
 | 0.12.13 | 12 | Document optimistic macro returns (ISS-005) | UNPLANNED | done | 2026-03-01 |
 | 0.12.12 | 12 | Return bank track name in track/select (ISS-004) | UNPLANNED | done | 2026-03-01 |
@@ -102,7 +111,13 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-Phase 12 decisions archived to `.gig/phases/v0.12-transaction-macro-layer/DECISIONS.md`.
+D-13.1: Phase 13 scope — sends, color, crossfade, monitor, master controls
+D-13.2a: Send infrastructure — 3 RPC methods (level/mode/enable), 4 sends/track, snapshot with isPreFader + sendChannelColor
+D-13.3: Track/master color setter — RGB 0.0–1.0
+D-13.4: Master expanded — setMute, setSolo
+D-13.5: Crossfade (A/B/AB) + monitor mode (ON/OFF/AUTO) with observers
+D-13.6: SendHandler new class, TrackHandler/MasterHandler extended
+D-13.7: 9 new tool schemas (114 total), system prompt "Mixer & Routing" section
 
 ---
 
@@ -192,9 +207,18 @@ Phase 12 decisions archived to `.gig/phases/v0.12-transaction-macro-layer/DECISI
 
 ---
 
+## Open Issues
+
+<!-- Summary of deferred issues from ISSUES.md -->
+
+_None._
+
+---
+
 ## Session Recovery
 
 1. Read this file — current state
 2. Read `PLAN.md` — what's next
 3. Read `DECISIONS.md` — what's been decided
-4. Resume from next batch
+4. Read `ISSUES.md` — open/deferred issues
+5. Resume from next batch

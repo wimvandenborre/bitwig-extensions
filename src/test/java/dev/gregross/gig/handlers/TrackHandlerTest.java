@@ -45,8 +45,16 @@ class TrackHandlerTest {
     }
 
     @Test
-    void registersExactlyFifteenMethods() {
-        assertEquals(15, dispatcher.getRegisteredMethods().size());
+    void registersMixerMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("track/setColor"));
+        assertTrue(methods.contains("track/setCrossfade"));
+        assertTrue(methods.contains("track/setMonitor"));
+    }
+
+    @Test
+    void registersExactlyEighteenMethods() {
+        assertEquals(18, dispatcher.getRegisteredMethods().size());
     }
 
     // --- trackBank/scrollTo validation ---
