@@ -90,7 +90,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache = new StateCache();
 
         // Register all observers into StateCache
-        stateCache.registerObservers(transport, trackBank, masterTrack, application);
+        stateCache.registerObservers(transport, trackBank, masterTrack, application, project);
         stateCache.registerClipObservers(trackBank);
         stateCache.registerDeviceObservers(cursorTrack, cursorDevice, remoteControlsPage);
         stateCache.registerClipCursorObservers(cursorClip, cursorTrack);
