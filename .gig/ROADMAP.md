@@ -24,6 +24,7 @@
 | 9 | Envelope Writing | v0.9.1–v0.9.5 | complete |
 | 10 | Clip, Scene & Cue Marker Lifecycle | v0.10.x | complete |
 | 11 | Bank Scrolling | v0.11.1–v0.11.9 | complete |
+| 12 | Transaction + Macro Layer | v0.12.x | planned |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

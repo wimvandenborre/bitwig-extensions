@@ -77,11 +77,11 @@ echo "--- O1. Tool Schema Validation ---"
 TOOLS_FILE="${PROJECT_ROOT}/tools/claude-tools.json"
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 99 ]; then
-  echo "  PASS  claude-tools.json has >= 99 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 104 ]; then
+  echo "  PASS  claude-tools.json has >= 104 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 99 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 104 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -398,6 +398,24 @@ assert_contains "system prompt mentions sceneBank tools" "$PROMPT" "sceneBank_"
 assert_contains "system prompt mentions trackBank tools" "$PROMPT" "trackBank_"
 assert_contains "system prompt mentions cueMarkerBank tools" "$PROMPT" "cueMarkerBank_"
 assert_contains "system prompt documents v0.11 migration" "$PROMPT" "v0.11"
+
+# Phase 12 — tool schemas
+TOOLS=$(cat "$TOOLS_FILE")
+assert_contains "tool schema has session_transaction" "$TOOLS" '"session_transaction"'
+assert_contains "tool schema has macro_createTrack" "$TOOLS" '"macro_createTrack"'
+assert_contains "tool schema has macro_createClip" "$TOOLS" '"macro_createClip"'
+assert_contains "tool schema has macro_writeClip" "$TOOLS" '"macro_writeClip"'
+assert_contains "tool schema has macro_buildSection" "$TOOLS" '"macro_buildSection"'
+
+# Phase 12 — system prompt
+assert_contains "system prompt has Transactions & Macros section" "$PROMPT" "Transactions & Macros"
+assert_contains "system prompt mentions session_transaction" "$PROMPT" "session_transaction"
+assert_contains "system prompt mentions macro_createTrack" "$PROMPT" "macro_createTrack"
+assert_contains "system prompt mentions macro_writeClip" "$PROMPT" "macro_writeClip"
+assert_contains "system prompt mentions macro_buildSection" "$PROMPT" "macro_buildSection"
+assert_contains "system prompt documents rollback" "$PROMPT" "undoAll"
+assert_contains "system prompt documents pre/post snapshots" "$PROMPT" "pre/post snapshots"
+assert_contains "system prompt documents postSnapshot option" "$PROMPT" "postSnapshot"
 
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
@@ -793,14 +811,21 @@ assert_contains "api/list has clip/getNotes" "$LIST" '"clip/getNotes"'
 assert_contains "api/list has clip/setStepSize" "$LIST" '"clip/setStepSize"'
 assert_contains "api/list has clip/scrollSteps" "$LIST" '"clip/scrollSteps"'
 
+# Phase 12 methods
+assert_contains "api/list has session/transaction" "$LIST" '"session/transaction"'
+assert_contains "api/list has macro/createTrack" "$LIST" '"macro/createTrack"'
+assert_contains "api/list has macro/createClip" "$LIST" '"macro/createClip"'
+assert_contains "api/list has macro/writeClip" "$LIST" '"macro/writeClip"'
+assert_contains "api/list has macro/buildSection" "$LIST" '"macro/buildSection"'
+
 # Count total methods
 METHOD_COUNT=$(echo "$LIST" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
 TOTAL=$((TOTAL + 1))
-if [ "$METHOD_COUNT" -ge 99 ]; then
-  echo "  PASS  api/list has >= 99 methods (found $METHOD_COUNT)"
+if [ "$METHOD_COUNT" -ge 104 ]; then
+  echo "  PASS  api/list has >= 104 methods (found $METHOD_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  api/list has >= 99 methods — found $METHOD_COUNT"
+  echo "  FAIL  api/list has >= 104 methods — found $METHOD_COUNT"
   FAIL=$((FAIL + 1))
 fi
 

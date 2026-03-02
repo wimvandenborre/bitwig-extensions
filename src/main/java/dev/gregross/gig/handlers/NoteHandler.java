@@ -11,9 +11,9 @@ import dev.gregross.gig.rpc.JsonRpcDispatcher;
 
 public class NoteHandler {
 
-    private static final int GRID_WIDTH = 64;
+    private static final int GRID_WIDTH = 256;
     private static final int GRID_HEIGHT = 128;
-    // Step size that makes 64 grid steps cover 256 beats (64 bars in 4/4)
+    // Step size that makes 256 grid steps cover 1024 beats (256 bars in 4/4)
     private static final double WIDE_STEP_SIZE = 4.0;
 
     private final Clip cursorClip;
@@ -33,6 +33,15 @@ public class NoteHandler {
                 JsonObject note = el.getAsJsonObject();
                 int x = note.get("x").getAsInt();
                 int y = note.get("y").getAsInt();
+                if (x < 0 || x >= GRID_WIDTH) {
+                    throw new IllegalArgumentException(
+                        "note x=" + x + " is out of range (0-" + (GRID_WIDTH - 1)
+                        + "). Grid covers " + GRID_WIDTH + " steps at current stepSize.");
+                }
+                if (y < 0 || y >= GRID_HEIGHT) {
+                    throw new IllegalArgumentException(
+                        "note y=" + y + " is out of range (0-" + (GRID_HEIGHT - 1) + ").");
+                }
                 int velocity = note.has("velocity")
                     ? (int) (note.get("velocity").getAsDouble() * 127)
                     : 100;

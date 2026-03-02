@@ -60,7 +60,8 @@ public class ClipHandler {
         dispatcher.register("clip/select", params -> {
             int trackIndex = requireInt(params, "trackIndex");
             int slotIndex = requireInt(params, "slotIndex");
-            if (!stateCache.clipHasContent(trackIndex, slotIndex)) {
+            boolean force = params.has("force") && params.get("force").getAsBoolean();
+            if (!force && !stateCache.clipHasContent(trackIndex, slotIndex)) {
                 throw new IllegalArgumentException(
                     "slot is empty at track " + trackIndex + " slot " + slotIndex
                     + " — create a clip first with clip/create");

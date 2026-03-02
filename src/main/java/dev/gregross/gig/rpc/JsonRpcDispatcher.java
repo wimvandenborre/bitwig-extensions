@@ -18,6 +18,21 @@ public class JsonRpcDispatcher {
     }
 
     /**
+     * Execute a registered handler directly and return its result.
+     * Used by session/transaction and MacroHandler to call handlers without JSON serialization.
+     *
+     * @throws RpcException if the handler throws one
+     * @throws IllegalArgumentException if the method is not registered or params are invalid
+     */
+    public JsonElement handleInternal(String method, JsonObject params) throws Exception {
+        MethodHandler handler = handlers.get(method);
+        if (handler == null) {
+            throw new IllegalArgumentException("Method not found: " + method);
+        }
+        return handler.handle(params);
+    }
+
+    /**
      * Handle a raw JSON-RPC request string.
      * Returns null for notifications (requests without an id).
      * Returns a JSON string for normal requests or batch requests.

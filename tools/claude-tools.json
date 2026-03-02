@@ -576,7 +576,7 @@
   },
   {
     "name": "clip_select",
-    "description": "Select a clip slot for note editing. The cursor clip will follow this selection, making it the target for setNotes, getNotes, clearNote, and clearAllNotes. Must be called before editing notes in a specific clip.",
+    "description": "Select a clip slot for note editing. The cursor clip will follow this selection, making it the target for setNotes, getNotes, clearNote, and clearAllNotes. Must be called before editing notes in a specific clip. IMPORTANT: Cursor movement is async — after selecting, wait 1-2 seconds before calling getNotes to allow step data to load. Writing (setNotes) uses deferred scheduling and is not affected.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -657,7 +657,7 @@
   },
   {
     "name": "clip_getNotes",
-    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), and duration (beats). Use this to inspect clip content before or after editing.",
+    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), and duration (beats). IMPORTANT: After clip/select, wait 1-2 seconds before calling this — the cursor clip loads step data asynchronously, and reading too soon returns empty or stale results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -797,7 +797,7 @@
   },
   {
     "name": "track_select",
-    "description": "Select a track by its bank index. The cursor track will follow this selection, making subsequent cursor-based operations (rename, delete, insert device, note editing) target the selected track. Index must be in the range 0–63. Out-of-range indices return an error with bank width context.",
+    "description": "Select a track by its bank index. The cursor track will follow this selection, making subsequent cursor-based operations (rename, delete, insert device, note editing) target the selected track. Returns { ok, trackName, trackIndex } with the bank track name (accurate immediately). IMPORTANT: Cursor movement is async — cursorTrack-dependent operations in the same flush cycle may still target the previous track.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1389,6 +1389,226 @@
       "type": "object",
       "properties": {},
       "required": []
+    }
+  },
+  {
+    "name": "session_transaction",
+    "description": "Execute a sequence of RPC operations atomically with stop-on-error semantics. Each operation is executed sequentially — if any step fails, execution stops immediately and partial results are returned. Use this to batch dependent calls (e.g., create clip then select it) where later steps should not run if earlier steps fail. Optionally capture state snapshots before and/or after execution, and optionally roll back completed steps on error via app/undo.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operations": {
+          "type": "array",
+          "description": "Ordered list of RPC operations to execute. Each operation has a 'method' (RPC method name like 'clip/create') and optional 'params' (method parameters).",
+          "items": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "description": "RPC method name (e.g., 'clip/create', 'track/rename')"
+              },
+              "params": {
+                "type": "object",
+                "description": "Parameters for the RPC method. Defaults to empty object if omitted."
+              }
+            },
+            "required": ["method"]
+          }
+        },
+        "preSnapshot": {
+          "type": "boolean",
+          "description": "If true, capture a full state snapshot before executing any operations. Returned in the response as 'preSnapshot'. Default: false."
+        },
+        "postSnapshot": {
+          "type": "boolean",
+          "description": "If true, capture a full state snapshot after all operations complete (or after the last successful step on error). Returned in the response as 'postSnapshot'. Default: false."
+        },
+        "rollback": {
+          "type": "string",
+          "enum": ["undoAll"],
+          "description": "If set to 'undoAll' and an error occurs, call app/undo N times for N successfully completed steps (best-effort). The response includes rollback info: { rolledBack: true, undoCount: N }."
+        }
+      },
+      "required": ["operations"]
+    }
+  },
+  {
+    "name": "macro_createTrack",
+    "description": "Create a new track with optional rename and device insertion in a single call. Composes track/create + track/rename + device/insertBitwigDevice. Use instead of calling these 3 methods separately.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["audio", "instrument", "effect"],
+          "description": "Type of track to create."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name to assign to the new track. If omitted, the track keeps its default name."
+        },
+        "position": {
+          "type": "integer",
+          "description": "0-based insert position. -1 or omitted = append at end."
+        },
+        "device": {
+          "type": "string",
+          "description": "Name of a Bitwig built-in device to insert on the new track (e.g., 'Polymer', 'Drum Machine'). Case-insensitive."
+        }
+      },
+      "required": ["type"]
+    }
+  },
+  {
+    "name": "macro_createClip",
+    "description": "Create an empty clip and select it (cursor clip ready for note writing) in a single call. Composes clip/create + clip/select. Use instead of calling these 2 methods separately.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Bank-relative track index (0–7)."
+        },
+        "sceneIndex": {
+          "type": "integer",
+          "description": "Bank-relative scene/slot index (0–4)."
+        },
+        "lengthBeats": {
+          "type": "integer",
+          "description": "Clip length in beats (e.g., 16 for 4 bars in 4/4)."
+        }
+      },
+      "required": ["trackIndex", "sceneIndex", "lengthBeats"]
+    }
+  },
+  {
+    "name": "macro_writeClip",
+    "description": "Create a clip, select it, set step size, and write notes in a single call. Composes clip/create + clip/select + clip/setStepSize + clip/setNotes + optional clip/rename. Returns { count } with the number of notes (optimistic — note writes are deferred to next flush cycle). To verify notes were actually written, call clip/getNotes after a 1-2 second delay.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Bank-relative track index (0–7)."
+        },
+        "sceneIndex": {
+          "type": "integer",
+          "description": "Bank-relative scene/slot index (0–4)."
+        },
+        "lengthBeats": {
+          "type": "integer",
+          "description": "Clip length in beats (e.g., 16 for 4 bars in 4/4)."
+        },
+        "stepSize": {
+          "type": "number",
+          "description": "Step resolution (0.25 = 1/16 note, 0.5 = 1/8, 1.0 = 1/4)."
+        },
+        "notes": {
+          "type": "array",
+          "description": "Array of note objects to write.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "integer", "description": "Step index (0-based)" },
+              "y": { "type": "integer", "description": "MIDI note number (0–127)" },
+              "velocity": { "type": "number", "description": "Velocity 0.0–1.0 (default 0.75)" },
+              "duration": { "type": "number", "description": "Duration in beats (default 1.0)" }
+            },
+            "required": ["x", "y"]
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional name for the clip."
+        }
+      },
+      "required": ["trackIndex", "sceneIndex", "lengthBeats", "stepSize", "notes"]
+    }
+  },
+  {
+    "name": "macro_buildSection",
+    "description": "Build a song section: create/rename a scene and write clips across multiple tracks. If sceneIndex is provided, uses that existing scene slot directly (recommended after manual scene creation or bulk deletion). If omitted, auto-creates a new scene (may fail if scene count cache is stale). Returns { sceneIndex, clipCount } (optimistic — note writes are deferred across multiple flush cycles). To verify, use clip/select + clip/getNotes on individual clips after a few seconds.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "sceneName": {
+          "type": "string",
+          "description": "Name for the scene (e.g., 'Verse 1', 'Chorus')."
+        },
+        "sceneIndex": {
+          "type": "integer",
+          "description": "Optional bank-relative scene slot index (0–4). If provided, skips scene creation and uses this slot directly. The scene must already exist and be visible in the current scene bank window. Recommended after manual scene creation or bulk deletion."
+        },
+        "clips": {
+          "type": "array",
+          "description": "Array of clip definitions, one per track.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "trackIndex": {
+                "type": "integer",
+                "description": "Bank-relative track index (0–7)."
+              },
+              "lengthBeats": {
+                "type": "integer",
+                "description": "Clip length in beats."
+              },
+              "stepSize": {
+                "type": "number",
+                "description": "Step resolution (0.25 = 1/16, 0.5 = 1/8, 1.0 = 1/4)."
+              },
+              "notes": {
+                "type": "array",
+                "description": "Array of note objects {x, y, velocity?, duration?}.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "x": { "type": "integer" },
+                    "y": { "type": "integer" },
+                    "velocity": { "type": "number" },
+                    "duration": { "type": "number" }
+                  },
+                  "required": ["x", "y"]
+                }
+              },
+              "name": {
+                "type": "string",
+                "description": "Optional name for this clip."
+              }
+            },
+            "required": ["trackIndex", "lengthBeats", "stepSize", "notes"]
+          }
+        }
+      },
+      "required": ["sceneName", "clips"]
+    }
+  },
+  {
+    "name": "macro_setupScenes",
+    "description": "Create and rename multiple scenes in one call, with each rename deferred to a separate flush cycle to avoid Bitwig's scene bank re-indexing bug (ISS-006). Use this instead of calling scene/create + scene/rename in a loop. Returns { created, renamed } (renamed count is optimistic — renames are deferred).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "scenes": {
+          "type": "array",
+          "description": "Array of scene definitions. Each scene will be created (in order) then renamed in a separate flush cycle.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "integer",
+                "description": "Bank-relative scene index (0–4) to rename. Must match the position the scene will occupy after creation."
+              },
+              "name": {
+                "type": "string",
+                "description": "Name for the scene."
+              }
+            },
+            "required": ["index", "name"]
+          }
+        }
+      },
+      "required": ["scenes"]
     }
   }
 ]

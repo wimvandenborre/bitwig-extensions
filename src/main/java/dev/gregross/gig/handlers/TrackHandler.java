@@ -88,7 +88,12 @@ public class TrackHandler {
         dispatcher.register("track/select", params -> {
             int index = requireInt(params, "index");
             trackBankManager.selectByIndex(index);
-            return cursorResponse();
+            // Return bank track name (accurate) — cursorTrack name is stale until next flush
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            result.addProperty("trackName", stateCache.getTrackName(index));
+            result.addProperty("trackIndex", index);
+            return result;
         });
 
         dispatcher.register("track/rename", params -> {

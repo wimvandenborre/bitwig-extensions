@@ -10,11 +10,13 @@ import dev.gregross.gig.handlers.ArrangerHandler;
 import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
+import dev.gregross.gig.handlers.MacroHandler;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
 import dev.gregross.gig.handlers.SceneHandler;
 import dev.gregross.gig.handlers.TrackBankManager;
 import dev.gregross.gig.handlers.TrackHandler;
+import dev.gregross.gig.handlers.TransactionHandler;
 import dev.gregross.gig.handlers.TransportHandler;
 import dev.gregross.gig.rpc.CommandQueue;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
@@ -31,7 +33,7 @@ public class GigMaestroExtension extends ControllerExtension {
     private static final int DEFAULT_PORT = 8787;
     private static final int TRACK_COUNT = 8;
     private static final int SCENE_COUNT = 5;
-    private static final int CLIP_GRID_WIDTH = 64;
+    private static final int CLIP_GRID_WIDTH = 256;
     private static final int CLIP_GRID_HEIGHT = 128;
     private static final String BITWIG_DEVICE_LIBRARY =
         "/Applications/Bitwig Studio.app/Contents/Resources/Library/devices";
@@ -123,6 +125,8 @@ public class GigMaestroExtension extends ControllerExtension {
         new NoteHandler(cursorClip, stateCache).register(dispatcher);
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);
+        new TransactionHandler(dispatcher, stateCache).register(dispatcher);
+        new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 
         // Start servers
         try {

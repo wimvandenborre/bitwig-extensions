@@ -248,7 +248,45 @@ To get MIDI notes: pick a root (e.g., C3 = 48), add each offset. C3 major triad 
 | Normal | 0.60–0.75 | Default playing level |
 | Accent | 0.80–0.95 | Emphasized beats, hits |
 
-## Song Building
+## Transactions & Macros
+
+### Transactions
+
+Use `session_transaction` to batch multiple RPC calls into a single request with stop-on-error semantics. If any step fails, execution stops immediately and you get partial results showing what succeeded and what failed.
+
+**When to use transactions:**
+- Dependent call sequences where later steps should not run if earlier steps fail
+- Reducing round-trips when you need multiple operations in sequence
+- When you want pre/post snapshots without extra calls
+
+**Example — create and configure a clip:**
+```
+session_transaction({
+  operations: [
+    { method: "clip/create", params: { trackIndex: 0, slotIndex: 0, lengthInBeats: 16 } },
+    { method: "clip/select", params: { trackIndex: 0, slotIndex: 0 } },
+    { method: "clip/setStepSize", params: { size: 0.25 } }
+  ],
+  postSnapshot: true
+})
+```
+
+**Rollback:** Add `rollback: "undoAll"` to automatically call undo for completed steps if an error occurs. This is best-effort — Bitwig's undo is user-level and may not perfectly reverse each step.
+
+### Macros
+
+Macros are predefined compound operations that collapse common multi-call workflows into single calls. **Always prefer macros over manual call sequences when available.**
+
+| Macro | Replaces | Calls Saved |
+|-------|----------|-------------|
+| `macro_createTrack` | track/create + track/rename + device/insert | 2–3 → 1 |
+| `macro_createClip` | clip/create + clip/select | 2 → 1 |
+| `macro_writeClip` | clip/create + clip/select + clip/setStepSize + clip/setNotes + clip/rename | 4–5 → 1 |
+| `macro_buildSection` | scene/create + scene/rename + N×(clip/create + clip/select + clip/setStepSize + clip/setNotes + clip/rename) | 10+ → 1 |
+
+**`macro_buildSection`** is the highest-impact macro. A 4-track song section that previously required 12+ individual calls now takes 1. It creates a new scene, scrolls the scene bank to make it visible, renames it, then writes all clips with notes.
+
+
 
 ### Default Assumptions
 
@@ -281,14 +319,24 @@ Create tracks in this order for a clean mix layout:
 
 ### Recommended Call Sequences
 
-**Track creation (per track):**
+**Track creation (per track) — use `macro_createTrack`:**
 ```
-track_createInstrument → track_rename → device_insertBitwigDevice → session_snapshot
+macro_createTrack({ type: "instrument", name: "Bass", device: "Polymer" })
 ```
+Manual fallback: `track_createInstrument → track_rename → device_insertBitwigDevice → session_snapshot`
 
-**Note writing (per clip):**
+**Note writing (per clip) — use `macro_writeClip`:**
 ```
-clip_create → clip_select → clip_setNotes → clip_getNotes (verify)
+macro_writeClip({ trackIndex: 0, sceneIndex: 0, lengthBeats: 16, stepSize: 0.25, notes: [...], name: "Kick" })
+```
+Manual fallback: `clip_create → clip_select → clip_setStepSize → clip_setNotes → clip_rename`
+
+**Full section (multi-track) — use `macro_buildSection`:**
+```
+macro_buildSection({ sceneName: "Verse 1", clips: [
+  { trackIndex: 0, lengthBeats: 16, stepSize: 0.25, notes: [...], name: "Drums" },
+  { trackIndex: 1, lengthBeats: 16, stepSize: 0.25, notes: [...], name: "Bass" }
+]})
 ```
 
 **Device setup (on cursor track):**
@@ -298,17 +346,20 @@ session_snapshot → device_listBitwigDevices → device_insertBitwigDevice → 
 
 ### Build From Scratch Workflow
 
-Complete sequence for creating a multi-track song:
+Complete sequence for creating a multi-track song using macros:
 
 1. **Set tempo:** `transport_setTempo` with desired BPM.
-2. **Create drum track:** `track_createInstrument` → `track_rename` "Drums" → `device_insertBitwigDevice` (e.g., "Drum Machine").
-3. **Write drum pattern:** `clip_create` (16 beats) → `clip_select` → `clip_setNotes` with kick/snare/hi-hat pattern using GM drum map values.
-4. **Create bass track:** `track_createInstrument` → `track_rename` "Bass" → `device_insertBitwigDevice` (e.g., "Polymer").
-5. **Write bass line:** `clip_create` → `clip_select` → `clip_setNotes` using scale formula + root in octave 2–3.
-6. **Create lead track:** `track_createInstrument` → `track_rename` "Lead" → `device_insertBitwigDevice`.
-7. **Write melody:** `clip_create` → `clip_select` → `clip_setNotes` using scale formula + root in octave 4–5.
-8. **Layer across scenes:** Repeat clip creation in different slots for verse, chorus, etc. Vary patterns per section.
-9. **Launch:** `clip_launch` or `scene_launch` to play back.
+2. **Create tracks:** Use `macro_createTrack` for each:
+   - `macro_createTrack({ type: "instrument", name: "Drums", device: "Drum Machine" })`
+   - `macro_createTrack({ type: "instrument", name: "Bass", device: "Polymer" })`
+   - `macro_createTrack({ type: "instrument", name: "Lead", device: "Polysynth" })`
+3. **Build sections:** Use `macro_buildSection` for each song section:
+   - `macro_buildSection({ sceneName: "Verse 1", clips: [{ trackIndex: 0, ... }, { trackIndex: 1, ... }, { trackIndex: 2, ... }] })`
+   - `macro_buildSection({ sceneName: "Chorus", clips: [...] })`
+4. **Verify:** `session_snapshot` to confirm all scenes and clips.
+5. **Launch:** `clip_launch` or `scene_launch` to play back.
+
+This workflow takes ~5 calls for a 3-track, 2-section song. The manual equivalent would take 20+ calls.
 
 ## Arrangement & Automation
 
