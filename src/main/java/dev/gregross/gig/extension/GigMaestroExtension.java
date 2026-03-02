@@ -80,6 +80,9 @@ public class GigMaestroExtension extends ControllerExtension {
         // Create project reference
         Project project = host.getProject();
 
+        // Create popup browser for preset/device/sample browsing
+        PopupBrowser popupBrowser = host.createPopupBrowser();
+
         // Create arranger and cue marker bank
         Arranger arranger = host.createArranger();
         CueMarkerBank cueMarkerBank = arranger.createCueMarkerBank(16);
