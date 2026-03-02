@@ -428,6 +428,26 @@ The master track has its own device chain, independent from track devices. Use `
 
 **Important:** `device_` methods control devices on the *cursor track* (regular tracks). `masterDevice_` methods control devices on the *master track*. They are independent — selecting a device on one does not affect the other.
 
+### Device Chain Navigation
+
+**Chain navigation** lets you enter and exit nested device chains (container devices like Instrument Layer, FX Layer, Polymer):
+
+1. Check `device.hasSlots` in snapshot — if `true`, the device has nested chains
+2. Read `device.slotNames` — array of available slot names (e.g., `["Chain 1", "Chain 2"]`)
+3. `device_enterSlot({ name: "Chain 1" })` — cursor enters that chain, showing the first device inside
+4. Work with devices inside the slot using normal `device_` methods
+5. `device_exitToParent` — return to the parent container device
+6. Check `device.isNested` — `true` when inside a nested chain
+
+Same pattern works for master bus: `masterDevice_enterSlot` / `masterDevice_exitToParent`.
+
+**Nesting snapshot fields** (on both `device` and `masterDevice` sections):
+- `isNested` (boolean) — currently inside a nested chain
+- `hasSlots` (boolean) — device has nested chains
+- `slotNames` (string[]) — available chain names
+- `hasLayers` (boolean) — device has indexed layers (future capability)
+- `hasDrumPads` (boolean) — device has drum pads (future capability)
+
 ### Mix Setup Workflow
 
 ```

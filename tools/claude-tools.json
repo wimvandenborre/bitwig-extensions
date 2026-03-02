@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag), masterDevice state (master bus device chain, parameters), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), and arrangement state (loop range, punch in/out, automation mode, cue markers). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -91,7 +91,9 @@
           "description": "Tempo in BPM (e.g., 120.0). Raw value, not normalized."
         }
       },
-      "required": ["tempo"]
+      "required": [
+        "tempo"
+      ]
     }
   },
   {
@@ -105,7 +107,9 @@
           "description": "Position in beats from project start (e.g., 4.0 for beat 5, since 0-based)."
         }
       },
-      "required": ["beats"]
+      "required": [
+        "beats"
+      ]
     }
   },
   {
@@ -119,7 +123,9 @@
           "description": "True to enable looping, false to disable."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -133,7 +139,9 @@
           "description": "True to enable the metronome, false to disable."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -178,7 +186,10 @@
           "description": "Volume level, normalized 0.0 to 1.0."
         }
       },
-      "required": ["index", "value"]
+      "required": [
+        "index",
+        "value"
+      ]
     }
   },
   {
@@ -196,7 +207,10 @@
           "description": "Pan position, normalized 0.0 (left) to 1.0 (right). 0.5 is center."
         }
       },
-      "required": ["index", "value"]
+      "required": [
+        "index",
+        "value"
+      ]
     }
   },
   {
@@ -214,7 +228,10 @@
           "description": "True to mute the track, false to unmute."
         }
       },
-      "required": ["index", "muted"]
+      "required": [
+        "index",
+        "muted"
+      ]
     }
   },
   {
@@ -232,7 +249,10 @@
           "description": "True to solo the track, false to unsolo."
         }
       },
-      "required": ["index", "soloed"]
+      "required": [
+        "index",
+        "soloed"
+      ]
     }
   },
   {
@@ -250,7 +270,10 @@
           "description": "True to arm the track for recording, false to disarm."
         }
       },
-      "required": ["index", "armed"]
+      "required": [
+        "index",
+        "armed"
+      ]
     }
   },
   {
@@ -276,7 +299,12 @@
           "description": "Blue component, 0.0 to 1.0."
         }
       },
-      "required": ["index", "r", "g", "b"]
+      "required": [
+        "index",
+        "r",
+        "g",
+        "b"
+      ]
     }
   },
   {
@@ -291,11 +319,18 @@
         },
         "mode": {
           "type": "string",
-          "enum": ["A", "B", "AB"],
+          "enum": [
+            "A",
+            "B",
+            "AB"
+          ],
           "description": "Crossfade assignment: 'A' (crossfader side A), 'B' (side B), or 'AB' (both/unassigned)."
         }
       },
-      "required": ["index", "mode"]
+      "required": [
+        "index",
+        "mode"
+      ]
     }
   },
   {
@@ -310,11 +345,18 @@
         },
         "mode": {
           "type": "string",
-          "enum": ["ON", "OFF", "AUTO"],
+          "enum": [
+            "ON",
+            "OFF",
+            "AUTO"
+          ],
           "description": "Monitor mode: 'ON' (always monitor input), 'OFF' (never monitor), 'AUTO' (monitor when armed)."
         }
       },
-      "required": ["index", "mode"]
+      "required": [
+        "index",
+        "mode"
+      ]
     }
   },
   {
@@ -328,7 +370,9 @@
           "description": "Volume level, normalized 0.0 to 1.0."
         }
       },
-      "required": ["value"]
+      "required": [
+        "value"
+      ]
     }
   },
   {
@@ -342,7 +386,9 @@
           "description": "Pan position, normalized 0.0 (left) to 1.0 (right). 0.5 is center."
         }
       },
-      "required": ["value"]
+      "required": [
+        "value"
+      ]
     }
   },
   {
@@ -356,7 +402,9 @@
           "description": "True to mute, false to unmute."
         }
       },
-      "required": ["value"]
+      "required": [
+        "value"
+      ]
     }
   },
   {
@@ -370,7 +418,9 @@
           "description": "True to solo, false to unsolo."
         }
       },
-      "required": ["value"]
+      "required": [
+        "value"
+      ]
     }
   },
   {
@@ -392,7 +442,11 @@
           "description": "Blue component, 0.0 to 1.0."
         }
       },
-      "required": ["r", "g", "b"]
+      "required": [
+        "r",
+        "g",
+        "b"
+      ]
     }
   },
   {
@@ -424,7 +478,9 @@
           "description": "true to enable the device, false to bypass it."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -439,11 +495,17 @@
         },
         "position": {
           "type": "string",
-          "enum": ["end", "before", "after"],
+          "enum": [
+            "end",
+            "before",
+            "after"
+          ],
           "description": "Where to insert: \"end\" = end of chain (default), \"before\" = before master cursor device, \"after\" = after master cursor device."
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     }
   },
   {
@@ -454,7 +516,11 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["vst2", "vst3", "clap"],
+          "enum": [
+            "vst2",
+            "vst3",
+            "clap"
+          ],
           "description": "Plugin format."
         },
         "id": {
@@ -463,11 +529,18 @@
         },
         "position": {
           "type": "string",
-          "enum": ["end", "before", "after"],
+          "enum": [
+            "end",
+            "before",
+            "after"
+          ],
           "description": "Where to insert: \"end\" = end of chain (default), \"before\" = before master cursor device, \"after\" = after master cursor device."
         }
       },
-      "required": ["type", "id"]
+      "required": [
+        "type",
+        "id"
+      ]
     }
   },
   {
@@ -490,7 +563,9 @@
           "description": "Page index (0-based)."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -526,7 +601,35 @@
           "description": "Parameter value, normalized 0.0 to 1.0."
         }
       },
-      "required": ["index", "value"]
+      "required": [
+        "index",
+        "value"
+      ]
+    }
+  },
+  {
+    "name": "masterDevice_enterSlot",
+    "description": "Navigate into a nested device chain (slot) of the current master bus device. Check masterDevice snapshot hasSlots and slotNames before calling. After entering, the masterDevice cursor points to the first device inside that slot.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The slot name to enter (from masterDevice snapshot slotNames array)."
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "masterDevice_exitToParent",
+    "description": "Navigate out of a nested device chain back to the parent device on the master bus. Check masterDevice snapshot isNested \u2014 only call when isNested is true.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
     }
   },
   {
@@ -548,7 +651,11 @@
           "description": "Send level, normalized 0.0 (off) to 1.0 (full)."
         }
       },
-      "required": ["trackIndex", "sendIndex", "value"]
+      "required": [
+        "trackIndex",
+        "sendIndex",
+        "value"
+      ]
     }
   },
   {
@@ -567,11 +674,19 @@
         },
         "mode": {
           "type": "string",
-          "enum": ["AUTO", "PRE", "POST"],
+          "enum": [
+            "AUTO",
+            "PRE",
+            "POST"
+          ],
           "description": "Send mode: 'AUTO' (follows project default), 'PRE' (pre-fader), 'POST' (post-fader)."
         }
       },
-      "required": ["trackIndex", "sendIndex", "mode"]
+      "required": [
+        "trackIndex",
+        "sendIndex",
+        "mode"
+      ]
     }
   },
   {
@@ -593,7 +708,11 @@
           "description": "True to enable the send, false to disable."
         }
       },
-      "required": ["trackIndex", "sendIndex", "enabled"]
+      "required": [
+        "trackIndex",
+        "sendIndex",
+        "enabled"
+      ]
     }
   },
   {
@@ -611,7 +730,10 @@
           "description": "Clip slot index (0-based). Valid range: 0 to 7."
         }
       },
-      "required": ["trackIndex", "slotIndex"]
+      "required": [
+        "trackIndex",
+        "slotIndex"
+      ]
     }
   },
   {
@@ -625,7 +747,9 @@
           "description": "Track index (0-based). Valid range: 0 to 63."
         }
       },
-      "required": ["trackIndex"]
+      "required": [
+        "trackIndex"
+      ]
     }
   },
   {
@@ -643,7 +767,10 @@
           "description": "Clip slot index (0-based). Valid range: 0 to 7."
         }
       },
-      "required": ["trackIndex", "slotIndex"]
+      "required": [
+        "trackIndex",
+        "slotIndex"
+      ]
     }
   },
   {
@@ -665,7 +792,11 @@
           "description": "Length of the new clip in beats (e.g., 4 for one bar at 4/4)."
         }
       },
-      "required": ["trackIndex", "slotIndex", "lengthInBeats"]
+      "required": [
+        "trackIndex",
+        "slotIndex",
+        "lengthInBeats"
+      ]
     }
   },
   {
@@ -679,7 +810,9 @@
           "description": "Scene index (0-based). Valid range: 0 to 7."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -711,7 +844,9 @@
           "description": "True to enable the device, false to bypass it."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -725,7 +860,9 @@
           "description": "Parameter page index (0-based). Check session_snapshot for pageCount."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -761,7 +898,10 @@
           "description": "Parameter value, normalized 0.0 to 1.0."
         }
       },
-      "required": ["index", "value"]
+      "required": [
+        "index",
+        "value"
+      ]
     }
   },
   {
@@ -775,7 +915,9 @@
           "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -789,7 +931,9 @@
           "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -803,7 +947,9 @@
           "description": "Parameter index on the current page (0-based). Valid range: 0 to 7."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -821,12 +967,15 @@
           "description": "True to enter touch/recording mode, false to exit."
         }
       },
-      "required": ["index", "touched"]
+      "required": [
+        "index",
+        "touched"
+      ]
     }
   },
   {
     "name": "device_writeEnvelope",
-    "description": "Write an automation envelope curve for a remote control parameter. Takes an array of {position, value} points and records them as automation data in the arranger. Internally uses simulated touch recording with playback — returns immediately but recording completes asynchronously (~100ms per point). PREREQUISITES: (1) Arranger automation write must be enabled via `transport_setArrangerAutomationWrite`. (2) Automation write mode should be set (e.g., 'touch' via `transport_setAutomationWriteMode`). Transport position and play/stop state are saved and restored after recording. Points are sorted by position, values clamped to [0,1], duplicate positions use last-wins.",
+    "description": "Write an automation envelope curve for a remote control parameter. Takes an array of {position, value} points and records them as automation data in the arranger. Internally uses simulated touch recording with playback \u2014 returns immediately but recording completes asynchronously (~100ms per point). PREREQUISITES: (1) Arranger automation write must be enabled via `transport_setArrangerAutomationWrite`. (2) Automation write mode should be set (e.g., 'touch' via `transport_setAutomationWriteMode`). Transport position and play/stop state are saved and restored after recording. Points are sorted by position, values clamped to [0,1], duplicate positions use last-wins.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -849,11 +998,17 @@
                 "description": "Parameter value, normalized 0.0 to 1.0. Values outside this range are clamped."
               }
             },
-            "required": ["position", "value"]
+            "required": [
+              "position",
+              "value"
+            ]
           }
         }
       },
-      "required": ["index", "points"]
+      "required": [
+        "index",
+        "points"
+      ]
     }
   },
   {
@@ -864,11 +1019,16 @@
       "properties": {
         "direction": {
           "type": "string",
-          "enum": ["next", "previous"],
+          "enum": [
+            "next",
+            "previous"
+          ],
           "description": "Direction to move the cursor: 'next' for the track below, 'previous' for the track above."
         }
       },
-      "required": ["direction"]
+      "required": [
+        "direction"
+      ]
     }
   },
   {
@@ -886,12 +1046,15 @@
           "description": "Clip slot index (0-based). Valid range: 0 to 7."
         }
       },
-      "required": ["trackIndex", "slotIndex"]
+      "required": [
+        "trackIndex",
+        "slotIndex"
+      ]
     }
   },
   {
     "name": "clip_select",
-    "description": "Select a clip slot for note editing. The cursor clip will follow this selection, making it the target for setNotes, getNotes, clearNote, and clearAllNotes. Must be called before editing notes in a specific clip. IMPORTANT: Cursor movement is async — after selecting, wait 1-2 seconds before calling getNotes to allow step data to load. Writing (setNotes) uses deferred scheduling and is not affected.",
+    "description": "Select a clip slot for note editing. The cursor clip will follow this selection, making it the target for setNotes, getNotes, clearNote, and clearAllNotes. Must be called before editing notes in a specific clip. IMPORTANT: Cursor movement is async \u2014 after selecting, wait 1-2 seconds before calling getNotes to allow step data to load. Writing (setNotes) uses deferred scheduling and is not affected.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -904,7 +1067,10 @@
           "description": "Clip slot index (0-based). Valid range: 0 to 7."
         }
       },
-      "required": ["trackIndex", "slotIndex"]
+      "required": [
+        "trackIndex",
+        "slotIndex"
+      ]
     }
   },
   {
@@ -936,11 +1102,16 @@
                 "description": "Note duration in beats. 0.25 = 1/16 note, 0.5 = 1/8 note, 1.0 = 1/4 note. Optional, defaults to 0.25."
               }
             },
-            "required": ["x", "y"]
+            "required": [
+              "x",
+              "y"
+            ]
           }
         }
       },
-      "required": ["notes"]
+      "required": [
+        "notes"
+      ]
     }
   },
   {
@@ -958,7 +1129,10 @@
           "description": "MIDI note number (0-127)."
         }
       },
-      "required": ["x", "y"]
+      "required": [
+        "x",
+        "y"
+      ]
     }
   },
   {
@@ -972,7 +1146,7 @@
   },
   {
     "name": "clip_getNotes",
-    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), and duration (beats). IMPORTANT: After clip/select, wait 1-2 seconds before calling this — the cursor clip loads step data asynchronously, and reading too soon returns empty or stale results.",
+    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), and duration (beats). IMPORTANT: After clip/select, wait 1-2 seconds before calling this \u2014 the cursor clip loads step data asynchronously, and reading too soon returns empty or stale results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -990,7 +1164,9 @@
           "description": "Step size in beat time. 0.25 = 1/16, 0.5 = 1/8, 1.0 = 1/4, 0.125 = 1/32."
         }
       },
-      "required": ["size"]
+      "required": [
+        "size"
+      ]
     }
   },
   {
@@ -1004,7 +1180,9 @@
           "description": "Step offset to scroll to (0-based). The viewport will show 64 steps starting from this position."
         }
       },
-      "required": ["offset"]
+      "required": [
+        "offset"
+      ]
     }
   },
   {
@@ -1019,22 +1197,32 @@
         },
         "position": {
           "type": "string",
-          "enum": ["end", "before", "after"],
+          "enum": [
+            "end",
+            "before",
+            "after"
+          ],
           "description": "Where to insert: \"end\" = end of device chain (default), \"before\" = before cursor device, \"after\" = after cursor device."
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     }
   },
   {
     "name": "device_insertPluginDevice",
-    "description": "Insert a third-party plugin (VST2, VST3, or CLAP) onto the cursor track. You must know the plugin ID — VST2 uses integer IDs, VST3 and CLAP use string IDs.",
+    "description": "Insert a third-party plugin (VST2, VST3, or CLAP) onto the cursor track. You must know the plugin ID \u2014 VST2 uses integer IDs, VST3 and CLAP use string IDs.",
     "input_schema": {
       "type": "object",
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["vst2", "vst3", "clap"],
+          "enum": [
+            "vst2",
+            "vst3",
+            "clap"
+          ],
           "description": "Plugin format type."
         },
         "id": {
@@ -1043,11 +1231,18 @@
         },
         "position": {
           "type": "string",
-          "enum": ["end", "before", "after"],
+          "enum": [
+            "end",
+            "before",
+            "after"
+          ],
           "description": "Where to insert: \"end\" = end of device chain (default), \"before\" = before cursor device, \"after\" = after cursor device."
         }
       },
-      "required": ["type", "id"]
+      "required": [
+        "type",
+        "id"
+      ]
     }
   },
   {
@@ -1061,7 +1256,32 @@
   },
   {
     "name": "device_remove",
-    "description": "Remove the currently selected device from the cursor track's device chain. Navigate to the target device first using `device_selectNext` / `device_selectPrevious`, then call this to delete it. Warning: the cursor device loses selection after removal — call `session_snapshot` to verify state. This action cannot be undone via this API (but Bitwig's undo may work).",
+    "description": "Remove the currently selected device from the cursor track's device chain. Navigate to the target device first using `device_selectNext` / `device_selectPrevious`, then call this to delete it. Warning: the cursor device loses selection after removal \u2014 call `session_snapshot` to verify state. This action cannot be undone via this API (but Bitwig's undo may work).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_enterSlot",
+    "description": "Navigate into a nested device chain (slot) of the current device. Check device snapshot hasSlots and slotNames before calling. After entering, the device cursor points to the first device inside that slot. Use device_exitToParent to return.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The slot name to enter (from device snapshot slotNames array)."
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  {
+    "name": "device_exitToParent",
+    "description": "Navigate out of a nested device chain back to the parent device. Check device snapshot isNested \u2014 only call when isNested is true. The device cursor returns to the parent container device.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -1070,7 +1290,7 @@
   },
   {
     "name": "track_createAudio",
-    "description": "Create a new audio track in the project. Audio tracks can record and play audio clips. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag — call `session_snapshot` to verify.",
+    "description": "Create a new audio track in the project. Audio tracks can record and play audio clips. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag \u2014 call `session_snapshot` to verify.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1084,7 +1304,7 @@
   },
   {
     "name": "track_createInstrument",
-    "description": "Create a new instrument track in the project. Instrument tracks host virtual instruments and can record/play MIDI. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag — call `session_snapshot` to verify.",
+    "description": "Create a new instrument track in the project. Instrument tracks host virtual instruments and can record/play MIDI. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag \u2014 call `session_snapshot` to verify.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1098,7 +1318,7 @@
   },
   {
     "name": "track_createEffect",
-    "description": "Create a new effect track (return/bus track) in the project. Effect tracks receive audio from sends and apply effects. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag — call `session_snapshot` to verify.",
+    "description": "Create a new effect track (return/bus track) in the project. Effect tracks receive audio from sends and apply effects. The new track is created at the specified position, or appended at the end if no position is given. The cursor track will follow the new track. Note: cursorTrackName in the response may lag \u2014 call `session_snapshot` to verify.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1112,7 +1332,7 @@
   },
   {
     "name": "track_select",
-    "description": "Select a track by its bank index. The cursor track will follow this selection, making subsequent cursor-based operations (rename, delete, insert device, note editing) target the selected track. Returns { ok, trackName, trackIndex } with the bank track name (accurate immediately). IMPORTANT: Cursor movement is async — cursorTrack-dependent operations in the same flush cycle may still target the previous track.",
+    "description": "Select a track by its bank index. The cursor track will follow this selection, making subsequent cursor-based operations (rename, delete, insert device, note editing) target the selected track. Returns { ok, trackName, trackIndex } with the bank track name (accurate immediately). IMPORTANT: Cursor movement is async \u2014 cursorTrack-dependent operations in the same flush cycle may still target the previous track.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1121,12 +1341,14 @@
           "description": "Track index to select (0-based). Valid range: 0 to 63."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
     "name": "track_rename",
-    "description": "Rename the currently selected (cursor) track. The cursor track must be pointing at the desired track first — use `track_select` or `cursor_selectTrack` to navigate.",
+    "description": "Rename the currently selected (cursor) track. The cursor track must be pointing at the desired track first \u2014 use `track_select` or `cursor_selectTrack` to navigate.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1135,7 +1357,9 @@
           "description": "New name for the track."
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     }
   },
   {
@@ -1167,7 +1391,9 @@
           "description": "True to enable playback follow, false to disable."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1181,7 +1407,9 @@
           "description": "True to show the clip launcher, false to hide."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1195,7 +1423,9 @@
           "description": "True to show the timeline, false to hide."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1209,7 +1439,9 @@
           "description": "True to show cue markers, false to hide."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1223,7 +1455,9 @@
           "description": "True to show effect tracks, false to hide."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1237,7 +1471,9 @@
           "description": "True to show the I/O section, false to hide."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1251,7 +1487,9 @@
           "description": "True for double-row height, false for single-row."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1273,7 +1511,11 @@
           "description": "True to enable looping, false to disable."
         }
       },
-      "required": ["start", "duration", "enabled"]
+      "required": [
+        "start",
+        "duration",
+        "enabled"
+      ]
     }
   },
   {
@@ -1300,7 +1542,10 @@
           "description": "True to enable punch-in, false to disable."
         }
       },
-      "required": ["position", "enabled"]
+      "required": [
+        "position",
+        "enabled"
+      ]
     }
   },
   {
@@ -1318,7 +1563,10 @@
           "description": "True to enable punch-out, false to disable."
         }
       },
-      "required": ["position", "enabled"]
+      "required": [
+        "position",
+        "enabled"
+      ]
     }
   },
   {
@@ -1329,11 +1577,17 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["latch", "touch", "write"],
+          "enum": [
+            "latch",
+            "touch",
+            "write"
+          ],
           "description": "Automation write mode: latch, touch, or write."
         }
       },
-      "required": ["mode"]
+      "required": [
+        "mode"
+      ]
     }
   },
   {
@@ -1347,7 +1601,9 @@
           "description": "True to enable arranger automation write, false to disable."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1361,7 +1617,9 @@
           "description": "True to enable clip launcher automation write, false to disable."
         }
       },
-      "required": ["enabled"]
+      "required": [
+        "enabled"
+      ]
     }
   },
   {
@@ -1406,7 +1664,9 @@
           "description": "If true, launch is quantized to the grid. If false, launches immediately. Defaults to false."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -1420,7 +1680,9 @@
           "description": "Cue marker index (0-15) to delete."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -1452,7 +1714,9 @@
           "description": "Scene index (0-7) within the current scene bank window."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -1470,12 +1734,15 @@
           "description": "New name for the scene (e.g., 'Verse 1', 'Chorus', 'Bridge')."
         }
       },
-      "required": ["index", "name"]
+      "required": [
+        "index",
+        "name"
+      ]
     }
   },
   {
     "name": "scene_delete",
-    "description": "Delete a scene by its bank index. Removes the scene and all its clips. WARNING: This is destructive and cannot be undone via the API — use `application_undo` if needed.",
+    "description": "Delete a scene by its bank index. Removes the scene and all its clips. WARNING: This is destructive and cannot be undone via the API \u2014 use `application_undo` if needed.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1484,7 +1751,9 @@
           "description": "Scene index (0-7) within the current scene bank window."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -1498,7 +1767,9 @@
           "description": "New name for the clip."
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     }
   },
   {
@@ -1516,7 +1787,10 @@
           "description": "Clip slot index (0-7) to duplicate."
         }
       },
-      "required": ["trackIndex", "slotIndex"]
+      "required": [
+        "trackIndex",
+        "slotIndex"
+      ]
     }
   },
   {
@@ -1542,12 +1816,17 @@
           "description": "Destination clip slot index (0-7). Existing content will be replaced."
         }
       },
-      "required": ["srcTrackIndex", "srcSlotIndex", "destTrackIndex", "destSlotIndex"]
+      "required": [
+        "srcTrackIndex",
+        "srcSlotIndex",
+        "destTrackIndex",
+        "destSlotIndex"
+      ]
     }
   },
   {
     "name": "cueMarker_rename",
-    "description": "Rename a cue marker by its bank index. Use `cueMarker_list` first to find valid marker indices. Markers created with `cueMarker_addAtPlayhead` default to 'Untitled' — use this to give them meaningful names like 'Intro', 'Verse 1', 'Chorus'.",
+    "description": "Rename a cue marker by its bank index. Use `cueMarker_list` first to find valid marker indices. Markers created with `cueMarker_addAtPlayhead` default to 'Untitled' \u2014 use this to give them meaningful names like 'Intro', 'Verse 1', 'Chorus'.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1560,7 +1839,10 @@
           "description": "New name for the cue marker."
         }
       },
-      "required": ["index", "name"]
+      "required": [
+        "index",
+        "name"
+      ]
     }
   },
   {
@@ -1578,7 +1860,10 @@
           "description": "New position in beats (must be >= 0)."
         }
       },
-      "required": ["index", "beats"]
+      "required": [
+        "index",
+        "beats"
+      ]
     }
   },
   {
@@ -1592,7 +1877,9 @@
           "description": "Cue marker index (0-15) to duplicate."
         }
       },
-      "required": ["index"]
+      "required": [
+        "index"
+      ]
     }
   },
   {
@@ -1606,7 +1893,9 @@
           "description": "Absolute global scene index to scroll to (0-based). Must be >= 0 and < itemCount."
         }
       },
-      "required": ["position"]
+      "required": [
+        "position"
+      ]
     }
   },
   {
@@ -1620,7 +1909,9 @@
           "description": "Number of positions to scroll. Positive = forward, negative = backward. Use bankSize (5) to scroll by one full page."
         }
       },
-      "required": ["amount"]
+      "required": [
+        "amount"
+      ]
     }
   },
   {
@@ -1643,7 +1934,9 @@
           "description": "Absolute global cue marker index to scroll to (0-based). Must be >= 0 and < itemCount."
         }
       },
-      "required": ["position"]
+      "required": [
+        "position"
+      ]
     }
   },
   {
@@ -1657,7 +1950,9 @@
           "description": "Number of positions to scroll. Positive = forward, negative = backward. Use bankSize (16) to scroll by one full page."
         }
       },
-      "required": ["amount"]
+      "required": [
+        "amount"
+      ]
     }
   },
   {
@@ -1680,7 +1975,9 @@
           "description": "Absolute global track index to scroll to (0-based). Must be >= 0 and < itemCount."
         }
       },
-      "required": ["position"]
+      "required": [
+        "position"
+      ]
     }
   },
   {
@@ -1694,7 +1991,9 @@
           "description": "Number of positions to scroll. Positive = forward, negative = backward. Use bankSize (8) to scroll by one full page."
         }
       },
-      "required": ["amount"]
+      "required": [
+        "amount"
+      ]
     }
   },
   {
@@ -1708,7 +2007,7 @@
   },
   {
     "name": "session_transaction",
-    "description": "Execute a sequence of RPC operations atomically with stop-on-error semantics. Each operation is executed sequentially — if any step fails, execution stops immediately and partial results are returned. Use this to batch dependent calls (e.g., create clip then select it) where later steps should not run if earlier steps fail. Optionally capture state snapshots before and/or after execution, and optionally roll back completed steps on error via app/undo.",
+    "description": "Execute a sequence of RPC operations atomically with stop-on-error semantics. Each operation is executed sequentially \u2014 if any step fails, execution stops immediately and partial results are returned. Use this to batch dependent calls (e.g., create clip then select it) where later steps should not run if earlier steps fail. Optionally capture state snapshots before and/or after execution, and optionally roll back completed steps on error via app/undo.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1727,7 +2026,9 @@
                 "description": "Parameters for the RPC method. Defaults to empty object if omitted."
               }
             },
-            "required": ["method"]
+            "required": [
+              "method"
+            ]
           }
         },
         "preSnapshot": {
@@ -1740,11 +2041,15 @@
         },
         "rollback": {
           "type": "string",
-          "enum": ["undoAll"],
+          "enum": [
+            "undoAll"
+          ],
           "description": "If set to 'undoAll' and an error occurs, call app/undo N times for N successfully completed steps (best-effort). The response includes rollback info: { rolledBack: true, undoCount: N }."
         }
       },
-      "required": ["operations"]
+      "required": [
+        "operations"
+      ]
     }
   },
   {
@@ -1755,7 +2060,11 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["audio", "instrument", "effect"],
+          "enum": [
+            "audio",
+            "instrument",
+            "effect"
+          ],
           "description": "Type of track to create."
         },
         "name": {
@@ -1771,7 +2080,9 @@
           "description": "Name of a Bitwig built-in device to insert on the new track (e.g., 'Polymer', 'Drum Machine'). Case-insensitive."
         }
       },
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     }
   },
   {
@@ -1782,33 +2093,37 @@
       "properties": {
         "trackIndex": {
           "type": "integer",
-          "description": "Bank-relative track index (0–7)."
+          "description": "Bank-relative track index (0\u20137)."
         },
         "sceneIndex": {
           "type": "integer",
-          "description": "Bank-relative scene/slot index (0–4)."
+          "description": "Bank-relative scene/slot index (0\u20134)."
         },
         "lengthBeats": {
           "type": "integer",
           "description": "Clip length in beats (e.g., 16 for 4 bars in 4/4)."
         }
       },
-      "required": ["trackIndex", "sceneIndex", "lengthBeats"]
+      "required": [
+        "trackIndex",
+        "sceneIndex",
+        "lengthBeats"
+      ]
     }
   },
   {
     "name": "macro_writeClip",
-    "description": "Create a clip, select it, set step size, and write notes in a single call. Composes clip/create + clip/select + clip/setStepSize + clip/setNotes + optional clip/rename. Returns { count } with the number of notes (optimistic — note writes are deferred to next flush cycle). To verify notes were actually written, call clip/getNotes after a 1-2 second delay.",
+    "description": "Create a clip, select it, set step size, and write notes in a single call. Composes clip/create + clip/select + clip/setStepSize + clip/setNotes + optional clip/rename. Returns { count } with the number of notes (optimistic \u2014 note writes are deferred to next flush cycle). To verify notes were actually written, call clip/getNotes after a 1-2 second delay.",
     "input_schema": {
       "type": "object",
       "properties": {
         "trackIndex": {
           "type": "integer",
-          "description": "Bank-relative track index (0–7)."
+          "description": "Bank-relative track index (0\u20137)."
         },
         "sceneIndex": {
           "type": "integer",
-          "description": "Bank-relative scene/slot index (0–4)."
+          "description": "Bank-relative scene/slot index (0\u20134)."
         },
         "lengthBeats": {
           "type": "integer",
@@ -1824,12 +2139,27 @@
           "items": {
             "type": "object",
             "properties": {
-              "x": { "type": "integer", "description": "Step index (0-based)" },
-              "y": { "type": "integer", "description": "MIDI note number (0–127)" },
-              "velocity": { "type": "number", "description": "Velocity 0.0–1.0 (default 0.75)" },
-              "duration": { "type": "number", "description": "Duration in beats (default 1.0)" }
+              "x": {
+                "type": "integer",
+                "description": "Step index (0-based)"
+              },
+              "y": {
+                "type": "integer",
+                "description": "MIDI note number (0\u2013127)"
+              },
+              "velocity": {
+                "type": "number",
+                "description": "Velocity 0.0\u20131.0 (default 0.75)"
+              },
+              "duration": {
+                "type": "number",
+                "description": "Duration in beats (default 1.0)"
+              }
             },
-            "required": ["x", "y"]
+            "required": [
+              "x",
+              "y"
+            ]
           }
         },
         "name": {
@@ -1837,12 +2167,18 @@
           "description": "Optional name for the clip."
         }
       },
-      "required": ["trackIndex", "sceneIndex", "lengthBeats", "stepSize", "notes"]
+      "required": [
+        "trackIndex",
+        "sceneIndex",
+        "lengthBeats",
+        "stepSize",
+        "notes"
+      ]
     }
   },
   {
     "name": "macro_buildSection",
-    "description": "Build a song section: create/rename a scene and write clips across multiple tracks. If sceneIndex is provided, uses that existing scene slot directly (recommended after manual scene creation or bulk deletion). If omitted, auto-creates a new scene (may fail if scene count cache is stale). Returns { sceneIndex, clipCount } (optimistic — note writes are deferred across multiple flush cycles). To verify, use clip/select + clip/getNotes on individual clips after a few seconds.",
+    "description": "Build a song section: create/rename a scene and write clips across multiple tracks. If sceneIndex is provided, uses that existing scene slot directly (recommended after manual scene creation or bulk deletion). If omitted, auto-creates a new scene (may fail if scene count cache is stale). Returns { sceneIndex, clipCount } (optimistic \u2014 note writes are deferred across multiple flush cycles). To verify, use clip/select + clip/getNotes on individual clips after a few seconds.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1852,7 +2188,7 @@
         },
         "sceneIndex": {
           "type": "integer",
-          "description": "Optional bank-relative scene slot index (0–4). If provided, skips scene creation and uses this slot directly. The scene must already exist and be visible in the current scene bank window. Recommended after manual scene creation or bulk deletion."
+          "description": "Optional bank-relative scene slot index (0\u20134). If provided, skips scene creation and uses this slot directly. The scene must already exist and be visible in the current scene bank window. Recommended after manual scene creation or bulk deletion."
         },
         "clips": {
           "type": "array",
@@ -1862,7 +2198,7 @@
             "properties": {
               "trackIndex": {
                 "type": "integer",
-                "description": "Bank-relative track index (0–7)."
+                "description": "Bank-relative track index (0\u20137)."
               },
               "lengthBeats": {
                 "type": "integer",
@@ -1878,12 +2214,23 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "x": { "type": "integer" },
-                    "y": { "type": "integer" },
-                    "velocity": { "type": "number" },
-                    "duration": { "type": "number" }
+                    "x": {
+                      "type": "integer"
+                    },
+                    "y": {
+                      "type": "integer"
+                    },
+                    "velocity": {
+                      "type": "number"
+                    },
+                    "duration": {
+                      "type": "number"
+                    }
                   },
-                  "required": ["x", "y"]
+                  "required": [
+                    "x",
+                    "y"
+                  ]
                 }
               },
               "name": {
@@ -1891,16 +2238,24 @@
                 "description": "Optional name for this clip."
               }
             },
-            "required": ["trackIndex", "lengthBeats", "stepSize", "notes"]
+            "required": [
+              "trackIndex",
+              "lengthBeats",
+              "stepSize",
+              "notes"
+            ]
           }
         }
       },
-      "required": ["sceneName", "clips"]
+      "required": [
+        "sceneName",
+        "clips"
+      ]
     }
   },
   {
     "name": "macro_setupScenes",
-    "description": "Create and rename multiple scenes in one call, with each rename deferred to a separate flush cycle to avoid Bitwig's scene bank re-indexing bug (ISS-006). Use this instead of calling scene/create + scene/rename in a loop. Returns { created, renamed } (renamed count is optimistic — renames are deferred).",
+    "description": "Create and rename multiple scenes in one call, with each rename deferred to a separate flush cycle to avoid Bitwig's scene bank re-indexing bug (ISS-006). Use this instead of calling scene/create + scene/rename in a loop. Returns { created, renamed } (renamed count is optimistic \u2014 renames are deferred).",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -1912,18 +2267,23 @@
             "properties": {
               "index": {
                 "type": "integer",
-                "description": "Bank-relative scene index (0–4) to rename. Must match the position the scene will occupy after creation."
+                "description": "Bank-relative scene index (0\u20134) to rename. Must match the position the scene will occupy after creation."
               },
               "name": {
                 "type": "string",
                 "description": "Name for the scene."
               }
             },
-            "required": ["index", "name"]
+            "required": [
+              "index",
+              "name"
+            ]
           }
         }
       },
-      "required": ["scenes"]
+      "required": [
+        "scenes"
+      ]
     }
   }
 ]

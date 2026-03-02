@@ -274,6 +274,18 @@ public class DeviceHandler {
             return result;
         });
 
+        // Nested device chain navigation
+        dispatcher.register("device/enterSlot", params -> {
+            String name = requireString(params, "name");
+            cursorDevice.selectFirstInSlot(name);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/exitToParent", params -> {
+            cursorDevice.selectParent();
+            return new JsonPrimitive("ok");
+        });
+
         // Cursor track navigation
         dispatcher.register("cursor/selectTrack", params -> {
             String direction = requireString(params, "direction");

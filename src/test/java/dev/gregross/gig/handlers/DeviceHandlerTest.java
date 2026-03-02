@@ -48,9 +48,16 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlySeventeenMethods() {
-        // 12 existing + 5 new automation methods
-        assertEquals(17, dispatcher.getRegisteredMethods().size());
+    void registersChainNavMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("device/enterSlot"));
+        assertTrue(methods.contains("device/exitToParent"));
+    }
+
+    @Test
+    void registersExactlyNineteenMethods() {
+        // 17 existing + 2 chain nav methods
+        assertEquals(19, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---
@@ -164,6 +171,15 @@ class DeviceHandlerTest {
         String response = dispatcher.handle(rpc("device/writeEnvelope", "{\"index\": 0}"));
         // With null transport, this NPEs at the precondition check (after index validation passes)
         assertContains(response, "-32603"); // internal error from NPE
+    }
+
+    // --- device/enterSlot validation ---
+
+    @Test
+    void enterSlot_missingName_returnsError() {
+        String response = dispatcher.handle(rpc("device/enterSlot", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "name");
     }
 
     // --- device/setParameterValue validation (existing) ---
