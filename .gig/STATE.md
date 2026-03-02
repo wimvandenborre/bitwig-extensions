@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.13.8` |
+| **Version** | `0.14.5` |
 | **Phase** | 14 — Master Bus FX & Device Routing |
-| **Status** | `GATHERED` |
-| **Last Batch** | — |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | Smoke tests |
 | **Last Updated** | 2026-03-01 |
 | **Last Updated** | 2026-03-01 |
 
@@ -19,6 +19,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.14.5 | 14 | Smoke tests | PLANNED | done | 2026-03-01 |
+| 0.14.4 | 14 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
+| 0.14.3 | 14 | Unit tests | PLANNED | done | 2026-03-01 |
+| 0.14.2 | 14 | MasterDeviceHandler — 10 RPC methods | PLANNED | done | 2026-03-01 |
+| 0.14.1 | 14 | Master cursor infrastructure — CursorDevice + observers + snapshot | PLANNED | done | 2026-03-01 |
 | 0.13.8 | 13 | [UNPLANNED] Fix master snapshot — add mute/solo/color | UNPLANNED | done | 2026-03-01 |
 | 0.13.7 | 13 | Smoke tests | PLANNED | done | 2026-03-01 |
 | 0.13.6 | 13 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |

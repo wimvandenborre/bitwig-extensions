@@ -15,11 +15,11 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 14.1 | `0.14.1` | Master cursor infrastructure — CursorDevice + observers + snapshot | in-session | pending |
-| 14.2 | `0.14.2` | MasterDeviceHandler — 10 RPC methods | in-session | pending |
-| 14.3 | `0.14.3` | Unit tests | in-session | pending |
-| 14.4 | `0.14.4` | Tool schemas + system prompt update | in-session | pending |
-| 14.5 | `0.14.5` | Smoke tests | in-session | pending |
+| 14.1 | `0.14.1` | Master cursor infrastructure — CursorDevice + observers + snapshot | in-session | done |
+| 14.2 | `0.14.2` | MasterDeviceHandler — 10 RPC methods | in-session | done |
+| 14.3 | `0.14.3` | Unit tests | in-session | done |
+| 14.4 | `0.14.4` | Tool schemas + system prompt update | in-session | done |
+| 14.5 | `0.14.5` | Smoke tests | in-session | done |
 
 ### Batch 14.1 — Master cursor infrastructure — CursorDevice + observers + snapshot
 
