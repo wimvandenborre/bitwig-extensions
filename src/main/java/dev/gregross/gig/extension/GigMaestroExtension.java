@@ -14,6 +14,7 @@ import dev.gregross.gig.handlers.MacroHandler;
 import dev.gregross.gig.handlers.MasterDeviceHandler;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
+import dev.gregross.gig.handlers.ProjectHandler;
 import dev.gregross.gig.handlers.SceneHandler;
 import dev.gregross.gig.handlers.SendHandler;
 import dev.gregross.gig.handlers.TrackBankManager;
@@ -113,7 +114,7 @@ public class GigMaestroExtension extends ControllerExtension {
         });
 
         // Register handlers
-        new ApplicationHandler(application).register(dispatcher);
+        new ApplicationHandler(application, host).register(dispatcher);
         new TransportHandler(transport).register(dispatcher);
         TrackBankManager trackBankManager = new TrackBankManager(trackBank, TRACK_COUNT);
         new TrackHandler(trackBank, application, cursorTrack, trackBankManager, stateCache).register(dispatcher);
@@ -137,6 +138,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);
         new MasterDeviceHandler(masterTrack, masterCursorDevice, masterRemoteControlsPage, deviceLibrary).register(dispatcher);
         new SendHandler(trackBank, SEND_COUNT).register(dispatcher);
+        new ProjectHandler(project, stateCache).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 
