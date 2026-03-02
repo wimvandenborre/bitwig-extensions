@@ -20,6 +20,9 @@ public class SendHandler {
     public void register(JsonRpcDispatcher dispatcher) {
         dispatcher.register("send/setLevel", params -> {
             Send send = getSend(params);
+            if (!params.has("value")) {
+                throw new IllegalArgumentException("missing 'value' parameter");
+            }
             double value = params.get("value").getAsDouble();
             send.value().setImmediately(value);
             return ok();
@@ -27,6 +30,9 @@ public class SendHandler {
 
         dispatcher.register("send/setMode", params -> {
             Send send = getSend(params);
+            if (!params.has("mode")) {
+                throw new IllegalArgumentException("missing 'mode' parameter");
+            }
             String mode = params.get("mode").getAsString().toUpperCase();
             if (!mode.equals("AUTO") && !mode.equals("PRE") && !mode.equals("POST")) {
                 throw new IllegalArgumentException("invalid send mode: " + mode + " (expected AUTO, PRE, or POST)");
@@ -37,6 +43,9 @@ public class SendHandler {
 
         dispatcher.register("send/setEnabled", params -> {
             Send send = getSend(params);
+            if (!params.has("enabled")) {
+                throw new IllegalArgumentException("missing 'enabled' parameter");
+            }
             boolean enabled = params.get("enabled").getAsBoolean();
             send.isEnabled().set(enabled);
             return ok();
@@ -44,6 +53,12 @@ public class SendHandler {
     }
 
     private Send getSend(JsonObject params) {
+        if (!params.has("trackIndex")) {
+            throw new IllegalArgumentException("missing 'trackIndex' parameter");
+        }
+        if (!params.has("sendIndex")) {
+            throw new IllegalArgumentException("missing 'sendIndex' parameter");
+        }
         int trackIndex = params.get("trackIndex").getAsInt();
         int sendIndex = params.get("sendIndex").getAsInt();
         if (trackIndex < 0 || trackIndex >= trackBank.getSizeOfBank()) {
