@@ -80,6 +80,9 @@ public class StateCache {
     // Master state
     private volatile double masterVolume;
     private volatile double masterPan;
+    private volatile boolean masterMute;
+    private volatile boolean masterSolo;
+    private final float[] masterColor = new float[3];
 
     // Device state (cursor device)
     private static final int PARAM_COUNT = 8;
@@ -230,6 +233,19 @@ public class StateCache {
 
         masterTrack.pan().value().markInterested();
         masterTrack.pan().value().addValueObserver((DoubleValueChangedCallback) v -> masterPan = v);
+
+        masterTrack.mute().markInterested();
+        masterTrack.mute().addValueObserver((BooleanValueChangedCallback) v -> masterMute = v);
+
+        masterTrack.solo().markInterested();
+        masterTrack.solo().addValueObserver((BooleanValueChangedCallback) v -> masterSolo = v);
+
+        masterTrack.color().markInterested();
+        masterTrack.color().addValueObserver((ColorValueChangedCallback) (r, g, b) -> {
+            masterColor[0] = r;
+            masterColor[1] = g;
+            masterColor[2] = b;
+        });
 
         // Application observers
         application.projectName().markInterested();
@@ -795,6 +811,13 @@ public class StateCache {
         JsonObject obj = new JsonObject();
         obj.addProperty("volume", masterVolume);
         obj.addProperty("pan", masterPan);
+        obj.addProperty("mute", masterMute);
+        obj.addProperty("solo", masterSolo);
+        JsonObject color = new JsonObject();
+        color.addProperty("r", masterColor[0]);
+        color.addProperty("g", masterColor[1]);
+        color.addProperty("b", masterColor[2]);
+        obj.add("color", color);
         return obj;
     }
 
