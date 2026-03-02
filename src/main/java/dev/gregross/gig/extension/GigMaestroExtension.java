@@ -14,6 +14,7 @@ import dev.gregross.gig.handlers.MacroHandler;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
 import dev.gregross.gig.handlers.SceneHandler;
+import dev.gregross.gig.handlers.SendHandler;
 import dev.gregross.gig.handlers.TrackBankManager;
 import dev.gregross.gig.handlers.TrackHandler;
 import dev.gregross.gig.handlers.TransactionHandler;
@@ -128,6 +129,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new NoteHandler(cursorClip, stateCache).register(dispatcher);
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);
+        new SendHandler(trackBank, SEND_COUNT).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 
