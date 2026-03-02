@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.12.6` |
+| **Version** | `0.12.14` |
 | **Phase** | 12 — Transaction + Macro Layer |
-| **Status** | `APPLIED` |
-| **Last Batch** | Smoke tests |
+| **Status** | `VERIFYING` |
+| **Last Batch** | Add macro/setupScenes (ISS-006 fix) [UNPLANNED] |
 | **Last Updated** | 2026-03-01 |
 
 ---
@@ -18,6 +18,14 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.12.14 | 12 | Add macro/setupScenes (ISS-006 fix) | UNPLANNED | done | 2026-03-01 |
+| 0.12.13 | 12 | Document optimistic macro returns (ISS-005) | UNPLANNED | done | 2026-03-01 |
+| 0.12.12 | 12 | Return bank track name in track/select (ISS-004) | UNPLANNED | done | 2026-03-01 |
+| 0.12.11 | 12 | Document cursor settle delay (ISS-003) | UNPLANNED | done | 2026-03-01 |
+| 0.12.10 | 12 | Add sceneIndex param to buildSection (ISS-002) | UNPLANNED | done | 2026-03-01 |
+| 0.12.9 | 12 | Increase clip grid to 256 + bounds validation (ISS-001) | UNPLANNED | done | 2026-03-01 |
+| 0.12.8 | 12 | Defer macro cursor ops across flush cycles | UNPLANNED | done | 2026-03-01 |
+| 0.12.7 | 12 | Fix macro clip selection + scene scrolling | UNPLANNED | done | 2026-03-01 |
 | 0.12.6 | 12 | Smoke tests | PLANNED | done | 2026-03-01 |
 | 0.12.5 | 12 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
 | 0.12.4 | 12 | Unit tests | PLANNED | done | 2026-03-01 |
@@ -161,8 +169,8 @@ Phase 12 decisions locked (9 entries: D-12.1, D-12.2→D-12.2a, D-12.3→D-12.3a
 - **Threading:** RPC handlers run inside `flush()` — calling `transport.play()` then `param.touch()` in the same handler doesn't work because the engine hasn't processed `play()` yet. Must use `host.scheduleTask()` to chain operations across flush cycles.
 - writeEnvelope returns immediately; actual recording happens asynchronously via scheduled tasks (~100ms per point)
 - DeviceHandler constructor: `(CursorTrack, CursorDevice, CursorRemoteControlsPage, DeviceLibrary, Transport, ControllerHost)`
-- Total RPC methods: 99 (90 + 9 Phase 11: 3 sceneBank scroll + 3 cueMarkerBank scroll + 3 trackBank scroll)
-- Total tests: 154 unit + 216 offline smoke = 370
+- Total RPC methods: 105 (99 + 6 Phase 12: session/transaction + 5 macros)
+- Total tests: 200 unit + 229 offline smoke = 429
 - Bank dimensions: TrackBank=8, SceneBank=5, CueMarkerBank=16 (8×5 APC40-style grid)
 - `trackBank.setShouldShowClipLauncherFeedback(true)` — shows clip launcher rectangle in Bitwig UI
 - `sceneBank.setIndication(true)` — indicates current scene bank window
