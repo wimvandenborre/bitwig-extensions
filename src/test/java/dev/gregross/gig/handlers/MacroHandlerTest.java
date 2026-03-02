@@ -89,12 +89,13 @@ class MacroHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersFourMacroMethods() {
+    void registersFiveMacroMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("macro/createTrack"));
         assertTrue(methods.contains("macro/createClip"));
         assertTrue(methods.contains("macro/writeClip"));
         assertTrue(methods.contains("macro/buildSection"));
+        assertTrue(methods.contains("macro/setupScenes"));
     }
 
     // --- macro/createTrack ---
@@ -302,6 +303,48 @@ class MacroHandlerTest {
         JsonObject result = parseResult(response);
         assertEquals(3, result.get("sceneIndex").getAsInt());
         assertEquals(1, result.get("clipCount").getAsInt());
+    }
+
+    // --- macro/setupScenes ---
+
+    @Test
+    void setupScenes_createsAndRenamesInSeparateFlushes() {
+        handle("macro/setupScenes", """
+            {"scenes":[
+                {"index":0,"name":"Intro"},
+                {"index":1,"name":"Verse"},
+                {"index":2,"name":"Chorus"}
+            ]}""");
+        // Phase 1: 3 scene creates in this flush cycle
+        // Phase 2+: each rename deferred to separate flush cycle
+        assertEquals(List.of(
+            "scene/create",
+            "scene/create",
+            "scene/create",
+            "scene/rename:Intro",
+            "scene/rename:Verse",
+            "scene/rename:Chorus"
+        ), callLog);
+    }
+
+    @Test
+    void setupScenes_returnsCreatedAndRenamedCounts() {
+        String response = handle("macro/setupScenes", """
+            {"scenes":[
+                {"index":0,"name":"A"},
+                {"index":1,"name":"B"}
+            ]}""");
+        JsonObject result = parseResult(response);
+        assertEquals(2, result.get("created").getAsInt());
+        assertEquals(2, result.get("renamed").getAsInt());
+    }
+
+    @Test
+    void setupScenes_emptyArray() {
+        String response = handle("macro/setupScenes", """
+            {"scenes":[]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("must not be empty"));
     }
 
     // --- Helpers ---

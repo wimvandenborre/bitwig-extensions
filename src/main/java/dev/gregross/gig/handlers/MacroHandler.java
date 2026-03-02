@@ -24,6 +24,7 @@ public class MacroHandler {
         dispatcher.register("macro/createClip", this::handleCreateClip);
         dispatcher.register("macro/writeClip", this::handleWriteClip);
         dispatcher.register("macro/buildSection", this::handleBuildSection);
+        dispatcher.register("macro/setupScenes", this::handleSetupScenes);
     }
 
     private JsonElement handleCreateTrack(JsonObject params) throws Exception {
@@ -197,6 +198,49 @@ public class MacroHandler {
         JsonObject result = new JsonObject();
         result.addProperty("sceneIndex", sceneIndexResult);
         result.addProperty("clipCount", clips.size());
+        return result;
+    }
+
+    private JsonElement handleSetupScenes(JsonObject params) throws Exception {
+        JsonArray scenes = requireArray(params, "scenes");
+
+        if (scenes.isEmpty()) {
+            throw new IllegalArgumentException("'scenes' array must not be empty");
+        }
+
+        int createCount = 0;
+        boolean shouldCreate = !params.has("createOnly") || params.get("createOnly").getAsBoolean();
+
+        // Phase 1 (this flush cycle): create all scenes if requested
+        if (shouldCreate) {
+            for (int i = 0; i < scenes.size(); i++) {
+                dispatcher.handleInternal("scene/create", new JsonObject());
+                createCount++;
+            }
+        }
+
+        // Phase 2+: rename each scene in a separate flush cycle
+        for (int i = 0; i < scenes.size(); i++) {
+            JsonObject scene = scenes.get(i).getAsJsonObject();
+            int index = requireInt(scene, "index");
+            String name = requireString(scene, "name");
+
+            long delay = FLUSH_DELAY_MS * (i + 1);
+            scheduler.schedule(() -> {
+                try {
+                    JsonObject renameParams = new JsonObject();
+                    renameParams.addProperty("index", index);
+                    renameParams.addProperty("name", name);
+                    dispatcher.handleInternal("scene/rename", renameParams);
+                } catch (Exception e) {
+                    // Deferred rename failed
+                }
+            }, delay);
+        }
+
+        JsonObject result = new JsonObject();
+        result.addProperty("created", createCount);
+        result.addProperty("renamed", scenes.size());
         return result;
     }
 

@@ -1582,5 +1582,33 @@
       },
       "required": ["sceneName", "clips"]
     }
+  },
+  {
+    "name": "macro_setupScenes",
+    "description": "Create and rename multiple scenes in one call, with each rename deferred to a separate flush cycle to avoid Bitwig's scene bank re-indexing bug (ISS-006). Use this instead of calling scene/create + scene/rename in a loop. Returns { created, renamed } (renamed count is optimistic — renames are deferred).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "scenes": {
+          "type": "array",
+          "description": "Array of scene definitions. Each scene will be created (in order) then renamed in a separate flush cycle.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "integer",
+                "description": "Bank-relative scene index (0–4) to rename. Must match the position the scene will occupy after creation."
+              },
+              "name": {
+                "type": "string",
+                "description": "Name for the scene."
+              }
+            },
+            "required": ["index", "name"]
+          }
+        }
+      },
+      "required": ["scenes"]
+    }
   }
 ]

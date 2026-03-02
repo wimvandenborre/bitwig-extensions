@@ -36,6 +36,12 @@ Moved to [Resolved Issues](#resolved-issues).
 
 ---
 
+### ~~ISS-006: Multiple scene renames in same flush cycle get shifted~~ → RESOLVED
+
+Moved to [Resolved Issues](#resolved-issues).
+
+---
+
 ## Resolved Issues
 
 ### ISS-001: Notes truncated beyond 64-step grid viewport
@@ -67,3 +73,9 @@ Moved to [Resolved Issues](#resolved-issues).
 **Severity:** Medium → **Resolved:** 2026-03-01
 **Fix:** Documented optimistic return values in tool schemas for `macro/writeClip` and `macro/buildSection`. Both descriptions now explicitly state that `count`/`clipCount` are optimistic (writes deferred to future flush cycles) and recommend `clip/getNotes` for verification after a delay. This is an inherent limitation of Bitwig's `scheduleTask()` — errors in scheduled callbacks can't propagate back to already-sent RPC responses.
 **Files:** `claude-tools.json`
+
+### ISS-006: Multiple scene renames in same flush cycle get shifted
+
+**Severity:** Medium → **Resolved:** 2026-03-01
+**Fix:** Added `macro/setupScenes` method that creates scenes in phase 1 (same flush) then defers each rename to a separate flush cycle via `scheduleTask`. This avoids Bitwig's scene bank re-indexing within a single flush. Each rename runs in its own flush cycle at `FLUSH_DELAY_MS * (i+1)` spacing.
+**Files:** `MacroHandler.java`, `MacroHandlerTest.java`, `claude-tools.json`
