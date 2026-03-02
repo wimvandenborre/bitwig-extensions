@@ -254,6 +254,70 @@
     }
   },
   {
+    "name": "track_setColor",
+    "description": "Set the color of a track in the track bank. Color is RGB floats 0.0 to 1.0.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 7."
+        },
+        "r": {
+          "type": "number",
+          "description": "Red component, 0.0 to 1.0."
+        },
+        "g": {
+          "type": "number",
+          "description": "Green component, 0.0 to 1.0."
+        },
+        "b": {
+          "type": "number",
+          "description": "Blue component, 0.0 to 1.0."
+        }
+      },
+      "required": ["index", "r", "g", "b"]
+    }
+  },
+  {
+    "name": "track_setCrossfade",
+    "description": "Set the crossfade mode of a track. Used for clip launcher A/B crossfading.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 7."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["A", "B", "AB"],
+          "description": "Crossfade assignment: 'A' (crossfader side A), 'B' (side B), or 'AB' (both/unassigned)."
+        }
+      },
+      "required": ["index", "mode"]
+    }
+  },
+  {
+    "name": "track_setMonitor",
+    "description": "Set the input monitoring mode of a track. Controls when audio input is monitored.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 7."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["ON", "OFF", "AUTO"],
+          "description": "Monitor mode: 'ON' (always monitor input), 'OFF' (never monitor), 'AUTO' (monitor when armed)."
+        }
+      },
+      "required": ["index", "mode"]
+    }
+  },
+  {
     "name": "master_setVolume",
     "description": "Set the master track volume. Volume is normalized 0.0 to 1.0 (0.0 = -inf dB, 1.0 = max).",
     "input_schema": {
@@ -279,6 +343,123 @@
         }
       },
       "required": ["value"]
+    }
+  },
+  {
+    "name": "master_setMute",
+    "description": "Mute or unmute the master track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "boolean",
+          "description": "True to mute, false to unmute."
+        }
+      },
+      "required": ["value"]
+    }
+  },
+  {
+    "name": "master_setSolo",
+    "description": "Solo or unsolo the master track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "boolean",
+          "description": "True to solo, false to unsolo."
+        }
+      },
+      "required": ["value"]
+    }
+  },
+  {
+    "name": "master_setColor",
+    "description": "Set the color of the master track. Color is RGB floats 0.0 to 1.0.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "r": {
+          "type": "number",
+          "description": "Red component, 0.0 to 1.0."
+        },
+        "g": {
+          "type": "number",
+          "description": "Green component, 0.0 to 1.0."
+        },
+        "b": {
+          "type": "number",
+          "description": "Blue component, 0.0 to 1.0."
+        }
+      },
+      "required": ["r", "g", "b"]
+    }
+  },
+  {
+    "name": "send_setLevel",
+    "description": "Set the send level (amount) for a specific send on a track. Routes audio to the corresponding effect/return track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 7."
+        },
+        "sendIndex": {
+          "type": "integer",
+          "description": "Send index (0-based). Valid range: 0 to 3."
+        },
+        "value": {
+          "type": "number",
+          "description": "Send level, normalized 0.0 (off) to 1.0 (full)."
+        }
+      },
+      "required": ["trackIndex", "sendIndex", "value"]
+    }
+  },
+  {
+    "name": "send_setMode",
+    "description": "Set the send mode (pre-fader, post-fader, or auto) for a specific send on a track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 7."
+        },
+        "sendIndex": {
+          "type": "integer",
+          "description": "Send index (0-based). Valid range: 0 to 3."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["AUTO", "PRE", "POST"],
+          "description": "Send mode: 'AUTO' (follows project default), 'PRE' (pre-fader), 'POST' (post-fader)."
+        }
+      },
+      "required": ["trackIndex", "sendIndex", "mode"]
+    }
+  },
+  {
+    "name": "send_setEnabled",
+    "description": "Enable or disable a specific send on a track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 7."
+        },
+        "sendIndex": {
+          "type": "integer",
+          "description": "Send index (0-based). Valid range: 0 to 3."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable the send, false to disable."
+        }
+      },
+      "required": ["trackIndex", "sendIndex", "enabled"]
     }
   },
   {

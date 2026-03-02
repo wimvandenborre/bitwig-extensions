@@ -13,7 +13,8 @@ Gig Maestro exposes a scrollable window into the Bitwig project:
 - **Scene Bank:** 5-scene window (indices 0–4). Scrollable — projects often have more than 5 scenes.
 - **Cue Marker Bank:** 16-marker window (indices 0–15). Scrollable if more than 16 markers exist.
 - **Device Parameters:** 8 remote control parameters per page (indices 0–7) on the currently selected device.
-- **Master Track:** A single master track with volume and pan controls.
+- **Sends:** 4 sends per track (indices 0–3). Each send routes audio to an effect/return track.
+- **Master Track:** A single master track with volume, pan, mute, solo, and color controls.
 
 If the project has fewer items than the bank window size, the extra slots will have empty names and default values.
 
@@ -360,6 +361,67 @@ Complete sequence for creating a multi-track song using macros:
 5. **Launch:** `clip_launch` or `scene_launch` to play back.
 
 This workflow takes ~5 calls for a 3-track, 2-section song. The manual equivalent would take 20+ calls.
+
+## Mixer & Routing
+
+### Send Routing
+
+Each track has 4 sends (indices 0–3) that route audio to effect/return tracks. The send routing workflow:
+
+1. **Create effect track:** `macro_createTrack({ type: "effect", name: "Reverb" })` or `track_createEffect`
+2. **Set send level:** `send_setLevel({ trackIndex: 0, sendIndex: 0, value: 0.5 })` — routes audio from track 0 to the first effect track at 50%
+3. **Set send mode:** `send_setMode({ trackIndex: 0, sendIndex: 0, mode: "POST" })` — post-fader (level follows track volume) or `PRE` (level independent of track volume) or `AUTO` (project default)
+4. **Enable/disable:** `send_setEnabled({ trackIndex: 0, sendIndex: 0, enabled: true })`
+
+**Snapshot:** Each track includes a `sends` array with `{ name, level, isPreFader, enabled, color }` per send. The `name` is the destination effect track name. The `color` is the destination track's color (for visual matching).
+
+**Send indices map to effect tracks in creation order.** Send 0 → first effect track, send 1 → second, etc. If no effect tracks exist, sends have empty names and zero levels.
+
+### Track Color
+
+Color-code tracks for visual organization:
+- `track_setColor({ index: 0, r: 0.2, g: 0.6, b: 0.8 })` — RGB floats 0.0 to 1.0
+- `master_setColor({ r: 0.8, g: 0.2, b: 0.2 })` — master track color
+
+Track colors appear in the snapshot per track as `color: { r, g, b }`.
+
+### Crossfade Mode
+
+Assign tracks to crossfader sides for live A/B transitions:
+- `track_setCrossfade({ index: 0, mode: "A" })` — side A
+- `track_setCrossfade({ index: 1, mode: "B" })` — side B
+- `track_setCrossfade({ index: 2, mode: "AB" })` — unassigned (both sides, default)
+
+Snapshot: `crossfadeMode` per track (`"A"`, `"B"`, or `"AB"`).
+
+### Monitor Mode
+
+Control input monitoring for recording workflows:
+- `track_setMonitor({ index: 0, mode: "AUTO" })` — monitor when armed (recommended default)
+- `track_setMonitor({ index: 0, mode: "ON" })` — always monitor input
+- `track_setMonitor({ index: 0, mode: "OFF" })` — never monitor
+
+Snapshot: `monitorMode` per track.
+
+### Master Track Controls
+
+The master track supports volume, pan, mute, solo, and color:
+- `master_setVolume`, `master_setPan` — level controls (0.0–1.0)
+- `master_setMute({ value: true })` — mute master output
+- `master_setSolo({ value: true })` — solo master
+- `master_setColor({ r, g, b })` — color-code master track
+
+### Mix Setup Workflow
+
+```
+1. Create tracks: macro_createTrack for each instrument
+2. Create effect tracks: macro_createTrack({ type: "effect", name: "Reverb" })
+3. Route sends: send_setLevel to connect instruments to effects
+4. Set levels: track_setVolume per track
+5. Set panning: track_setPan per track
+6. Color-code: track_setColor per track for visual organization
+7. Verify: session_snapshot to confirm mix state
+```
 
 ## Arrangement & Automation
 
