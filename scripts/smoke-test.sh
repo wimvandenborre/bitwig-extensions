@@ -479,6 +479,37 @@ assert_contains "system prompt has Master Bus FX section" "$PROMPT" "Master Bus 
 assert_contains "system prompt mentions masterDevice_insertBitwigDevice" "$PROMPT" "masterDevice_insertBitwigDevice"
 assert_contains "system prompt mentions masterDevice vs device distinction" "$PROMPT" "masterDevice_"
 
+# Phase 15 — preset cycling + chain navigation tool schemas
+PHASE15_TOOLS="device_nextPreset device_previousPreset device_nextPresetCategory device_previousPresetCategory device_nextPresetCreator device_previousPresetCreator device_enterSlot device_exitToParent masterDevice_nextPreset masterDevice_previousPreset masterDevice_enterSlot masterDevice_exitToParent"
+for tool in $PHASE15_TOOLS; do
+  TOTAL=$((TOTAL + 1))
+  if grep -qF "\"$tool\"" "$TOOLS_FILE"; then
+    echo "  PASS  tool schema exists: $tool"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL  tool schema missing: $tool"
+    FAIL=$((FAIL + 1))
+  fi
+done
+
+# Phase 15 — tool schema field checks
+ENTER_SLOT_NAME_TYPE=$(jq -r '.[] | select(.name=="device_enterSlot") | .input_schema.properties.name.type' "$TOOLS_FILE")
+assert_equals "device_enterSlot name is string" "$ENTER_SLOT_NAME_TYPE" "string"
+MASTER_ENTER_SLOT_NAME_TYPE=$(jq -r '.[] | select(.name=="masterDevice_enterSlot") | .input_schema.properties.name.type' "$TOOLS_FILE")
+assert_equals "masterDevice_enterSlot name is string" "$MASTER_ENTER_SLOT_NAME_TYPE" "string"
+ENTER_SLOT_REQUIRED=$(jq -r '.[] | select(.name=="device_enterSlot") | .input_schema.required[0]' "$TOOLS_FILE")
+assert_equals "device_enterSlot requires name" "$ENTER_SLOT_REQUIRED" "name"
+
+# Phase 15 — snapshot description mentions nesting
+SNAP_DESC=$(jq -r '.[] | select(.name=="session_snapshot") | .description' "$TOOLS_FILE")
+assert_contains "session_snapshot mentions nesting info" "$SNAP_DESC" "nesting info"
+
+# Phase 15 — system prompt
+assert_contains "system prompt has Preset Cycling section" "$PROMPT" "Preset Cycling"
+assert_contains "system prompt mentions enterSlot" "$PROMPT" "enterSlot"
+assert_contains "system prompt mentions exitToParent" "$PROMPT" "exitToParent"
+assert_contains "system prompt mentions hasSlots" "$PROMPT" "hasSlots"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
@@ -1342,8 +1373,58 @@ assert_contains "masterDevice/setParameterValue index out of range returns -3260
 ERR=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/insertBitwigDevice","params":{},"id":409}')
 assert_contains "masterDevice/insertBitwigDevice missing name returns -32602" "$ERR" '-32602'
 
-# 45. Clean up — delete the duplicated track and undo rename
-echo "--- 45. Track Cleanup ---"
+# 45. Phase 15 — Preset cycling & chain navigation
+echo "--- 45. Preset Cycling & Chain Navigation ---"
+
+# Verify new methods in api/list
+RESP=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":500}')
+assert_contains "api/list includes device/nextPreset" "$RESP" 'device/nextPreset'
+assert_contains "api/list includes device/enterSlot" "$RESP" 'device/enterSlot'
+assert_contains "api/list includes device/exitToParent" "$RESP" 'device/exitToParent'
+assert_contains "api/list includes masterDevice/nextPreset" "$RESP" 'masterDevice/nextPreset'
+assert_contains "api/list includes masterDevice/enterSlot" "$RESP" 'masterDevice/enterSlot'
+
+# Verify snapshot has nesting fields
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":501}')
+assert_contains "device snapshot has isNested field" "$SNAP" '"isNested"'
+assert_contains "device snapshot has hasSlots field" "$SNAP" '"hasSlots"'
+assert_contains "device snapshot has slotNames field" "$SNAP" '"slotNames"'
+assert_contains "device snapshot has hasLayers field" "$SNAP" '"hasLayers"'
+assert_contains "device snapshot has hasDrumPads field" "$SNAP" '"hasDrumPads"'
+
+# Insert Instrument Layer on track to test chain navigation
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{"name":"Instrument Layer"},"id":502}')
+assert_contains "insert Instrument Layer returns ok" "$RESP" '"ok"'
+sleep 0.5
+
+# Verify hasSlots is true
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":503}')
+# Instrument Layer should have slots
+assert_contains "Instrument Layer shows in snapshot" "$SNAP" 'Instrument Layer'
+
+# Enter slot and exit
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/enterSlot","params":{"name":"Chain 1"},"id":504}')
+assert_contains "device/enterSlot returns ok" "$RESP" '"ok"'
+sleep 0.3
+
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/exitToParent","id":505}')
+assert_contains "device/exitToParent returns ok" "$RESP" '"ok"'
+sleep 0.3
+
+# Remove test device
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/remove","id":506}')
+assert_contains "remove Instrument Layer returns ok" "$RESP" '"ok"'
+sleep 0.3
+
+# enterSlot missing name returns error
+ERR=$(rpc '{"jsonrpc":"2.0","method":"device/enterSlot","params":{},"id":507}')
+assert_contains "device/enterSlot missing name returns -32602" "$ERR" '-32602'
+
+ERR=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/enterSlot","params":{},"id":508}')
+assert_contains "masterDevice/enterSlot missing name returns -32602" "$ERR" '-32602'
+
+# 46. Clean up — delete the duplicated track and undo rename
+echo "--- 46. Track Cleanup ---"
 # Select track 0 and restore original name
 rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
 sleep 0.3
