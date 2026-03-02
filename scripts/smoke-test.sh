@@ -515,6 +515,38 @@ assert_contains "system prompt mentions enterSlot" "$PROMPT" "enterSlot"
 assert_contains "system prompt mentions exitToParent" "$PROMPT" "exitToParent"
 assert_contains "system prompt mentions hasSlots" "$PROMPT" "hasSlots"
 
+# Phase 16 — project & session management tool schemas
+PHASE16_TOOLS="app_activateEngine app_deactivateEngine app_showNotification app_setPanelLayout project_unsoloAll project_unmuteAll project_unarmAll project_getState transport_continuePlayback transport_restart transport_returnToArrangement transport_jumpToPreviousCueMarker transport_jumpToNextCueMarker transport_setPreRoll transport_setMetronomeVolume"
+for tool in $PHASE16_TOOLS; do
+  TOTAL=$((TOTAL + 1))
+  if grep -qF "\"$tool\"" "$TOOLS_FILE"; then
+    echo "  PASS  tool schema exists: $tool"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL  tool schema missing: $tool"
+    FAIL=$((FAIL + 1))
+  fi
+done
+
+# Phase 16 — tool schema field checks
+LAYOUT_ENUM=$(jq -r '.[] | select(.name=="app_setPanelLayout") | .input_schema.properties.layout.enum | length' "$TOOLS_FILE")
+assert_equals "app_setPanelLayout has 3 layout values" "$LAYOUT_ENUM" "3"
+PREROLL_ENUM=$(jq -r '.[] | select(.name=="transport_setPreRoll") | .input_schema.properties.value.enum | length' "$TOOLS_FILE")
+assert_equals "transport_setPreRoll has 4 value options" "$PREROLL_ENUM" "4"
+NOTIF_REQ=$(jq -r '.[] | select(.name=="app_showNotification") | .input_schema.required[0]' "$TOOLS_FILE")
+assert_equals "app_showNotification requires text" "$NOTIF_REQ" "text"
+
+# Phase 16 — snapshot description mentions project state
+SNAP_DESC=$(jq -r '.[] | select(.name=="session_snapshot") | .description' "$TOOLS_FILE")
+assert_contains "session_snapshot mentions project state" "$SNAP_DESC" "hasSoloedTracks"
+assert_contains "session_snapshot mentions metronomeVolume" "$SNAP_DESC" "metronomeVolume"
+
+# Phase 16 — system prompt
+assert_contains "system prompt has Project & Session Management section" "$PROMPT" "Project & Session Management"
+assert_contains "system prompt mentions activateEngine" "$PROMPT" "activateEngine"
+assert_contains "system prompt mentions returnToArrangement" "$PROMPT" "returnToArrangement"
+assert_contains "system prompt mentions setPreRoll" "$PROMPT" "setPreRoll"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
@@ -1427,8 +1459,83 @@ assert_contains "device/enterSlot missing name returns -32602" "$ERR" '-32602'
 ERR=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/enterSlot","params":{},"id":508}')
 assert_contains "masterDevice/enterSlot missing name returns -32602" "$ERR" '-32602'
 
-# 46. Clean up — delete the duplicated track and undo rename
-echo "--- 46. Track Cleanup ---"
+# 46. Phase 16 — Project & Session Management
+echo "--- 46. Project & Session Management ---"
+
+# Verify new methods in api/list
+RESP=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":600}')
+assert_contains "api/list includes app/activateEngine" "$RESP" 'app/activateEngine'
+assert_contains "api/list includes app/deactivateEngine" "$RESP" 'app/deactivateEngine'
+assert_contains "api/list includes app/showNotification" "$RESP" 'app/showNotification'
+assert_contains "api/list includes app/setPanelLayout" "$RESP" 'app/setPanelLayout'
+assert_contains "api/list includes project/unsoloAll" "$RESP" 'project/unsoloAll'
+assert_contains "api/list includes project/unmuteAll" "$RESP" 'project/unmuteAll'
+assert_contains "api/list includes project/unarmAll" "$RESP" 'project/unarmAll'
+assert_contains "api/list includes project/getState" "$RESP" 'project/getState'
+assert_contains "api/list includes transport/continuePlayback" "$RESP" 'transport/continuePlayback'
+assert_contains "api/list includes transport/restart" "$RESP" 'transport/restart'
+assert_contains "api/list includes transport/returnToArrangement" "$RESP" 'transport/returnToArrangement'
+assert_contains "api/list includes transport/jumpToPreviousCueMarker" "$RESP" 'transport/jumpToPreviousCueMarker'
+assert_contains "api/list includes transport/jumpToNextCueMarker" "$RESP" 'transport/jumpToNextCueMarker'
+assert_contains "api/list includes transport/setPreRoll" "$RESP" 'transport/setPreRoll'
+assert_contains "api/list includes transport/setMetronomeVolume" "$RESP" 'transport/setMetronomeVolume'
+
+# Verify snapshot has new project state fields
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":601}')
+assert_contains "application snapshot has hasSoloedTracks" "$SNAP" '"hasSoloedTracks"'
+assert_contains "application snapshot has hasMutedTracks" "$SNAP" '"hasMutedTracks"'
+assert_contains "application snapshot has hasArmedTracks" "$SNAP" '"hasArmedTracks"'
+assert_contains "application snapshot has isModified" "$SNAP" '"isModified"'
+assert_contains "application snapshot has panelLayout" "$SNAP" '"panelLayout"'
+assert_contains "transport snapshot has metronomeVolume" "$SNAP" '"metronomeVolume"'
+assert_contains "transport snapshot has preRoll" "$SNAP" '"preRoll"'
+
+# Test project/getState
+RESP=$(rpc '{"jsonrpc":"2.0","method":"project/getState","id":602}')
+assert_contains "project/getState returns hasSoloedTracks" "$RESP" '"hasSoloedTracks"'
+assert_contains "project/getState returns isModified" "$RESP" '"isModified"'
+
+# Test project bulk operations (safe to call even with no soloed/muted/armed tracks)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"project/unsoloAll","id":603}')
+assert_contains "project/unsoloAll returns ok" "$RESP" '"ok"'
+RESP=$(rpc '{"jsonrpc":"2.0","method":"project/unmuteAll","id":604}')
+assert_contains "project/unmuteAll returns ok" "$RESP" '"ok"'
+RESP=$(rpc '{"jsonrpc":"2.0","method":"project/unarmAll","id":605}')
+assert_contains "project/unarmAll returns ok" "$RESP" '"ok"'
+
+# Test app/showNotification
+RESP=$(rpc '{"jsonrpc":"2.0","method":"app/showNotification","params":{"text":"Smoke test"},"id":606}')
+assert_contains "app/showNotification returns ok" "$RESP" '"ok"'
+
+# Test app/setPanelLayout (set to ARRANGE — safe default)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"app/setPanelLayout","params":{"layout":"ARRANGE"},"id":607}')
+assert_contains "app/setPanelLayout returns ok" "$RESP" '"ok"'
+
+# Test app/setPanelLayout with invalid layout
+RESP=$(rpc '{"jsonrpc":"2.0","method":"app/setPanelLayout","params":{"layout":"INVALID"},"id":608}')
+assert_contains "app/setPanelLayout invalid layout returns error" "$RESP" '-32602'
+
+# Test transport navigation
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/returnToArrangement","id":609}')
+assert_contains "transport/returnToArrangement returns ok" "$RESP" '"ok"'
+
+# Test transport/setPreRoll
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/setPreRoll","params":{"value":"one_bar"},"id":610}')
+assert_contains "transport/setPreRoll returns ok" "$RESP" '"ok"'
+
+# Test transport/setPreRoll with invalid value
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/setPreRoll","params":{"value":"three_bars"},"id":611}')
+assert_contains "transport/setPreRoll invalid value returns error" "$RESP" '-32602'
+
+# Test transport/setMetronomeVolume
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/setMetronomeVolume","params":{"value":0.5},"id":612}')
+assert_contains "transport/setMetronomeVolume returns ok" "$RESP" '"ok"'
+
+# Restore pre-roll to none
+rpc '{"jsonrpc":"2.0","method":"transport/setPreRoll","params":{"value":"none"},"id":613}' > /dev/null
+
+# 47. Clean up — delete the duplicated track and undo rename
+echo "--- 47. Track Cleanup ---"
 # Select track 0 and restore original name
 rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
 sleep 0.3
