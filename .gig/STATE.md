@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.12.14` |
-| **Phase** | 12 — Transaction + Macro Layer |
-| **Status** | `VERIFIED` |
-| **Last Batch** | Phase 12 archived and merged to main |
+| **Version** | `0.13.0` |
+| **Phase** | 13 — Mixer & Routing Intelligence |
+| **Status** | `GATHERED` |
+| **Last Batch** | — (not started) |
 | **Last Updated** | 2026-03-01 |
 
 ---
@@ -102,7 +102,13 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-Phase 12 decisions archived to `.gig/phases/v0.12-transaction-macro-layer/DECISIONS.md`.
+D-13.1: Phase 13 scope — sends, color, crossfade, monitor, master controls
+D-13.2a: Send infrastructure — 3 RPC methods (level/mode/enable), 4 sends/track, snapshot with isPreFader + sendChannelColor
+D-13.3: Track/master color setter — RGB 0.0–1.0
+D-13.4: Master expanded — setMute, setSolo
+D-13.5: Crossfade (A/B/AB) + monitor mode (ON/OFF/AUTO) with observers
+D-13.6: SendHandler new class, TrackHandler/MasterHandler extended
+D-13.7: 9 new tool schemas (114 total), system prompt "Mixer & Routing" section
 
 ---
 
@@ -192,9 +198,18 @@ Phase 12 decisions archived to `.gig/phases/v0.12-transaction-macro-layer/DECISI
 
 ---
 
+## Open Issues
+
+<!-- Summary of deferred issues from ISSUES.md -->
+
+_None._
+
+---
+
 ## Session Recovery
 
 1. Read this file — current state
 2. Read `PLAN.md` — what's next
 3. Read `DECISIONS.md` — what's been decided
-4. Resume from next batch
+4. Read `ISSUES.md` — open/deferred issues
+5. Resume from next batch
