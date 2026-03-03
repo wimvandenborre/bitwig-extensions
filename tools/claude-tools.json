@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), and browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), and browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -2573,6 +2573,228 @@
       "type": "object",
       "properties": {},
       "required": []
+    }
+  },
+  {
+    "name": "browser_filterSelectNext",
+    "description": "Select the next filter item in the specified column. The browser must be open for this to have effect.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "enum": [
+            "category",
+            "tag",
+            "creator",
+            "device",
+            "deviceType",
+            "fileType",
+            "location",
+            "smartCollection"
+          ],
+          "description": "Filter column name."
+        }
+      },
+      "required": [
+        "column"
+      ]
+    }
+  },
+  {
+    "name": "browser_filterSelectPrevious",
+    "description": "Select the previous filter item in the specified column.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "enum": [
+            "category",
+            "tag",
+            "creator",
+            "device",
+            "deviceType",
+            "fileType",
+            "location",
+            "smartCollection"
+          ],
+          "description": "Filter column name."
+        }
+      },
+      "required": [
+        "column"
+      ]
+    }
+  },
+  {
+    "name": "browser_filterSelectFirst",
+    "description": "Jump to the first filter item in the specified column.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "enum": [
+            "category",
+            "tag",
+            "creator",
+            "device",
+            "deviceType",
+            "fileType",
+            "location",
+            "smartCollection"
+          ],
+          "description": "Filter column name."
+        }
+      },
+      "required": [
+        "column"
+      ]
+    }
+  },
+  {
+    "name": "browser_filterSelectLast",
+    "description": "Jump to the last filter item in the specified column.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "enum": [
+            "category",
+            "tag",
+            "creator",
+            "device",
+            "deviceType",
+            "fileType",
+            "location",
+            "smartCollection"
+          ],
+          "description": "Filter column name."
+        }
+      },
+      "required": [
+        "column"
+      ]
+    }
+  },
+  {
+    "name": "browser_filterSelectParent",
+    "description": "Navigate to the parent item in a hierarchical filter column (e.g., move from a subcategory to its parent category).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "enum": [
+            "category",
+            "tag",
+            "creator",
+            "device",
+            "deviceType",
+            "fileType",
+            "location",
+            "smartCollection"
+          ],
+          "description": "Filter column name."
+        }
+      },
+      "required": [
+        "column"
+      ]
+    }
+  },
+  {
+    "name": "browser_filterSelectFirstChild",
+    "description": "Navigate to the first child item in a hierarchical filter column (e.g., expand a category to see its subcategories).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "enum": [
+            "category",
+            "tag",
+            "creator",
+            "device",
+            "deviceType",
+            "fileType",
+            "location",
+            "smartCollection"
+          ],
+          "description": "Filter column name."
+        }
+      },
+      "required": [
+        "column"
+      ]
+    }
+  },
+  {
+    "name": "browser_filterReset",
+    "description": "Reset the specified filter column to the wildcard (All/Any) item, clearing any active filter selection.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "enum": [
+            "category",
+            "tag",
+            "creator",
+            "device",
+            "deviceType",
+            "fileType",
+            "location",
+            "smartCollection"
+          ],
+          "description": "Filter column to reset."
+        }
+      },
+      "required": [
+        "column"
+      ]
+    }
+  },
+  {
+    "name": "browser_getFilters",
+    "description": "Get the current state of all 8 filter columns. Returns per-column: exists (boolean), name (current filter cursor item), hitCount (results matching this filter), entryCount (total filter entries).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_getResults",
+    "description": "Get the current result bank state \u2014 8 visible result items with name and isSelected, plus total entryCount. Use browser_scrollResults to page through results.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "browser_scrollResults",
+    "description": "Scroll the result bank window. Use to page through browser results when more than 8 items exist.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "string",
+          "enum": [
+            "forward",
+            "backward",
+            "pageForward",
+            "pageBackward"
+          ],
+          "description": "Scroll direction."
+        }
+      },
+      "required": [
+        "direction"
+      ]
     }
   }
 ]

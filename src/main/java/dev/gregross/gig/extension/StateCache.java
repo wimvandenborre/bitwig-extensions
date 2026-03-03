@@ -199,6 +199,26 @@ public class StateCache {
     private volatile String browserResultName = "";
     private volatile boolean browserResultIsSelected;
 
+    // Browser filter state — 8 named columns
+    static final int FILTER_COLUMN_COUNT = 8;
+    static final String[] FILTER_COLUMN_NAMES = {
+        "category", "tag", "creator", "device",
+        "deviceType", "fileType", "location", "smartCollection"
+    };
+    private final boolean[] filterExists = new boolean[FILTER_COLUMN_COUNT];
+    private final String[] filterNames = new String[FILTER_COLUMN_COUNT];
+    private final int[] filterHitCounts = new int[FILTER_COLUMN_COUNT];
+    private final int[] filterEntryCounts = new int[FILTER_COLUMN_COUNT];
+    private CursorBrowserFilterItem[] filterCursors;
+    private BrowserFilterColumn[] filterColumns;
+
+    // Browser result bank state
+    private static final int RESULT_BANK_SIZE = 8;
+    private final String[] resultBankNames = new String[RESULT_BANK_SIZE];
+    private final boolean[] resultBankSelected = new boolean[RESULT_BANK_SIZE];
+    private volatile int resultsEntryCount;
+    private BrowserResultsItemBank resultBank;
+
     // Cue marker state
     private static final int CUE_MARKER_COUNT = 16;
     private final String[] cueMarkerNames = new String[CUE_MARKER_COUNT];
@@ -764,6 +784,24 @@ public class StateCache {
         popupBrowser.shouldAudition().markInterested();
         popupBrowser.shouldAudition().addValueObserver((BooleanValueChangedCallback) v -> browserShouldAudition = v);
 
+        // Results entry count
+        popupBrowser.resultsColumn().entryCount().markInterested();
+        popupBrowser.resultsColumn().entryCount().addValueObserver((IntegerValueChangedCallback) v -> resultsEntryCount = v);
+
+        // Create result item bank (8 items)
+        for (int i = 0; i < RESULT_BANK_SIZE; i++) {
+            resultBankNames[i] = "";
+        }
+        resultBank = (BrowserResultsItemBank) popupBrowser.resultsColumn().createItemBank(RESULT_BANK_SIZE);
+        for (int i = 0; i < RESULT_BANK_SIZE; i++) {
+            final int idx = i;
+            BrowserResultsItem item = (BrowserResultsItem) resultBank.getItemAt(i);
+            item.name().markInterested();
+            item.name().addValueObserver((StringValueChangedCallback) v -> resultBankNames[idx] = (String) v);
+            item.isSelected().markInterested();
+            item.isSelected().addValueObserver((BooleanValueChangedCallback) v -> resultBankSelected[idx] = v);
+        }
+
         // Create cursor item for result tracking
         BrowserResultsItem resultCursor = popupBrowser.resultsColumn().createCursorItem();
         resultCursor.name().markInterested();
@@ -771,6 +809,74 @@ public class StateCache {
 
         resultCursor.isSelected().markInterested();
         resultCursor.isSelected().addValueObserver((BooleanValueChangedCallback) v -> browserResultIsSelected = v);
+    }
+
+    public void registerFilterObservers(PopupBrowser popupBrowser) {
+        // Initialize arrays
+        for (int i = 0; i < FILTER_COLUMN_COUNT; i++) {
+            filterNames[i] = "";
+        }
+
+        // Map named columns to array indices matching FILTER_COLUMN_NAMES order
+        BrowserFilterColumn[] columns = {
+            popupBrowser.categoryColumn(),    // 0: category
+            popupBrowser.tagColumn(),          // 1: tag
+            popupBrowser.creatorColumn(),      // 2: creator
+            popupBrowser.deviceColumn(),       // 3: device
+            popupBrowser.deviceTypeColumn(),   // 4: deviceType
+            popupBrowser.fileTypeColumn(),     // 5: fileType
+            popupBrowser.locationColumn(),     // 6: location
+            popupBrowser.smartCollectionColumn() // 7: smartCollection
+        };
+        filterColumns = columns;
+        filterCursors = new CursorBrowserFilterItem[FILTER_COLUMN_COUNT];
+
+        for (int i = 0; i < FILTER_COLUMN_COUNT; i++) {
+            final int idx = i;
+            BrowserFilterColumn col = columns[i];
+
+            col.exists().markInterested();
+            col.exists().addValueObserver((BooleanValueChangedCallback) v -> filterExists[idx] = v);
+
+            col.entryCount().markInterested();
+            col.entryCount().addValueObserver((IntegerValueChangedCallback) v -> filterEntryCounts[idx] = v);
+
+            CursorBrowserFilterItem cursor = (CursorBrowserFilterItem) col.createCursorItem();
+            filterCursors[i] = cursor;
+
+            cursor.name().markInterested();
+            cursor.name().addValueObserver((StringValueChangedCallback) v -> filterNames[idx] = (String) v);
+
+            cursor.hitCount().markInterested();
+            cursor.hitCount().addValueObserver((IntegerValueChangedCallback) v -> filterHitCounts[idx] = v);
+        }
+    }
+
+    public CursorBrowserFilterItem[] getFilterCursors() {
+        return filterCursors;
+    }
+
+    public BrowserFilterColumn[] getFilterColumns() {
+        return filterColumns;
+    }
+
+    public BrowserResultsItemBank getResultBank() {
+        return resultBank;
+    }
+
+    public JsonObject getResultBankState() {
+        JsonObject obj = new JsonObject();
+        JsonArray items = new JsonArray();
+        for (int i = 0; i < RESULT_BANK_SIZE; i++) {
+            JsonObject item = new JsonObject();
+            item.addProperty("index", i);
+            item.addProperty("name", resultBankNames[i] != null ? resultBankNames[i] : "");
+            item.addProperty("isSelected", resultBankSelected[i]);
+            items.add(item);
+        }
+        obj.add("items", items);
+        obj.addProperty("entryCount", resultsEntryCount);
+        return obj;
     }
 
     public double getClipStepSize() {
@@ -1184,6 +1290,20 @@ public class StateCache {
         obj.addProperty("shouldAudition", browserShouldAudition);
         obj.addProperty("resultName", browserResultName);
         obj.addProperty("resultIsSelected", browserResultIsSelected);
+        obj.addProperty("resultsEntryCount", resultsEntryCount);
+
+        // Filter columns
+        JsonObject filters = new JsonObject();
+        for (int i = 0; i < FILTER_COLUMN_COUNT; i++) {
+            JsonObject col = new JsonObject();
+            col.addProperty("exists", filterExists[i]);
+            col.addProperty("name", filterNames[i] != null ? filterNames[i] : "");
+            col.addProperty("hitCount", filterHitCounts[i]);
+            col.addProperty("entryCount", filterEntryCounts[i]);
+            filters.add(FILTER_COLUMN_NAMES[i], col);
+        }
+        obj.add("filters", filters);
+
         return obj;
     }
 

@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.17.6` |
-| **Phase** | 17 — PopupBrowser API Integration |
+| **Version** | `0.18.6` |
+| **Phase** | 18 — Deep Browser Filters |
 | **Status** | `GOVERNED` |
-| **Last Batch** | Smoke tests |
+| **Last Batch** | Smoke tests (Phase 18) |
 | **Last Updated** | 2026-03-02 |
 
 ---
@@ -121,11 +121,11 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- D-16.1: Scope — state management + transport nav (defer zoom/panels)
-- D-16.2: Architecture — extend App (+4), new Project (+6), extend Transport (+7) = 17 methods
-- D-16.3: Snapshot — 7 new fields (project state + transport settings + panelLayout)
-- D-16.4: Notifications — app/showNotification via host.showPopupNotification()
-- D-16.5: Transport — continue, restart, returnToArrangement, cue marker nav, preRoll, metronomeVolume
+- D-18.1: Scope — all 8 filter columns via generic `column` parameter
+- D-18.2: Navigation — cursor-based per column (not bank-based)
+- D-18.3: Snapshot — 4 fields × 8 columns nested in browser.filters + resultsEntryCount
+- D-18.4: Methods — 8 filter methods (6 nav + filterReset + getFilters)
+- D-18.5: Results — 8-item result bank + scrollResults + getResults
 
 ---
 

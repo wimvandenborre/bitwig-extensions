@@ -663,6 +663,29 @@ browser_browsePresets → browser_selectNextFile → session_snapshot (check res
 
 To cycle through multiple presets: open once, call `selectNextFile` repeatedly (checking state between calls), then `commit` when satisfied or `cancel` to revert.
 
+### Browser Filter Navigation
+
+The browser has 8 filter columns that narrow results: `category`, `tag`, `creator`, `device`, `deviceType`, `fileType`, `location`, `smartCollection`. All filter methods accept a `column` parameter.
+
+**Flat navigation:**
+- `browser_filterSelectNext` / `browser_filterSelectPrevious` — step through filter values
+- `browser_filterSelectFirst` / `browser_filterSelectLast` — jump to ends
+
+**Hierarchical navigation** (for nested categories):
+- `browser_filterSelectFirstChild` — drill into a category's subcategories
+- `browser_filterSelectParent` — go back up one level
+
+**Reset:** `browser_filterReset` clears a filter column back to "All" (wildcard).
+
+**State:** `browser_getFilters` returns all 8 columns with `exists`, `name` (current cursor), `hitCount` (matching results), `entryCount` (total entries).
+
+**Result bank:** `browser_getResults` shows 8 result items at once. Use `browser_scrollResults` with `direction` (forward/backward/pageForward/pageBackward) to page through results.
+
+**Filtered browsing workflow:**
+```
+browser_browsePresets → browser_filterSelectNext(column: "category") → browser_getFilters (check hitCount) → browser_getResults → browser_selectNextFile → browser_commit
+```
+
 ## Example Workflow
 
 **Task:** "Set the tempo to 128 and solo track 2."

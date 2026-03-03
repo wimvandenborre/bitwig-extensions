@@ -576,6 +576,37 @@ assert_contains "system prompt mentions browsePresets" "$PROMPT" "browsePresets"
 assert_contains "system prompt mentions commit" "$PROMPT" "browser_commit"
 assert_contains "system prompt mentions audition" "$PROMPT" "setShouldAudition"
 
+# Phase 18 — deep browser filter tool schemas
+PHASE18_TOOLS="browser_filterSelectNext browser_filterSelectPrevious browser_filterSelectFirst browser_filterSelectLast browser_filterSelectParent browser_filterSelectFirstChild browser_filterReset browser_getFilters browser_getResults browser_scrollResults"
+for tool in $PHASE18_TOOLS; do
+  TOTAL=$((TOTAL + 1))
+  if grep -qF "\"$tool\"" "$TOOLS_FILE"; then
+    echo "  PASS  tool schema exists: $tool"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL  tool schema missing: $tool"
+    FAIL=$((FAIL + 1))
+  fi
+done
+
+# Phase 18 — tool schema field checks
+FILTER_COL_ENUM=$(jq -r '.[] | select(.name=="browser_filterSelectNext") | .input_schema.properties.column.enum | length' "$TOOLS_FILE")
+assert_equals "browser_filterSelectNext has 8 column values" "$FILTER_COL_ENUM" "8"
+SCROLL_DIR_ENUM=$(jq -r '.[] | select(.name=="browser_scrollResults") | .input_schema.properties.direction.enum | length' "$TOOLS_FILE")
+assert_equals "browser_scrollResults has 4 direction values" "$SCROLL_DIR_ENUM" "4"
+FILTER_REQ=$(jq -r '.[] | select(.name=="browser_filterReset") | .input_schema.required[0]' "$TOOLS_FILE")
+assert_equals "browser_filterReset requires column" "$FILTER_REQ" "column"
+
+# Phase 18 — snapshot description mentions filters
+SNAP_DESC=$(jq -r '.[] | select(.name=="session_snapshot") | .description' "$TOOLS_FILE")
+assert_contains "session_snapshot mentions filters" "$SNAP_DESC" "filters"
+
+# Phase 18 — system prompt
+assert_contains "system prompt has Filter Navigation section" "$PROMPT" "Browser Filter Navigation"
+assert_contains "system prompt mentions filterSelectNext" "$PROMPT" "filterSelectNext"
+assert_contains "system prompt mentions filterReset" "$PROMPT" "filterReset"
+assert_contains "system prompt mentions scrollResults" "$PROMPT" "scrollResults"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
@@ -1607,8 +1638,51 @@ assert_contains "browser/selectNextFile returns ok" "$RESP" '"ok"'
 RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/selectPreviousFile","id":707}')
 assert_contains "browser/selectPreviousFile returns ok" "$RESP" '"ok"'
 
-# 48. Clean up — delete the duplicated track and undo rename
-echo "--- 48. Track Cleanup ---"
+# 48. Phase 18 — Deep Browser Filters
+echo "--- 48. Deep Browser Filters ---"
+
+# Verify api/list includes filter methods
+API_LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":800}')
+FILTER_METHODS="browser/filterSelectNext browser/filterSelectPrevious browser/filterSelectFirst browser/filterSelectLast browser/filterSelectParent browser/filterSelectFirstChild browser/filterReset browser/getFilters browser/getResults browser/scrollResults"
+for method in $FILTER_METHODS; do
+  assert_contains "api/list includes $method" "$API_LIST" "$method"
+done
+
+# Verify snapshot includes filters in browser section
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":801}')
+assert_contains "snapshot has browser.filters" "$SNAP" '"filters"'
+assert_contains "snapshot has browser.resultsEntryCount" "$SNAP" '"resultsEntryCount"'
+assert_contains "snapshot has filter column category" "$SNAP" '"category"'
+assert_contains "snapshot has filter column tag" "$SNAP" '"tag"'
+
+# Test browser/getFilters
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/getFilters","id":802}')
+assert_contains "browser/getFilters returns category" "$RESP" '"category"'
+assert_contains "browser/getFilters returns entryCount" "$RESP" '"entryCount"'
+
+# Test browser/getResults
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/getResults","id":803}')
+assert_contains "browser/getResults returns items" "$RESP" '"items"'
+assert_contains "browser/getResults returns entryCount" "$RESP" '"entryCount"'
+
+# Test browser/filterSelectNext with valid column
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/filterSelectNext","params":{"column":"category"},"id":804}')
+assert_contains "browser/filterSelectNext returns ok" "$RESP" '"ok"'
+
+# Test browser/filterSelectNext with invalid column
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/filterSelectNext","params":{"column":"invalid"},"id":805}')
+assert_contains "browser/filterSelectNext invalid column returns error" "$RESP" '-32602'
+
+# Test browser/scrollResults with valid direction
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/scrollResults","params":{"direction":"forward"},"id":806}')
+assert_contains "browser/scrollResults returns ok" "$RESP" '"ok"'
+
+# Test browser/scrollResults with invalid direction
+RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/scrollResults","params":{"direction":"sideways"},"id":807}')
+assert_contains "browser/scrollResults invalid direction returns error" "$RESP" '-32602'
+
+# 49. Clean up — delete the duplicated track and undo rename
+echo "--- 49. Track Cleanup ---"
 # Select track 0 and restore original name
 rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":150}' > /dev/null
 sleep 0.3
