@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.18.6` |
 | **Phase** | 18 — Deep Browser Filters |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | Smoke tests (Phase 18) |
 | **Last Updated** | 2026-03-02 |
 
