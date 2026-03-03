@@ -70,6 +70,15 @@ public class GigMaestroExtension extends ControllerExtension {
             CursorDeviceFollowMode.FOLLOW_SELECTION);
         CursorRemoteControlsPage remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
 
+        // Create drum pad bank for reading drum pad names (128 = full MIDI range)
+        com.bitwig.extension.controller.api.DrumPadBank drumPadBank = cursorDevice.createDrumPadBank(128);
+        for (int i = 0; i < 128; i++) {
+            com.bitwig.extension.controller.api.DrumPad pad =
+                (com.bitwig.extension.controller.api.DrumPad) drumPadBank.getItemAt(i);
+            pad.name().markInterested();
+            pad.exists().markInterested();
+        }
+
         // Create master cursor device for master bus FX
         CursorDevice masterCursorDevice = masterTrack.createCursorDevice("gig-master-device", 0);
         CursorRemoteControlsPage masterRemoteControlsPage = masterCursorDevice.createCursorRemoteControlsPage(8);
@@ -138,7 +147,7 @@ public class GigMaestroExtension extends ControllerExtension {
                 throw new RuntimeException("Failed to create empty device library", e2);
             }
         }
-        new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, deviceLibrary, transport, host).register(dispatcher);
+        new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, drumPadBank, deviceLibrary, transport, host).register(dispatcher);
         new NoteHandler(cursorClip, stateCache).register(dispatcher);
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, stateCache).register(dispatcher);

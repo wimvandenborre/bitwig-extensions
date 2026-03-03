@@ -1350,6 +1350,15 @@
     }
   },
   {
+    "name": "device_getDrumPads",
+    "description": "Returns the drum pad names and their MIDI note numbers for the currently selected device. Only works when the device has drum pads (hasDrumPads: true in snapshot). Use this to discover which MIDI note corresponds to which drum sound (e.g., kick, snare, hi-hat) before writing notes with clip_setNotes. Different drum kits map sounds to different notes — always call this first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
     "name": "device_enterSlot",
     "description": "Navigate into a nested device chain (slot) of the current device. Check device snapshot hasSlots and slotNames before calling. After entering, the device cursor points to the first device inside that slot. Use device_exitToParent to return.",
     "input_schema": {

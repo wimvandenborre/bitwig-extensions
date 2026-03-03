@@ -15,7 +15,7 @@ class DeviceHandlerTest {
         // Pass null for Bitwig API objects — we only test parameter validation,
         // not actual API calls (those would NPE on null objects)
         dispatcher = new JsonRpcDispatcher();
-        new DeviceHandler(null, null, null, null, null, null).register(dispatcher);
+        new DeviceHandler(null, null, null, null, null, null, null).register(dispatcher);
     }
 
     // --- Registration ---
@@ -55,9 +55,15 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlyNineteenMethods() {
-        // 17 existing + 2 chain nav methods
-        assertEquals(19, dispatcher.getRegisteredMethods().size());
+    void registersDrumPadMethod() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("device/getDrumPads"));
+    }
+
+    @Test
+    void registersExactlyTwentyMethods() {
+        // 17 existing + 2 chain nav + 1 getDrumPads
+        assertEquals(20, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---

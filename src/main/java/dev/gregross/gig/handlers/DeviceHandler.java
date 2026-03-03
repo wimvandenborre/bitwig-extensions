@@ -4,6 +4,7 @@ import com.bitwig.extension.controller.api.ControllerHost;
 import com.bitwig.extension.controller.api.CursorDevice;
 import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
 import com.bitwig.extension.controller.api.CursorTrack;
+import com.bitwig.extension.controller.api.DrumPadBank;
 import com.bitwig.extension.controller.api.InsertionPoint;
 import com.bitwig.extension.controller.api.RemoteControl;
 import com.bitwig.extension.controller.api.Transport;
@@ -25,17 +26,20 @@ public class DeviceHandler {
     private final CursorTrack cursorTrack;
     private final CursorDevice cursorDevice;
     private final CursorRemoteControlsPage remoteControlsPage;
+    private final DrumPadBank drumPadBank;
     private final DeviceLibrary deviceLibrary;
     private final Transport transport;
     private final ControllerHost host;
 
     public DeviceHandler(CursorTrack cursorTrack, CursorDevice cursorDevice,
                          CursorRemoteControlsPage remoteControlsPage,
+                         DrumPadBank drumPadBank,
                          DeviceLibrary deviceLibrary, Transport transport,
                          ControllerHost host) {
         this.cursorTrack = cursorTrack;
         this.cursorDevice = cursorDevice;
         this.remoteControlsPage = remoteControlsPage;
+        this.drumPadBank = drumPadBank;
         this.deviceLibrary = deviceLibrary;
         this.transport = transport;
         this.host = host;
@@ -272,6 +276,28 @@ public class DeviceHandler {
             result.addProperty("ok", true);
             result.addProperty("pointsWritten", pointCount);
             return result;
+        });
+
+        // Drum pad inspection
+        dispatcher.register("device/getDrumPads", params -> {
+            if (!cursorDevice.hasDrumPads().get()) {
+                throw new IllegalStateException("Current device has no drum pads");
+            }
+            JsonArray pads = new JsonArray();
+            for (int i = 0; i < 128; i++) {
+                com.bitwig.extension.controller.api.DrumPad pad =
+                    (com.bitwig.extension.controller.api.DrumPad) drumPadBank.getItemAt(i);
+                if (pad.exists().get()) {
+                    String name = pad.name().get();
+                    if (name != null && !name.isEmpty()) {
+                        JsonObject padObj = new JsonObject();
+                        padObj.addProperty("note", i);
+                        padObj.addProperty("name", name);
+                        pads.add(padObj);
+                    }
+                }
+            }
+            return pads;
         });
 
         // Nested device chain navigation
