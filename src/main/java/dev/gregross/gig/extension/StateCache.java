@@ -66,6 +66,7 @@ public class StateCache {
     // Scene state
     private final String[] sceneNames = new String[SCENE_COUNT];
     private final int[] sceneClipCounts = new int[SCENE_COUNT];
+    private final float[][] sceneColors = new float[SCENE_COUNT][3];
     private volatile int sceneBankOffset;
     private volatile int sceneItemCount;
     private volatile boolean sceneCanScrollForwards;
@@ -150,6 +151,9 @@ public class StateCache {
     private volatile boolean clipShuffle;
     private volatile double clipAccent;
     private volatile boolean clipUseLoopStartAsQuantizationReference;
+    private volatile boolean clipLoopEnabled;
+    private volatile double clipLoopStart;
+    private final float[] clipColor = new float[3];
 
     // Application state
     private volatile String projectName = "";
@@ -462,6 +466,12 @@ public class StateCache {
             scene.name().addValueObserver((StringValueChangedCallback) v -> sceneNames[sceneIdx] = (String) v);
             scene.clipCount().markInterested();
             scene.clipCount().addValueObserver((IntegerValueChangedCallback) v -> sceneClipCounts[sceneIdx] = v);
+            scene.color().markInterested();
+            scene.color().addValueObserver((ColorValueChangedCallback) (r, g, b) -> {
+                sceneColors[sceneIdx][0] = r;
+                sceneColors[sceneIdx][1] = g;
+                sceneColors[sceneIdx][2] = b;
+            });
         }
     }
 
@@ -591,6 +601,21 @@ public class StateCache {
 
         cursorClip.useLoopStartAsQuantizationReference().markInterested();
         cursorClip.useLoopStartAsQuantizationReference().addValueObserver((BooleanValueChangedCallback) v -> clipUseLoopStartAsQuantizationReference = v);
+
+        // Loop enabled and loop start
+        cursorClip.isLoopEnabled().markInterested();
+        cursorClip.isLoopEnabled().addValueObserver((BooleanValueChangedCallback) v -> clipLoopEnabled = v);
+
+        cursorClip.getLoopStart().markInterested();
+        cursorClip.getLoopStart().addValueObserver((DoubleValueChangedCallback) v -> clipLoopStart = v);
+
+        // Clip color
+        cursorClip.color().markInterested();
+        cursorClip.color().addValueObserver((ColorValueChangedCallback) (r, g, b) -> {
+            clipColor[0] = r;
+            clipColor[1] = g;
+            clipColor[2] = b;
+        });
     }
 
     public void registerArrangerObservers(Arranger arranger) {
@@ -948,6 +973,16 @@ public class StateCache {
         return obj;
     }
 
+    public JsonObject getClipPlaybackSettings() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("playStart", clipPlayStart);
+        obj.addProperty("playStop", clipPlayStop);
+        obj.addProperty("loopStart", clipLoopStart);
+        obj.addProperty("loopLength", clipLoopLength);
+        obj.addProperty("isLoopEnabled", clipLoopEnabled);
+        return obj;
+    }
+
     public JsonObject getClipLauncherSettings() {
         JsonObject obj = new JsonObject();
         obj.addProperty("defaultLaunchQuantization", defaultLaunchQuantization);
@@ -1126,6 +1161,11 @@ public class StateCache {
             scene.addProperty("index", i);
             scene.addProperty("name", sceneNames[i] != null ? sceneNames[i] : "");
             scene.addProperty("clipCount", sceneClipCounts[i]);
+            JsonObject color = new JsonObject();
+            color.addProperty("r", sceneColors[i][0]);
+            color.addProperty("g", sceneColors[i][1]);
+            color.addProperty("b", sceneColors[i][2]);
+            scene.add("color", color);
             scenes.add(scene);
         }
         obj.add("scenes", scenes);
@@ -1250,6 +1290,13 @@ public class StateCache {
         obj.addProperty("shuffle", clipShuffle);
         obj.addProperty("accent", clipAccent);
         obj.addProperty("useLoopStartAsQuantizationReference", clipUseLoopStartAsQuantizationReference);
+        obj.addProperty("isLoopEnabled", clipLoopEnabled);
+        obj.addProperty("loopStart", clipLoopStart);
+        JsonObject color = new JsonObject();
+        color.addProperty("r", clipColor[0]);
+        color.addProperty("g", clipColor[1]);
+        color.addProperty("b", clipColor[2]);
+        obj.add("color", color);
         return obj;
     }
 
