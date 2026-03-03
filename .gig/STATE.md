@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.20.6` |
 | **Phase** | 20 — Clip Launcher Grid Enhancements |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | Smoke tests (Phase 20) |
 | **Last Updated** | 2026-03-02 |
 
