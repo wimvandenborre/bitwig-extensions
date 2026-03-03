@@ -84,6 +84,42 @@ public class SceneHandler {
         dispatcher.register("sceneBank/getScrollInfo", params -> {
             return stateCache.getSceneBankScrollInfo();
         });
+
+        // Color
+        dispatcher.register("scene/setColor", params -> {
+            int index = requireInt(params, "index");
+            validateIndex(index);
+            float r = (float) requireDouble(params, "r");
+            float g = (float) requireDouble(params, "g");
+            float b = (float) requireDouble(params, "b");
+            if (r < 0.0f || r > 1.0f) throw new IllegalArgumentException("r must be between 0.0 and 1.0");
+            if (g < 0.0f || g > 1.0f) throw new IllegalArgumentException("g must be between 0.0 and 1.0");
+            if (b < 0.0f || b > 1.0f) throw new IllegalArgumentException("b must be between 0.0 and 1.0");
+            sceneBank.getScene(index).color().set(r, g, b);
+            return ok();
+        });
+
+        // Alternative launch methods
+        dispatcher.register("scene/launchAlt", params -> {
+            int index = requireInt(params, "index");
+            validateIndex(index);
+            sceneBank.getScene(index).launchAlt();
+            return ok();
+        });
+
+        dispatcher.register("scene/launchRelease", params -> {
+            int index = requireInt(params, "index");
+            validateIndex(index);
+            sceneBank.getScene(index).launchRelease();
+            return ok();
+        });
+
+        dispatcher.register("scene/launchReleaseAlt", params -> {
+            int index = requireInt(params, "index");
+            validateIndex(index);
+            sceneBank.getScene(index).launchReleaseAlt();
+            return ok();
+        });
     }
 
     private void validateIndex(int index) {
@@ -112,5 +148,13 @@ public class SceneHandler {
             throw new IllegalArgumentException("missing '" + key + "' parameter");
         }
         return el.getAsString();
+    }
+
+    private double requireDouble(JsonObject params, String key) {
+        JsonElement el = params.get(key);
+        if (el == null) {
+            throw new IllegalArgumentException("missing '" + key + "' parameter");
+        }
+        return el.getAsDouble();
     }
 }
