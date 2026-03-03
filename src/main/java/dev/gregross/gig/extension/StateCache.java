@@ -209,7 +209,7 @@ public class StateCache {
     private final String[] filterNames = new String[FILTER_COLUMN_COUNT];
     private final int[] filterHitCounts = new int[FILTER_COLUMN_COUNT];
     private final int[] filterEntryCounts = new int[FILTER_COLUMN_COUNT];
-    private BrowserFilterItem[] filterCursors;
+    private CursorBrowserFilterItem[] filterCursors;
     private BrowserFilterColumn[] filterColumns;
 
     // Browser result bank state
@@ -829,7 +829,7 @@ public class StateCache {
             popupBrowser.smartCollectionColumn() // 7: smartCollection
         };
         filterColumns = columns;
-        filterCursors = new BrowserFilterItem[FILTER_COLUMN_COUNT];
+        filterCursors = new CursorBrowserFilterItem[FILTER_COLUMN_COUNT];
 
         for (int i = 0; i < FILTER_COLUMN_COUNT; i++) {
             final int idx = i;
@@ -841,7 +841,7 @@ public class StateCache {
             col.entryCount().markInterested();
             col.entryCount().addValueObserver((IntegerValueChangedCallback) v -> filterEntryCounts[idx] = v);
 
-            BrowserFilterItem cursor = col.createCursorItem();
+            CursorBrowserFilterItem cursor = (CursorBrowserFilterItem) col.createCursorItem();
             filterCursors[i] = cursor;
 
             cursor.name().markInterested();
@@ -852,7 +852,7 @@ public class StateCache {
         }
     }
 
-    public BrowserFilterItem[] getFilterCursors() {
+    public CursorBrowserFilterItem[] getFilterCursors() {
         return filterCursors;
     }
 
