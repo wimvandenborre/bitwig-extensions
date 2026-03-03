@@ -6,6 +6,43 @@
 
 ## Open Issues
 
+### ISS-008: browser/getState resultName lags behind file selection
+
+**Severity:** Major
+**Source:** UAT — song creation test
+**Phase:** Discovered post-Phase 20
+**Status:** OPEN
+**Description:** After calling `browser/selectNextFile` or `browser/selectFirstFile`, the `resultName` field in `browser/getState` does not update immediately. It continues reporting the previously committed preset name (or empty string) for multiple calls. This makes it impossible to reliably confirm which preset is selected before committing. During testing, navigating to "Mellow Keys" (8 steps from first) and committing actually loaded "Cosy Sofa Keys" or a different preset because the cursor position and the reported name were out of sync.
+**Evidence:** Called `selectFirstFile` + 7x `selectNextFile` to reach index 7, `getState` still reported previous preset name. Committed and got wrong preset. Repeated attempts with different step counts yielded inconsistent results.
+**Root cause (suspected):** StateCache observer for `resultName` fires asynchronously — the `selectNextFile` RPC returns before the observer callback updates the cached name. Need a flush cycle or delay between navigation and state read.
+**Batch:** —
+
+---
+
+### ISS-009: Preset browsing replaces device and clears clip content
+
+**Severity:** Minor
+**Source:** UAT — song creation test
+**Phase:** Discovered post-Phase 20
+**Status:** OPEN
+**Description:** When `browser/browsePresets` is used and a preset is committed, it replaces the device configuration entirely. For Drum Machine, this wipes the clip content (all notes lost) because the new preset reconfigures the drum pads. The user must re-write notes after loading a preset. This is expected Bitwig behavior (preset = full device state replacement), but the tool schemas don't warn about this side effect.
+**Evidence:** Created clips with notes on all 4 tracks, then loaded presets via browser/commit. After loading "Soulful - Soul Crushed Kit" on Drum Machine, snapshot showed `hasContent: false` on slot 0. Had to re-create clips and re-write all notes.
+**Batch:** —
+
+---
+
+### ISS-010: track/setVolume param name inconsistency with tool schema
+
+**Severity:** Minor
+**Source:** UAT — song creation test
+**Phase:** Discovered post-Phase 20
+**Status:** OPEN
+**Description:** The `track/setVolume` RPC handler expects `{"index": N, "value": X}` but the tool schema name `track_setVolume` may lead LLM agents to guess the param is named `"volume"` instead of `"value"`. During testing, `{"index":0,"volume":0.75}` returned a null pointer error. This is not a bug per se — the schema is correct — but the param name `"value"` is inconsistent with the method name `setVolume`. Other methods like `track/setPan` likely use the same pattern.
+**Evidence:** `{"index":0,"volume":0.75}` → `-32603 Internal error: Cannot invoke ... because the return value of "JsonObject.get(String)" is null`. Correct call: `{"index":0,"value":0.75}`.
+**Batch:** —
+
+---
+
 ### ISS-007: Deprecated preset cycling methods throw runtime error in API v25
 
 **Severity:** Blocker

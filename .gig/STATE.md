@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.20.6` |
+| **Version** | `0.20.7` |
 | **Phase** | 20 — Clip Launcher Grid Enhancements |
 | **Status** | `GOVERNED` |
-| **Last Batch** | Smoke tests (Phase 20) |
+| **Last Batch** | [UNPLANNED] Add clip/setChance for note probability |
 | **Last Updated** | 2026-03-02 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.20.7 | 20 | [UNPLANNED] Add clip/setChance for note probability | UNPLANNED | done | 2026-03-02 |
 | 0.20.6 | 20 | Smoke tests | PLANNED | done | 2026-03-02 |
 | 0.20.5 | 20 | Tool schemas + system prompt update | PLANNED | done | 2026-03-02 |
 | 0.20.4 | 20 | Unit tests | PLANNED | done | 2026-03-02 |

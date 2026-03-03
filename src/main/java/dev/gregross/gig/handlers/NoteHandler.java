@@ -86,11 +86,35 @@ public class NoteHandler {
                         note.addProperty("y", y);
                         note.addProperty("velocity", step.velocity());
                         note.addProperty("duration", step.duration());
+                        if (step.isChanceEnabled()) {
+                            note.addProperty("chance", step.chance());
+                        }
                         notes.add(note);
                     }
                 }
             }
             return notes;
+        });
+
+        dispatcher.register("clip/setChance", params -> {
+            JsonArray notes = requireArray(params, "notes");
+            int count = 0;
+            for (JsonElement el : notes) {
+                JsonObject note = el.getAsJsonObject();
+                int x = note.get("x").getAsInt();
+                int y = note.get("y").getAsInt();
+                double chance = note.get("chance").getAsDouble();
+                if (chance < 0.0 || chance > 1.0) {
+                    throw new IllegalArgumentException("chance must be between 0.0 and 1.0");
+                }
+                NoteStep step = cursorClip.getStep(0, x, y);
+                step.setChance(chance);
+                step.setIsChanceEnabled(true);
+                count++;
+            }
+            JsonObject result = new JsonObject();
+            result.addProperty("count", count);
+            return result;
         });
 
         dispatcher.register("clip/setStepSize", params -> {

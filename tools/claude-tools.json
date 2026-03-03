@@ -1135,7 +1135,7 @@
       "properties": {
         "notes": {
           "type": "array",
-          "description": "Array of notes to write. Each note has x (step position), y (MIDI note number), velocity (0.0-1.0, optional, default ~0.79), and duration (in beats, optional, default 0.25).",
+          "description": "Array of notes to write. Each note has x (step position), y (MIDI note number), velocity (0.0-1.0, optional, default ~0.79), and duration (in beats, optional, default 0.25). To set note probability, use clip_setChance after writing notes (chance requires a separate call due to Bitwig's flush cycle).",
           "items": {
             "type": "object",
             "properties": {
@@ -1205,6 +1205,38 @@
       "type": "object",
       "properties": {},
       "required": []
+    }
+  },
+  {
+    "name": "clip_setChance",
+    "description": "Set the probability (chance) for existing notes in the selected clip. Notes must already exist — call clip_setNotes first, then clip_setChance. Each entry specifies the step position (x, y) and the chance value. When chance is enabled, the note only plays with the given probability on each loop iteration.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "array",
+          "description": "Array of note positions with chance values.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer",
+                "description": "Step position of the existing note."
+              },
+              "y": {
+                "type": "integer",
+                "description": "MIDI note number of the existing note."
+              },
+              "chance": {
+                "type": "number",
+                "description": "Probability the note plays (0.0 to 1.0). 0.5 = 50% chance, 1.0 = always plays."
+              }
+            },
+            "required": ["x", "y", "chance"]
+          }
+        }
+      },
+      "required": ["notes"]
     }
   },
   {
