@@ -36,9 +36,9 @@ class ClipHandlerTest {
     }
 
     @Test
-    void registersExactlySixteenMethods() {
-        // 10 original + 6 new clip launch settings
-        assertEquals(16, dispatcher.getRegisteredMethods().size());
+    void registersExactlyThirtyMethods() {
+        // 10 original + 6 launch settings + 14 grid enhancements
+        assertEquals(30, dispatcher.getRegisteredMethods().size());
     }
 
     @Test
@@ -50,6 +50,25 @@ class ClipHandlerTest {
         assertTrue(methods.contains("clip/setAccent"));
         assertTrue(methods.contains("clip/setUseLoopStartAsQuantizationReference"));
         assertTrue(methods.contains("clip/getLaunchSettings"));
+    }
+
+    @Test
+    void registersGridEnhancementMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("clip/setColor"));
+        assertTrue(methods.contains("clip/setPlayStart"));
+        assertTrue(methods.contains("clip/setPlayStop"));
+        assertTrue(methods.contains("clip/setLoopStart"));
+        assertTrue(methods.contains("clip/setLoopLength"));
+        assertTrue(methods.contains("clip/setLoopEnabled"));
+        assertTrue(methods.contains("clip/getPlaybackSettings"));
+        assertTrue(methods.contains("clip/quantize"));
+        assertTrue(methods.contains("clip/transpose"));
+        assertTrue(methods.contains("clip/duplicateContent"));
+        assertTrue(methods.contains("clip/showInEditor"));
+        assertTrue(methods.contains("clip/launchAlt"));
+        assertTrue(methods.contains("clip/launchRelease"));
+        assertTrue(methods.contains("clip/launchReleaseAlt"));
     }
 
     // --- clip/select validation ---
@@ -161,6 +180,49 @@ class ClipHandlerTest {
             "{\"trackIndex\": 0, \"slotIndex\": 0, \"quantization\": \"1\"}"));
         assertContains(response, "-32602");
         assertContains(response, "both be provided");
+    }
+
+    // --- clip/setColor validation ---
+
+    @Test
+    void setColor_missingTrackIndex_returnsError() {
+        String response = dispatcher.handle(rpc("clip/setColor",
+            "{\"slotIndex\": 0, \"r\": 0.5, \"g\": 0.5, \"b\": 0.5}"));
+        assertContains(response, "-32602");
+        assertContains(response, "trackIndex");
+    }
+
+    @Test
+    void setColor_rOutOfRange_returnsError() {
+        String response = dispatcher.handle(rpc("clip/setColor",
+            "{\"trackIndex\": 0, \"slotIndex\": 0, \"r\": 1.5, \"g\": 0.5, \"b\": 0.5}"));
+        assertContains(response, "-32602");
+        assertContains(response, "between 0.0 and 1.0");
+    }
+
+    // --- clip/quantize validation ---
+
+    @Test
+    void quantize_missingAmount_returnsError() {
+        String response = dispatcher.handle(rpc("clip/quantize", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "amount");
+    }
+
+    @Test
+    void quantize_outOfRange_returnsError() {
+        String response = dispatcher.handle(rpc("clip/quantize", "{\"amount\": 1.5}"));
+        assertContains(response, "-32602");
+        assertContains(response, "between 0.0 and 1.0");
+    }
+
+    // --- clip/transpose validation ---
+
+    @Test
+    void transpose_missingSemitones_returnsError() {
+        String response = dispatcher.handle(rpc("clip/transpose", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "semitones");
     }
 
     // --- Helpers ---
