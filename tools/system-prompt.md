@@ -723,6 +723,42 @@ Both params must be provided together or both omitted.
 - **Transport section:** `defaultLaunchQuantization`, `clipLauncherPostRecordingAction`, `clipLauncherPostRecordingTimeOffset`, `clipLauncherOverdubEnabled`, `fillModeActive`
 - **Clip section:** `launchQuantization`, `launchMode`, `shuffle`, `accent`, `useLoopStartAsQuantizationReference`
 
+## Clip Grid Enhancements
+
+Additional tools for clip and scene visual customization, playback boundaries, note operations, and alternative launch methods.
+
+### Clip Color & Boundaries
+
+- **`clip_setColor`** — Set clip slot color (RGB 0.0–1.0). Operates on slot directly (trackIndex + slotIndex).
+- **`clip_setPlayStart`** / **`clip_setPlayStop`** — Set play start/stop boundaries in beats (cursor clip).
+- **`clip_setLoopStart`** / **`clip_setLoopLength`** — Set loop region in beats (cursor clip).
+- **`clip_setLoopEnabled`** — Enable/disable looping (cursor clip).
+- **`clip_getPlaybackSettings`** — Returns playStart, playStop, loopStart, loopLength, isLoopEnabled.
+
+### Note Operations
+
+- **`clip_quantize`** — Morph-quantize notes toward grid (0.0 = no change, 1.0 = fully on grid). Cursor clip.
+- **`clip_transpose`** — Transpose all notes by N semitones (positive = up, negative = down). Cursor clip.
+- **`clip_duplicateContent`** — Double clip length and repeat notes. Cursor clip.
+
+### Alternative Launch Methods
+
+Available for both clips and scenes. These correspond to Bitwig's configurable alt-launch actions:
+
+- **`clip_launchAlt`** / **`scene_launchAlt`** — Alternative launch action.
+- **`clip_launchRelease`** / **`scene_launchRelease`** — Simulate releasing the launch button.
+- **`clip_launchReleaseAlt`** / **`scene_launchReleaseAlt`** — Alternative release action.
+- **`clip_showInEditor`** — Open a clip in Bitwig's detail editor panel.
+
+### Scene Color
+
+- **`scene_setColor`** — Set scene color (RGB 0.0–1.0, by scene bank index).
+
+### Snapshot Fields
+
+- **Clip section:** `isLoopEnabled`, `loopStart`, `color` (object with `r`, `g`, `b`)
+- **Scene entries:** `color` (object with `r`, `g`, `b`)
+
 ## Example Workflow
 
 **Task:** "Set the tempo to 128 and solo track 2."
