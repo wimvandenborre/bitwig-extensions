@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.19.6` |
-| **Phase** | 19 — Clip Launcher Automation |
+| **Version** | `0.20.6` |
+| **Phase** | 20 — Clip Launcher Grid Enhancements |
 | **Status** | `GOVERNED` |
-| **Last Batch** | Smoke tests (Phase 19) |
+| **Last Batch** | Smoke tests (Phase 20) |
 | **Last Updated** | 2026-03-02 |
 
 ---
@@ -18,6 +18,12 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.20.6 | 20 | Smoke tests | PLANNED | done | 2026-03-02 |
+| 0.20.5 | 20 | Tool schemas + system prompt update | PLANNED | done | 2026-03-02 |
+| 0.20.4 | 20 | Unit tests | PLANNED | done | 2026-03-02 |
+| 0.20.3 | 20 | SceneHandler — scene color + alt launch methods | PLANNED | done | 2026-03-02 |
+| 0.20.2 | 20 | ClipHandler — color, boundaries, quantize, transpose, extras | PLANNED | done | 2026-03-02 |
+| 0.20.1 | 20 | Snapshot observers — scene color + cursor clip fields | PLANNED | done | 2026-03-02 |
 | 0.15.6 | 15 | [UNPLANNED] Remove broken preset methods (ISS-007) | UNPLANNED | done | 2026-03-02 |
 | 0.15.5 | 15 | Smoke tests | PLANNED | done | 2026-03-02 |
 | 0.15.4 | 15 | Tool schemas + system prompt update | PLANNED | done | 2026-03-01 |
@@ -121,7 +127,12 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-_Phase 19 archived. No active decisions._
+- D-20.1: Scope — color, boundaries, quantize, transpose, duplicateContent, alt launch, showInEditor
+- D-20.2: Clip/scene color — slot-level r,g,b float + scene/setColor
+- D-20.3: Clip boundaries — 6 methods (setPlayStart/Stop, setLoopStart/Length/Enabled, getPlaybackSettings)
+- D-20.4: Note ops — clip/quantize (amount 0–1) + clip/transpose (semitones)
+- D-20.5: Alt launch — 6 methods (3 clip + 3 scene) + duplicateContent + showInEditor
+- D-20.6: Observers — isLoopEnabled, loopStart, cursor clip color, scene colors
 
 ---
 

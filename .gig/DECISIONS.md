@@ -21,4 +21,4 @@
 **ID:** D-{batch}.{num}
 -->
 
-_No active decisions. Run `/gig:gather` to start the next phase._
+_No active decisions. Decisions are created during `/gig:gather`._

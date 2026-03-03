@@ -32,6 +32,7 @@
 | 17 | PopupBrowser API Integration | v0.17.1–v0.17.6 | complete |
 | 18 | Deep Browser Filters | v0.18.1–v0.18.6 | complete |
 | 19 | Clip Launcher Automation | v0.19.1–v0.19.6 | complete |
+| 20 | Clip Launcher Grid Enhancements | v0.20.1–v0.20.6 | complete |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

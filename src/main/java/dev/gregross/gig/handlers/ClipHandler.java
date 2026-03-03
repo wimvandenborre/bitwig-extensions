@@ -189,6 +189,109 @@ public class ClipHandler {
         });
 
         dispatcher.register("clip/getLaunchSettings", params -> stateCache.getClipLaunchSettings());
+
+        // Color (slot-level)
+        dispatcher.register("clip/setColor", params -> {
+            int trackIndex = requireInt(params, "trackIndex");
+            int slotIndex = requireInt(params, "slotIndex");
+            float r = (float) requireDouble(params, "r");
+            float g = (float) requireDouble(params, "g");
+            float b = (float) requireDouble(params, "b");
+            validateColorComponent(r, "r");
+            validateColorComponent(g, "g");
+            validateColorComponent(b, "b");
+            ClipLauncherSlot slot = (ClipLauncherSlot) getSlotBank(trackIndex).getItemAt(slotIndex);
+            slot.color().set(r, g, b);
+            return new JsonPrimitive("ok");
+        });
+
+        // Play/loop boundaries (cursor clip)
+        dispatcher.register("clip/setPlayStart", params -> {
+            double beats = requireDouble(params, "beats");
+            cursorClip.getPlayStart().set(beats);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/setPlayStop", params -> {
+            double beats = requireDouble(params, "beats");
+            cursorClip.getPlayStop().set(beats);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/setLoopStart", params -> {
+            double beats = requireDouble(params, "beats");
+            cursorClip.getLoopStart().set(beats);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/setLoopLength", params -> {
+            double beats = requireDouble(params, "beats");
+            cursorClip.getLoopLength().set(beats);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/setLoopEnabled", params -> {
+            boolean enabled = requireBoolean(params, "enabled");
+            cursorClip.isLoopEnabled().set(enabled);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/getPlaybackSettings", params -> stateCache.getClipPlaybackSettings());
+
+        // Note operations (cursor clip)
+        dispatcher.register("clip/quantize", params -> {
+            double amount = requireDouble(params, "amount");
+            if (amount < 0.0 || amount > 1.0) {
+                throw new IllegalArgumentException("quantize amount must be between 0.0 and 1.0");
+            }
+            cursorClip.quantize(amount);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/transpose", params -> {
+            int semitones = requireInt(params, "semitones");
+            cursorClip.transpose(semitones);
+            return new JsonPrimitive("ok");
+        });
+
+        // Content operations (cursor clip)
+        dispatcher.register("clip/duplicateContent", params -> {
+            cursorClip.duplicateContent();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/showInEditor", params -> {
+            int trackIndex = requireInt(params, "trackIndex");
+            int slotIndex = requireInt(params, "slotIndex");
+            ClipLauncherSlot slot = (ClipLauncherSlot) getSlotBank(trackIndex).getItemAt(slotIndex);
+            slot.showInEditor();
+            return new JsonPrimitive("ok");
+        });
+
+        // Alternative launch methods (slot-level)
+        dispatcher.register("clip/launchAlt", params -> {
+            int trackIndex = requireInt(params, "trackIndex");
+            int slotIndex = requireInt(params, "slotIndex");
+            ClipLauncherSlot slot = (ClipLauncherSlot) getSlotBank(trackIndex).getItemAt(slotIndex);
+            slot.launchAlt();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/launchRelease", params -> {
+            int trackIndex = requireInt(params, "trackIndex");
+            int slotIndex = requireInt(params, "slotIndex");
+            ClipLauncherSlot slot = (ClipLauncherSlot) getSlotBank(trackIndex).getItemAt(slotIndex);
+            slot.launchRelease();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("clip/launchReleaseAlt", params -> {
+            int trackIndex = requireInt(params, "trackIndex");
+            int slotIndex = requireInt(params, "slotIndex");
+            ClipLauncherSlot slot = (ClipLauncherSlot) getSlotBank(trackIndex).getItemAt(slotIndex);
+            slot.launchReleaseAlt();
+            return new JsonPrimitive("ok");
+        });
     }
 
     private ClipLauncherSlotBank getSlotBank(int trackIndex) {
@@ -229,6 +332,12 @@ public class ClipHandler {
             throw new IllegalArgumentException("missing '" + key + "' parameter");
         }
         return el.getAsDouble();
+    }
+
+    private void validateColorComponent(float value, String name) {
+        if (value < 0.0f || value > 1.0f) {
+            throw new IllegalArgumentException(name + " must be between 0.0 and 1.0");
+        }
     }
 
     private void validateLaunchQuantization(String value) {

@@ -3067,5 +3067,291 @@
       "properties": {},
       "required": []
     }
+  },
+  {
+    "name": "clip_setColor",
+    "description": "Set the color of a clip launcher slot. Uses RGB values normalized to 0.0–1.0.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-7)."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-4)."
+        },
+        "r": {
+          "type": "number",
+          "description": "Red component (0.0 to 1.0)."
+        },
+        "g": {
+          "type": "number",
+          "description": "Green component (0.0 to 1.0)."
+        },
+        "b": {
+          "type": "number",
+          "description": "Blue component (0.0 to 1.0)."
+        }
+      },
+      "required": ["trackIndex", "slotIndex", "r", "g", "b"]
+    }
+  },
+  {
+    "name": "clip_setPlayStart",
+    "description": "Set the play start position of the currently selected clip (cursor clip) in beats.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "beats": {
+          "type": "number",
+          "description": "Play start position in beats."
+        }
+      },
+      "required": ["beats"]
+    }
+  },
+  {
+    "name": "clip_setPlayStop",
+    "description": "Set the play stop position of the currently selected clip (cursor clip) in beats.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "beats": {
+          "type": "number",
+          "description": "Play stop position in beats."
+        }
+      },
+      "required": ["beats"]
+    }
+  },
+  {
+    "name": "clip_setLoopStart",
+    "description": "Set the loop start position of the currently selected clip (cursor clip) in beats.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "beats": {
+          "type": "number",
+          "description": "Loop start position in beats."
+        }
+      },
+      "required": ["beats"]
+    }
+  },
+  {
+    "name": "clip_setLoopLength",
+    "description": "Set the loop length of the currently selected clip (cursor clip) in beats.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "beats": {
+          "type": "number",
+          "description": "Loop length in beats."
+        }
+      },
+      "required": ["beats"]
+    }
+  },
+  {
+    "name": "clip_setLoopEnabled",
+    "description": "Enable or disable looping for the currently selected clip (cursor clip).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether looping is enabled."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "clip_getPlaybackSettings",
+    "description": "Get playback settings for the currently selected clip (cursor clip). Returns playStart, playStop, loopStart, loopLength, and isLoopEnabled.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "clip_quantize",
+    "description": "Quantize the notes in the currently selected clip (cursor clip). Applies a morph quantization — amount controls how far notes move toward the grid.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "description": "Quantize amount (0.0 = no change, 1.0 = fully on grid)."
+        }
+      },
+      "required": ["amount"]
+    }
+  },
+  {
+    "name": "clip_transpose",
+    "description": "Transpose all notes in the currently selected clip (cursor clip) by a number of semitones.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "semitones": {
+          "type": "integer",
+          "description": "Number of semitones to transpose (positive = up, negative = down)."
+        }
+      },
+      "required": ["semitones"]
+    }
+  },
+  {
+    "name": "clip_duplicateContent",
+    "description": "Duplicate the content of the currently selected clip (cursor clip). Doubles the clip length and repeats the notes.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "clip_showInEditor",
+    "description": "Show a clip launcher slot in Bitwig's detail editor panel.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-7)."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-4)."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "clip_launchAlt",
+    "description": "Launch a clip using the alternative launch action (configured in Bitwig preferences).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-7)."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-4)."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "clip_launchRelease",
+    "description": "Trigger the launch release action for a clip (simulates releasing the launch button).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-7)."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-4)."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "clip_launchReleaseAlt",
+    "description": "Trigger the alternative launch release action for a clip.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "Track index (0-7)."
+        },
+        "slotIndex": {
+          "type": "integer",
+          "description": "Clip slot index (0-4)."
+        }
+      },
+      "required": ["trackIndex", "slotIndex"]
+    }
+  },
+  {
+    "name": "scene_setColor",
+    "description": "Set the color of a scene. Uses RGB values normalized to 0.0–1.0.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Scene index (0-4) within the current scene bank window."
+        },
+        "r": {
+          "type": "number",
+          "description": "Red component (0.0 to 1.0)."
+        },
+        "g": {
+          "type": "number",
+          "description": "Green component (0.0 to 1.0)."
+        },
+        "b": {
+          "type": "number",
+          "description": "Blue component (0.0 to 1.0)."
+        }
+      },
+      "required": ["index", "r", "g", "b"]
+    }
+  },
+  {
+    "name": "scene_launchAlt",
+    "description": "Launch a scene using the alternative launch action (configured in Bitwig preferences).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Scene index (0-4) within the current scene bank window."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "scene_launchRelease",
+    "description": "Trigger the launch release action for a scene (simulates releasing the launch button).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Scene index (0-4) within the current scene bank window."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "scene_launchReleaseAlt",
+    "description": "Trigger the alternative launch release action for a scene.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Scene index (0-4) within the current scene bank window."
+        }
+      },
+      "required": ["index"]
+    }
   }
 ]

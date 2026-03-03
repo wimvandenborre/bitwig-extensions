@@ -39,8 +39,18 @@ class SceneHandlerTest {
     }
 
     @Test
-    void registersExactlyEightMethods() {
-        assertEquals(8, dispatcher.getRegisteredMethods().size());
+    void registersExactlyTwelveMethods() {
+        // 5 scene + 3 scroll + 4 grid enhancements
+        assertEquals(12, dispatcher.getRegisteredMethods().size());
+    }
+
+    @Test
+    void registersGridEnhancementMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("scene/setColor"));
+        assertTrue(methods.contains("scene/launchAlt"));
+        assertTrue(methods.contains("scene/launchRelease"));
+        assertTrue(methods.contains("scene/launchReleaseAlt"));
     }
 
     // --- scene/duplicate validation ---
@@ -110,6 +120,38 @@ class SceneHandlerTest {
     @Test
     void sceneDelete_indexTooHigh_returnsError() {
         String response = dispatcher.handle(rpc("scene/delete", "{\"index\": 8}"));
+        assertContains(response, "-32602");
+    }
+
+    // --- scene/setColor validation ---
+
+    @Test
+    void sceneSetColor_missingIndex_returnsError() {
+        String response = dispatcher.handle(rpc("scene/setColor",
+            "{\"r\": 0.5, \"g\": 0.5, \"b\": 0.5}"));
+        assertContains(response, "-32602");
+        assertContains(response, "index");
+    }
+
+    @Test
+    void sceneSetColor_rOutOfRange_returnsError() {
+        String response = dispatcher.handle(rpc("scene/setColor",
+            "{\"index\": 0, \"r\": 1.5, \"g\": 0.5, \"b\": 0.5}"));
+        assertContains(response, "-32602");
+        assertContains(response, "between 0.0 and 1.0");
+    }
+
+    // --- scene/launchAlt validation ---
+
+    @Test
+    void sceneLaunchAlt_negativeIndex_returnsError() {
+        String response = dispatcher.handle(rpc("scene/launchAlt", "{\"index\": -1}"));
+        assertContains(response, "-32602");
+    }
+
+    @Test
+    void sceneLaunchAlt_indexTooHigh_returnsError() {
+        String response = dispatcher.handle(rpc("scene/launchAlt", "{\"index\": 8}"));
         assertContains(response, "-32602");
     }
 
