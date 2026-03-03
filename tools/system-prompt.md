@@ -686,6 +686,43 @@ The browser has 8 filter columns that narrow results: `category`, `tag`, `creato
 browser_browsePresets → browser_filterSelectNext(column: "category") → browser_getFilters (check hitCount) → browser_getResults → browser_selectNextFile → browser_commit
 ```
 
+## Clip Launcher Automation
+
+Control how clips launch, quantize, and behave after recording. Settings exist at three levels:
+
+### Global Defaults (Transport)
+
+These affect all clips that use "default" settings:
+- **`transport_setDefaultLaunchQuantization`** — Global quantization grid. Values: `none`, `8`, `4`, `2`, `1`, `1/2`, `1/4`, `1/8`, `1/16`.
+- **`transport_setPostRecordingAction`** — What happens after clip recording ends. Values: `off`, `play_recorded`, `record_next_free_slot`, `stop`, `return_to_arrangement`, `return_to_previous_clip`, `play_random`.
+- **`transport_setPostRecordingTimeOffset`** — Delay in beats before post-recording action triggers.
+- **`transport_setClipLauncherOverdub`** — When enabled, recording into existing clips adds notes instead of replacing.
+- **`transport_setFillMode`** — When active, fill clips play instead of regular clips.
+- **`transport_getClipLauncherSettings`** — Returns all 5 settings.
+
+### Per-Clip Settings (Cursor Clip)
+
+Override defaults for individual clips. Select a clip first with `clip_select`:
+- **`clip_setLaunchQuantization`** — Per-clip quantization. Values: `default` (use global), `none`, `8`, `4`, `2`, `1`, `1/2`, `1/4`, `1/8`, `1/16`.
+- **`clip_setLaunchMode`** — How the clip starts. Values: `default`, `from_start`, `continue_or_from_start`, `continue_or_synced`, `synced`.
+- **`clip_setShuffle`** — Enable/disable shuffle (swing) for this clip.
+- **`clip_setAccent`** — Velocity emphasis (0.0 to 1.0).
+- **`clip_setUseLoopStartAsQuantizationReference`** — "Q to loop" — quantize relative to loop start instead of song position.
+- **`clip_getLaunchSettings`** — Returns all 5 per-clip settings.
+
+### Per-Launch Overrides
+
+Override quantization and mode for a single launch without changing clip settings:
+- **`clip_launch`** with optional `quantization` + `launchMode` params — launch a clip with temporary overrides.
+- **`scene_launch`** with optional `quantization` + `launchMode` params — launch a scene with temporary overrides.
+
+Both params must be provided together or both omitted.
+
+### Snapshot Fields
+
+- **Transport section:** `defaultLaunchQuantization`, `clipLauncherPostRecordingAction`, `clipLauncherPostRecordingTimeOffset`, `clipLauncherOverdubEnabled`, `fillModeActive`
+- **Clip section:** `launchQuantization`, `launchMode`, `shuffle`, `accent`, `useLoopStartAsQuantizationReference`
+
 ## Example Workflow
 
 **Task:** "Set the tempo to 128 and solo track 2."
