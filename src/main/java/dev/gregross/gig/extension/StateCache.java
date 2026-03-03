@@ -145,6 +145,11 @@ public class StateCache {
     private volatile boolean clipHasNotes;
     private volatile String clipTrackName = "";
     private volatile double clipStepSize = 0.25; // default 1/16
+    private volatile String clipLaunchQuantization = "";
+    private volatile String clipLaunchMode = "";
+    private volatile boolean clipShuffle;
+    private volatile double clipAccent;
+    private volatile boolean clipUseLoopStartAsQuantizationReference;
 
     // Application state
     private volatile String projectName = "";
@@ -162,6 +167,13 @@ public class StateCache {
     // Transport — metronome & pre-roll
     private volatile double metronomeVolume;
     private volatile String preRoll = "";
+
+    // Transport — clip launcher settings
+    private volatile String defaultLaunchQuantization = "";
+    private volatile String clipLauncherPostRecordingAction = "";
+    private volatile double clipLauncherPostRecordingTimeOffset;
+    private volatile boolean clipLauncherOverdubEnabled;
+    private volatile boolean fillModeActive;
 
     // Arranger visibility state
     private volatile boolean arrangerPlaybackFollow;
@@ -269,6 +281,22 @@ public class StateCache {
 
         transport.isMetronomeEnabled().markInterested();
         transport.isMetronomeEnabled().addValueObserver((BooleanValueChangedCallback) v -> isMetronomeEnabled = v);
+
+        // Clip launcher settings
+        transport.defaultLaunchQuantization().markInterested();
+        transport.defaultLaunchQuantization().addValueObserver((EnumValueChangedCallback) v -> defaultLaunchQuantization = (String) v);
+
+        transport.clipLauncherPostRecordingAction().markInterested();
+        transport.clipLauncherPostRecordingAction().addValueObserver((EnumValueChangedCallback) v -> clipLauncherPostRecordingAction = (String) v);
+
+        transport.getClipLauncherPostRecordingTimeOffset().markInterested();
+        transport.getClipLauncherPostRecordingTimeOffset().addValueObserver((DoubleValueChangedCallback) v -> clipLauncherPostRecordingTimeOffset = v);
+
+        transport.isClipLauncherOverdubEnabled().markInterested();
+        transport.isClipLauncherOverdubEnabled().addValueObserver((BooleanValueChangedCallback) v -> clipLauncherOverdubEnabled = v);
+
+        transport.isFillModeActive().markInterested();
+        transport.isFillModeActive().addValueObserver((BooleanValueChangedCallback) v -> fillModeActive = v);
 
         // Track observers
         for (int i = 0; i < TRACK_COUNT; i++) {
@@ -547,6 +575,22 @@ public class StateCache {
                 clipHasNotes = true;
             }
         });
+
+        // Clip launch settings
+        cursorClip.launchQuantization().markInterested();
+        cursorClip.launchQuantization().addValueObserver((EnumValueChangedCallback) v -> clipLaunchQuantization = (String) v);
+
+        cursorClip.launchMode().markInterested();
+        cursorClip.launchMode().addValueObserver((EnumValueChangedCallback) v -> clipLaunchMode = (String) v);
+
+        cursorClip.getShuffle().markInterested();
+        cursorClip.getShuffle().addValueObserver((BooleanValueChangedCallback) v -> clipShuffle = v);
+
+        cursorClip.getAccent().markInterested();
+        cursorClip.getAccent().addRawValueObserver((DoubleValueChangedCallback) v -> clipAccent = v);
+
+        cursorClip.useLoopStartAsQuantizationReference().markInterested();
+        cursorClip.useLoopStartAsQuantizationReference().addValueObserver((BooleanValueChangedCallback) v -> clipUseLoopStartAsQuantizationReference = v);
     }
 
     public void registerArrangerObservers(Arranger arranger) {
@@ -894,6 +938,26 @@ public class StateCache {
         this.clipStepSize = stepSize;
     }
 
+    public JsonObject getClipLaunchSettings() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("launchQuantization", clipLaunchQuantization);
+        obj.addProperty("launchMode", clipLaunchMode);
+        obj.addProperty("shuffle", clipShuffle);
+        obj.addProperty("accent", clipAccent);
+        obj.addProperty("useLoopStartAsQuantizationReference", clipUseLoopStartAsQuantizationReference);
+        return obj;
+    }
+
+    public JsonObject getClipLauncherSettings() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("defaultLaunchQuantization", defaultLaunchQuantization);
+        obj.addProperty("clipLauncherPostRecordingAction", clipLauncherPostRecordingAction);
+        obj.addProperty("clipLauncherPostRecordingTimeOffset", clipLauncherPostRecordingTimeOffset);
+        obj.addProperty("clipLauncherOverdubEnabled", clipLauncherOverdubEnabled);
+        obj.addProperty("fillModeActive", fillModeActive);
+        return obj;
+    }
+
     public JsonObject getSnapshot() {
         JsonObject snapshot = new JsonObject();
         snapshot.add("transport", getTransportState());
@@ -968,6 +1032,11 @@ public class StateCache {
         obj.addProperty("isMetronomeEnabled", isMetronomeEnabled);
         obj.addProperty("metronomeVolume", metronomeVolume);
         obj.addProperty("preRoll", preRoll);
+        obj.addProperty("defaultLaunchQuantization", defaultLaunchQuantization);
+        obj.addProperty("clipLauncherPostRecordingAction", clipLauncherPostRecordingAction);
+        obj.addProperty("clipLauncherPostRecordingTimeOffset", clipLauncherPostRecordingTimeOffset);
+        obj.addProperty("clipLauncherOverdubEnabled", clipLauncherOverdubEnabled);
+        obj.addProperty("fillModeActive", fillModeActive);
         return obj;
     }
 
@@ -1176,6 +1245,11 @@ public class StateCache {
         obj.addProperty("playStop", clipPlayStop);
         obj.addProperty("stepSize", clipStepSize);
         obj.addProperty("hasContent", clipHasNotes);
+        obj.addProperty("launchQuantization", clipLaunchQuantization);
+        obj.addProperty("launchMode", clipLaunchMode);
+        obj.addProperty("shuffle", clipShuffle);
+        obj.addProperty("accent", clipAccent);
+        obj.addProperty("useLoopStartAsQuantizationReference", clipUseLoopStartAsQuantizationReference);
         return obj;
     }
 

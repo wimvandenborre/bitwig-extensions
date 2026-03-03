@@ -3,6 +3,7 @@ package dev.gregross.gig.handlers;
 import com.bitwig.extension.controller.api.Transport;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 
 import java.util.Set;
@@ -10,9 +11,11 @@ import java.util.Set;
 public class TransportHandler {
 
     private final Transport transport;
+    private final StateCache stateCache;
 
-    public TransportHandler(Transport transport) {
+    public TransportHandler(Transport transport, StateCache stateCache) {
         this.transport = transport;
+        this.stateCache = stateCache;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -227,10 +230,72 @@ public class TransportHandler {
             transport.metronomeVolume().setImmediately(value);
             return ok();
         });
+
+        // --- Clip Launcher Settings ---
+
+        dispatcher.register("transport/setDefaultLaunchQuantization", params -> {
+            if (!params.has("quantization")) {
+                throw new IllegalArgumentException("missing 'quantization' parameter");
+            }
+            String quantization = params.get("quantization").getAsString();
+            if (!DEFAULT_LAUNCH_QUANTIZATIONS.contains(quantization)) {
+                throw new IllegalArgumentException("invalid quantization '" + quantization
+                    + "' — valid values: " + DEFAULT_LAUNCH_QUANTIZATIONS);
+            }
+            transport.defaultLaunchQuantization().set(quantization);
+            return ok();
+        });
+
+        dispatcher.register("transport/setPostRecordingAction", params -> {
+            if (!params.has("action")) {
+                throw new IllegalArgumentException("missing 'action' parameter");
+            }
+            String action = params.get("action").getAsString();
+            if (!POST_RECORDING_ACTIONS.contains(action)) {
+                throw new IllegalArgumentException("invalid action '" + action
+                    + "' — valid values: " + POST_RECORDING_ACTIONS);
+            }
+            transport.clipLauncherPostRecordingAction().set(action);
+            return ok();
+        });
+
+        dispatcher.register("transport/setPostRecordingTimeOffset", params -> {
+            if (!params.has("beats")) {
+                throw new IllegalArgumentException("missing 'beats' parameter");
+            }
+            double beats = params.get("beats").getAsDouble();
+            transport.getClipLauncherPostRecordingTimeOffset().set(beats);
+            return ok();
+        });
+
+        dispatcher.register("transport/setClipLauncherOverdub", params -> {
+            if (!params.has("enabled")) {
+                throw new IllegalArgumentException("missing 'enabled' parameter");
+            }
+            transport.isClipLauncherOverdubEnabled().set(params.get("enabled").getAsBoolean());
+            return ok();
+        });
+
+        dispatcher.register("transport/setFillMode", params -> {
+            if (!params.has("enabled")) {
+                throw new IllegalArgumentException("missing 'enabled' parameter");
+            }
+            transport.isFillModeActive().set(params.get("enabled").getAsBoolean());
+            return ok();
+        });
+
+        dispatcher.register("transport/getClipLauncherSettings", params -> stateCache.getClipLauncherSettings());
     }
 
     private static final Set<String> AUTOMATION_MODES = Set.of("latch", "touch", "write");
     private static final Set<String> PRE_ROLL_VALUES = Set.of("none", "one_bar", "two_bars", "four_bars");
+    private static final Set<String> DEFAULT_LAUNCH_QUANTIZATIONS = Set.of(
+        "none", "8", "4", "2", "1", "1/2", "1/4", "1/8", "1/16"
+    );
+    private static final Set<String> POST_RECORDING_ACTIONS = Set.of(
+        "off", "play_recorded", "record_next_free_slot", "stop",
+        "return_to_arrangement", "return_to_previous_clip", "play_random"
+    );
 
     private JsonObject ok() {
         JsonObject result = new JsonObject();

@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.18.6` |
-| **Phase** | 18 — Deep Browser Filters |
+| **Version** | `0.19.6` |
+| **Phase** | 19 — Clip Launcher Automation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | Smoke tests (Phase 18) |
+| **Last Batch** | Smoke tests (Phase 19) |
 | **Last Updated** | 2026-03-02 |
 
 ---
@@ -121,11 +121,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- D-18.1: Scope — all 8 filter columns via generic `column` parameter
-- D-18.2: Navigation — cursor-based per column (not bank-based)
-- D-18.3: Snapshot — 4 fields × 8 columns nested in browser.filters + resultsEntryCount
-- D-18.4: Methods — 8 filter methods (6 nav + filterReset + getFilters)
-- D-18.5: Results — 8-item result bank + scrollResults + getResults
+_Phase 19 archived. No active decisions._
 
 ---
 

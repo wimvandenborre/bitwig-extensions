@@ -717,7 +717,7 @@
   },
   {
     "name": "clip_launch",
-    "description": "Launch a clip in the clip launcher. The clip at the specified track and slot index will start playing. Note: this starts the transport if it is currently stopped.",
+    "description": "Launch a clip in the clip launcher. The clip at the specified track and slot index will start playing. Optionally override launch quantization and mode for this specific launch. Note: this starts the transport if it is currently stopped.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -728,6 +728,33 @@
         "slotIndex": {
           "type": "integer",
           "description": "Clip slot index (0-based). Valid range: 0 to 7."
+        },
+        "quantization": {
+          "type": "string",
+          "description": "Override launch quantization for this launch. Must be provided together with launchMode.",
+          "enum": [
+            "default",
+            "none",
+            "8",
+            "4",
+            "2",
+            "1",
+            "1/2",
+            "1/4",
+            "1/8",
+            "1/16"
+          ]
+        },
+        "launchMode": {
+          "type": "string",
+          "description": "Override launch mode for this launch. Must be provided together with quantization.",
+          "enum": [
+            "default",
+            "from_start",
+            "continue_or_from_start",
+            "continue_or_synced",
+            "synced"
+          ]
         }
       },
       "required": [
@@ -801,13 +828,40 @@
   },
   {
     "name": "scene_launch",
-    "description": "Launch a scene in the clip launcher. Triggers all clips in the scene row across all tracks.",
+    "description": "Launch a scene in the clip launcher. Triggers all clips in the scene row across all tracks. Optionally override launch quantization and mode for this specific launch.",
     "input_schema": {
       "type": "object",
       "properties": {
         "index": {
           "type": "integer",
           "description": "Scene index (0-based). Valid range: 0 to 7."
+        },
+        "quantization": {
+          "type": "string",
+          "description": "Override launch quantization for this launch. Must be provided together with launchMode.",
+          "enum": [
+            "default",
+            "none",
+            "8",
+            "4",
+            "2",
+            "1",
+            "1/2",
+            "1/4",
+            "1/8",
+            "1/16"
+          ]
+        },
+        "launchMode": {
+          "type": "string",
+          "description": "Override launch mode for this launch. Must be provided together with quantization.",
+          "enum": [
+            "default",
+            "from_start",
+            "continue_or_from_start",
+            "continue_or_synced",
+            "synced"
+          ]
         }
       },
       "required": [
@@ -2795,6 +2849,223 @@
       "required": [
         "direction"
       ]
+    }
+  },
+  {
+    "name": "clip_setLaunchQuantization",
+    "description": "Set the launch quantization for the currently selected clip (cursor clip). Controls how the clip aligns to the grid when launched.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantization": {
+          "type": "string",
+          "description": "Launch quantization value.",
+          "enum": [
+            "default",
+            "none",
+            "8",
+            "4",
+            "2",
+            "1",
+            "1/2",
+            "1/4",
+            "1/8",
+            "1/16"
+          ]
+        }
+      },
+      "required": [
+        "quantization"
+      ]
+    }
+  },
+  {
+    "name": "clip_setLaunchMode",
+    "description": "Set the launch mode for the currently selected clip (cursor clip). Controls playback behavior when the clip is launched.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "launchMode": {
+          "type": "string",
+          "description": "Launch mode value.",
+          "enum": [
+            "default",
+            "from_start",
+            "continue_or_from_start",
+            "continue_or_synced",
+            "synced"
+          ]
+        }
+      },
+      "required": [
+        "launchMode"
+      ]
+    }
+  },
+  {
+    "name": "clip_setShuffle",
+    "description": "Enable or disable shuffle (swing) for the currently selected clip (cursor clip).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether shuffle is enabled."
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    }
+  },
+  {
+    "name": "clip_setAccent",
+    "description": "Set the accent amount for the currently selected clip (cursor clip). Controls velocity emphasis.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Accent amount (0.0 to 1.0)."
+        }
+      },
+      "required": [
+        "value"
+      ]
+    }
+  },
+  {
+    "name": "clip_setUseLoopStartAsQuantizationReference",
+    "description": "Set whether the clip uses loop start as quantization reference (\"Q to loop\" in Bitwig inspector) for the currently selected clip.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to use loop start as quantization reference."
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    }
+  },
+  {
+    "name": "clip_getLaunchSettings",
+    "description": "Get all launch settings for the currently selected clip (cursor clip). Returns launchQuantization, launchMode, shuffle, accent, and useLoopStartAsQuantizationReference.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "transport_setDefaultLaunchQuantization",
+    "description": "Set the global default launch quantization for the clip launcher. Affects all clips that use \"default\" quantization.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "quantization": {
+          "type": "string",
+          "description": "Default launch quantization value. Note: \"default\" is not valid here \u2014 this IS the default.",
+          "enum": [
+            "none",
+            "8",
+            "4",
+            "2",
+            "1",
+            "1/2",
+            "1/4",
+            "1/8",
+            "1/16"
+          ]
+        }
+      },
+      "required": [
+        "quantization"
+      ]
+    }
+  },
+  {
+    "name": "transport_setPostRecordingAction",
+    "description": "Set what happens after recording a clip in the clip launcher.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "Post-recording action.",
+          "enum": [
+            "off",
+            "play_recorded",
+            "record_next_free_slot",
+            "stop",
+            "return_to_arrangement",
+            "return_to_previous_clip",
+            "play_random"
+          ]
+        }
+      },
+      "required": [
+        "action"
+      ]
+    }
+  },
+  {
+    "name": "transport_setPostRecordingTimeOffset",
+    "description": "Set the post-recording time offset in beats. Controls how long after the recording point the post-recording action triggers.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "beats": {
+          "type": "number",
+          "description": "Time offset in beats."
+        }
+      },
+      "required": [
+        "beats"
+      ]
+    }
+  },
+  {
+    "name": "transport_setClipLauncherOverdub",
+    "description": "Enable or disable clip launcher overdub mode. When enabled, recording into an existing clip adds notes instead of replacing.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether overdub is enabled."
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    }
+  },
+  {
+    "name": "transport_setFillMode",
+    "description": "Enable or disable fill mode. When active, fill clips play instead of regular clips.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether fill mode is active."
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    }
+  },
+  {
+    "name": "transport_getClipLauncherSettings",
+    "description": "Get all clip launcher settings from the transport. Returns defaultLaunchQuantization, clipLauncherPostRecordingAction, clipLauncherPostRecordingTimeOffset, clipLauncherOverdubEnabled, and fillModeActive.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
     }
   }
 ]

@@ -1,5 +1,6 @@
 package dev.gregross.gig.handlers;
 
+import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ class TransportHandlerTest {
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new TransportHandler(null).register(dispatcher);
+        new TransportHandler(null, new StateCache()).register(dispatcher);
     }
 
     // --- Registration ---
@@ -59,9 +60,20 @@ class TransportHandlerTest {
     }
 
     @Test
-    void registersTwentySixMethodsTotal() {
-        // 19 original + 7 new = 26
-        assertEquals(26, dispatcher.getRegisteredMethods().size());
+    void registersClipLauncherSettingsMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("transport/setDefaultLaunchQuantization"));
+        assertTrue(methods.contains("transport/setPostRecordingAction"));
+        assertTrue(methods.contains("transport/setPostRecordingTimeOffset"));
+        assertTrue(methods.contains("transport/setClipLauncherOverdub"));
+        assertTrue(methods.contains("transport/setFillMode"));
+        assertTrue(methods.contains("transport/getClipLauncherSettings"));
+    }
+
+    @Test
+    void registersThirtyTwoMethodsTotal() {
+        // 26 original + 6 new = 32
+        assertEquals(32, dispatcher.getRegisteredMethods().size());
     }
 
     // --- setLoopRange validation ---
@@ -192,6 +204,67 @@ class TransportHandlerTest {
         String response = dispatcher.handle(rpc("transport/setMetronomeVolume", "{}"));
         assertContains(response, "-32602");
         assertContains(response, "value");
+    }
+
+    // --- setDefaultLaunchQuantization validation ---
+
+    @Test
+    void setDefaultLaunchQuantization_missingParam_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setDefaultLaunchQuantization", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "quantization");
+    }
+
+    @Test
+    void setDefaultLaunchQuantization_invalidValue_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setDefaultLaunchQuantization",
+            "{\"quantization\": \"bad\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "bad");
+    }
+
+    // --- setPostRecordingAction validation ---
+
+    @Test
+    void setPostRecordingAction_missingParam_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setPostRecordingAction", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "action");
+    }
+
+    @Test
+    void setPostRecordingAction_invalidValue_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setPostRecordingAction",
+            "{\"action\": \"invalid\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "invalid");
+    }
+
+    // --- setPostRecordingTimeOffset validation ---
+
+    @Test
+    void setPostRecordingTimeOffset_missingParam_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setPostRecordingTimeOffset", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "beats");
+    }
+
+    // --- setClipLauncherOverdub validation ---
+
+    @Test
+    void setClipLauncherOverdub_missingParam_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setClipLauncherOverdub", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "enabled");
+    }
+
+    // --- setFillMode validation ---
+
+    @Test
+    void setFillMode_missingParam_returnsError() {
+        String response = dispatcher.handle(rpc("transport/setFillMode", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "enabled");
     }
 
     // --- Helpers ---

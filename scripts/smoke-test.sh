@@ -607,6 +607,43 @@ assert_contains "system prompt mentions filterSelectNext" "$PROMPT" "filterSelec
 assert_contains "system prompt mentions filterReset" "$PROMPT" "filterReset"
 assert_contains "system prompt mentions scrollResults" "$PROMPT" "scrollResults"
 
+# Phase 19 — clip launcher automation tool schemas
+echo "--- Phase 19 Offline: Clip Launcher Automation ---"
+
+# Verify new tools exist
+for TOOL_NAME in clip_setLaunchQuantization clip_setLaunchMode clip_setShuffle clip_setAccent clip_setUseLoopStartAsQuantizationReference clip_getLaunchSettings transport_setDefaultLaunchQuantization transport_setPostRecordingAction transport_setPostRecordingTimeOffset transport_setClipLauncherOverdub transport_setFillMode transport_getClipLauncherSettings; do
+  TOOL_EXISTS=$(jq -r ".[] | select(.name==\"$TOOL_NAME\") | .name" "$TOOLS_FILE")
+  assert_equals "tool $TOOL_NAME exists" "$TOOL_EXISTS" "$TOOL_NAME"
+done
+
+# Verify clip_launch has optional quantization param
+CLIP_LAUNCH_Q=$(jq -r '.[] | select(.name=="clip_launch") | .input_schema.properties.quantization.enum | length' "$TOOLS_FILE")
+assert_equals "clip_launch has 10 quantization values" "$CLIP_LAUNCH_Q" "10"
+CLIP_LAUNCH_MODE=$(jq -r '.[] | select(.name=="clip_launch") | .input_schema.properties.launchMode.enum | length' "$TOOLS_FILE")
+assert_equals "clip_launch has 5 launchMode values" "$CLIP_LAUNCH_MODE" "5"
+
+# Verify scene_launch has optional quantization param
+SCENE_LAUNCH_Q=$(jq -r '.[] | select(.name=="scene_launch") | .input_schema.properties.quantization.enum | length' "$TOOLS_FILE")
+assert_equals "scene_launch has 10 quantization values" "$SCENE_LAUNCH_Q" "10"
+
+# Verify enum values for clip settings
+LAUNCH_Q_ENUM=$(jq -r '.[] | select(.name=="clip_setLaunchQuantization") | .input_schema.properties.quantization.enum | length' "$TOOLS_FILE")
+assert_equals "clip_setLaunchQuantization has 10 enum values" "$LAUNCH_Q_ENUM" "10"
+LAUNCH_MODE_ENUM=$(jq -r '.[] | select(.name=="clip_setLaunchMode") | .input_schema.properties.launchMode.enum | length' "$TOOLS_FILE")
+assert_equals "clip_setLaunchMode has 5 enum values" "$LAUNCH_MODE_ENUM" "5"
+
+# Verify transport default quantization has 9 values (no "default")
+DEF_Q_ENUM=$(jq -r '.[] | select(.name=="transport_setDefaultLaunchQuantization") | .input_schema.properties.quantization.enum | length' "$TOOLS_FILE")
+assert_equals "transport_setDefaultLaunchQuantization has 9 enum values" "$DEF_Q_ENUM" "9"
+POST_REC_ENUM=$(jq -r '.[] | select(.name=="transport_setPostRecordingAction") | .input_schema.properties.action.enum | length' "$TOOLS_FILE")
+assert_equals "transport_setPostRecordingAction has 7 enum values" "$POST_REC_ENUM" "7"
+
+# Verify system prompt has clip launcher section
+assert_contains "system prompt has Clip Launcher Automation section" "$PROMPT" "Clip Launcher Automation"
+assert_contains "system prompt mentions per-clip settings" "$PROMPT" "clip_setLaunchQuantization"
+assert_contains "system prompt mentions transport settings" "$PROMPT" "transport_setDefaultLaunchQuantization"
+assert_contains "system prompt mentions per-launch overrides" "$PROMPT" "Per-Launch Overrides"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
@@ -1680,6 +1717,53 @@ assert_contains "browser/scrollResults returns ok" "$RESP" '"ok"'
 # Test browser/scrollResults with invalid direction
 RESP=$(rpc '{"jsonrpc":"2.0","method":"browser/scrollResults","params":{"direction":"sideways"},"id":807}')
 assert_contains "browser/scrollResults invalid direction returns error" "$RESP" '-32602'
+
+# 50. Clip Launcher Automation (Phase 19)
+echo "--- 50. Clip Launcher Automation ---"
+
+# Verify api/list includes new methods
+API_LIST=$(rpc '{"jsonrpc":"2.0","method":"api/list","id":900}')
+CLIP_LAUNCHER_METHODS="clip/setLaunchQuantization clip/setLaunchMode clip/setShuffle clip/setAccent clip/setUseLoopStartAsQuantizationReference clip/getLaunchSettings transport/setDefaultLaunchQuantization transport/setPostRecordingAction transport/setPostRecordingTimeOffset transport/setClipLauncherOverdub transport/setFillMode transport/getClipLauncherSettings"
+for method in $CLIP_LAUNCHER_METHODS; do
+  assert_contains "api/list includes $method" "$API_LIST" "$method"
+done
+
+# Verify snapshot has new transport fields
+SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":901}')
+assert_contains "snapshot has defaultLaunchQuantization" "$SNAP" '"defaultLaunchQuantization"'
+assert_contains "snapshot has clipLauncherPostRecordingAction" "$SNAP" '"clipLauncherPostRecordingAction"'
+assert_contains "snapshot has fillModeActive" "$SNAP" '"fillModeActive"'
+assert_contains "snapshot has clipLauncherOverdubEnabled" "$SNAP" '"clipLauncherOverdubEnabled"'
+
+# Test transport/getClipLauncherSettings
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/getClipLauncherSettings","id":902}')
+assert_contains "transport/getClipLauncherSettings returns defaultLaunchQuantization" "$RESP" '"defaultLaunchQuantization"'
+assert_contains "transport/getClipLauncherSettings returns fillModeActive" "$RESP" '"fillModeActive"'
+
+# Test transport/setFillMode
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/setFillMode","params":{"enabled":false},"id":903}')
+assert_contains "transport/setFillMode returns ok" "$RESP" '"ok"'
+
+# Test transport/setDefaultLaunchQuantization validation
+RESP=$(rpc '{"jsonrpc":"2.0","method":"transport/setDefaultLaunchQuantization","params":{"quantization":"invalid"},"id":904}')
+assert_contains "transport/setDefaultLaunchQuantization invalid returns error" "$RESP" '-32602'
+
+# Test clip/setLaunchQuantization validation
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/setLaunchQuantization","params":{"quantization":"bad"},"id":905}')
+assert_contains "clip/setLaunchQuantization invalid returns error" "$RESP" '-32602'
+
+# Test clip/setLaunchMode validation
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/setLaunchMode","params":{"launchMode":"invalid"},"id":906}')
+assert_contains "clip/setLaunchMode invalid returns error" "$RESP" '-32602'
+
+# Test clip/setAccent out of range
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/setAccent","params":{"value":2.0},"id":907}')
+assert_contains "clip/setAccent out of range returns error" "$RESP" '-32602'
+
+# Test clip/getLaunchSettings
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/getLaunchSettings","id":908}')
+assert_contains "clip/getLaunchSettings returns launchQuantization" "$RESP" '"launchQuantization"'
+assert_contains "clip/getLaunchSettings returns launchMode" "$RESP" '"launchMode"'
 
 # 49. Clean up — delete the duplicated track and undo rename
 echo "--- 49. Track Cleanup ---"

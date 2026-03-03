@@ -121,7 +121,7 @@ public class GigMaestroExtension extends ControllerExtension {
 
         // Register handlers
         new ApplicationHandler(application, host).register(dispatcher);
-        new TransportHandler(transport).register(dispatcher);
+        new TransportHandler(transport, stateCache).register(dispatcher);
         TrackBankManager trackBankManager = new TrackBankManager(trackBank, TRACK_COUNT);
         new TrackHandler(trackBank, application, cursorTrack, trackBankManager, stateCache).register(dispatcher);
         new MasterHandler(masterTrack).register(dispatcher);
