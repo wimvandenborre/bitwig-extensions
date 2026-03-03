@@ -212,6 +212,13 @@ public class StateCache {
     private BrowserFilterItem[] filterCursors;
     private BrowserFilterColumn[] filterColumns;
 
+    // Browser result bank state
+    private static final int RESULT_BANK_SIZE = 8;
+    private final String[] resultBankNames = new String[RESULT_BANK_SIZE];
+    private final boolean[] resultBankSelected = new boolean[RESULT_BANK_SIZE];
+    private volatile int resultsEntryCount;
+    private BrowserResultsItemBank resultBank;
+
     // Cue marker state
     private static final int CUE_MARKER_COUNT = 16;
     private final String[] cueMarkerNames = new String[CUE_MARKER_COUNT];
@@ -777,6 +784,24 @@ public class StateCache {
         popupBrowser.shouldAudition().markInterested();
         popupBrowser.shouldAudition().addValueObserver((BooleanValueChangedCallback) v -> browserShouldAudition = v);
 
+        // Results entry count
+        popupBrowser.resultsColumn().entryCount().markInterested();
+        popupBrowser.resultsColumn().entryCount().addValueObserver((IntegerValueChangedCallback) v -> resultsEntryCount = v);
+
+        // Create result item bank (8 items)
+        for (int i = 0; i < RESULT_BANK_SIZE; i++) {
+            resultBankNames[i] = "";
+        }
+        resultBank = (BrowserResultsItemBank) popupBrowser.resultsColumn().createItemBank(RESULT_BANK_SIZE);
+        for (int i = 0; i < RESULT_BANK_SIZE; i++) {
+            final int idx = i;
+            BrowserResultsItem item = (BrowserResultsItem) resultBank.getItemAt(i);
+            item.name().markInterested();
+            item.name().addValueObserver((StringValueChangedCallback) v -> resultBankNames[idx] = (String) v);
+            item.isSelected().markInterested();
+            item.isSelected().addValueObserver((BooleanValueChangedCallback) v -> resultBankSelected[idx] = v);
+        }
+
         // Create cursor item for result tracking
         BrowserResultsItem resultCursor = popupBrowser.resultsColumn().createCursorItem();
         resultCursor.name().markInterested();
@@ -833,6 +858,25 @@ public class StateCache {
 
     public BrowserFilterColumn[] getFilterColumns() {
         return filterColumns;
+    }
+
+    public BrowserResultsItemBank getResultBank() {
+        return resultBank;
+    }
+
+    public JsonObject getResultBankState() {
+        JsonObject obj = new JsonObject();
+        JsonArray items = new JsonArray();
+        for (int i = 0; i < RESULT_BANK_SIZE; i++) {
+            JsonObject item = new JsonObject();
+            item.addProperty("index", i);
+            item.addProperty("name", resultBankNames[i] != null ? resultBankNames[i] : "");
+            item.addProperty("isSelected", resultBankSelected[i]);
+            items.add(item);
+        }
+        obj.add("items", items);
+        obj.addProperty("entryCount", resultsEntryCount);
+        return obj;
     }
 
     public double getClipStepSize() {
@@ -1246,6 +1290,7 @@ public class StateCache {
         obj.addProperty("shouldAudition", browserShouldAudition);
         obj.addProperty("resultName", browserResultName);
         obj.addProperty("resultIsSelected", browserResultIsSelected);
+        obj.addProperty("resultsEntryCount", resultsEntryCount);
 
         // Filter columns
         JsonObject filters = new JsonObject();
