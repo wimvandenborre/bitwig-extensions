@@ -644,6 +644,45 @@ assert_contains "system prompt mentions per-clip settings" "$PROMPT" "clip_setLa
 assert_contains "system prompt mentions transport settings" "$PROMPT" "transport_setDefaultLaunchQuantization"
 assert_contains "system prompt mentions per-launch overrides" "$PROMPT" "Per-Launch Overrides"
 
+# Phase 20 — clip grid enhancement tool schemas
+echo "--- Phase 20 Offline: Clip Grid Enhancements ---"
+
+# Verify new clip tools exist
+for TOOL_NAME in clip_setColor clip_setPlayStart clip_setPlayStop clip_setLoopStart clip_setLoopLength clip_setLoopEnabled clip_getPlaybackSettings clip_quantize clip_transpose clip_duplicateContent clip_showInEditor clip_launchAlt clip_launchRelease clip_launchReleaseAlt; do
+  TOOL_EXISTS=$(jq -r ".[] | select(.name==\"$TOOL_NAME\") | .name" "$TOOLS_FILE")
+  assert_equals "tool $TOOL_NAME exists" "$TOOL_EXISTS" "$TOOL_NAME"
+done
+
+# Verify new scene tools exist
+for TOOL_NAME in scene_setColor scene_launchAlt scene_launchRelease scene_launchReleaseAlt; do
+  TOOL_EXISTS=$(jq -r ".[] | select(.name==\"$TOOL_NAME\") | .name" "$TOOLS_FILE")
+  assert_equals "tool $TOOL_NAME exists" "$TOOL_EXISTS" "$TOOL_NAME"
+done
+
+# Verify clip_setColor has required params
+CLIP_COLOR_REQ=$(jq -r '.[] | select(.name=="clip_setColor") | .input_schema.required | join(",")' "$TOOLS_FILE")
+assert_contains "clip_setColor requires trackIndex" "$CLIP_COLOR_REQ" "trackIndex"
+assert_contains "clip_setColor requires r" "$CLIP_COLOR_REQ" "r"
+
+# Verify scene_setColor has required params
+SCENE_COLOR_REQ=$(jq -r '.[] | select(.name=="scene_setColor") | .input_schema.required | join(",")' "$TOOLS_FILE")
+assert_contains "scene_setColor requires index" "$SCENE_COLOR_REQ" "index"
+assert_contains "scene_setColor requires r" "$SCENE_COLOR_REQ" "r"
+
+# Verify clip_quantize has amount param
+QUANTIZE_TYPE=$(jq -r '.[] | select(.name=="clip_quantize") | .input_schema.properties.amount.type' "$TOOLS_FILE")
+assert_equals "clip_quantize amount param is number" "$QUANTIZE_TYPE" "number"
+
+# Verify clip_transpose has semitones param
+TRANSPOSE_TYPE=$(jq -r '.[] | select(.name=="clip_transpose") | .input_schema.properties.semitones.type' "$TOOLS_FILE")
+assert_equals "clip_transpose semitones param is integer" "$TRANSPOSE_TYPE" "integer"
+
+# Verify system prompt has grid enhancements section
+assert_contains "system prompt has Clip Grid Enhancements section" "$PROMPT" "Clip Grid Enhancements"
+assert_contains "system prompt mentions clip_setColor" "$PROMPT" "clip_setColor"
+assert_contains "system prompt mentions clip_quantize" "$PROMPT" "clip_quantize"
+assert_contains "system prompt mentions scene_setColor" "$PROMPT" "scene_setColor"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
