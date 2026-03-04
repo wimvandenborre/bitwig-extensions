@@ -488,6 +488,95 @@ class SongCommand {
                         client.call("clip/setChance", chanceParams);
                     }
 
+                    // Set expressive properties if present
+                    JsonArray exprNotes = new JsonArray();
+                    JsonArray repeatNotes = new JsonArray();
+                    JsonArray occurrenceNotes = new JsonArray();
+                    JsonArray recurrenceNotes = new JsonArray();
+
+                    for (JsonElement noteEl : notes) {
+                        JsonObject note = noteEl.getAsJsonObject();
+                        int nx = note.get("x").getAsInt();
+                        int ny = note.get("y").getAsInt();
+
+                        // Scalar expressions
+                        String[] scalarProps = {"pan", "timbre", "pressure", "gain",
+                            "transpose", "releaseVelocity", "velocitySpread"};
+                        for (String prop : scalarProps) {
+                            if (note.has(prop)) {
+                                JsonObject expr = new JsonObject();
+                                expr.addProperty("x", nx);
+                                expr.addProperty("y", ny);
+                                expr.addProperty("property", prop);
+                                expr.addProperty("value", note.get(prop).getAsDouble());
+                                exprNotes.add(expr);
+                            }
+                        }
+                        // Mute
+                        if (note.has("mute") && note.get("mute").getAsBoolean()) {
+                            JsonObject expr = new JsonObject();
+                            expr.addProperty("x", nx);
+                            expr.addProperty("y", ny);
+                            expr.addProperty("property", "mute");
+                            expr.addProperty("value", 1.0);
+                            exprNotes.add(expr);
+                        }
+
+                        // Repeat
+                        if (note.has("repeat")) {
+                            JsonObject rep = note.getAsJsonObject("repeat");
+                            JsonObject rn = new JsonObject();
+                            rn.addProperty("x", nx);
+                            rn.addProperty("y", ny);
+                            rn.addProperty("count", rep.get("count").getAsInt());
+                            rn.addProperty("curve", rep.get("curve").getAsDouble());
+                            rn.addProperty("velocityEnd", rep.get("velocityEnd").getAsDouble());
+                            rn.addProperty("velocityCurve", rep.get("velocityCurve").getAsDouble());
+                            repeatNotes.add(rn);
+                        }
+
+                        // Occurrence
+                        if (note.has("occurrence")) {
+                            JsonObject on = new JsonObject();
+                            on.addProperty("x", nx);
+                            on.addProperty("y", ny);
+                            on.addProperty("condition", note.get("occurrence").getAsString());
+                            occurrenceNotes.add(on);
+                        }
+
+                        // Recurrence
+                        if (note.has("recurrence")) {
+                            JsonObject rec = note.getAsJsonObject("recurrence");
+                            JsonObject rn = new JsonObject();
+                            rn.addProperty("x", nx);
+                            rn.addProperty("y", ny);
+                            rn.addProperty("length", rec.get("length").getAsInt());
+                            rn.addProperty("mask", rec.get("mask").getAsInt());
+                            recurrenceNotes.add(rn);
+                        }
+                    }
+
+                    if (!exprNotes.isEmpty()) {
+                        JsonObject exprParams = new JsonObject();
+                        exprParams.add("notes", exprNotes);
+                        client.call("clip/setNoteExpressions", exprParams);
+                    }
+                    if (!repeatNotes.isEmpty()) {
+                        JsonObject repParams = new JsonObject();
+                        repParams.add("notes", repeatNotes);
+                        client.call("clip/setNoteRepeat", repParams);
+                    }
+                    if (!occurrenceNotes.isEmpty()) {
+                        JsonObject occParams = new JsonObject();
+                        occParams.add("notes", occurrenceNotes);
+                        client.call("clip/setNoteOccurrence", occParams);
+                    }
+                    if (!recurrenceNotes.isEmpty()) {
+                        JsonObject recParams = new JsonObject();
+                        recParams.add("notes", recurrenceNotes);
+                        client.call("clip/setNoteRecurrence", recParams);
+                    }
+
                     log.println("  [" + (c + 1) + "/" + clips.size() + "] Track " + trackIndex
                         + " / Scene " + sceneAbsolute + " (" + notes.size() + " notes)");
                 }
