@@ -682,6 +682,9 @@ assert_contains "system prompt has Clip Grid Enhancements section" "$PROMPT" "Cl
 assert_contains "system prompt mentions clip_setColor" "$PROMPT" "clip_setColor"
 assert_contains "system prompt mentions clip_quantize" "$PROMPT" "clip_quantize"
 assert_contains "system prompt mentions scene_setColor" "$PROMPT" "scene_setColor"
+assert_contains "system prompt has Song Persistence section" "$PROMPT" "Song Persistence"
+assert_contains "system prompt mentions song dump" "$PROMPT" "gig song dump"
+assert_contains "system prompt mentions song rebuild" "$PROMPT" "gig song rebuild"
 
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
@@ -706,6 +709,7 @@ assert_contains "CLI help shows snapshot command" "$HELP" "snapshot"
 assert_contains "CLI help shows device command" "$HELP" "device"
 assert_contains "CLI help shows note command" "$HELP" "note"
 assert_contains "CLI help shows rpc command" "$HELP" "rpc"
+assert_contains "CLI help shows song command" "$HELP" "song"
 assert_contains "CLI help shows --pretty option" "$HELP" "--pretty"
 assert_contains "CLI help shows --port option" "$HELP" "--port"
 
@@ -746,6 +750,20 @@ assert_contains "note help shows get-notes" "$NOTE_HELP" "get-notes"
 assert_contains "note help shows set-step-size" "$NOTE_HELP" "set-step-size"
 assert_contains "note help shows scroll-steps" "$NOTE_HELP" "scroll-steps"
 assert_contains "note help shows delete" "$NOTE_HELP" "delete"
+
+# Song subcommand help
+SONG_HELP=$(java -jar "$CLI_JAR" song --help 2>&1)
+assert_contains "song help shows dump" "$SONG_HELP" "dump"
+assert_contains "song help shows rebuild" "$SONG_HELP" "rebuild"
+
+# Song dump subcommand help
+DUMP_HELP=$(java -jar "$CLI_JAR" song dump --help 2>&1)
+assert_contains "song dump help shows --output" "$DUMP_HELP" "--output"
+assert_contains "song dump help shows -o shorthand" "$DUMP_HELP" "-o"
+
+# Song rebuild subcommand help
+REBUILD_HELP=$(java -jar "$CLI_JAR" song rebuild --help 2>&1)
+assert_contains "song rebuild help shows filePath" "$REBUILD_HELP" "<filePath>"
 
 # Version
 VERSION=$(java -jar "$CLI_JAR" --version 2>&1)

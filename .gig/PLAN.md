@@ -16,7 +16,7 @@
 ### Batch 1 — SongCommand CLI: `gig song dump` (v0.21.1)
 **Delegation:** in-session
 **Decisions:** D-21.3, D-21.5, D-21.6r
-**Status:** pending
+**Status:** done
 
 Add `SongCommand` to CLI with `dump` subcommand. CLI drives multi-step RPC:
 1. Call `session/snapshot` — extract transport, tracks, scenes, master
@@ -42,7 +42,7 @@ Options:
 ### Batch 2 — SongCommand CLI: `gig song rebuild` (v0.21.2)
 **Delegation:** in-session
 **Decisions:** D-21.1, D-21.2, D-21.4
-**Status:** pending
+**Status:** done
 
 Add `rebuild` subcommand to `SongCommand`:
 - `gig song rebuild <file>` — reads JSON, validates format version, executes rebuild phases
@@ -69,7 +69,7 @@ Progress logging to stdout.
 
 ### Batch 3 — Unit tests (v0.21.3)
 **Delegation:** in-session
-**Status:** pending
+**Status:** done
 
 - SongCommand test: CLI registration, help output
 
@@ -83,7 +83,7 @@ Progress logging to stdout.
 
 ### Batch 4 — Tool schemas + system prompt update (v0.21.4)
 **Delegation:** in-session
-**Status:** pending
+**Status:** done
 
 - Update `system-prompt.md` with song dump/rebuild CLI workflow documentation
 
