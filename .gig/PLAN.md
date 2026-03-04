@@ -20,7 +20,7 @@
 | 22.3 | `0.22.3` | Song rebuild expressive properties | in-session | done |
 | 22.4 | `0.22.4` | Unit tests | in-session | done |
 | 22.5 | `0.22.5` | Tool schemas + system prompt update | in-session | done |
-| 22.6 | `0.22.6` | Smoke tests | in-session | pending |
+| 22.6 | `0.22.6` | Smoke tests | in-session | done |
 
 ---
 

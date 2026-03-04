@@ -686,6 +686,47 @@ assert_contains "system prompt has Song Persistence section" "$PROMPT" "Song Per
 assert_contains "system prompt mentions song dump" "$PROMPT" "gig song dump"
 assert_contains "system prompt mentions song rebuild" "$PROMPT" "gig song rebuild"
 
+# Phase 22 — NoteStep expressive properties
+echo "--- Phase 22 Offline: NoteStep Expressive Properties ---"
+
+# Tool schema presence
+assert_contains "has clip_setNoteExpressions tool" "$TOOLS_LIST" "clip_setNoteExpressions"
+assert_contains "has clip_setNoteRepeat tool" "$TOOLS_LIST" "clip_setNoteRepeat"
+assert_contains "has clip_setNoteOccurrence tool" "$TOOLS_LIST" "clip_setNoteOccurrence"
+assert_contains "has clip_setNoteRecurrence tool" "$TOOLS_LIST" "clip_setNoteRecurrence"
+
+# getNotes description mentions expressive properties
+GETNOTES_DESC=$(jq -r '.[] | select(.name=="clip_getNotes") | .description' "$TOOLS_FILE")
+assert_contains "clip_getNotes describes pan" "$GETNOTES_DESC" "pan"
+assert_contains "clip_getNotes describes transpose" "$GETNOTES_DESC" "transpose"
+assert_contains "clip_getNotes describes occurrence" "$GETNOTES_DESC" "occurrence"
+assert_contains "clip_getNotes describes recurrence" "$GETNOTES_DESC" "recurrence"
+
+# setNoteExpressions schema validation
+EXPR_PROPS=$(jq -r '.[] | select(.name=="clip_setNoteExpressions") | .input_schema.properties.notes.items.properties.property.enum | join(",")' "$TOOLS_FILE")
+assert_contains "setNoteExpressions has pan in enum" "$EXPR_PROPS" "pan"
+assert_contains "setNoteExpressions has gain in enum" "$EXPR_PROPS" "gain"
+assert_contains "setNoteExpressions has mute in enum" "$EXPR_PROPS" "mute"
+
+# setNoteOccurrence schema has condition enum
+OCC_ENUM=$(jq -r '.[] | select(.name=="clip_setNoteOccurrence") | .input_schema.properties.notes.items.properties.condition.enum | join(",")' "$TOOLS_FILE")
+assert_contains "setNoteOccurrence has ALWAYS" "$OCC_ENUM" "ALWAYS"
+assert_contains "setNoteOccurrence has FILL" "$OCC_ENUM" "FILL"
+assert_contains "setNoteOccurrence has NOT_FIRST" "$OCC_ENUM" "NOT_FIRST"
+
+# setNoteRepeat requires all 4 sub-properties
+REPEAT_REQ=$(jq -r '.[] | select(.name=="clip_setNoteRepeat") | .input_schema.properties.notes.items.required | join(",")' "$TOOLS_FILE")
+assert_contains "setNoteRepeat requires count" "$REPEAT_REQ" "count"
+assert_contains "setNoteRepeat requires curve" "$REPEAT_REQ" "curve"
+assert_contains "setNoteRepeat requires velocityEnd" "$REPEAT_REQ" "velocityEnd"
+assert_contains "setNoteRepeat requires velocityCurve" "$REPEAT_REQ" "velocityCurve"
+
+# System prompt mentions expressive section
+assert_contains "system prompt has Expressive Note Properties section" "$PROMPT" "Expressive Note Properties"
+assert_contains "system prompt mentions clip_setNoteExpressions" "$PROMPT" "clip_setNoteExpressions"
+assert_contains "system prompt mentions clip_setNoteRepeat" "$PROMPT" "clip_setNoteRepeat"
+assert_contains "system prompt mentions clip_setNoteOccurrence" "$PROMPT" "clip_setNoteOccurrence"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
