@@ -59,6 +59,10 @@ val cliRuntimeOnly by configurations.getting
 dependencies {
     cliImplementation(libs.picocli)
     cliImplementation(libs.gson)
+
+    // CLI classes available in tests
+    testImplementation(sourceSets["cli"].output)
+    testImplementation(libs.picocli)
 }
 
 tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("cliShadowJar") {
