@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.21.5` |
 | **Phase** | 21 — Song Rebuild from JSON |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | Smoke tests |
 | **Last Updated** | 2026-03-04 |
 
