@@ -1,6 +1,7 @@
 package dev.gregross.gig.handlers;
 
 import com.bitwig.extension.controller.api.Clip;
+import com.bitwig.extension.controller.api.NoteOccurrence;
 import com.bitwig.extension.controller.api.NoteStep;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -206,6 +207,84 @@ public class NoteHandler {
                         throw new IllegalArgumentException(
                             "unknown property '" + property + "'. Valid: pan, timbre, pressure, gain, transpose, releaseVelocity, velocitySpread, mute");
                 }
+                count++;
+            }
+            JsonObject result = new JsonObject();
+            result.addProperty("count", count);
+            return result;
+        });
+
+        dispatcher.register("clip/setNoteRepeat", params -> {
+            JsonArray notes = requireArray(params, "notes");
+            int count = 0;
+            for (JsonElement el : notes) {
+                JsonObject note = el.getAsJsonObject();
+                int x = note.get("x").getAsInt();
+                int y = note.get("y").getAsInt();
+                int repeatCount = note.get("count").getAsInt();
+                double curve = note.get("curve").getAsDouble();
+                double velocityEnd = note.get("velocityEnd").getAsDouble();
+                double velocityCurve = note.get("velocityCurve").getAsDouble();
+                if (repeatCount < -127 || repeatCount > 127)
+                    throw new IllegalArgumentException("count must be between -127 and 127");
+                if (curve < -1.0 || curve > 1.0)
+                    throw new IllegalArgumentException("curve must be between -1.0 and 1.0");
+                if (velocityEnd < -1.0 || velocityEnd > 1.0)
+                    throw new IllegalArgumentException("velocityEnd must be between -1.0 and 1.0");
+                if (velocityCurve < -1.0 || velocityCurve > 1.0)
+                    throw new IllegalArgumentException("velocityCurve must be between -1.0 and 1.0");
+                NoteStep step = cursorClip.getStep(0, x, y);
+                step.setRepeatCount(repeatCount);
+                step.setRepeatCurve(curve);
+                step.setRepeatVelocityEnd(velocityEnd);
+                step.setRepeatVelocityCurve(velocityCurve);
+                step.setIsRepeatEnabled(true);
+                count++;
+            }
+            JsonObject result = new JsonObject();
+            result.addProperty("count", count);
+            return result;
+        });
+
+        dispatcher.register("clip/setNoteOccurrence", params -> {
+            JsonArray notes = requireArray(params, "notes");
+            int count = 0;
+            for (JsonElement el : notes) {
+                JsonObject note = el.getAsJsonObject();
+                int x = note.get("x").getAsInt();
+                int y = note.get("y").getAsInt();
+                String condition = note.get("condition").getAsString().toUpperCase();
+                NoteOccurrence occurrence;
+                try {
+                    occurrence = NoteOccurrence.valueOf(condition);
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException(
+                        "unknown occurrence '" + condition + "'. Valid: ALWAYS, FIRST, NOT_FIRST, PREV, NOT_PREV, PREV_CHANNEL, NOT_PREV_CHANNEL, PREV_KEY, NOT_PREV_KEY, FILL, NOT_FILL");
+                }
+                NoteStep step = cursorClip.getStep(0, x, y);
+                step.setOccurrence(occurrence);
+                step.setIsOccurrenceEnabled(true);
+                count++;
+            }
+            JsonObject result = new JsonObject();
+            result.addProperty("count", count);
+            return result;
+        });
+
+        dispatcher.register("clip/setNoteRecurrence", params -> {
+            JsonArray notes = requireArray(params, "notes");
+            int count = 0;
+            for (JsonElement el : notes) {
+                JsonObject note = el.getAsJsonObject();
+                int x = note.get("x").getAsInt();
+                int y = note.get("y").getAsInt();
+                int length = note.get("length").getAsInt();
+                int mask = note.get("mask").getAsInt();
+                if (length < 1 || length > 8)
+                    throw new IllegalArgumentException("length must be between 1 and 8");
+                NoteStep step = cursorClip.getStep(0, x, y);
+                step.setRecurrence(length, mask);
+                step.setIsRecurrenceEnabled(true);
                 count++;
             }
             JsonObject result = new JsonObject();

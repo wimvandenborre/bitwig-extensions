@@ -16,7 +16,7 @@
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
 | 22.1 | `0.22.1` | Extend getNotes + setNoteExpressions | in-session | done |
-| 22.2 | `0.22.2` | setNoteRepeat + setNoteOccurrence + setNoteRecurrence | in-session | pending |
+| 22.2 | `0.22.2` | setNoteRepeat + setNoteOccurrence + setNoteRecurrence | in-session | done |
 | 22.3 | `0.22.3` | Song rebuild expressive properties | in-session | pending |
 | 22.4 | `0.22.4` | Unit tests | in-session | pending |
 | 22.5 | `0.22.5` | Tool schemas + system prompt update | in-session | pending |
