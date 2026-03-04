@@ -362,6 +362,29 @@ Complete sequence for creating a multi-track song using macros:
 
 This workflow takes ~5 calls for a 3-track, 2-section song. The manual equivalent would take 20+ calls.
 
+### Song Persistence (CLI)
+
+The Gig CLI provides song dump and rebuild commands for session persistence.
+
+**Export a song:**
+```bash
+gig song dump --output songs/my-song.json
+```
+Captures: transport (tempo, time signature), tracks (volume, pan, mute, solo, color), scenes (names, colors), all clips with notes and chance data, instruments, drum pad mapping, cue markers. Progress logged to stderr.
+
+**Rebuild from JSON:**
+```bash
+gig song rebuild songs/my-song.json
+```
+Restores in order: transport → scenes + colors → clips + notes + chance → clip colors → track mix → master mix → cue markers. Progress logged to stderr.
+
+**Not restored (manual steps):**
+- Instruments and presets (load manually per track)
+- Device chains and FX parameters (rebuild after presets loaded)
+- Arranger timeline clips (no API for launcher→arranger copy)
+
+**Song JSON format:** `formatVersion: "1"` in meta section. Each clip includes `lengthBeats`, `stepSize`, `color`, `name`, and full note data with chance values.
+
 ## Mixer & Routing
 
 ### Send Routing
