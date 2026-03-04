@@ -1,0 +1,8207 @@
+{
+  "meta": {
+    "name": "Funky Chill Eb Minor",
+    "key": "Eb minor",
+    "created": "2026-03-03",
+    "version": "gig-maestro-v0.20.8"
+  },
+  "transport": {
+    "tempo": 92.0,
+    "timeSignature": "4/4"
+  },
+  "tracks": [
+    {
+      "index": 0,
+      "name": "Drums",
+      "volume": 0.72,
+      "pan": 0.5,
+      "mute": false,
+      "solo": false,
+      "color": {
+        "r": 0.8980393,
+        "g": 0.29803923,
+        "b": 0.09411766
+      }
+    },
+    {
+      "index": 1,
+      "name": "Bass",
+      "volume": 0.68,
+      "pan": 0.5,
+      "mute": false,
+      "solo": false,
+      "color": {
+        "r": 0.20000002,
+        "g": 0.8000001,
+        "b": 0.29411766
+      }
+    },
+    {
+      "index": 2,
+      "name": "Keys",
+      "volume": 0.58,
+      "pan": 0.6,
+      "mute": false,
+      "solo": false,
+      "color": {
+        "r": 0.29803923,
+        "g": 0.49803925,
+        "b": 0.8980393
+      }
+    },
+    {
+      "index": 3,
+      "name": "Pad",
+      "volume": 0.48,
+      "pan": 0.4,
+      "mute": false,
+      "solo": false,
+      "color": {
+        "r": 0.69803923,
+        "g": 0.29803923,
+        "b": 0.8000001
+      }
+    }
+  ],
+  "master": {
+    "volume": 0.76,
+    "pan": 0.5
+  },
+  "scenes": [
+    {
+      "absoluteIndex": 0,
+      "name": "Intro",
+      "color": {
+        "r": 0.29803923,
+        "g": 0.29803923,
+        "b": 0.6
+      }
+    },
+    {
+      "absoluteIndex": 1,
+      "name": "Groove",
+      "color": {
+        "r": 0.20000002,
+        "g": 0.6,
+        "b": 0.29411766
+      }
+    },
+    {
+      "absoluteIndex": 2,
+      "name": "Lift",
+      "color": {
+        "r": 0.8000001,
+        "g": 0.6,
+        "b": 0.09411766
+      }
+    },
+    {
+      "absoluteIndex": 3,
+      "name": "Breakdown",
+      "color": {
+        "r": 0.49803925,
+        "g": 0.20000002,
+        "b": 0.6
+      }
+    },
+    {
+      "absoluteIndex": 4,
+      "name": "Drop",
+      "color": {
+        "r": 0.8980393,
+        "g": 0.20000002,
+        "b": 0.19607845
+      }
+    },
+    {
+      "absoluteIndex": 5,
+      "name": "\u00bb Groove",
+      "color": {
+        "r": 1.0,
+        "g": 0.8000001,
+        "b": 0.19607845
+      }
+    },
+    {
+      "absoluteIndex": 6,
+      "name": "\u00bb Lift",
+      "color": {
+        "r": 1.0,
+        "g": 0.8000001,
+        "b": 0.19607845
+      }
+    },
+    {
+      "absoluteIndex": 7,
+      "name": "\u00bb Breakdown",
+      "color": {
+        "r": 1.0,
+        "g": 0.8000001,
+        "b": 0.19607845
+      }
+    },
+    {
+      "absoluteIndex": 8,
+      "name": "\u00bb Drop",
+      "color": {
+        "r": 1.0,
+        "g": 0.8000001,
+        "b": 0.19607845
+      }
+    }
+  ],
+  "clips": [
+    {
+      "track": 0,
+      "scene": 0,
+      "sceneAbsolute": 0,
+      "notes": [
+        {
+          "x": 0,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 43,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 43,
+          "velocity": 0.24409449100494385,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 43,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 43,
+          "velocity": 0.24409449100494385,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 0,
+      "sceneAbsolute": 0,
+      "notes": [
+        {
+          "x": 0,
+          "y": 39,
+          "velocity": 0.8425197005271912,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 3,
+          "y": 39,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 5,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 44,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 39,
+          "velocity": 0.7952755689620972,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 11,
+          "y": 46,
+          "velocity": 0.6929134130477905,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 44,
+          "velocity": 0.5984252095222473,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 39,
+          "velocity": 0.8425197005271912,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 19,
+          "y": 42,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 44,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 46,
+          "velocity": 0.748031497001648,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 44,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 27,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 39,
+          "velocity": 0.6456692814826965,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 39,
+          "velocity": 0.8425197005271912,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 35,
+          "y": 39,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 37,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 44,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 46,
+          "velocity": 0.7952755689620972,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 43,
+          "y": 44,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 47,
+          "y": 39,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 39,
+          "velocity": 0.8425197005271912,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 51,
+          "y": 44,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 46,
+          "velocity": 0.748031497001648,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 57,
+          "y": 49,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 46,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 44,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 61,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 63,
+          "y": 39,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 0,
+      "sceneAbsolute": 0,
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.5433070659637451,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.4960629940032959,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 61,
+          "velocity": 0.4488188922405243,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 54,
+          "velocity": 0.4488188922405243,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 61,
+          "velocity": 0.3937007784843445,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 51,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 54,
+          "velocity": 0.3937007784843445,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 58,
+          "velocity": 0.3937007784843445,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 61,
+          "velocity": 0.34645670652389526,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 60,
+          "velocity": 0.4960629940032959,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 63,
+          "velocity": 0.4960629940032959,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 67,
+          "velocity": 0.4488188922405243,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 56,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 60,
+          "velocity": 0.4488188922405243,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 63,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 67,
+          "velocity": 0.3937007784843445,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 63,
+          "velocity": 0.34645670652389526,
+          "duration": 0.5,
+          "chance": 0.6
+        },
+        {
+          "x": 28,
+          "y": 61,
+          "velocity": 0.29921260476112366,
+          "duration": 0.5,
+          "chance": 0.5
+        },
+        {
+          "x": 32,
+          "y": 58,
+          "velocity": 0.5433070659637451,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 61,
+          "velocity": 0.4960629940032959,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 65,
+          "velocity": 0.4960629940032959,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 68,
+          "velocity": 0.4488188922405243,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 58,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 61,
+          "velocity": 0.4488188922405243,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 65,
+          "velocity": 0.4488188922405243,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 68,
+          "velocity": 0.3937007784843445,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 61,
+          "velocity": 0.3937007784843445,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 65,
+          "velocity": 0.3937007784843445,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 68,
+          "velocity": 0.34645670652389526,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 54,
+          "velocity": 0.5433070659637451,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 58,
+          "velocity": 0.4960629940032959,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 61,
+          "velocity": 0.4960629940032959,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 65,
+          "velocity": 0.4488188922405243,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 55,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 55,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 55,
+          "y": 61,
+          "velocity": 0.4488188922405243,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 55,
+          "y": 65,
+          "velocity": 0.3937007784843445,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 63,
+          "velocity": 0.34645670652389526,
+          "duration": 0.5,
+          "chance": 0.6
+        },
+        {
+          "x": 58,
+          "y": 54,
+          "velocity": 0.4488188922405243,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 58,
+          "velocity": 0.3937007784843445,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 61,
+          "velocity": 0.3937007784843445,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 65,
+          "velocity": 0.34645670652389526,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 58,
+          "velocity": 0.29921260476112366,
+          "duration": 0.5,
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 0,
+      "sceneAbsolute": 0,
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 63,
+          "velocity": 0.34645670652389526,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 66,
+          "velocity": 0.29921260476112366,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 70,
+          "velocity": 0.29921260476112366,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 73,
+          "velocity": 0.24409449100494385,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 77,
+          "velocity": 0.19685038924217224,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 54,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 54,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 63,
+          "velocity": 0.34645670652389526,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 68,
+          "velocity": 0.29921260476112366,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 70,
+          "velocity": 0.29921260476112366,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 75,
+          "velocity": 0.24409449100494385,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 77,
+          "velocity": 0.19685038924217224,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 56,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 0,
+      "scene": 1,
+      "sceneAbsolute": 1,
+      "notes": [
+        {
+          "x": 0,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 2,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 37,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 36,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 49,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 36,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 37,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 43,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 18,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 37,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 36,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 49,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 36,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 37,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 34,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 37,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 36,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 49,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 36,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 43,
+          "y": 42,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 37,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 47,
+          "y": 43,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 36,
+          "velocity": 0.874015748500824,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 50,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 37,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 36,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 55,
+          "y": 49,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 36,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 59,
+          "y": 42,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 37,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 38,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 1,
+      "sceneAbsolute": 1,
+      "notes": [
+        {
+          "x": 0,
+          "y": 39,
+          "velocity": 0.8425197005271912,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 3,
+          "y": 39,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 0.55
+        },
+        {
+          "x": 6,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 44,
+          "velocity": 0.748031497001648,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 46,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 0.6
+        },
+        {
+          "x": 14,
+          "y": 44,
+          "velocity": 0.6456692814826965,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 39,
+          "velocity": 0.8425197005271912,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 19,
+          "y": 39,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 0.55
+        },
+        {
+          "x": 22,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 44,
+          "velocity": 0.748031497001648,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 46,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 0.6
+        },
+        {
+          "x": 30,
+          "y": 49,
+          "velocity": 0.6456692814826965,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 39,
+          "velocity": 0.8425197005271912,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 35,
+          "y": 39,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 0.55
+        },
+        {
+          "x": 38,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 44,
+          "velocity": 0.748031497001648,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 46,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 0.6
+        },
+        {
+          "x": 46,
+          "y": 44,
+          "velocity": 0.6456692814826965,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 39,
+          "velocity": 0.8425197005271912,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 51,
+          "y": 39,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 0.55
+        },
+        {
+          "x": 54,
+          "y": 46,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 44,
+          "velocity": 0.748031497001648,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 0.6
+        },
+        {
+          "x": 62,
+          "y": 41,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 1,
+      "sceneAbsolute": 1,
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.5433070659637451,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 54,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 58,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 51,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 54,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 58,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 53,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 53,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 56,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 49,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 53,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 56,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 44,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 51,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 56,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 44,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 51,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 56,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 46,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 53,
+          "velocity": 0.5433070659637451,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 49,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 53,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 46,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 49,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 53,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 1,
+      "sceneAbsolute": 1,
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.3937007784843445,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.34645670652389526,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.34645670652389526,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 49,
+          "velocity": 0.3937007784843445,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 53,
+          "velocity": 0.34645670652389526,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 58,
+          "velocity": 0.34645670652389526,
+          "duration": 8.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 0,
+      "scene": 2,
+      "sceneAbsolute": 2,
+      "notes": [
+        {
+          "x": 0,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 48,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 2,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 37,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 36,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 37,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 36,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 49,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 18,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 37,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 36,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 36,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 37,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 36,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 31,
+          "y": 49,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 34,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 37,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 36,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 43,
+          "y": 42,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 37,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 36,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 47,
+          "y": 49,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 50,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 37,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 36,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 55,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 36,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 59,
+          "y": 42,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 37,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 37,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 38,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 63,
+          "y": 49,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 2,
+      "sceneAbsolute": 2,
+      "notes": [
+        {
+          "x": 0,
+          "y": 39,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 2,
+          "y": 51,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 39,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 44,
+          "velocity": 0.7952755689620972,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 46,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 44,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 39,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 18,
+          "y": 51,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 39,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 44,
+          "velocity": 0.7952755689620972,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 49,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 46,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 39,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 34,
+          "y": 51,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 39,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 44,
+          "velocity": 0.7952755689620972,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 46,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 44,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 39,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 50,
+          "y": 51,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 46,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 49,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 46,
+          "velocity": 0.7952755689620972,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 44,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 2,
+      "sceneAbsolute": 2,
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.5984252095222473,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 3,
+          "y": 54,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 3,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 58,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 63,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 49,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 53,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 56,
+          "velocity": 0.5984252095222473,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 19,
+          "y": 53,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 19,
+          "y": 56,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 53,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 61,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 44,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 51,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 56,
+          "velocity": 0.5984252095222473,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 35,
+          "y": 51,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 35,
+          "y": 56,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 44,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 63,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 46,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 49,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 53,
+          "velocity": 0.5984252095222473,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 51,
+          "y": 49,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 51,
+          "y": 53,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 46,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 53,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 58,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 2,
+      "sceneAbsolute": 2,
+      "notes": [
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 63,
+          "velocity": 0.3937007784843445,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 66,
+          "velocity": 0.34645670652389526,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 56,
+          "velocity": 0.4488188922405243,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 61,
+          "velocity": 0.3937007784843445,
+          "duration": 8.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 65,
+          "velocity": 0.34645670652389526,
+          "duration": 8.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 0,
+      "scene": 3,
+      "sceneAbsolute": 3,
+      "notes": [
+        {
+          "x": 0,
+          "y": 36,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 43,
+          "velocity": 0.24409449100494385,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 37,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 49,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 36,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 43,
+          "velocity": 0.24409449100494385,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 44,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 45,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 36,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 43,
+          "velocity": 0.24409449100494385,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 37,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 49,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 36,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 55,
+          "y": 43,
+          "velocity": 0.24409449100494385,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 38,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 44,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 45,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 3,
+      "sceneAbsolute": 3,
+      "notes": [
+        {
+          "x": 0,
+          "y": 39,
+          "velocity": 0.6929134130477905,
+          "duration": 2.0,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 42,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 44,
+          "velocity": 0.6929134130477905,
+          "duration": 2.0,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 46,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 49,
+          "velocity": 0.6456692814826965,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 46,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 3,
+      "sceneAbsolute": 3,
+      "notes": [
+        {
+          "x": 0,
+          "y": 63,
+          "velocity": 0.4488188922405243,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 61,
+          "velocity": 0.3937007784843445,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 58,
+          "velocity": 0.34645670652389526,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 66,
+          "velocity": 0.3937007784843445,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 63,
+          "velocity": 0.4488188922405243,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 61,
+          "velocity": 0.3937007784843445,
+          "duration": 0.75,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 58,
+          "velocity": 0.34645670652389526,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 63,
+          "velocity": 0.4488188922405243,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 58,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 61,
+          "velocity": 0.34645670652389526,
+          "duration": 0.5,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 3,
+      "sceneAbsolute": 3,
+      "notes": [
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.4488188922405243,
+          "duration": 16.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.3937007784843445,
+          "duration": 16.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 61,
+          "velocity": 0.3937007784843445,
+          "duration": 16.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 66,
+          "velocity": 0.29921260476112366,
+          "duration": 16.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 0,
+      "scene": 4,
+      "sceneAbsolute": 4,
+      "notes": [
+        {
+          "x": 0,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 48,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 1,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 2,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 3,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 36,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 37,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 5,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 36,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 9,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 11,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 37,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 13,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 36,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 37,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 17,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 18,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 19,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 36,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 37,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 21,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 36,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 23,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 25,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 27,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 37,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 29,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 36,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 31,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 48,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 33,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 34,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 35,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 36,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 37,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 37,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 36,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 39,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 41,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 42,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 43,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 37,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 45,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 36,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 37,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 47,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 49,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 50,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 51,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 36,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 37,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 38,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 53,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 36,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 55,
+          "y": 38,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 37,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 37,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 42,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 37,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 37,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 4,
+      "sceneAbsolute": 4,
+      "notes": [
+        {
+          "x": 0,
+          "y": 39,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 2,
+          "y": 39,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 39,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 42,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 44,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 44,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 46,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 44,
+          "velocity": 0.748031497001648,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 39,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 18,
+          "y": 39,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 39,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 42,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 44,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 26,
+          "y": 46,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 49,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 51,
+          "velocity": 0.748031497001648,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 39,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 34,
+          "y": 39,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 39,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 42,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 44,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 42,
+          "y": 44,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 46,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 44,
+          "velocity": 0.748031497001648,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 39,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 50,
+          "y": 39,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 46,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 49,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 51,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 58,
+          "y": 49,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 46,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 44,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 4,
+      "sceneAbsolute": 4,
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 2,
+          "y": 54,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 2,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 51,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 54,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 58,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 63,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 58,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 58,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 63,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 49,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 53,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 56,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 18,
+          "y": 53,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 18,
+          "y": 56,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 49,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 53,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 20,
+          "y": 56,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 22,
+          "y": 61,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 53,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 24,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 53,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 28,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 30,
+          "y": 61,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 44,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 51,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 56,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 34,
+          "y": 51,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 34,
+          "y": 56,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 44,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 51,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 36,
+          "y": 56,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 38,
+          "y": 63,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 44,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 40,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 44,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 46,
+          "y": 63,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 46,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 49,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 53,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 50,
+          "y": 49,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 50,
+          "y": 53,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 46,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 49,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 52,
+          "y": 53,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 54,
+          "y": 58,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 46,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 56,
+          "y": 53,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 60,
+          "y": 53,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 62,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 4,
+      "sceneAbsolute": 4,
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 63,
+          "velocity": 0.34645670652389526,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 65,
+          "velocity": 0.29921260476112366,
+          "duration": 4.0,
+          "chance": 0.6
+        },
+        {
+          "x": 16,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 53,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 16,
+          "y": 61,
+          "velocity": 0.34645670652389526,
+          "duration": 4.0,
+          "chance": 0.6
+        },
+        {
+          "x": 32,
+          "y": 44,
+          "velocity": 0.4960629940032959,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 51,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 56,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 32,
+          "y": 63,
+          "velocity": 0.34645670652389526,
+          "duration": 4.0,
+          "chance": 0.6
+        },
+        {
+          "x": 48,
+          "y": 46,
+          "velocity": 0.4960629940032959,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 49,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 53,
+          "velocity": 0.4488188922405243,
+          "duration": 4.0,
+          "chance": 1.0
+        },
+        {
+          "x": 48,
+          "y": 58,
+          "velocity": 0.34645670652389526,
+          "duration": 4.0,
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "track": 0,
+      "scene": 0,
+      "sceneAbsolute": 5,
+      "sceneName": "\u00bb Groove",
+      "notes": [
+        {
+          "x": 0,
+          "y": 36,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 37,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 38,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 37,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 37,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 38,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 9,
+          "y": 37,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 37,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 11,
+          "y": 37,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 37,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 38,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 13,
+          "y": 37,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 37,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 37,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 48,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 0,
+      "sceneAbsolute": 5,
+      "sceneName": "\u00bb Groove",
+      "notes": [
+        {
+          "x": 8,
+          "y": 39,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 42,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 44,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 46,
+          "velocity": 0.7952755689620972,
+          "duration": 0.5,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 0,
+      "sceneAbsolute": 5,
+      "sceneName": "\u00bb Groove",
+      "notes": [
+        {
+          "x": 12,
+          "y": 51,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 54,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 51,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 58,
+          "velocity": 0.5433070659637451,
+          "duration": 0.5,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 0,
+      "sceneAbsolute": 5,
+      "sceneName": "\u00bb Groove",
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.19685038924217224,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.14960630238056183,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.14960630238056183,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 51,
+          "velocity": 0.3937007784843445,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 54,
+          "velocity": 0.34645670652389526,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 58,
+          "velocity": 0.34645670652389526,
+          "duration": 1.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 0,
+      "scene": 1,
+      "sceneAbsolute": 6,
+      "sceneName": "\u00bb Lift",
+      "notes": [
+        {
+          "x": 0,
+          "y": 36,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 38,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 37,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 38,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 47,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 9,
+          "y": 46,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 45,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 11,
+          "y": 44,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 44,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 13,
+          "y": 44,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 37,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 48,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 1,
+      "sceneAbsolute": 6,
+      "sceneName": "\u00bb Lift",
+      "notes": [
+        {
+          "x": 0,
+          "y": 39,
+          "velocity": 0.7952755689620972,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 42,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 44,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 46,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 49,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 51,
+          "velocity": 0.8976377844810486,
+          "duration": 0.5,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 1,
+      "sceneAbsolute": 6,
+      "sceneName": "\u00bb Lift",
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.4488188922405243,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 53,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 56,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 54,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 58,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 54,
+          "velocity": 0.5984252095222473,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 58,
+          "velocity": 0.5984252095222473,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 63,
+          "velocity": 0.6456692814826965,
+          "duration": 1.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 1,
+      "sceneAbsolute": 6,
+      "sceneName": "\u00bb Lift",
+      "notes": [
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.24409449100494385,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.19685038924217224,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 63,
+          "velocity": 0.14960630238056183,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 58,
+          "velocity": 0.4488188922405243,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 63,
+          "velocity": 0.3937007784843445,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 66,
+          "velocity": 0.34645670652389526,
+          "duration": 1.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 0,
+      "scene": 2,
+      "sceneAbsolute": 7,
+      "sceneName": "\u00bb Breakdown",
+      "notes": [
+        {
+          "x": 0,
+          "y": 36,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 48,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 49,
+          "velocity": 0.4960629940032959,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 43,
+          "velocity": 0.24409449100494385,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 38,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 43,
+          "velocity": 0.19685038924217224,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 2,
+      "sceneAbsolute": 7,
+      "sceneName": "\u00bb Breakdown",
+      "notes": [
+        {
+          "x": 0,
+          "y": 39,
+          "velocity": 0.5984252095222473,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 42,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 2,
+      "sceneAbsolute": 7,
+      "sceneName": "\u00bb Breakdown",
+      "notes": [
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.34645670652389526,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 63,
+          "velocity": 0.4488188922405243,
+          "duration": 1.5,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 61,
+          "velocity": 0.29921260476112366,
+          "duration": 0.5,
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 2,
+      "sceneAbsolute": 7,
+      "sceneName": "\u00bb Breakdown",
+      "notes": [
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.3937007784843445,
+          "duration": 2.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.3937007784843445,
+          "duration": 2.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 61,
+          "velocity": 0.34645670652389526,
+          "duration": 2.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 66,
+          "velocity": 0.24409449100494385,
+          "duration": 2.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 0,
+      "scene": 3,
+      "sceneAbsolute": 8,
+      "sceneName": "\u00bb Drop",
+      "notes": [
+        {
+          "x": 0,
+          "y": 36,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 37,
+          "velocity": 0.29921260476112366,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 49,
+          "velocity": 0.3937007784843445,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 2,
+          "y": 37,
+          "velocity": 0.34645670652389526,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 37,
+          "velocity": 0.3937007784843445,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 5,
+          "y": 37,
+          "velocity": 0.4488188922405243,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 6,
+          "y": 37,
+          "velocity": 0.4960629940032959,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 7,
+          "y": 37,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 36,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 37,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 9,
+          "y": 37,
+          "velocity": 0.6456692814826965,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 37,
+          "velocity": 0.6929134130477905,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 11,
+          "y": 37,
+          "velocity": 0.748031497001648,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 36,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 37,
+          "velocity": 0.7952755689620972,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 13,
+          "y": 37,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 36,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 37,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 37,
+          "velocity": 0.9448819160461426,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 48,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 1,
+      "scene": 3,
+      "sceneAbsolute": 8,
+      "sceneName": "\u00bb Drop",
+      "notes": [
+        {
+          "x": 0,
+          "y": 39,
+          "velocity": 0.6929134130477905,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 41,
+          "velocity": 0.748031497001648,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 42,
+          "velocity": 0.7952755689620972,
+          "duration": 0.5,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 44,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 13,
+          "y": 44,
+          "velocity": 0.8425197005271912,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 14,
+          "y": 46,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 15,
+          "y": 46,
+          "velocity": 0.8976377844810486,
+          "duration": 0.25,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 2,
+      "scene": 3,
+      "sceneAbsolute": 8,
+      "sceneName": "\u00bb Drop",
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.3937007784843445,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 56,
+          "velocity": 0.3937007784843445,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.3937007784843445,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 51,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 54,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 58,
+          "velocity": 0.5433070659637451,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 51,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 54,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 10,
+          "y": 58,
+          "velocity": 0.5984252095222473,
+          "duration": 0.25,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 51,
+          "velocity": 0.6456692814826965,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 54,
+          "velocity": 0.6456692814826965,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 58,
+          "velocity": 0.6456692814826965,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 63,
+          "velocity": 0.4960629940032959,
+          "duration": 1.0,
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "track": 3,
+      "scene": 3,
+      "sceneAbsolute": 8,
+      "sceneName": "\u00bb Drop",
+      "notes": [
+        {
+          "x": 0,
+          "y": 51,
+          "velocity": 0.14960630238056183,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "velocity": 0.09448818862438202,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 0,
+          "y": 58,
+          "velocity": 0.09448818862438202,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 51,
+          "velocity": 0.29921260476112366,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 54,
+          "velocity": 0.24409449100494385,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 4,
+          "y": 58,
+          "velocity": 0.24409449100494385,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 51,
+          "velocity": 0.4488188922405243,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 54,
+          "velocity": 0.3937007784843445,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 58,
+          "velocity": 0.3937007784843445,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 8,
+          "y": 63,
+          "velocity": 0.29921260476112366,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 51,
+          "velocity": 0.5433070659637451,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 54,
+          "velocity": 0.4960629940032959,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 58,
+          "velocity": 0.4960629940032959,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 63,
+          "velocity": 0.4488188922405243,
+          "duration": 1.0,
+          "chance": 1.0
+        },
+        {
+          "x": 12,
+          "y": 66,
+          "velocity": 0.34645670652389526,
+          "duration": 1.0,
+          "chance": 1.0
+        }
+      ]
+    }
+  ],
+  "devices": {},
+  "masterDevices": [
+    {
+      "name": "EQ-5",
+      "pages": [
+        {
+          "pageIndex": 0,
+          "pageName": "Gain",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "1 Gain",
+              "value": 0.53,
+              "displayed": "+1.4 dB"
+            },
+            {
+              "index": 1,
+              "name": "2 Gain",
+              "value": 0.48,
+              "displayed": "-1.0 dB"
+            },
+            {
+              "index": 2,
+              "name": "3 Gain",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            },
+            {
+              "index": 3,
+              "name": "4 Gain",
+              "value": 0.51,
+              "displayed": "+0.5 dB"
+            },
+            {
+              "index": 4,
+              "name": "5 Gain",
+              "value": 0.53,
+              "displayed": "+1.4 dB"
+            },
+            {
+              "index": 5,
+              "name": "Amount",
+              "value": 1.0,
+              "displayed": "100 %"
+            },
+            {
+              "index": 6,
+              "name": "Shift",
+              "value": 0.5,
+              "displayed": "0.00 st"
+            },
+            {
+              "index": 7,
+              "name": "Output",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            }
+          ]
+        },
+        {
+          "pageIndex": 1,
+          "pageName": "Freq",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "1 Freq",
+              "value": 0.17000000000000004,
+              "displayed": "64.7 Hz"
+            },
+            {
+              "index": 1,
+              "name": "2 Freq",
+              "value": 0.38000000000000006,
+              "displayed": "276 Hz"
+            },
+            {
+              "index": 2,
+              "name": "3 Freq",
+              "value": 0.6050633018440817,
+              "displayed": "1.31 kHz"
+            },
+            {
+              "index": 3,
+              "name": "4 Freq",
+              "value": 0.78,
+              "displayed": "4.38 kHz"
+            },
+            {
+              "index": 4,
+              "name": "5 Freq",
+              "value": 0.92,
+              "displayed": "11.5 kHz"
+            },
+            {
+              "index": 5,
+              "name": "Amount",
+              "value": 1.0,
+              "displayed": "100 %"
+            },
+            {
+              "index": 6,
+              "name": "Shift",
+              "value": 0.5,
+              "displayed": "0.00 st"
+            },
+            {
+              "index": 7,
+              "name": "Output",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            }
+          ]
+        },
+        {
+          "pageIndex": 2,
+          "pageName": "Q",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "1 Q",
+              "value": 0.32669977453726895,
+              "displayed": "0.71"
+            },
+            {
+              "index": 1,
+              "name": "2 Q",
+              "value": 0.3266996153846154,
+              "displayed": "0.71"
+            },
+            {
+              "index": 2,
+              "name": "3 Q",
+              "value": 0.3266996153846154,
+              "displayed": "0.71"
+            },
+            {
+              "index": 3,
+              "name": "4 Q",
+              "value": 0.3266996153846154,
+              "displayed": "0.71"
+            },
+            {
+              "index": 4,
+              "name": "5 Q",
+              "value": 0.3266996153846154,
+              "displayed": "0.71"
+            },
+            {
+              "index": 5,
+              "name": "Amount",
+              "value": 1.0,
+              "displayed": "100 %"
+            },
+            {
+              "index": 6,
+              "name": "Shift",
+              "value": 0.5,
+              "displayed": "0.00 st"
+            },
+            {
+              "index": 7,
+              "name": "Output",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            }
+          ]
+        },
+        {
+          "pageIndex": 3,
+          "pageName": "Type",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "1 Mode",
+              "value": 0.6666666666666666,
+              "displayed": "Bell"
+            },
+            {
+              "index": 1,
+              "name": "2 Mode",
+              "value": 0.0,
+              "displayed": "Bell"
+            },
+            {
+              "index": 2,
+              "name": "3 Mode",
+              "value": 0.0,
+              "displayed": "Bell"
+            },
+            {
+              "index": 3,
+              "name": "4 Mode",
+              "value": 0.0,
+              "displayed": "Bell"
+            },
+            {
+              "index": 4,
+              "name": "5 Mode",
+              "value": 0.6666666666666666,
+              "displayed": "Bell"
+            },
+            {
+              "index": 5,
+              "name": "Amount",
+              "value": 1.0,
+              "displayed": "100 %"
+            },
+            {
+              "index": 6,
+              "name": "Shift",
+              "value": 0.5,
+              "displayed": "0.00 st"
+            },
+            {
+              "index": 7,
+              "name": "Output",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            }
+          ]
+        },
+        {
+          "pageIndex": 4,
+          "pageName": "On/Off",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "1 On",
+              "value": 1.0,
+              "displayed": "On"
+            },
+            {
+              "index": 1,
+              "name": "2 On",
+              "value": 1.0,
+              "displayed": "On"
+            },
+            {
+              "index": 2,
+              "name": "3 On",
+              "value": 1.0,
+              "displayed": "On"
+            },
+            {
+              "index": 3,
+              "name": "4 On",
+              "value": 1.0,
+              "displayed": "On"
+            },
+            {
+              "index": 4,
+              "name": "5 On",
+              "value": 1.0,
+              "displayed": "On"
+            },
+            {
+              "index": 5,
+              "name": "Amount",
+              "value": 1.0,
+              "displayed": "100 %"
+            },
+            {
+              "index": 6,
+              "name": "Shift",
+              "value": 0.5,
+              "displayed": "0.00 st"
+            },
+            {
+              "index": 7,
+              "name": "Output",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            }
+          ]
+        },
+        {
+          "pageIndex": 5,
+          "pageName": "Common",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "1 Freq",
+              "value": 0.17000000000000004,
+              "displayed": "64.7 Hz"
+            },
+            {
+              "index": 1,
+              "name": "2 Freq",
+              "value": 0.38000000000000006,
+              "displayed": "276 Hz"
+            },
+            {
+              "index": 2,
+              "name": "3 Freq",
+              "value": 0.6050633018440817,
+              "displayed": "1.31 kHz"
+            },
+            {
+              "index": 3,
+              "name": "4 Freq",
+              "value": 0.78,
+              "displayed": "4.38 kHz"
+            },
+            {
+              "index": 4,
+              "name": "5 Freq",
+              "value": 0.92,
+              "displayed": "11.5 kHz"
+            },
+            {
+              "index": 5,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 6,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 7,
+              "name": "Shift",
+              "value": 0.5,
+              "displayed": "0.00 st"
+            }
+          ]
+        },
+        {
+          "pageIndex": 6,
+          "pageName": "Envelope",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "1 Gain",
+              "value": 0.53,
+              "displayed": "+1.4 dB"
+            },
+            {
+              "index": 1,
+              "name": "2 Gain",
+              "value": 0.48,
+              "displayed": "-1.0 dB"
+            },
+            {
+              "index": 2,
+              "name": "3 Gain",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            },
+            {
+              "index": 3,
+              "name": "4 Gain",
+              "value": 0.51,
+              "displayed": "+0.5 dB"
+            },
+            {
+              "index": 4,
+              "name": "5 Gain",
+              "value": 0.53,
+              "displayed": "+1.4 dB"
+            },
+            {
+              "index": 5,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 6,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 7,
+              "name": "Output",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Compressor",
+      "pages": [
+        {
+          "pageIndex": 0,
+          "pageName": "Comp",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "Input",
+              "value": 0.5,
+              "displayed": "0.0 dB"
+            },
+            {
+              "index": 1,
+              "name": "Threshold",
+              "value": 0.75,
+              "displayed": "-15.0 dB"
+            },
+            {
+              "index": 2,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 3,
+              "name": "Attack",
+              "value": 0.5,
+              "displayed": "3.80 ms"
+            },
+            {
+              "index": 4,
+              "name": "Release",
+              "value": 0.35,
+              "displayed": "137 ms"
+            },
+            {
+              "index": 5,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 6,
+              "name": "Ratio",
+              "value": 0.4,
+              "displayed": "1.67:1"
+            },
+            {
+              "index": 7,
+              "name": "Output",
+              "value": 0.52,
+              "displayed": "+0.8 dB"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Saturator",
+      "pages": [
+        {
+          "pageIndex": 0,
+          "pageName": "Main / Hi",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "Hi Thresh",
+              "value": 0.8,
+              "displayed": "-8.0 dB"
+            },
+            {
+              "index": 1,
+              "name": "Hi Knee",
+              "value": 0.75,
+              "displayed": "-6.0 dB"
+            },
+            {
+              "index": 2,
+              "name": "Hi Ratio",
+              "value": 0.6412500000000001,
+              "displayed": "-71.7 %"
+            },
+            {
+              "index": 3,
+              "name": "Cutoff",
+              "value": 0.5988372093023255,
+              "displayed": "1.69 kHz"
+            },
+            {
+              "index": 4,
+              "name": "Thresh \u00b1",
+              "value": 0.6525000000000004,
+              "displayed": "+3.7 dB"
+            },
+            {
+              "index": 5,
+              "name": "Knee \u00b1",
+              "value": 0.5,
+              "displayed": "0.00 %"
+            },
+            {
+              "index": 6,
+              "name": "Ratio \u00b1",
+              "value": 0.5,
+              "displayed": "0.00 %"
+            },
+            {
+              "index": 7,
+              "name": "Drive",
+              "value": 0.3499999999999999,
+              "displayed": "+1.3 dB"
+            }
+          ]
+        },
+        {
+          "pageIndex": 1,
+          "pageName": "Lo",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "Lo Thresh",
+              "value": 0.25,
+              "displayed": "-30.0 dB"
+            },
+            {
+              "index": 1,
+              "name": "Lo Knee",
+              "value": 0.25,
+              "displayed": "+6.0 dB"
+            },
+            {
+              "index": 2,
+              "name": "Lo Ratio",
+              "value": 0.8,
+              "displayed": "0.00 %"
+            },
+            {
+              "index": 3,
+              "name": "Cutoff",
+              "value": 0.5988372093023255,
+              "displayed": "1.69 kHz"
+            },
+            {
+              "index": 4,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 5,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 6,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 7,
+              "name": "Slope",
+              "value": 0.3333333333333333,
+              "displayed": "2\u1d3f"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Peak Limiter",
+      "pages": [
+        {
+          "pageIndex": 0,
+          "pageName": "Limiter",
+          "parameters": [
+            {
+              "index": 0,
+              "name": "Gain",
+              "value": 0.54,
+              "displayed": "+2.9 dB"
+            },
+            {
+              "index": 1,
+              "name": "Ceiling",
+              "value": 0.9920000000000001,
+              "displayed": "-0.3 dB"
+            },
+            {
+              "index": 2,
+              "name": "Release",
+              "value": 0.4000000000000001,
+              "displayed": "158 ms"
+            },
+            {
+              "index": 3,
+              "name": "Release Bias",
+              "value": 0.5,
+              "displayed": "0.00 %"
+            },
+            {
+              "index": 4,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 5,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 6,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            },
+            {
+              "index": 7,
+              "name": "",
+              "value": 0.0,
+              "displayed": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "cueMarkers": [
+    {
+      "name": "Intro",
+      "position": 0.0
+    },
+    {
+      "name": "\u00bb Groove",
+      "position": 12.0
+    },
+    {
+      "name": "Groove",
+      "position": 16.0
+    },
+    {
+      "name": "\u00bb Lift",
+      "position": 44.0
+    },
+    {
+      "name": "Lift",
+      "position": 48.0
+    },
+    {
+      "name": "\u00bb Breakdown",
+      "position": 76.0
+    },
+    {
+      "name": "Breakdown",
+      "position": 80.0
+    },
+    {
+      "name": "\u00bb Drop",
+      "position": 92.0
+    },
+    {
+      "name": "Drop",
+      "position": 96.0
+    },
+    {
+      "name": "\u00bb Groove 2",
+      "position": 124.0
+    },
+    {
+      "name": "Groove 2",
+      "position": 128.0
+    },
+    {
+      "name": "\u00bb Breakdown 2",
+      "position": 140.0
+    },
+    {
+      "name": "Breakdown 2",
+      "position": 144.0
+    },
+    {
+      "name": "\u00bb Drop 2",
+      "position": 156.0
+    },
+    {
+      "name": "Drop 2",
+      "position": 160.0
+    },
+    {
+      "name": "\u00bb Outro",
+      "position": 188.0
+    },
+    {
+      "name": "Outro",
+      "position": 192.0
+    }
+  ],
+  "trackDevices": {
+    "0": [
+      {
+        "name": "EQ-5",
+        "position": 1,
+        "pages": [
+          {
+            "pageIndex": 0,
+            "pageName": "Gain",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Gain",
+                "value": 0.56,
+                "displayed": "+2.9 dB"
+              },
+              {
+                "index": 1,
+                "name": "2 Gain",
+                "value": 0.46,
+                "displayed": "-1.9 dB"
+              },
+              {
+                "index": 2,
+                "name": "3 Gain",
+                "value": 0.52,
+                "displayed": "+1.0 dB"
+              },
+              {
+                "index": 3,
+                "name": "4 Gain",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              },
+              {
+                "index": 4,
+                "name": "5 Gain",
+                "value": 0.54,
+                "displayed": "+1.9 dB"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 1,
+            "pageName": "Freq",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Freq",
+                "value": 0.22,
+                "displayed": "91.4 Hz"
+              },
+              {
+                "index": 1,
+                "name": "2 Freq",
+                "value": 0.41,
+                "displayed": "340 Hz"
+              },
+              {
+                "index": 2,
+                "name": "3 Freq",
+                "value": 0.6050633018440817,
+                "displayed": "1.31 kHz"
+              },
+              {
+                "index": 3,
+                "name": "4 Freq",
+                "value": 0.7518313689462526,
+                "displayed": "3.60 kHz"
+              },
+              {
+                "index": 4,
+                "name": "5 Freq",
+                "value": 0.9,
+                "displayed": "10.0 kHz"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 2,
+            "pageName": "Q",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Q",
+                "value": 0.32669977453726895,
+                "displayed": "0.71"
+              },
+              {
+                "index": 1,
+                "name": "2 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 2,
+                "name": "3 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 3,
+                "name": "4 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 4,
+                "name": "5 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 3,
+            "pageName": "Type",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Mode",
+                "value": 0.6666666666666666,
+                "displayed": "Bell"
+              },
+              {
+                "index": 1,
+                "name": "2 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 2,
+                "name": "3 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 3,
+                "name": "4 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 4,
+                "name": "5 Mode",
+                "value": 0.6666666666666666,
+                "displayed": "Bell"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 4,
+            "pageName": "On/Off",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 1,
+                "name": "2 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 2,
+                "name": "3 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 3,
+                "name": "4 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 4,
+                "name": "5 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 5,
+            "pageName": "Common",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Freq",
+                "value": 0.22,
+                "displayed": "91.4 Hz"
+              },
+              {
+                "index": 1,
+                "name": "2 Freq",
+                "value": 0.41,
+                "displayed": "340 Hz"
+              },
+              {
+                "index": 2,
+                "name": "3 Freq",
+                "value": 0.6050633018440817,
+                "displayed": "1.31 kHz"
+              },
+              {
+                "index": 3,
+                "name": "4 Freq",
+                "value": 0.7518313689462526,
+                "displayed": "3.60 kHz"
+              },
+              {
+                "index": 4,
+                "name": "5 Freq",
+                "value": 0.9,
+                "displayed": "10.0 kHz"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              }
+            ]
+          },
+          {
+            "pageIndex": 6,
+            "pageName": "Envelope",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Gain",
+                "value": 0.56,
+                "displayed": "+2.9 dB"
+              },
+              {
+                "index": 1,
+                "name": "2 Gain",
+                "value": 0.46,
+                "displayed": "-1.9 dB"
+              },
+              {
+                "index": 2,
+                "name": "3 Gain",
+                "value": 0.52,
+                "displayed": "+1.0 dB"
+              },
+              {
+                "index": 3,
+                "name": "4 Gain",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              },
+              {
+                "index": 4,
+                "name": "5 Gain",
+                "value": 0.54,
+                "displayed": "+1.9 dB"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Compressor",
+        "position": 2,
+        "pages": [
+          {
+            "pageIndex": 0,
+            "pageName": "Comp",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "Input",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              },
+              {
+                "index": 1,
+                "name": "Threshold",
+                "value": 0.72,
+                "displayed": "-16.8 dB"
+              },
+              {
+                "index": 2,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 3,
+                "name": "Attack",
+                "value": 0.35,
+                "displayed": "1.58 ms"
+              },
+              {
+                "index": 4,
+                "name": "Release",
+                "value": 0.25000000000000006,
+                "displayed": "95.5 ms"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "Ratio",
+                "value": 0.6,
+                "displayed": "2.50:1"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.53,
+                "displayed": "+1.2 dB"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "1": [
+      {
+        "name": "EQ-5",
+        "position": 1,
+        "pages": [
+          {
+            "pageIndex": 0,
+            "pageName": "Gain",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Gain",
+                "value": 0.58,
+                "displayed": "+3.8 dB"
+              },
+              {
+                "index": 1,
+                "name": "2 Gain",
+                "value": 0.44,
+                "displayed": "-2.9 dB"
+              },
+              {
+                "index": 2,
+                "name": "3 Gain",
+                "value": 0.53,
+                "displayed": "+1.4 dB"
+              },
+              {
+                "index": 3,
+                "name": "4 Gain",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              },
+              {
+                "index": 4,
+                "name": "5 Gain",
+                "value": 0.46,
+                "displayed": "-1.9 dB"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 1,
+            "pageName": "Freq",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Freq",
+                "value": 0.17000000000000004,
+                "displayed": "64.7 Hz"
+              },
+              {
+                "index": 1,
+                "name": "2 Freq",
+                "value": 0.36,
+                "displayed": "240 Hz"
+              },
+              {
+                "index": 2,
+                "name": "3 Freq",
+                "value": 0.55,
+                "displayed": "893 Hz"
+              },
+              {
+                "index": 3,
+                "name": "4 Freq",
+                "value": 0.7518313689462526,
+                "displayed": "3.60 kHz"
+              },
+              {
+                "index": 4,
+                "name": "5 Freq",
+                "value": 0.85,
+                "displayed": "7.10 kHz"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 2,
+            "pageName": "Q",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Q",
+                "value": 0.32669977453726895,
+                "displayed": "0.71"
+              },
+              {
+                "index": 1,
+                "name": "2 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 2,
+                "name": "3 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 3,
+                "name": "4 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 4,
+                "name": "5 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 3,
+            "pageName": "Type",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Mode",
+                "value": 0.6666666666666666,
+                "displayed": "Bell"
+              },
+              {
+                "index": 1,
+                "name": "2 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 2,
+                "name": "3 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 3,
+                "name": "4 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 4,
+                "name": "5 Mode",
+                "value": 0.6666666666666666,
+                "displayed": "Bell"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 4,
+            "pageName": "On/Off",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 1,
+                "name": "2 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 2,
+                "name": "3 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 3,
+                "name": "4 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 4,
+                "name": "5 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 5,
+            "pageName": "Common",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Freq",
+                "value": 0.17000000000000004,
+                "displayed": "64.7 Hz"
+              },
+              {
+                "index": 1,
+                "name": "2 Freq",
+                "value": 0.36,
+                "displayed": "240 Hz"
+              },
+              {
+                "index": 2,
+                "name": "3 Freq",
+                "value": 0.55,
+                "displayed": "893 Hz"
+              },
+              {
+                "index": 3,
+                "name": "4 Freq",
+                "value": 0.7518313689462526,
+                "displayed": "3.60 kHz"
+              },
+              {
+                "index": 4,
+                "name": "5 Freq",
+                "value": 0.85,
+                "displayed": "7.10 kHz"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              }
+            ]
+          },
+          {
+            "pageIndex": 6,
+            "pageName": "Envelope",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Gain",
+                "value": 0.58,
+                "displayed": "+3.8 dB"
+              },
+              {
+                "index": 1,
+                "name": "2 Gain",
+                "value": 0.44,
+                "displayed": "-2.9 dB"
+              },
+              {
+                "index": 2,
+                "name": "3 Gain",
+                "value": 0.53,
+                "displayed": "+1.4 dB"
+              },
+              {
+                "index": 3,
+                "name": "4 Gain",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              },
+              {
+                "index": 4,
+                "name": "5 Gain",
+                "value": 0.46,
+                "displayed": "-1.9 dB"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Compressor",
+        "position": 2,
+        "pages": [
+          {
+            "pageIndex": 0,
+            "pageName": "Comp",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "Input",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              },
+              {
+                "index": 1,
+                "name": "Threshold",
+                "value": 0.68,
+                "displayed": "-19.2 dB"
+              },
+              {
+                "index": 2,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 3,
+                "name": "Attack",
+                "value": 0.3999999999999999,
+                "displayed": "2.12 ms"
+              },
+              {
+                "index": 4,
+                "name": "Release",
+                "value": 0.3,
+                "displayed": "114 ms"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "Ratio",
+                "value": 0.65,
+                "displayed": "2.86:1"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.54,
+                "displayed": "+1.6 dB"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "2": [
+      {
+        "name": "EQ-5",
+        "position": 1,
+        "pages": [
+          {
+            "pageIndex": 0,
+            "pageName": "Gain",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Gain",
+                "value": 0.42,
+                "displayed": "-3.8 dB"
+              },
+              {
+                "index": 1,
+                "name": "2 Gain",
+                "value": 0.46,
+                "displayed": "-1.9 dB"
+              },
+              {
+                "index": 2,
+                "name": "3 Gain",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              },
+              {
+                "index": 3,
+                "name": "4 Gain",
+                "value": 0.54,
+                "displayed": "+1.9 dB"
+              },
+              {
+                "index": 4,
+                "name": "5 Gain",
+                "value": 0.52,
+                "displayed": "+1.0 dB"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 1,
+            "pageName": "Freq",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Freq",
+                "value": 0.28,
+                "displayed": "138 Hz"
+              },
+              {
+                "index": 1,
+                "name": "2 Freq",
+                "value": 0.41,
+                "displayed": "340 Hz"
+              },
+              {
+                "index": 2,
+                "name": "3 Freq",
+                "value": 0.6050633018440817,
+                "displayed": "1.31 kHz"
+              },
+              {
+                "index": 3,
+                "name": "4 Freq",
+                "value": 0.72,
+                "displayed": "2.89 kHz"
+              },
+              {
+                "index": 4,
+                "name": "5 Freq",
+                "value": 0.9255307786166642,
+                "displayed": "12.0 kHz"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 2,
+            "pageName": "Q",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Q",
+                "value": 0.32669977453726895,
+                "displayed": "0.71"
+              },
+              {
+                "index": 1,
+                "name": "2 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 2,
+                "name": "3 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 3,
+                "name": "4 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 4,
+                "name": "5 Q",
+                "value": 0.3266996153846154,
+                "displayed": "0.71"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 3,
+            "pageName": "Type",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Mode",
+                "value": 0.6666666666666666,
+                "displayed": "Bell"
+              },
+              {
+                "index": 1,
+                "name": "2 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 2,
+                "name": "3 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 3,
+                "name": "4 Mode",
+                "value": 0.0,
+                "displayed": "Bell"
+              },
+              {
+                "index": 4,
+                "name": "5 Mode",
+                "value": 0.6666666666666666,
+                "displayed": "Bell"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 4,
+            "pageName": "On/Off",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 1,
+                "name": "2 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 2,
+                "name": "3 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 3,
+                "name": "4 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 4,
+                "name": "5 On",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 5,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 6,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 5,
+            "pageName": "Common",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Freq",
+                "value": 0.28,
+                "displayed": "138 Hz"
+              },
+              {
+                "index": 1,
+                "name": "2 Freq",
+                "value": 0.41,
+                "displayed": "340 Hz"
+              },
+              {
+                "index": 2,
+                "name": "3 Freq",
+                "value": 0.6050633018440817,
+                "displayed": "1.31 kHz"
+              },
+              {
+                "index": 3,
+                "name": "4 Freq",
+                "value": 0.72,
+                "displayed": "2.89 kHz"
+              },
+              {
+                "index": 4,
+                "name": "5 Freq",
+                "value": 0.9255307786166642,
+                "displayed": "12.0 kHz"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "Shift",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              }
+            ]
+          },
+          {
+            "pageIndex": 6,
+            "pageName": "Envelope",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "1 Gain",
+                "value": 0.42,
+                "displayed": "-3.8 dB"
+              },
+              {
+                "index": 1,
+                "name": "2 Gain",
+                "value": 0.46,
+                "displayed": "-1.9 dB"
+              },
+              {
+                "index": 2,
+                "name": "3 Gain",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              },
+              {
+                "index": 3,
+                "name": "4 Gain",
+                "value": 0.54,
+                "displayed": "+1.9 dB"
+              },
+              {
+                "index": 4,
+                "name": "5 Gain",
+                "value": 0.52,
+                "displayed": "+1.0 dB"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.5,
+                "displayed": "0.0 dB"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "3": [
+      {
+        "name": "Polymer",
+        "position": 0,
+        "pages": [
+          {
+            "pageIndex": 0,
+            "pageName": "Perform",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "SeqAmnt",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 1,
+                "name": "Rate",
+                "value": 0.588711384426002,
+                "displayed": "2.00"
+              },
+              {
+                "index": 2,
+                "name": "Timebase",
+                "value": 0.10526315789473684,
+                "displayed": "Bar"
+              },
+              {
+                "index": 3,
+                "name": "Smooth",
+                "value": 0.31199999999999983,
+                "displayed": "0.74 ms"
+              },
+              {
+                "index": 4,
+                "name": "Cutoff",
+                "value": 0.33006029285099003,
+                "displayed": "227 Hz"
+              },
+              {
+                "index": 5,
+                "name": "Detune",
+                "value": 0.3377777777777773,
+                "displayed": "34 cents"
+              },
+              {
+                "index": 6,
+                "name": "Reverb",
+                "value": 0.14666666666666692,
+                "displayed": "14.7 %"
+              },
+              {
+                "index": 7,
+                "name": "Output",
+                "value": 0.7209478422028067,
+                "displayed": "-2.5 dB"
+              }
+            ]
+          },
+          {
+            "pageIndex": 1,
+            "pageName": "Wavetable",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "Index",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 1,
+                "name": "IndexMod",
+                "value": 0.5,
+                "displayed": "0.00 %"
+              },
+              {
+                "index": 2,
+                "name": "PitchMod",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 3,
+                "name": "PhaseMod",
+                "value": 0.0,
+                "displayed": "0.00 %"
+              },
+              {
+                "index": 4,
+                "name": "Unison",
+                "value": 0.5,
+                "displayed": "5"
+              },
+              {
+                "index": 5,
+                "name": "U.Detune",
+                "value": 0.3377777777777773,
+                "displayed": "34 cents"
+              },
+              {
+                "index": 6,
+                "name": "Pitch",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 7,
+                "name": "Detune",
+                "value": 0.5,
+                "displayed": "0.00 Hz"
+              }
+            ]
+          },
+          {
+            "pageIndex": 2,
+            "pageName": "Low-pass MG",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "Cutoff",
+                "value": 0.33006029285099003,
+                "displayed": "227 Hz"
+              },
+              {
+                "index": 1,
+                "name": "Reso",
+                "value": 0.0,
+                "displayed": "0.00 %"
+              },
+              {
+                "index": 2,
+                "name": "Drive",
+                "value": 0.5666666666666661,
+                "displayed": "+3.3 dB"
+              },
+              {
+                "index": 3,
+                "name": "Keytrack",
+                "value": 0.2649999999999998,
+                "displayed": "53.0 %"
+              },
+              {
+                "index": 4,
+                "name": "Ctf Mod",
+                "value": 0.5,
+                "displayed": "0.00 st"
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              }
+            ]
+          },
+          {
+            "pageIndex": 3,
+            "pageName": "ADSR",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "Attack",
+                "value": 0.2844444444444445,
+                "displayed": "184 ms"
+              },
+              {
+                "index": 1,
+                "name": "Decay",
+                "value": 0.2844999999999999,
+                "displayed": "184 ms"
+              },
+              {
+                "index": 2,
+                "name": "Sustain",
+                "value": 1.0,
+                "displayed": "100 %"
+              },
+              {
+                "index": 3,
+                "name": "Release",
+                "value": 0.6983841904761906,
+                "displayed": "2.73 s"
+              },
+              {
+                "index": 4,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              }
+            ]
+          },
+          {
+            "pageIndex": 4,
+            "pageName": "Filter EG",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "Attack",
+                "value": 0.08000000000000002,
+                "displayed": "4.10 ms"
+              },
+              {
+                "index": 1,
+                "name": "Decay",
+                "value": 0.4819999999999999,
+                "displayed": "896 ms"
+              },
+              {
+                "index": 2,
+                "name": "Sustain",
+                "value": 0.3400000000000001,
+                "displayed": "34.0 %"
+              },
+              {
+                "index": 3,
+                "name": "Release",
+                "value": 0.29949999999999993,
+                "displayed": "215 ms"
+              },
+              {
+                "index": 4,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 5,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              }
+            ]
+          },
+          {
+            "pageIndex": 5,
+            "pageName": "Curves",
+            "parameters": [
+              {
+                "index": 0,
+                "name": "Rate",
+                "value": 0.588711384426002,
+                "displayed": "2.00"
+              },
+              {
+                "index": 1,
+                "name": "Timebase",
+                "value": 0.10526315789473684,
+                "displayed": "Bar"
+              },
+              {
+                "index": 2,
+                "name": "Phase",
+                "value": 0.5,
+                "displayed": "0 \u00b0"
+              },
+              {
+                "index": 3,
+                "name": "Mode",
+                "value": 0.5,
+                "displayed": "Sync"
+              },
+              {
+                "index": 4,
+                "name": "Smooth?",
+                "value": 1.0,
+                "displayed": "On"
+              },
+              {
+                "index": 5,
+                "name": "Lag Time",
+                "value": 0.31199999999999983,
+                "displayed": "0.74 ms"
+              },
+              {
+                "index": 6,
+                "name": "",
+                "value": 0.0,
+                "displayed": ""
+              },
+              {
+                "index": 7,
+                "name": "Amount",
+                "value": 1.0,
+                "displayed": "100 %"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "instruments": [
+    {
+      "track": 0,
+      "device": "Drum Machine",
+      "preset": "Soulful - Soul Crushed Kit"
+    },
+    {
+      "track": 1,
+      "device": "Polymer",
+      "preset": "Mirage (Bass)"
+    },
+    {
+      "track": 2,
+      "device": "Polymer",
+      "preset": "Cosy Sofa Keys (Electric Piano)"
+    },
+    {
+      "track": 3,
+      "device": "Polymer",
+      "preset": "CurveGated Pad"
+    }
+  ],
+  "drumPadMap": [
+    {
+      "note": 36,
+      "name": "Kick 808"
+    },
+    {
+      "note": 37,
+      "name": "Snare"
+    },
+    {
+      "note": 38,
+      "name": "Hat Closed"
+    },
+    {
+      "note": 39,
+      "name": "Hat Closed"
+    },
+    {
+      "note": 40,
+      "name": "Kick 2"
+    },
+    {
+      "note": 41,
+      "name": "Snare 808"
+    },
+    {
+      "note": 42,
+      "name": "RimFX"
+    },
+    {
+      "note": 43,
+      "name": "RimClick"
+    },
+    {
+      "note": 44,
+      "name": "Tom 3"
+    },
+    {
+      "note": 45,
+      "name": "Tom 3"
+    },
+    {
+      "note": 46,
+      "name": "Tom 3"
+    },
+    {
+      "note": 47,
+      "name": "Tom 4"
+    },
+    {
+      "note": 48,
+      "name": "Crash"
+    },
+    {
+      "note": 49,
+      "name": "Ride"
+    },
+    {
+      "note": 52,
+      "name": "Loop 1"
+    },
+    {
+      "note": 53,
+      "name": "Warp"
+    },
+    {
+      "note": 54,
+      "name": "Warp"
+    }
+  ],
+  "arrangement": {
+    "structure": [
+      {
+        "scene": "Intro",
+        "bars": 4,
+        "startBeat": 0
+      },
+      {
+        "scene": "\u00bb Groove",
+        "bars": 1,
+        "startBeat": 12
+      },
+      {
+        "scene": "Groove",
+        "bars": 8,
+        "startBeat": 16
+      },
+      {
+        "scene": "\u00bb Lift",
+        "bars": 1,
+        "startBeat": 44
+      },
+      {
+        "scene": "Lift",
+        "bars": 8,
+        "startBeat": 48
+      },
+      {
+        "scene": "\u00bb Breakdown",
+        "bars": 1,
+        "startBeat": 76
+      },
+      {
+        "scene": "Breakdown",
+        "bars": 4,
+        "startBeat": 80
+      },
+      {
+        "scene": "\u00bb Drop",
+        "bars": 1,
+        "startBeat": 92
+      },
+      {
+        "scene": "Drop",
+        "bars": 8,
+        "startBeat": 96
+      },
+      {
+        "scene": "\u00bb Groove",
+        "bars": 1,
+        "startBeat": 124
+      },
+      {
+        "scene": "Groove",
+        "bars": 4,
+        "startBeat": 128
+      },
+      {
+        "scene": "\u00bb Breakdown",
+        "bars": 1,
+        "startBeat": 140
+      },
+      {
+        "scene": "Breakdown",
+        "bars": 4,
+        "startBeat": 144
+      },
+      {
+        "scene": "\u00bb Drop",
+        "bars": 1,
+        "startBeat": 156
+      },
+      {
+        "scene": "Drop",
+        "bars": 8,
+        "startBeat": 160
+      },
+      {
+        "scene": "Intro",
+        "bars": 4,
+        "startBeat": 192,
+        "label": "Outro"
+      }
+    ]
+  },
+  "stats": {
+    "totalClips": 36,
+    "totalNotes": 757,
+    "notesWithChance": 757,
+    "totalScenes": 9,
+    "totalCueMarkers": 17,
+    "trackDeviceCount": 6,
+    "masterDeviceCount": 4
+  }
+}
