@@ -97,7 +97,7 @@ Progress logging to stdout.
 
 ### Batch 5 — Smoke tests (v0.21.5)
 **Delegation:** in-session
-**Status:** pending
+**Status:** done
 
 - Offline: CLI help for song subcommands
 - Online: full dump→rebuild round-trip test
