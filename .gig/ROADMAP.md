@@ -34,6 +34,7 @@
 | 19 | Clip Launcher Automation | v0.19.1–v0.19.6 | complete |
 | 20 | Clip Launcher Grid Enhancements | v0.20.1–v0.20.6 | complete |
 | 21 | Song Rebuild from JSON | v0.21.1–v0.21.5 | complete |
+| 22 | NoteStep Expressive Properties | v0.22.1–v0.22.6 | planned |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones
