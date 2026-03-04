@@ -341,8 +341,333 @@ class SongCommand {
 
         @Override
         public void run() {
-            System.err.println("Rebuild not yet implemented. Coming in v0.21.2.");
-            System.exit(1);
+            try {
+                RpcClient client = songParent.parent.createClient();
+                PrintStream log = System.err;
+
+                // Read and parse song JSON
+                String jsonStr = Files.readString(Path.of(filePath));
+                JsonObject song = JsonParser.parseString(jsonStr).getAsJsonObject();
+
+                // Validate format version (accept missing for legacy files)
+                if (song.has("meta") && song.getAsJsonObject("meta").has("formatVersion")) {
+                    String version = song.getAsJsonObject("meta").get("formatVersion").getAsString();
+                    if (!"1".equals(version)) {
+                        log.println("Error: Unsupported format version: " + version);
+                        System.exit(1);
+                    }
+                }
+
+                JsonObject transport = song.getAsJsonObject("transport");
+                JsonArray tracks = song.getAsJsonArray("tracks");
+                JsonObject master = song.getAsJsonObject("master");
+                JsonArray scenes = song.getAsJsonArray("scenes");
+                JsonArray clips = song.getAsJsonArray("clips");
+                JsonArray cueMarkers = song.has("cueMarkers") ? song.getAsJsonArray("cueMarkers") : new JsonArray();
+
+                int totalSteps = 7;
+                int step = 0;
+
+                // --- Step 1: Transport ---
+                step++;
+                log.println("[" + step + "/" + totalSteps + "] Setting transport: "
+                    + transport.get("tempo").getAsDouble() + " BPM, "
+                    + transport.get("timeSignature").getAsString());
+
+                JsonObject tempoParams = new JsonObject();
+                tempoParams.addProperty("bpm", transport.get("tempo").getAsDouble());
+                client.call("transport/setTempo", tempoParams);
+
+                // --- Step 2: Scenes ---
+                step++;
+                log.println("[" + step + "/" + totalSteps + "] Creating " + scenes.size() + " scenes...");
+
+                // Build scene array for macro/setupScenes
+                JsonArray sceneSetup = new JsonArray();
+                for (int i = 0; i < scenes.size(); i++) {
+                    JsonObject scene = scenes.get(i).getAsJsonObject();
+                    JsonObject sceneEntry = new JsonObject();
+                    sceneEntry.addProperty("index", i);
+                    sceneEntry.addProperty("name", scene.get("name").getAsString());
+                    sceneSetup.add(sceneEntry);
+                }
+
+                JsonObject setupParams = new JsonObject();
+                setupParams.add("scenes", sceneSetup);
+                client.call("macro/setupScenes", setupParams);
+                Thread.sleep(SCENE_SETTLE_MS);
+
+                // Set scene colors (need to scroll through scene bank)
+                for (int i = 0; i < scenes.size(); i++) {
+                    JsonObject scene = scenes.get(i).getAsJsonObject();
+                    if (!scene.has("color")) continue;
+
+                    int scrollPos = (i / SCENE_BANK_SIZE) * SCENE_BANK_SIZE;
+                    int bankIndex = i - scrollPos;
+
+                    JsonObject scrollParams = new JsonObject();
+                    scrollParams.addProperty("position", scrollPos);
+                    client.call("sceneBank/scrollTo", scrollParams);
+
+                    JsonObject colorObj = scene.getAsJsonObject("color");
+                    JsonObject colorParams = new JsonObject();
+                    colorParams.addProperty("index", bankIndex);
+                    colorParams.addProperty("r", colorObj.get("r").getAsFloat());
+                    colorParams.addProperty("g", colorObj.get("g").getAsFloat());
+                    colorParams.addProperty("b", colorObj.get("b").getAsFloat());
+                    client.call("scene/setColor", colorParams);
+                }
+                Thread.sleep(SCROLL_SETTLE_MS);
+
+                // --- Step 3: Clips ---
+                step++;
+                log.println("[" + step + "/" + totalSteps + "] Writing " + clips.size() + " clips...");
+
+                for (int c = 0; c < clips.size(); c++) {
+                    JsonObject clip = clips.get(c).getAsJsonObject();
+                    int trackIndex = clip.get("track").getAsInt();
+                    int sceneAbsolute = clip.get("sceneAbsolute").getAsInt();
+                    JsonArray notes = clip.getAsJsonArray("notes");
+
+                    // Default values for legacy format
+                    int lengthBeats = clip.has("lengthBeats")
+                        ? (int) clip.get("lengthBeats").getAsDouble() : 16;
+                    double stepSize = clip.has("stepSize")
+                        ? clip.get("stepSize").getAsDouble() : 0.25;
+                    String clipName = clip.has("name") && !clip.get("name").isJsonNull()
+                        ? clip.get("name").getAsString() : null;
+
+                    // Scroll scene bank to make this scene visible
+                    int scrollPos = (sceneAbsolute / SCENE_BANK_SIZE) * SCENE_BANK_SIZE;
+                    int slotIndex = sceneAbsolute - scrollPos;
+
+                    JsonObject scrollParams = new JsonObject();
+                    scrollParams.addProperty("position", scrollPos);
+                    client.call("sceneBank/scrollTo", scrollParams);
+
+                    // Strip chance data from notes for setNotes (chance is set separately)
+                    JsonArray cleanNotes = new JsonArray();
+                    JsonArray chanceNotes = new JsonArray();
+                    for (JsonElement noteEl : notes) {
+                        JsonObject note = noteEl.getAsJsonObject();
+                        JsonObject clean = new JsonObject();
+                        clean.addProperty("x", note.get("x").getAsInt());
+                        clean.addProperty("y", note.get("y").getAsInt());
+                        clean.addProperty("velocity", note.get("velocity").getAsDouble());
+                        clean.addProperty("duration", note.get("duration").getAsDouble());
+                        cleanNotes.add(clean);
+
+                        if (note.has("chance") && note.get("chance").getAsDouble() < 1.0) {
+                            JsonObject cn = new JsonObject();
+                            cn.addProperty("x", note.get("x").getAsInt());
+                            cn.addProperty("y", note.get("y").getAsInt());
+                            cn.addProperty("chance", note.get("chance").getAsDouble());
+                            chanceNotes.add(cn);
+                        }
+                    }
+
+                    // Use macro/writeClip for creation + note writing
+                    JsonObject writeParams = new JsonObject();
+                    writeParams.addProperty("trackIndex", trackIndex);
+                    writeParams.addProperty("sceneIndex", slotIndex);
+                    writeParams.addProperty("lengthBeats", lengthBeats);
+                    writeParams.addProperty("stepSize", stepSize);
+                    writeParams.add("notes", cleanNotes);
+                    if (clipName != null) {
+                        writeParams.addProperty("name", clipName);
+                    }
+                    client.call("macro/writeClip", writeParams);
+                    Thread.sleep(CLIP_WRITE_MS);
+
+                    // Set chance on notes if any
+                    if (!chanceNotes.isEmpty()) {
+                        // Need to wait for clip write to complete, then set chance
+                        Thread.sleep(CLIP_WRITE_MS);
+                        JsonObject chanceParams = new JsonObject();
+                        chanceParams.add("notes", chanceNotes);
+                        client.call("clip/setChance", chanceParams);
+                    }
+
+                    log.println("  [" + (c + 1) + "/" + clips.size() + "] Track " + trackIndex
+                        + " / Scene " + sceneAbsolute + " (" + notes.size() + " notes)");
+                }
+
+                // --- Step 4: Clip colors ---
+                step++;
+                log.println("[" + step + "/" + totalSteps + "] Setting clip colors...");
+
+                for (int c = 0; c < clips.size(); c++) {
+                    JsonObject clip = clips.get(c).getAsJsonObject();
+                    int trackIndex = clip.get("track").getAsInt();
+                    int sceneAbsolute = clip.get("sceneAbsolute").getAsInt();
+
+                    // Determine color: use clip color if present, else scene color
+                    JsonObject colorObj = null;
+                    if (clip.has("color") && !clip.get("color").isJsonNull()) {
+                        colorObj = clip.getAsJsonObject("color");
+                    } else {
+                        // Fall back to scene color
+                        for (JsonElement sceneEl : scenes) {
+                            JsonObject scene = sceneEl.getAsJsonObject();
+                            int absIdx = scene.has("absoluteIndex")
+                                ? scene.get("absoluteIndex").getAsInt()
+                                : scene.get("index").getAsInt();
+                            if (absIdx == sceneAbsolute && scene.has("color")) {
+                                colorObj = scene.getAsJsonObject("color");
+                                break;
+                            }
+                        }
+                    }
+                    if (colorObj == null) continue;
+
+                    // Scroll and select the clip
+                    int scrollPos = (sceneAbsolute / SCENE_BANK_SIZE) * SCENE_BANK_SIZE;
+                    int slotIndex = sceneAbsolute - scrollPos;
+
+                    JsonObject scrollParams = new JsonObject();
+                    scrollParams.addProperty("position", scrollPos);
+                    client.call("sceneBank/scrollTo", scrollParams);
+
+                    JsonObject selectParams = new JsonObject();
+                    selectParams.addProperty("trackIndex", trackIndex);
+                    selectParams.addProperty("slotIndex", slotIndex);
+                    selectParams.addProperty("force", true);
+                    client.call("clip/select", selectParams);
+                    Thread.sleep(CLIP_COLOR_MS);
+
+                    JsonObject colorParams = new JsonObject();
+                    colorParams.addProperty("r", colorObj.get("r").getAsFloat());
+                    colorParams.addProperty("g", colorObj.get("g").getAsFloat());
+                    colorParams.addProperty("b", colorObj.get("b").getAsFloat());
+                    client.call("clip/setColor", colorParams);
+                    Thread.sleep(CLIP_COLOR_MS);
+                }
+
+                // --- Step 5: Track mix ---
+                step++;
+                log.println("[" + step + "/" + totalSteps + "] Mixing " + tracks.size() + " tracks...");
+
+                for (JsonElement trackEl : tracks) {
+                    JsonObject track = trackEl.getAsJsonObject();
+                    int idx = track.get("index").getAsInt();
+
+                    JsonObject volParams = new JsonObject();
+                    volParams.addProperty("index", idx);
+                    volParams.addProperty("value", track.get("volume").getAsDouble());
+                    client.call("track/setVolume", volParams);
+
+                    JsonObject panParams = new JsonObject();
+                    panParams.addProperty("index", idx);
+                    panParams.addProperty("value", track.get("pan").getAsDouble());
+                    client.call("track/setPan", panParams);
+
+                    if (track.has("mute")) {
+                        JsonObject muteParams = new JsonObject();
+                        muteParams.addProperty("index", idx);
+                        muteParams.addProperty("value", track.get("mute").getAsBoolean());
+                        client.call("track/setMute", muteParams);
+                    }
+
+                    if (track.has("solo")) {
+                        JsonObject soloParams = new JsonObject();
+                        soloParams.addProperty("index", idx);
+                        soloParams.addProperty("value", track.get("solo").getAsBoolean());
+                        client.call("track/setSolo", soloParams);
+                    }
+
+                    if (track.has("color")) {
+                        JsonObject colorObj = track.getAsJsonObject("color");
+                        JsonObject colorParams = new JsonObject();
+                        colorParams.addProperty("index", idx);
+                        colorParams.addProperty("r", colorObj.get("r").getAsFloat());
+                        colorParams.addProperty("g", colorObj.get("g").getAsFloat());
+                        colorParams.addProperty("b", colorObj.get("b").getAsFloat());
+                        client.call("track/setColor", colorParams);
+                    }
+                }
+
+                // --- Step 6: Master mix ---
+                step++;
+                log.println("[" + step + "/" + totalSteps + "] Setting master mix...");
+
+                JsonObject masterVolParams = new JsonObject();
+                masterVolParams.addProperty("value", master.get("volume").getAsDouble());
+                client.call("master/setVolume", masterVolParams);
+
+                JsonObject masterPanParams = new JsonObject();
+                masterPanParams.addProperty("value", master.get("pan").getAsDouble());
+                client.call("master/setPan", masterPanParams);
+
+                // --- Step 7: Cue markers ---
+                step++;
+                if (!cueMarkers.isEmpty()) {
+                    log.println("[" + step + "/" + totalSteps + "] Adding " + cueMarkers.size()
+                        + " cue markers...");
+
+                    for (int m = 0; m < cueMarkers.size(); m++) {
+                        JsonObject marker = cueMarkers.get(m).getAsJsonObject();
+                        double position = marker.get("position").getAsDouble();
+                        String name = marker.get("name").getAsString();
+
+                        // Set transport to marker position
+                        JsonObject posParams = new JsonObject();
+                        posParams.addProperty("beats", position);
+                        client.call("transport/setPosition", posParams);
+                        Thread.sleep(CUE_MARKER_MS);
+
+                        // Add marker at playhead
+                        client.call("cueMarker/addAtPlayhead", null);
+                        Thread.sleep(CUE_MARKER_MS);
+
+                        // Rename the marker (it's at bank index m, assuming bank is large enough)
+                        // Need to scroll cue marker bank if m >= 16
+                        int bankIdx = m % 16;
+                        if (m > 0 && bankIdx == 0) {
+                            JsonObject scrollParams = new JsonObject();
+                            scrollParams.addProperty("amount", 16);
+                            client.call("cueMarkerBank/scrollBy", scrollParams);
+                            Thread.sleep(CUE_MARKER_MS);
+                        }
+
+                        JsonObject renameParams = new JsonObject();
+                        renameParams.addProperty("index", bankIdx);
+                        renameParams.addProperty("name", name);
+                        client.call("cueMarker/rename", renameParams);
+                    }
+
+                    // Reset transport to start
+                    JsonObject posParams = new JsonObject();
+                    posParams.addProperty("beats", 0.0);
+                    client.call("transport/setPosition", posParams);
+                } else {
+                    log.println("[" + step + "/" + totalSteps + "] No cue markers to add.");
+                }
+
+                // Scroll scene bank back to 0
+                JsonObject scrollParams = new JsonObject();
+                scrollParams.addProperty("position", 0);
+                client.call("sceneBank/scrollTo", scrollParams);
+
+                log.println("Done! Rebuilt " + clips.size() + " clips across "
+                    + scenes.size() + " scenes.");
+
+                // Print manual steps reminder
+                if (song.has("instruments") && song.getAsJsonArray("instruments").size() > 0) {
+                    log.println();
+                    log.println("Manual steps required:");
+                    for (JsonElement instEl : song.getAsJsonArray("instruments")) {
+                        JsonObject inst = instEl.getAsJsonObject();
+                        log.println("  Track " + inst.get("track").getAsInt()
+                            + ": Load " + inst.get("device").getAsString()
+                            + " → " + inst.get("preset").getAsString());
+                    }
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+                e.printStackTrace(System.err);
+                System.exit(1);
+            }
         }
     }
 }
