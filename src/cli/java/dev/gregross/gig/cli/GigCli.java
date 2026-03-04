@@ -15,7 +15,8 @@ import picocli.CommandLine.Option;
         DeviceCommand.class,
         NoteCommand.class,
         SnapshotCommand.class,
-        RpcCommand.class
+        RpcCommand.class,
+        SongCommand.class
     }
 )
 public class GigCli {

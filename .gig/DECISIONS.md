@@ -108,5 +108,16 @@ No other new extension methods needed — the existing `macro/setupScenes`, `mac
 
 **Rationale:** The dump side is the painful one — 36 individual clip selects + getNotes + device parameter reads. Doing this server-side avoids 40+ round-trips and handles cursor settle timing internally. The rebuild side already has adequate methods.
 
-**Status:** ACTIVE
+**Status:** REVISED
 **ID:** D-21.6
+
+---
+
+## 2026-03-04 — Extension: No new RPC method needed — CLI drives dump
+
+**Decision:** No `macro/dumpSong` RPC method. The CLI drives the dump by calling existing RPC methods in sequence: `session/snapshot` for base data, then iterating `clip/select` + `clip/getNotes` per clip, `device/getDrumPads` for drum mapping. This avoids a deadlock: RPC handlers run on the session thread during `flush()`, so blocking with CountDownLatch would prevent scheduled tasks (which also need flush cycles) from executing.
+
+**Rationale:** D-21.6 proposed CountDownLatch to block the session thread while deferred clip reads completed. This deadlocks because `scheduleTask` callbacks run inside future `flush()` calls, but `flush()` can't run if the current one is blocked. The CLI-driven approach is simpler, proven (we did it manually), and avoids threading issues entirely.
+
+**Status:** ACTIVE
+**ID:** D-21.6r
