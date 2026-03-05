@@ -19,7 +19,7 @@
 | 23.2 | `0.23.2` | NoteInputHandler — 10 RPC methods | in-session | done |
 | 23.3 | `0.23.3` | Unit tests | in-session | done |
 | 23.4 | `0.23.4` | Tool schemas + system prompt update | in-session | done |
-| 23.5 | `0.23.5` | Smoke tests | in-session | pending |
+| 23.5 | `0.23.5` | Smoke tests | in-session | done |
 
 ---
 

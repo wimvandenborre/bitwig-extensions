@@ -727,6 +727,50 @@ assert_contains "system prompt mentions clip_setNoteExpressions" "$PROMPT" "clip
 assert_contains "system prompt mentions clip_setNoteRepeat" "$PROMPT" "clip_setNoteRepeat"
 assert_contains "system prompt mentions clip_setNoteOccurrence" "$PROMPT" "clip_setNoteOccurrence"
 
+# Phase 23 — NoteInput & Arpeggiator
+echo "--- Phase 23 Offline: NoteInput & Arpeggiator ---"
+
+# Tool schema presence (10 new tools)
+assert_contains "has noteInput_sendNote tool" "$TOOLS_LIST" "noteInput_sendNote"
+assert_contains "has noteInput_sendMidi tool" "$TOOLS_LIST" "noteInput_sendMidi"
+assert_contains "has arpeggiator_configure tool" "$TOOLS_LIST" "arpeggiator_configure"
+assert_contains "has arpeggiator_setEnabled tool" "$TOOLS_LIST" "arpeggiator_setEnabled"
+assert_contains "has arpeggiator_releaseNotes tool" "$TOOLS_LIST" "arpeggiator_releaseNotes"
+assert_contains "has arpeggiator_getState tool" "$TOOLS_LIST" "arpeggiator_getState"
+assert_contains "has noteLatch_configure tool" "$TOOLS_LIST" "noteLatch_configure"
+assert_contains "has noteLatch_setEnabled tool" "$TOOLS_LIST" "noteLatch_setEnabled"
+assert_contains "has noteLatch_releaseNotes tool" "$TOOLS_LIST" "noteLatch_releaseNotes"
+assert_contains "has noteLatch_getState tool" "$TOOLS_LIST" "noteLatch_getState"
+
+# arpeggiator_configure has mode enum with 17 values
+ARP_MODE_ENUM=$(jq -r '.[] | select(.name=="arpeggiator_configure") | .input_schema.properties.mode.enum | join(",")' "$TOOLS_FILE")
+assert_contains "arp mode enum has 'up'" "$ARP_MODE_ENUM" "up"
+assert_contains "arp mode enum has 'random'" "$ARP_MODE_ENUM" "random"
+assert_contains "arp mode enum has 'converge-up'" "$ARP_MODE_ENUM" "converge-up"
+assert_contains "arp mode enum has 'pinky-down'" "$ARP_MODE_ENUM" "pinky-down"
+
+# noteInput_sendNote has note and velocity required
+SENDNOTE_REQ=$(jq -r '.[] | select(.name=="noteInput_sendNote") | .input_schema.required | join(",")' "$TOOLS_FILE")
+assert_contains "sendNote requires note" "$SENDNOTE_REQ" "note"
+assert_contains "sendNote requires velocity" "$SENDNOTE_REQ" "velocity"
+
+# noteLatch_configure has mode enum
+LATCH_MODE_ENUM=$(jq -r '.[] | select(.name=="noteLatch_configure") | .input_schema.properties.mode.enum | join(",")' "$TOOLS_FILE")
+assert_contains "latch mode enum has 'chord'" "$LATCH_MODE_ENUM" "chord"
+assert_contains "latch mode enum has 'toggle'" "$LATCH_MODE_ENUM" "toggle"
+assert_contains "latch mode enum has 'velocity'" "$LATCH_MODE_ENUM" "velocity"
+
+# session_snapshot description mentions arpeggiator and noteLatch
+SNAPSHOT_DESC=$(jq -r '.[] | select(.name=="session_snapshot") | .description' "$TOOLS_FILE")
+assert_contains "snapshot mentions arpeggiator" "$SNAPSHOT_DESC" "arpeggiator"
+assert_contains "snapshot mentions noteLatch" "$SNAPSHOT_DESC" "noteLatch"
+
+# System prompt mentions NoteInput & Arpeggiator section
+assert_contains "system prompt has NoteInput & Arpeggiator section" "$PROMPT" "NoteInput & Arpeggiator"
+assert_contains "system prompt mentions noteInput_sendNote" "$PROMPT" "noteInput_sendNote"
+assert_contains "system prompt mentions arpeggiator_configure" "$PROMPT" "arpeggiator_configure"
+assert_contains "system prompt mentions noteLatch_configure" "$PROMPT" "noteLatch_configure"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"

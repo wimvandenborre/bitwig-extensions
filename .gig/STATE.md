@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.23.4` |
+| **Version** | `0.23.5` |
 | **Phase** | 23 — NoteInput & Arpeggiator |
 | **Status** | `IMPLEMENTING` |
-| **Last Batch** | 23.4 — Tool schemas + system prompt update |
+| **Last Batch** | 23.5 — Smoke tests |
 | **Last Updated** | 2026-03-04 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| `0.23.5` | 23 | Smoke tests | PLANNED | DONE | 2026-03-04 |
 | `0.23.4` | 23 | Tool schemas + system prompt update | PLANNED | DONE | 2026-03-04 |
 | `0.23.3` | 23 | Unit tests | PLANNED | DONE | 2026-03-04 |
 | `0.23.2` | 23 | NoteInputHandler — 10 RPC methods | PLANNED | DONE | 2026-03-04 |
