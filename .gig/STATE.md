@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.24.2` |
+| **Version** | `0.24.3` |
 | **Phase** | 24 — Device Sound Design Navigation |
 | **Status** | `IMPLEMENTING` |
-| **Last Batch** | 24.2 — MasterDeviceHandler — layer, keypad, page tag methods |
+| **Last Batch** | 24.3 — Unit tests |
 | **Last Updated** | 2026-03-05 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| `0.24.3` | 24 | Unit tests | PLANNED | DONE | 2026-03-05 |
 | `0.24.2` | 24 | MasterDeviceHandler — layer, keypad, page tag methods | PLANNED | DONE | 2026-03-05 |
 | `0.24.1` | 24 | DeviceHandler — layer, keypad, page tag methods | PLANNED | DONE | 2026-03-05 |
 | `0.23.5` | 23 | Smoke tests | PLANNED | DONE | 2026-03-04 |

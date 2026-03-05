@@ -17,7 +17,7 @@
 |-------|---------|-------|------------|--------|
 | 24.1 | `0.24.1` | DeviceHandler — layer, keypad, page tag methods | in-session | done |
 | 24.2 | `0.24.2` | MasterDeviceHandler — layer, keypad, page tag methods | in-session | done |
-| 24.3 | `0.24.3` | Unit tests | in-session | pending |
+| 24.3 | `0.24.3` | Unit tests | in-session | done |
 | 24.4 | `0.24.4` | Tool schemas + system prompt update | in-session | pending |
 | 24.5 | `0.24.5` | Smoke tests | in-session | pending |
 

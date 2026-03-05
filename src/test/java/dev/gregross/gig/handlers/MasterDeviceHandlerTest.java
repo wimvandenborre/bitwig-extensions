@@ -19,7 +19,7 @@ class MasterDeviceHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersTwelveMethods() {
+    void registersFifteenMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("masterDevice/selectNext"));
         assertTrue(methods.contains("masterDevice/selectPrevious"));
@@ -33,7 +33,10 @@ class MasterDeviceHandlerTest {
         assertTrue(methods.contains("masterDevice/setParameterValue"));
         assertTrue(methods.contains("masterDevice/enterSlot"));
         assertTrue(methods.contains("masterDevice/exitToParent"));
-        assertEquals(12, methods.size());
+        assertTrue(methods.contains("masterDevice/enterLayer"));
+        assertTrue(methods.contains("masterDevice/enterKeyPad"));
+        assertTrue(methods.contains("masterDevice/selectPageByTag"));
+        assertEquals(15, methods.size());
     }
 
     // --- setEnabled validation ---
@@ -109,6 +112,54 @@ class MasterDeviceHandlerTest {
         String response = dispatcher.handle(rpc("masterDevice/setParameterValue", "{\"index\":8,\"value\":0.5}"));
         assertContains(response, "-32602");
         assertContains(response, "out of range");
+    }
+
+    // --- masterDevice/enterLayer validation ---
+
+    @Test
+    void enterLayer_missingBothParams_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/enterLayer", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "must provide");
+    }
+
+    @Test
+    void enterLayer_bothParams_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/enterLayer", "{\"index\":0,\"name\":\"Layer 1\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "mutually exclusive");
+    }
+
+    // --- masterDevice/enterKeyPad validation ---
+
+    @Test
+    void enterKeyPad_missingKey_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/enterKeyPad", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "key");
+    }
+
+    @Test
+    void enterKeyPad_keyOutOfRange_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/enterKeyPad", "{\"key\":128}"));
+        assertContains(response, "-32602");
+        assertContains(response, "0-127");
+    }
+
+    // --- masterDevice/selectPageByTag validation ---
+
+    @Test
+    void selectPageByTag_missingTag_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/selectPageByTag", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "tag");
+    }
+
+    @Test
+    void selectPageByTag_invalidTag_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/selectPageByTag", "{\"tag\":\"bogus\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "Invalid page tag");
     }
 
     // --- Helpers ---
