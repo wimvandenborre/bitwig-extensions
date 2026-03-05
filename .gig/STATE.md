@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.24.5` |
-| **Phase** | 24 — Device Sound Design Navigation |
-| **Status** | `GOVERNED` |
+| **Phase** | 25 — Track Routing & Groups |
+| **Status** | `GATHERING` |
 | **Last Batch** | 24.5 — Smoke tests |
 | **Last Updated** | 2026-03-05 |
 

@@ -118,6 +118,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerArrangementObservers(transport, cueMarkerBank);
         stateCache.registerSendObservers(trackBank, SEND_COUNT);
         stateCache.registerMixerObservers(trackBank);
+        stateCache.registerGroupObservers(trackBank);
         stateCache.registerMasterDeviceObservers(masterCursorDevice, masterRemoteControlsPage);
         stateCache.registerBrowserObservers(popupBrowser);
         stateCache.registerFilterObservers(popupBrowser);
@@ -139,7 +140,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new ApplicationHandler(application, host).register(dispatcher);
         new TransportHandler(transport, stateCache).register(dispatcher);
         TrackBankManager trackBankManager = new TrackBankManager(trackBank, TRACK_COUNT);
-        new TrackHandler(trackBank, application, cursorTrack, trackBankManager, stateCache).register(dispatcher);
+        new TrackHandler(trackBank, application, cursorTrack, trackBankManager, stateCache, noteInput).register(dispatcher);
         new MasterHandler(masterTrack).register(dispatcher);
         new ClipHandler(trackBank, trackBank.sceneBank(), cursorClip, stateCache).register(dispatcher);
         DeviceLibrary deviceLibrary;
