@@ -90,6 +90,11 @@ public class GigMaestroExtension extends ControllerExtension {
         // Create project reference
         Project project = host.getProject();
 
+        // Create note input for real-time MIDI injection
+        NoteInput noteInput = host.getMidiInPort(0).createNoteInput("Gig Maestro");
+        Arpeggiator arpeggiator = noteInput.arpeggiator();
+        NoteLatch noteLatch = noteInput.noteLatch();
+
         // Create popup browser for preset/device/sample browsing
         PopupBrowser popupBrowser = host.createPopupBrowser();
 
@@ -115,6 +120,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerMasterDeviceObservers(masterCursorDevice, masterRemoteControlsPage);
         stateCache.registerBrowserObservers(popupBrowser);
         stateCache.registerFilterObservers(popupBrowser);
+        stateCache.registerNoteInputObservers(arpeggiator, noteLatch);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
