@@ -844,3 +844,69 @@ Available for both clips and scenes. These correspond to Bitwig's configurable a
    ```
 5. Call `clip_getNotes` to verify 16 kick notes were written.
 6. Call `clip_launch` to play the pattern.
+
+## NoteInput & Arpeggiator
+
+Real-time MIDI injection and arpeggiator/note-latch control. Notes sent via NoteInput play through the selected track's instrument immediately (no clip recording required).
+
+### Sending Notes
+
+- **`noteInput_sendNote`** — Send note-on/off: `{note: 60, velocity: 100}`. velocity=0 = note-off. Optional `channel` (0-15, default 0).
+- **`noteInput_sendMidi`** — Send raw MIDI: `{status, data0, data1}`. For CC, pitch bend, aftertouch, etc.
+
+**Important:** Always send note-off (velocity=0) after note-on, or notes sustain indefinitely.
+
+### Arpeggiator
+
+Transforms held notes into rhythmic patterns. 17 modes available:
+
+| Category | Modes |
+|----------|-------|
+| Basic | `all`, `up`, `down`, `flow`, `random` |
+| Bounce | `up-down`, `up-then-down`, `down-up`, `down-then-up` |
+| Converge/Diverge | `converge-up`, `converge-down`, `diverge-up`, `diverge-down` |
+| Thumb/Pinky | `thumb-up`, `thumb-down`, `pinky-up`, `pinky-down` |
+
+**Properties (via `arpeggiator_configure`):**
+- `mode` — Pattern mode (see table above)
+- `octaves` — Range 0-8
+- `rate` — Note repeat rate in beats (0.25 = 1/16, 0.5 = 1/8, 1.0 = 1/4)
+- `gateLength` — Note length as ratio of period (1/32 to 8)
+- `shuffle` — Enable shuffle timing (boolean)
+- `humanize` — Timing variation 0.0-1.0
+- `isFreeRunning` — Don't sync to transport (boolean)
+- `enableOverlappingNotes` — Allow overlapping arp notes (boolean)
+- `usePressureToVelocity` — Use aftertouch for velocity (boolean)
+- `terminateNotesImmediately` — Stop notes on key release (boolean)
+
+**Control:**
+- `arpeggiator_setEnabled` — Enable/disable
+- `arpeggiator_releaseNotes` — Release all held arp notes
+- `arpeggiator_getState` — Get all current properties
+
+### Note Latch
+
+Sustains notes after key release. 3 modes:
+- `chord` — All notes sustain until new notes replace them
+- `toggle` — Each note toggles on/off independently
+- `velocity` — Notes above threshold sustain, below threshold release
+
+**Configure via `noteLatch_configure`:** `mode`, `mono` (single note only), `velocityThreshold`.
+
+**Control:** `noteLatch_setEnabled`, `noteLatch_releaseNotes`, `noteLatch_getState`.
+
+### Arpeggiator Workflow
+
+```
+1. arpeggiator_configure(mode: "up", rate: 0.25, octaves: 2)
+2. arpeggiator_setEnabled(enabled: true)
+3. noteInput_sendNote(note: 60, velocity: 100)  // starts arp pattern
+4. noteInput_sendNote(note: 64, velocity: 100)  // adds to chord
+5. arpeggiator_releaseNotes()                   // stop pattern
+6. arpeggiator_setEnabled(enabled: false)        // disable
+```
+
+### Snapshot Sections
+
+- **arpeggiator:** `isEnabled`, `mode`, `octaves`, `rate`, `gateLength`, `shuffle`, `humanize`, `isFreeRunning`, `enableOverlappingNotes`, `usePressureToVelocity`, `terminateNotesImmediately`
+- **noteLatch:** `isEnabled`, `mode`, `mono`, `velocityThreshold`, `activeNotes`

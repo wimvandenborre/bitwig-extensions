@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), and browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), and noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -3543,6 +3543,186 @@
         }
       },
       "required": ["index"]
+    }
+  },
+  {
+    "name": "noteInput_sendNote",
+    "description": "Send a note-on or note-off event via the NoteInput for real-time MIDI playback. velocity=0 sends note-off. Notes are injected directly into the selected track's instrument.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "type": "integer",
+          "description": "MIDI note number (0-127). Middle C = 60."
+        },
+        "velocity": {
+          "type": "integer",
+          "description": "Note velocity (0-127). 0 = note-off."
+        },
+        "channel": {
+          "type": "integer",
+          "description": "MIDI channel (0-15). Default: 0."
+        }
+      },
+      "required": ["note", "velocity"]
+    }
+  },
+  {
+    "name": "noteInput_sendMidi",
+    "description": "Send a raw MIDI event via the NoteInput. Use for CC, pitch bend, aftertouch, or any MIDI message. For notes, prefer noteInput_sendNote.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "description": "MIDI status byte (e.g., 0x90 for note-on ch1, 0xB0 for CC ch1, 0xE0 for pitch bend ch1)."
+        },
+        "data0": {
+          "type": "integer",
+          "description": "First data byte (0-127)."
+        },
+        "data1": {
+          "type": "integer",
+          "description": "Second data byte (0-127)."
+        }
+      },
+      "required": ["status", "data0", "data1"]
+    }
+  },
+  {
+    "name": "arpeggiator_configure",
+    "description": "Batch-configure arpeggiator properties. All parameters are optional — only provided values are changed. Use with arpeggiator_setEnabled to activate.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "Arpeggiator pattern mode.",
+          "enum": [
+            "all", "up", "up-down", "up-then-down", "down", "down-up", "down-then-up",
+            "flow", "random", "converge-up", "converge-down", "diverge-up", "diverge-down",
+            "thumb-up", "thumb-down", "pinky-up", "pinky-down"
+          ]
+        },
+        "octaves": {
+          "type": "integer",
+          "description": "Octave range (0-8)."
+        },
+        "rate": {
+          "type": "number",
+          "description": "Note repeat rate in beats (e.g., 0.25 = 1/16, 0.5 = 1/8, 1.0 = 1/4)."
+        },
+        "gateLength": {
+          "type": "number",
+          "description": "Note length as ratio of the period (1/32 to 8)."
+        },
+        "shuffle": {
+          "type": "boolean",
+          "description": "Enable shuffle timing."
+        },
+        "humanize": {
+          "type": "number",
+          "description": "Humanize amount (0.0 to 1.0)."
+        },
+        "isFreeRunning": {
+          "type": "boolean",
+          "description": "If true, arpeggiator does not sync to transport."
+        },
+        "enableOverlappingNotes": {
+          "type": "boolean",
+          "description": "Allow overlapping notes in arpeggio."
+        },
+        "usePressureToVelocity": {
+          "type": "boolean",
+          "description": "Use note pressure to determine arpeggio velocity."
+        },
+        "terminateNotesImmediately": {
+          "type": "boolean",
+          "description": "If true, notes stop immediately on release rather than playing to their computed end."
+        }
+      }
+    }
+  },
+  {
+    "name": "arpeggiator_setEnabled",
+    "description": "Enable or disable the arpeggiator. When enabled, held notes are transformed into rhythmic patterns based on the configured mode and rate.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable, false to disable."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "arpeggiator_releaseNotes",
+    "description": "Release all notes currently held by the arpeggiator. Stops any playing arpeggiated pattern.",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "arpeggiator_getState",
+    "description": "Get the current arpeggiator state: isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately.",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "noteLatch_configure",
+    "description": "Batch-configure note latch properties. All parameters are optional — only provided values are changed. Use with noteLatch_setEnabled to activate.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "Latch mode.",
+          "enum": ["chord", "toggle", "velocity"]
+        },
+        "mono": {
+          "type": "boolean",
+          "description": "If true, only one note is latched at a time."
+        },
+        "velocityThreshold": {
+          "type": "integer",
+          "description": "Velocity threshold for the velocity latch mode."
+        }
+      }
+    }
+  },
+  {
+    "name": "noteLatch_setEnabled",
+    "description": "Enable or disable note latch. When enabled, notes sustain after release based on the latch mode (chord, toggle, or velocity).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable, false to disable."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "noteLatch_releaseNotes",
+    "description": "Release all notes currently held by the note latch. Stops any sustained notes.",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "noteLatch_getState",
+    "description": "Get the current note latch state: isEnabled, mode, mono, velocityThreshold, activeNotes.",
+    "input_schema": {
+      "type": "object",
+      "properties": {}
     }
   }
 ]
