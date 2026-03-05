@@ -6,9 +6,9 @@
 |-------|-------|
 | **Version** | `0.23.5` |
 | **Phase** | 23 — NoteInput & Arpeggiator |
-| **Status** | `IMPLEMENTING` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 23.5 — Smoke tests |
-| **Last Updated** | 2026-03-04 |
+| **Last Updated** | 2026-03-05 |
 
 ---
 
