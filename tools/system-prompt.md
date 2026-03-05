@@ -148,6 +148,55 @@ You can add and remove devices on the cursor track:
 3. Call `device_insertBitwigDevice` with the name (and optional position).
 4. Call `session_snapshot` to verify the device was added — it should appear in the `device` section.
 
+### Device Sound Design Navigation
+
+Navigate inside complex devices to access nested layers, drum pads, and specific parameter pages.
+
+**Layer Navigation** — for Instrument Layer, FX Layer, and similar layered devices:
+- `device_enterLayer` — enter a layer's device chain by `index` (0-based) or `name` (mutually exclusive)
+- `device_exitToParent` — return to parent device after layer editing
+
+**Drum Pad Navigation** — for Drum Machine per-pad device chains:
+- `device_enterKeyPad` — enter a drum pad's device chain by MIDI `key` (0-127)
+- Common keys: 36=kick, 37=rimshot, 38=snare, 42=closed hihat, 46=open hihat, 49=crash
+
+**Parameter Page Tag Filtering** — jump directly to relevant pages instead of cycling:
+- `device_selectPageByTag` — find page by tag with optional `direction` and `cycle`
+
+| Tag | Description | Example Pages |
+|-----|-------------|---------------|
+| `osc` | Oscillator | Oscillator 1, Oscillator 2 |
+| `filter` | Filter | Filter, Filter Mod |
+| `env` | Envelope | Amp Envelope, Mod Envelope |
+| `lfo` | LFO | LFO 1, LFO 2 |
+| `fx` | Effects | FX, Effects |
+| `eq` | Equalizer | EQ |
+| `mixer` | Mixer/levels | Mixer, Levels |
+| `perf` | Performance | Performance, Macro |
+
+All 3 methods are also available on `masterDevice_*` for master bus devices.
+
+**Sound design workflow:**
+```
+1. device_insertBitwigDevice(name: "Polymer")       // insert synth
+2. device_selectPageByTag(tag: "osc")                // jump to oscillator page
+3. device_setParameterValue(index: 0, value: 0.7)    // tweak oscillator params
+4. device_selectPageByTag(tag: "filter")             // jump to filter page
+5. device_setParameterValue(index: 0, value: 0.3)    // set filter cutoff
+6. device_selectPageByTag(tag: "env")                // jump to envelope
+7. device_setParameterValue(index: 2, value: 0.5)    // adjust decay
+```
+
+**Layer editing workflow (Instrument Layer):**
+```
+1. device_insertBitwigDevice(name: "Instrument Layer")
+2. device_enterLayer(index: 0)                       // enter first layer
+3. device_insertBitwigDevice(name: "Polysynth")      // add synth to layer
+4. device_exitToParent()                             // back to layer device
+5. device_enterLayer(index: 1)                       // enter second layer
+6. device_insertBitwigDevice(name: "Polymer")        // add different synth
+```
+
 ### Track Management
 
 You can create, select, rename, delete, and duplicate tracks:

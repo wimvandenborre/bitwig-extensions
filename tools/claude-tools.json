@@ -3724,5 +3724,115 @@
       "type": "object",
       "properties": {}
     }
+  },
+  {
+    "name": "device_enterLayer",
+    "description": "Navigate the device cursor into a nested layer's device chain. Used for Instrument Layer, FX Layer, and similar layered devices. Provide either index or name (not both). Use device_exitToParent to return.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Layer index (0-based). Mutually exclusive with name."
+        },
+        "name": {
+          "type": "string",
+          "description": "Layer name. Mutually exclusive with index."
+        }
+      }
+    }
+  },
+  {
+    "name": "device_enterKeyPad",
+    "description": "Navigate the device cursor into a drum pad's device chain by MIDI key. Used for Drum Machine to access per-pad instruments and FX. Use device_exitToParent to return.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "integer",
+          "description": "MIDI note number (0-127) associated with the drum pad. Common: 36=kick, 38=snare, 42=hihat."
+        }
+      },
+      "required": ["key"]
+    }
+  },
+  {
+    "name": "device_selectPageByTag",
+    "description": "Jump to a parameter page by tag instead of cycling sequentially. Tags are assigned by device developers to categorize pages (e.g., oscillator pages tagged 'osc', filter pages tagged 'filter').",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "description": "Page tag to match.",
+          "enum": ["env", "eq", "filter", "fx", "lfo", "mixer", "osc", "perf"]
+        },
+        "direction": {
+          "type": "string",
+          "description": "Search direction. Default: 'next'.",
+          "enum": ["next", "previous"]
+        },
+        "cycle": {
+          "type": "boolean",
+          "description": "Wrap around when reaching the end. Default: true."
+        }
+      },
+      "required": ["tag"]
+    }
+  },
+  {
+    "name": "masterDevice_enterLayer",
+    "description": "Navigate the master device cursor into a nested layer's device chain. Same as device_enterLayer but for master bus devices.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Layer index (0-based). Mutually exclusive with name."
+        },
+        "name": {
+          "type": "string",
+          "description": "Layer name. Mutually exclusive with index."
+        }
+      }
+    }
+  },
+  {
+    "name": "masterDevice_enterKeyPad",
+    "description": "Navigate the master device cursor into a drum pad's device chain by MIDI key. Same as device_enterKeyPad but for master bus devices.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "integer",
+          "description": "MIDI note number (0-127) associated with the drum pad."
+        }
+      },
+      "required": ["key"]
+    }
+  },
+  {
+    "name": "masterDevice_selectPageByTag",
+    "description": "Jump to a parameter page by tag on the master device. Same as device_selectPageByTag but for master bus devices.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "description": "Page tag to match.",
+          "enum": ["env", "eq", "filter", "fx", "lfo", "mixer", "osc", "perf"]
+        },
+        "direction": {
+          "type": "string",
+          "description": "Search direction. Default: 'next'.",
+          "enum": ["next", "previous"]
+        },
+        "cycle": {
+          "type": "boolean",
+          "description": "Wrap around when reaching the end. Default: true."
+        }
+      },
+      "required": ["tag"]
+    }
   }
 ]
