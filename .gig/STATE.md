@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.22.6` |
 | **Phase** | 22 — NoteStep Expressive Properties |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | Smoke tests |
 | **Last Updated** | 2026-03-04 |
 
