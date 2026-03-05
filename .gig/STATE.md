@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.23.2` |
+| **Version** | `0.23.3` |
 | **Phase** | 23 — NoteInput & Arpeggiator |
 | **Status** | `IMPLEMENTING` |
-| **Last Batch** | 23.2 — NoteInputHandler — 10 RPC methods |
+| **Last Batch** | 23.3 — Unit tests |
 | **Last Updated** | 2026-03-04 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| `0.23.3` | 23 | Unit tests | PLANNED | DONE | 2026-03-04 |
 | `0.23.2` | 23 | NoteInputHandler — 10 RPC methods | PLANNED | DONE | 2026-03-04 |
 | `0.23.1` | 23 | NoteInput infrastructure + snapshot observers | PLANNED | DONE | 2026-03-04 |
 | 0.22.6 | 22 | Smoke tests | PLANNED | done | 2026-03-04 |
