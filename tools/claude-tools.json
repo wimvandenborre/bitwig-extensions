@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), and noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode, trackType, isGroup, isGroupExpanded), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), and noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -1619,6 +1619,69 @@
   {
     "name": "track_duplicate",
     "description": "Duplicate the currently selected (cursor) track. Creates a copy of the track with all its clips, devices, and settings. The cursor track must be pointing at the track to duplicate.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_setGroupExpanded",
+    "description": "Expand or collapse the currently selected group track. The cursor track must be pointing at a group track. Use 'expanded' to set a specific state, or 'toggle' to flip the current state. Provide exactly one parameter.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "expanded": {
+          "type": "boolean",
+          "description": "True to expand the group, false to collapse it."
+        },
+        "toggle": {
+          "type": "boolean",
+          "description": "Set to true to toggle the current expanded/collapsed state."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "track_navigateInto",
+    "description": "Navigate into the currently selected group track. Makes the group's child tracks visible as top-level tracks in the track bank. Use track/navigateToParent to go back up. The cursor track must be pointing at a group track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_navigateToParent",
+    "description": "Navigate out of the current group track to the parent level. Reverses the effect of track/navigateInto. If already at the top level, this has no effect.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_createGroup",
+    "description": "Create a new group track that wraps the currently selected track. The selected track becomes a child of the new group. The cursor track must be pointing at the track to group.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_addNoteSource",
+    "description": "Route the extension's NoteInput to the currently selected track. After calling this, noteInput/sendNote and noteInput/sendMidi will play through this track's instrument. Useful for targeting real-time MIDI playback to a specific track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_removeNoteSource",
+    "description": "Remove the NoteInput routing from the currently selected track. Stops the extension's NoteInput from playing through this track. Use after track/addNoteSource when done with targeted playback.",
     "input_schema": {
       "type": "object",
       "properties": {},

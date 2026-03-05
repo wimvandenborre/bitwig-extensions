@@ -804,6 +804,34 @@ assert_contains "system prompt mentions device_enterLayer" "$PROMPT" "device_ent
 assert_contains "system prompt mentions device_selectPageByTag" "$PROMPT" "device_selectPageByTag"
 assert_contains "system prompt mentions page tag table" "$PROMPT" "osc"
 
+# Phase 25 — Track Routing & Groups
+echo "--- Phase 25 Offline: Track Routing & Groups ---"
+
+# Tool schema presence (6 new tools)
+assert_contains "has track_setGroupExpanded tool" "$TOOLS_LIST" "track_setGroupExpanded"
+assert_contains "has track_navigateInto tool" "$TOOLS_LIST" "track_navigateInto"
+assert_contains "has track_navigateToParent tool" "$TOOLS_LIST" "track_navigateToParent"
+assert_contains "has track_createGroup tool" "$TOOLS_LIST" "track_createGroup"
+assert_contains "has track_addNoteSource tool" "$TOOLS_LIST" "track_addNoteSource"
+assert_contains "has track_removeNoteSource tool" "$TOOLS_LIST" "track_removeNoteSource"
+
+# track_setGroupExpanded has expanded and toggle properties
+GRP_PROPS=$(jq -r '.[] | select(.name=="track_setGroupExpanded") | .input_schema.properties | keys | join(",")' "$TOOLS_FILE")
+assert_contains "setGroupExpanded has expanded prop" "$GRP_PROPS" "expanded"
+assert_contains "setGroupExpanded has toggle prop" "$GRP_PROPS" "toggle"
+
+# session_snapshot mentions trackType, isGroup, isGroupExpanded
+SNAP_DESC=$(jq -r '.[] | select(.name=="session_snapshot") | .description' "$TOOLS_FILE")
+assert_contains "snapshot desc mentions trackType" "$SNAP_DESC" "trackType"
+assert_contains "snapshot desc mentions isGroup" "$SNAP_DESC" "isGroup"
+assert_contains "snapshot desc mentions isGroupExpanded" "$SNAP_DESC" "isGroupExpanded"
+
+# System prompt mentions Track Routing & Groups
+assert_contains "system prompt has Track Routing section" "$PROMPT" "Track Routing"
+assert_contains "system prompt mentions navigateInto" "$PROMPT" "track_navigateInto"
+assert_contains "system prompt mentions addNoteSource" "$PROMPT" "track_addNoteSource"
+assert_contains "system prompt mentions track types" "$PROMPT" "trackType"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"

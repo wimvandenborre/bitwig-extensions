@@ -2,6 +2,7 @@ package dev.gregross.gig.handlers;
 
 import com.bitwig.extension.controller.api.Application;
 import com.bitwig.extension.controller.api.CursorTrack;
+import com.bitwig.extension.controller.api.NoteInput;
 import com.bitwig.extension.controller.api.Track;
 import com.bitwig.extension.controller.api.TrackBank;
 import com.google.gson.JsonElement;
@@ -13,20 +14,25 @@ import dev.gregross.gig.rpc.RpcException;
 
 public class TrackHandler {
 
+    private static final int SEND_COUNT = 4;
+    private static final int SCENE_COUNT = 5;
+
     private final TrackBank trackBank;
     private final Application application;
     private final CursorTrack cursorTrack;
     private final TrackBankManager trackBankManager;
     private final StateCache stateCache;
+    private final NoteInput noteInput;
 
     public TrackHandler(TrackBank trackBank, Application application,
                         CursorTrack cursorTrack, TrackBankManager trackBankManager,
-                        StateCache stateCache) {
+                        StateCache stateCache, NoteInput noteInput) {
         this.trackBank = trackBank;
         this.application = application;
         this.cursorTrack = cursorTrack;
         this.trackBankManager = trackBankManager;
         this.stateCache = stateCache;
+        this.noteInput = noteInput;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -142,6 +148,50 @@ public class TrackHandler {
                 throw new IllegalArgumentException("invalid monitor mode: " + mode + " (expected ON, OFF, or AUTO)");
             }
             track.monitorMode().set(mode);
+            return ok();
+        });
+
+        // --- Phase 25: Group & routing methods ---
+
+        dispatcher.register("track/setGroupExpanded", params -> {
+            boolean hasExpanded = params.has("expanded") && !params.get("expanded").isJsonNull();
+            boolean hasToggle = params.has("toggle") && !params.get("toggle").isJsonNull();
+            if (!hasExpanded && !hasToggle) {
+                throw new IllegalArgumentException("must provide 'expanded' or 'toggle' parameter");
+            }
+            if (hasExpanded && hasToggle) {
+                throw new IllegalArgumentException("'expanded' and 'toggle' are mutually exclusive — provide one, not both");
+            }
+            if (hasToggle) {
+                cursorTrack.isGroupExpanded().toggle();
+            } else {
+                cursorTrack.isGroupExpanded().set(params.get("expanded").getAsBoolean());
+            }
+            return ok();
+        });
+
+        dispatcher.register("track/navigateInto", params -> {
+            application.navigateIntoTrackGroup(cursorTrack);
+            return ok();
+        });
+
+        dispatcher.register("track/navigateToParent", params -> {
+            application.navigateToParentTrackGroup();
+            return ok();
+        });
+
+        dispatcher.register("track/createGroup", params -> {
+            cursorTrack.createParentTrack(SEND_COUNT, SCENE_COUNT);
+            return ok();
+        });
+
+        dispatcher.register("track/addNoteSource", params -> {
+            cursorTrack.addNoteSource(noteInput);
+            return ok();
+        });
+
+        dispatcher.register("track/removeNoteSource", params -> {
+            cursorTrack.removeNoteSource(noteInput);
             return ok();
         });
 

@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.24.5` |
-| **Phase** | 24 — Device Sound Design Navigation |
+| **Version** | `0.25.5` |
+| **Phase** | 25 — Track Routing & Groups |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 24.5 — Smoke tests |
+| **Last Batch** | 25.5 — Smoke tests |
 | **Last Updated** | 2026-03-05 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| `0.25.5` | 25 | Smoke tests | PLANNED | DONE | 2026-03-05 |
+| `0.25.4` | 25 | Tool schemas + system prompt | PLANNED | DONE | 2026-03-05 |
+| `0.25.3` | 25 | Unit tests | PLANNED | DONE | 2026-03-05 |
+| `0.25.2` | 25 | TrackHandler — 6 group & routing methods | PLANNED | DONE | 2026-03-05 |
+| `0.25.1` | 25 | Snapshot observers (trackType, isGroup, isGroupExpanded) | PLANNED | DONE | 2026-03-05 |
 | `0.24.5` | 24 | Smoke tests | PLANNED | DONE | 2026-03-05 |
 | `0.24.4` | 24 | Tool schemas + system prompt update | PLANNED | DONE | 2026-03-05 |
 | `0.24.3` | 24 | Unit tests | PLANNED | DONE | 2026-03-05 |

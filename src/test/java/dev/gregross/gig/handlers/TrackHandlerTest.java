@@ -14,7 +14,7 @@ class TrackHandlerTest {
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new TrackHandler(null, null, null, null, new StateCache()).register(dispatcher);
+        new TrackHandler(null, null, null, null, new StateCache(), null).register(dispatcher);
     }
 
     // --- Registration ---
@@ -53,8 +53,19 @@ class TrackHandlerTest {
     }
 
     @Test
-    void registersExactlyEighteenMethods() {
-        assertEquals(18, dispatcher.getRegisteredMethods().size());
+    void registersGroupAndRoutingMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("track/setGroupExpanded"));
+        assertTrue(methods.contains("track/navigateInto"));
+        assertTrue(methods.contains("track/navigateToParent"));
+        assertTrue(methods.contains("track/createGroup"));
+        assertTrue(methods.contains("track/addNoteSource"));
+        assertTrue(methods.contains("track/removeNoteSource"));
+    }
+
+    @Test
+    void registersExactlyTwentyFourMethods() {
+        assertEquals(24, dispatcher.getRegisteredMethods().size());
     }
 
     // --- trackBank/scrollTo validation ---
@@ -101,6 +112,22 @@ class TrackHandlerTest {
         assertContains(response, "bankSize");
         assertContains(response, "canScrollForwards");
         assertContains(response, "canScrollBackwards");
+    }
+
+    // --- track/setGroupExpanded validation ---
+
+    @Test
+    void setGroupExpanded_missingBothParams_returnsError() {
+        String response = dispatcher.handle(rpc("track/setGroupExpanded", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "must provide");
+    }
+
+    @Test
+    void setGroupExpanded_bothParams_returnsError() {
+        String response = dispatcher.handle(rpc("track/setGroupExpanded", "{\"expanded\":true,\"toggle\":true}"));
+        assertContains(response, "-32602");
+        assertContains(response, "mutually exclusive");
     }
 
     // --- Helpers ---

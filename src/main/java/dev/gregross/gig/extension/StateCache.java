@@ -44,6 +44,9 @@ public class StateCache {
     private final float[][] trackColors = new float[TRACK_COUNT][3]; // r, g, b
     private final String[] trackCrossfadeModes = new String[TRACK_COUNT];
     private final String[] trackMonitorModes = new String[TRACK_COUNT];
+    private final String[] trackTypes = new String[TRACK_COUNT];
+    private final boolean[] trackIsGroup = new boolean[TRACK_COUNT];
+    private final boolean[] trackIsGroupExpanded = new boolean[TRACK_COUNT];
 
     // Send state — [trackIndex][sendIndex]
     private volatile int sendCount = DEFAULT_SEND_COUNT;
@@ -784,6 +787,23 @@ public class StateCache {
         }
     }
 
+    public void registerGroupObservers(TrackBank trackBank) {
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            final int idx = i;
+            Track track = (Track) trackBank.getItemAt(i);
+            trackTypes[idx] = "";
+
+            track.trackType().markInterested();
+            track.trackType().addValueObserver((StringValueChangedCallback) v -> trackTypes[idx] = (String) v);
+
+            track.isGroup().markInterested();
+            track.isGroup().addValueObserver((BooleanValueChangedCallback) v -> trackIsGroup[idx] = v);
+
+            track.isGroupExpanded().markInterested();
+            track.isGroupExpanded().addValueObserver((BooleanValueChangedCallback) v -> trackIsGroupExpanded[idx] = v);
+        }
+    }
+
     public void registerMasterDeviceObservers(CursorDevice masterCursorDevice,
                                                CursorRemoteControlsPage masterRemoteControlsPage) {
         // Initialize param arrays
@@ -1184,6 +1204,9 @@ public class StateCache {
 
             track.addProperty("crossfadeMode", trackCrossfadeModes[i] != null ? trackCrossfadeModes[i] : "");
             track.addProperty("monitorMode", trackMonitorModes[i] != null ? trackMonitorModes[i] : "");
+            track.addProperty("trackType", trackTypes[i] != null ? trackTypes[i] : "");
+            track.addProperty("isGroup", trackIsGroup[i]);
+            track.addProperty("isGroupExpanded", trackIsGroupExpanded[i]);
 
             JsonArray sends = new JsonArray();
             for (int s = 0; s < sendCount; s++) {

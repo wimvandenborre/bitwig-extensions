@@ -211,6 +211,41 @@ You can create, select, rename, delete, and duplicate tracks:
 
 **Song structure workflow:** See the "Song Building" section below for a complete multi-track workflow with recommended call sequences.
 
+### Track Routing & Groups
+
+**Track types** are reported in the snapshot via `trackType`: `Group`, `Instrument`, `Audio`, `Hybrid`, `Effect`, or `Master`. Use `isGroup` (boolean) and `isGroupExpanded` (boolean) to check group status.
+
+**Group creation:**
+- `track_createGroup` wraps the currently selected track in a new group track
+- The selected track becomes a child of the new group
+
+**Group navigation:**
+- `track_navigateInto` — drill into a group to see its children as top-level tracks in the bank
+- `track_navigateToParent` — navigate back out to the parent group level
+- `track_setGroupExpanded` — fold/unfold a group (use `expanded: true/false` or `toggle: true`)
+
+**Note routing:**
+- `track_addNoteSource` — route the extension's NoteInput to the cursor track
+- `track_removeNoteSource` — remove the NoteInput routing from the cursor track
+- Combined with `noteInput_sendNote` / `noteInput_sendMidi`, this enables targeted real-time playback to specific tracks
+
+**Group workflow example — organizing tracks into a group:**
+```
+1. track_select(index: 0)                              // select first track
+2. track_createGroup()                                 // wrap in group
+3. session_snapshot()                                   // verify group created
+4. track_setGroupExpanded(expanded: false)              // collapse group
+```
+
+**Note routing workflow — playing through a specific track:**
+```
+1. track_select(index: 2)                              // select target track
+2. track_addNoteSource()                               // route NoteInput here
+3. noteInput_sendNote(note: 60, velocity: 100)         // play C4
+4. noteInput_sendNote(note: 60, velocity: 0)           // release C4
+5. track_removeNoteSource()                            // clean up routing
+```
+
 ### Index Conventions
 
 All indices are **0-based**:
