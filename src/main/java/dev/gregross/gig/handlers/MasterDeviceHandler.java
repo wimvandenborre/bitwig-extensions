@@ -114,6 +114,49 @@ public class MasterDeviceHandler {
             return new JsonPrimitive("ok");
         });
 
+        // Layer and drum pad navigation
+        dispatcher.register("masterDevice/enterLayer", params -> {
+            boolean hasIndex = params.has("index") && !params.get("index").isJsonNull();
+            boolean hasName = params.has("name") && !params.get("name").isJsonNull();
+            if (!hasIndex && !hasName) {
+                throw new IllegalArgumentException("must provide 'index' or 'name' parameter");
+            }
+            if (hasIndex && hasName) {
+                throw new IllegalArgumentException("'index' and 'name' are mutually exclusive — provide one, not both");
+            }
+            if (hasIndex) {
+                cursorDevice.selectFirstInLayer(params.get("index").getAsInt());
+            } else {
+                cursorDevice.selectFirstInLayer(params.get("name").getAsString());
+            }
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/enterKeyPad", params -> {
+            int key = requireInt(params, "key");
+            if (key < 0 || key > 127) {
+                throw new IllegalArgumentException("key must be 0-127, got " + key);
+            }
+            cursorDevice.selectFirstInKeyPad(key);
+            return new JsonPrimitive("ok");
+        });
+
+        // Parameter page tag filtering
+        dispatcher.register("masterDevice/selectPageByTag", params -> {
+            String tag = requireString(params, "tag").toLowerCase();
+            DeviceHandler.validatePageTag(tag);
+            String direction = optionalString(params, "direction", "next");
+            boolean cycle = params.has("cycle") ? params.get("cycle").getAsBoolean() : true;
+            if ("next".equals(direction)) {
+                remoteControlsPage.selectNextPageMatching(tag, cycle);
+            } else if ("previous".equals(direction)) {
+                remoteControlsPage.selectPreviousPageMatching(tag, cycle);
+            } else {
+                throw new IllegalArgumentException("direction must be 'next' or 'previous', got: " + direction);
+            }
+            return new JsonPrimitive("ok");
+        });
+
         // Parameter mutation
         dispatcher.register("masterDevice/setParameterValue", params -> {
             int index = requireInt(params, "index");
