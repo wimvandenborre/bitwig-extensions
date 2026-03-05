@@ -36,6 +36,7 @@
 | 21 | Song Rebuild from JSON | v0.21.1–v0.21.5 | complete |
 | 22 | NoteStep Expressive Properties | v0.22.1–v0.22.6 | complete |
 | 23 | NoteInput & Arpeggiator | v0.23.1–v0.23.5 | complete |
+| 24 | Device Sound Design Navigation | v0.24.1–v0.24.5 | complete |
 <!-- Phases added by gig:plan, archived by gig:verify -->
 
 ## Completed Milestones

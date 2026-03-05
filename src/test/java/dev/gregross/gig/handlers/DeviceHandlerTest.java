@@ -61,9 +61,17 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlyTwentyMethods() {
-        // 17 existing + 2 chain nav + 1 getDrumPads
-        assertEquals(20, dispatcher.getRegisteredMethods().size());
+    void registersLayerAndKeyPadMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("device/enterLayer"));
+        assertTrue(methods.contains("device/enterKeyPad"));
+        assertTrue(methods.contains("device/selectPageByTag"));
+    }
+
+    @Test
+    void registersExactlyTwentyThreeMethods() {
+        // 17 existing + 2 chain nav + 1 getDrumPads + 3 sound design nav
+        assertEquals(23, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---
@@ -209,6 +217,80 @@ class DeviceHandlerTest {
         String response = dispatcher.handle(rpc("device/setParameterValue", "{\"index\": 8, \"value\": 0.5}"));
         assertContains(response, "-32602");
         assertContains(response, "out of range");
+    }
+
+    // --- device/enterLayer validation ---
+
+    @Test
+    void enterLayer_missingBothParams_returnsError() {
+        String response = dispatcher.handle(rpc("device/enterLayer", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "must provide");
+    }
+
+    @Test
+    void enterLayer_bothParams_returnsError() {
+        String response = dispatcher.handle(rpc("device/enterLayer", "{\"index\":0,\"name\":\"Layer 1\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "mutually exclusive");
+    }
+
+    // --- device/enterKeyPad validation ---
+
+    @Test
+    void enterKeyPad_missingKey_returnsError() {
+        String response = dispatcher.handle(rpc("device/enterKeyPad", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "key");
+    }
+
+    @Test
+    void enterKeyPad_keyOutOfRange_returnsError() {
+        String response = dispatcher.handle(rpc("device/enterKeyPad", "{\"key\":128}"));
+        assertContains(response, "-32602");
+        assertContains(response, "0-127");
+    }
+
+    @Test
+    void enterKeyPad_negativeKey_returnsError() {
+        String response = dispatcher.handle(rpc("device/enterKeyPad", "{\"key\":-1}"));
+        assertContains(response, "-32602");
+        assertContains(response, "0-127");
+    }
+
+    // --- device/selectPageByTag validation ---
+
+    @Test
+    void selectPageByTag_missingTag_returnsError() {
+        String response = dispatcher.handle(rpc("device/selectPageByTag", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "tag");
+    }
+
+    @Test
+    void selectPageByTag_invalidTag_returnsError() {
+        String response = dispatcher.handle(rpc("device/selectPageByTag", "{\"tag\":\"bogus\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "Invalid page tag");
+    }
+
+    // --- VALID_PAGE_TAGS validation ---
+
+    @Test
+    void validPageTagsContainsEightTags() {
+        assertEquals(8, DeviceHandler.VALID_PAGE_TAGS.size());
+    }
+
+    @Test
+    void validPageTagsContainsExpectedValues() {
+        assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("env"));
+        assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("eq"));
+        assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("filter"));
+        assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("fx"));
+        assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("lfo"));
+        assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("mixer"));
+        assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("osc"));
+        assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("perf"));
     }
 
     // --- Helpers ---

@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.23.5` |
-| **Phase** | 23 — NoteInput & Arpeggiator |
+| **Version** | `0.24.5` |
+| **Phase** | 24 — Device Sound Design Navigation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 23.5 — Smoke tests |
+| **Last Batch** | 24.5 — Smoke tests |
 | **Last Updated** | 2026-03-05 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| `0.24.5` | 24 | Smoke tests | PLANNED | DONE | 2026-03-05 |
+| `0.24.4` | 24 | Tool schemas + system prompt update | PLANNED | DONE | 2026-03-05 |
+| `0.24.3` | 24 | Unit tests | PLANNED | DONE | 2026-03-05 |
+| `0.24.2` | 24 | MasterDeviceHandler — layer, keypad, page tag methods | PLANNED | DONE | 2026-03-05 |
+| `0.24.1` | 24 | DeviceHandler — layer, keypad, page tag methods | PLANNED | DONE | 2026-03-05 |
 | `0.23.5` | 23 | Smoke tests | PLANNED | DONE | 2026-03-04 |
 | `0.23.4` | 23 | Tool schemas + system prompt update | PLANNED | DONE | 2026-03-04 |
 | `0.23.3` | 23 | Unit tests | PLANNED | DONE | 2026-03-04 |
