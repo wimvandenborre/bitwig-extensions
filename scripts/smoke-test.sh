@@ -771,6 +771,39 @@ assert_contains "system prompt mentions noteInput_sendNote" "$PROMPT" "noteInput
 assert_contains "system prompt mentions arpeggiator_configure" "$PROMPT" "arpeggiator_configure"
 assert_contains "system prompt mentions noteLatch_configure" "$PROMPT" "noteLatch_configure"
 
+# Phase 24 — Device Sound Design Navigation
+echo "--- Phase 24 Offline: Device Sound Design Navigation ---"
+
+# Tool schema presence (6 new tools)
+assert_contains "has device_enterLayer tool" "$TOOLS_LIST" "device_enterLayer"
+assert_contains "has device_enterKeyPad tool" "$TOOLS_LIST" "device_enterKeyPad"
+assert_contains "has device_selectPageByTag tool" "$TOOLS_LIST" "device_selectPageByTag"
+assert_contains "has masterDevice_enterLayer tool" "$TOOLS_LIST" "masterDevice_enterLayer"
+assert_contains "has masterDevice_enterKeyPad tool" "$TOOLS_LIST" "masterDevice_enterKeyPad"
+assert_contains "has masterDevice_selectPageByTag tool" "$TOOLS_LIST" "masterDevice_selectPageByTag"
+
+# device_selectPageByTag has tag enum with 8 values
+TAG_ENUM=$(jq -r '.[] | select(.name=="device_selectPageByTag") | .input_schema.properties.tag.enum | join(",")' "$TOOLS_FILE")
+assert_contains "page tag enum has 'osc'" "$TAG_ENUM" "osc"
+assert_contains "page tag enum has 'filter'" "$TAG_ENUM" "filter"
+assert_contains "page tag enum has 'env'" "$TAG_ENUM" "env"
+assert_contains "page tag enum has 'lfo'" "$TAG_ENUM" "lfo"
+
+# device_enterLayer has index and name properties
+LAYER_PROPS=$(jq -r '.[] | select(.name=="device_enterLayer") | .input_schema.properties | keys | join(",")' "$TOOLS_FILE")
+assert_contains "enterLayer has index prop" "$LAYER_PROPS" "index"
+assert_contains "enterLayer has name prop" "$LAYER_PROPS" "name"
+
+# device_enterKeyPad has key required
+KEYPAD_REQ=$(jq -r '.[] | select(.name=="device_enterKeyPad") | .input_schema.required | join(",")' "$TOOLS_FILE")
+assert_contains "enterKeyPad requires key" "$KEYPAD_REQ" "key"
+
+# System prompt mentions Device Sound Design Navigation
+assert_contains "system prompt has Device Sound Design Navigation section" "$PROMPT" "Device Sound Design Navigation"
+assert_contains "system prompt mentions device_enterLayer" "$PROMPT" "device_enterLayer"
+assert_contains "system prompt mentions device_selectPageByTag" "$PROMPT" "device_selectPageByTag"
+assert_contains "system prompt mentions page tag table" "$PROMPT" "osc"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
