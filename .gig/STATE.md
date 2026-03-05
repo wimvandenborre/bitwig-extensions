@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.25.5` |
 | **Phase** | 25 — Track Routing & Groups |
-| **Status** | `IMPLEMENTING` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 25.5 — Smoke tests |
 | **Last Updated** | 2026-03-05 |
 
