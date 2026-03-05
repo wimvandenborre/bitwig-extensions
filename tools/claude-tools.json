@@ -1200,7 +1200,7 @@
   },
   {
     "name": "clip_getNotes",
-    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), and duration (beats). IMPORTANT: After clip/select, wait 1-2 seconds before calling this \u2014 the cursor clip loads step data asynchronously, and reading too soon returns empty or stale results.",
+    "description": "Read all notes in the selected clip's current grid viewport. Returns a sparse array containing only cells with notes (NoteOn state). Each note includes x (step), y (MIDI note), velocity (0.0-1.0), duration (beats), and expressive properties when non-default: pan (-1..1), timbre (-1..1), pressure (0..1), gain (0..1, 0.5=0dB), transpose (-96..+96 semitones), releaseVelocity (0..1), velocitySpread (0..1), mute (boolean), chance (0..1), occurrence (NoteOccurrence enum string), recurrence ({length, mask}), repeat ({count, curve, velocityEnd, velocityCurve}). IMPORTANT: After clip/select, wait 1-2 seconds before calling this \u2014 the cursor clip loads step data asynchronously, and reading too soon returns empty or stale results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -1233,6 +1233,156 @@
               }
             },
             "required": ["x", "y", "chance"]
+          }
+        }
+      },
+      "required": ["notes"]
+    }
+  },
+  {
+    "name": "clip_setNoteExpressions",
+    "description": "Set expressive properties on existing notes in the selected clip. Batch-set scalar note properties like pan, timbre, pressure, gain, transpose, releaseVelocity, velocitySpread, or mute. Each entry targets a specific note by step position (x, y) and sets one property at a time. Notes must already exist. Call after clip_setNotes.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "array",
+          "description": "Array of note expression entries.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer",
+                "description": "Step position of the existing note."
+              },
+              "y": {
+                "type": "integer",
+                "description": "MIDI note number of the existing note."
+              },
+              "property": {
+                "type": "string",
+                "description": "Property to set. One of: pan (-1..1), timbre (-1..1), pressure (0..1), gain (0..1, 0.5=0dB), transpose (-96..+96), releaseVelocity (0..1), velocitySpread (0..1), mute (0=unmute, non-zero=mute).",
+                "enum": ["pan", "timbre", "pressure", "gain", "transpose", "releaseVelocity", "velocitySpread", "mute"]
+              },
+              "value": {
+                "type": "number",
+                "description": "Value to set for the property. Range depends on property."
+              }
+            },
+            "required": ["x", "y", "property", "value"]
+          }
+        }
+      },
+      "required": ["notes"]
+    }
+  },
+  {
+    "name": "clip_setNoteRepeat",
+    "description": "Set note repeat (note echo/ratchet) properties on existing notes. Enables repeat and sets all 4 sub-properties together. Repeat creates rhythmic subdivisions of a note — positive count = divisions, negative count = rate. Notes must already exist.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "array",
+          "description": "Array of notes with repeat settings.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer",
+                "description": "Step position of the existing note."
+              },
+              "y": {
+                "type": "integer",
+                "description": "MIDI note number of the existing note."
+              },
+              "count": {
+                "type": "integer",
+                "description": "Repeat count (-127..127). Positive = number of divisions, negative = rate."
+              },
+              "curve": {
+                "type": "number",
+                "description": "Timing curve (-1..1). 0 = linear, negative = accelerating, positive = decelerating."
+              },
+              "velocityEnd": {
+                "type": "number",
+                "description": "Velocity change over repeats (-1..1). Relative amount applied to note velocity."
+              },
+              "velocityCurve": {
+                "type": "number",
+                "description": "Velocity curve shape (-1..1). 0 = linear velocity change."
+              }
+            },
+            "required": ["x", "y", "count", "curve", "velocityEnd", "velocityCurve"]
+          }
+        }
+      },
+      "required": ["notes"]
+    }
+  },
+  {
+    "name": "clip_setNoteOccurrence",
+    "description": "Set occurrence conditions on existing notes. Occurrence controls when a note plays based on context: whether it's the first time, whether previous notes were playing, fill mode, etc. Notes must already exist.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "array",
+          "description": "Array of notes with occurrence conditions.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer",
+                "description": "Step position of the existing note."
+              },
+              "y": {
+                "type": "integer",
+                "description": "MIDI note number of the existing note."
+              },
+              "condition": {
+                "type": "string",
+                "description": "Occurrence condition (case-insensitive).",
+                "enum": ["ALWAYS", "FIRST", "NOT_FIRST", "PREV", "NOT_PREV", "PREV_CHANNEL", "NOT_PREV_CHANNEL", "PREV_KEY", "NOT_PREV_KEY", "FILL", "NOT_FILL"]
+              }
+            },
+            "required": ["x", "y", "condition"]
+          }
+        }
+      },
+      "required": ["notes"]
+    }
+  },
+  {
+    "name": "clip_setNoteRecurrence",
+    "description": "Set recurrence patterns on existing notes. Recurrence makes notes play only on specific iterations of a cycle (1-8 steps). The mask is a bitmask where bit N controls whether the note plays on cycle N. Example: length=4, mask=5 (binary 0101) = plays on cycles 1 and 3. Notes must already exist.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "array",
+          "description": "Array of notes with recurrence patterns.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer",
+                "description": "Step position of the existing note."
+              },
+              "y": {
+                "type": "integer",
+                "description": "MIDI note number of the existing note."
+              },
+              "length": {
+                "type": "integer",
+                "description": "Recurrence cycle length (1-8)."
+              },
+              "mask": {
+                "type": "integer",
+                "description": "Bitmask for which cycles the note plays. Bit N = cycle N. Max 8 bits."
+              }
+            },
+            "required": ["x", "y", "length", "mask"]
           }
         }
       },

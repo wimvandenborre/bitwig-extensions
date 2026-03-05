@@ -105,6 +105,34 @@ The extension provides a **cursor clip** that follows the selected clip in the s
 
 **Snapshot:** The `clip` section in `session_snapshot` shows cursor clip metadata: `trackName`, `playingStep`, `loopLength`, `playStart`, `playStop`, `stepSize`, `hasContent`. It does NOT include note data — use `clip_getNotes` for that.
 
+### Expressive Note Properties
+
+After writing base notes, you can add per-note expression to create more dynamic performances:
+
+**Scalar properties** (via `clip_setNoteExpressions`):
+- `pan` (-1..1): Note panning. -1 = full left, +1 = full right.
+- `timbre` (-1..1): Timbre/brightness modulation.
+- `pressure` (0..1): Aftertouch/pressure per note.
+- `gain` (0..1): Per-note volume. 0.5 = 0dB (unity gain).
+- `transpose` (-96..+96): Pitch offset in semitones.
+- `releaseVelocity` (0..1): How fast the note is released.
+- `velocitySpread` (0..1): Randomization of velocity on each playback.
+- `mute` (0 or 1): Mute individual notes without removing them.
+
+**Repeat/ratchet** (via `clip_setNoteRepeat`): Creates rhythmic subdivisions of a note. Set `count` (positive = divisions, negative = rate), `curve` (timing shape), `velocityEnd` (velocity fade), `velocityCurve` (velocity fade shape). All 4 properties are set together.
+
+**Occurrence** (via `clip_setNoteOccurrence`): Controls when notes play based on context. Valid conditions: ALWAYS, FIRST, NOT_FIRST, PREV, NOT_PREV, PREV_CHANNEL, NOT_PREV_CHANNEL, PREV_KEY, NOT_PREV_KEY, FILL, NOT_FILL.
+
+**Recurrence** (via `clip_setNoteRecurrence`): Notes play only on specific iterations of a cycle. Set `length` (1-8) and `mask` (bitmask). Example: length=4, mask=5 (binary 0101) = note plays on iterations 1 and 3 only.
+
+**Workflow for expressive notes:**
+1. Write base notes: `clip_setNotes` with x, y, velocity, duration.
+2. Add chance: `clip_setChance` for probability (optional).
+3. Add expressions: `clip_setNoteExpressions` for pan/timbre/gain/etc (optional).
+4. Add repeat: `clip_setNoteRepeat` for ratchet effects (optional).
+5. Add occurrence/recurrence for conditional playback (optional).
+6. Read back: `clip_getNotes` returns all properties (only non-default values included).
+
 ### Device Insertion & Removal
 
 You can add and remove devices on the cursor track:
