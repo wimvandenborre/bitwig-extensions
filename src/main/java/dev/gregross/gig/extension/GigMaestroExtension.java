@@ -15,6 +15,7 @@ import dev.gregross.gig.handlers.MacroHandler;
 import dev.gregross.gig.handlers.MasterDeviceHandler;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
+import dev.gregross.gig.handlers.NoteInputHandler;
 import dev.gregross.gig.handlers.ProjectHandler;
 import dev.gregross.gig.handlers.SceneHandler;
 import dev.gregross.gig.handlers.SendHandler;
@@ -90,6 +91,11 @@ public class GigMaestroExtension extends ControllerExtension {
         // Create project reference
         Project project = host.getProject();
 
+        // Create note input for real-time MIDI injection
+        NoteInput noteInput = host.getMidiInPort(0).createNoteInput("Gig Maestro");
+        Arpeggiator arpeggiator = noteInput.arpeggiator();
+        NoteLatch noteLatch = noteInput.noteLatch();
+
         // Create popup browser for preset/device/sample browsing
         PopupBrowser popupBrowser = host.createPopupBrowser();
 
@@ -115,6 +121,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerMasterDeviceObservers(masterCursorDevice, masterRemoteControlsPage);
         stateCache.registerBrowserObservers(popupBrowser);
         stateCache.registerFilterObservers(popupBrowser);
+        stateCache.registerNoteInputObservers(arpeggiator, noteLatch);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
@@ -156,6 +163,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new ProjectHandler(project, stateCache).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
         new BrowserHandler(popupBrowser, cursorDevice, stateCache).register(dispatcher);
+        new NoteInputHandler(noteInput, arpeggiator, noteLatch, stateCache).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 
         // Start servers

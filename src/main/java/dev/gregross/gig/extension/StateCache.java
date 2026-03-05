@@ -245,6 +245,26 @@ public class StateCache {
     private volatile boolean cueMarkerCanScrollForwards;
     private volatile boolean cueMarkerCanScrollBackwards;
 
+    // Arpeggiator state
+    private volatile boolean arpEnabled;
+    private volatile String arpMode = "up";
+    private volatile int arpOctaves;
+    private volatile double arpRate;
+    private volatile double arpGateLength;
+    private volatile boolean arpShuffle;
+    private volatile double arpHumanize;
+    private volatile boolean arpFreeRunning;
+    private volatile boolean arpOverlappingNotes;
+    private volatile boolean arpUsePressureToVelocity;
+    private volatile boolean arpTerminateNotesImmediately;
+
+    // NoteLatch state
+    private volatile boolean noteLatchEnabled;
+    private volatile String noteLatchMode = "chord";
+    private volatile boolean noteLatchMono;
+    private volatile int noteLatchVelocityThreshold;
+    private volatile int noteLatchActiveNotes;
+
     // Delta detection — previous section hashes
     private int prevTransportHash;
     private int prevTracksHash;
@@ -257,6 +277,8 @@ public class StateCache {
     private int prevArrangementHash;
     private int prevMasterDeviceHash;
     private int prevBrowserHash;
+    private int prevArpeggiatorHash;
+    private int prevNoteLatchHash;
 
     public void registerObservers(Transport transport, TrackBank trackBank,
                                    MasterTrack masterTrack, Application application,
@@ -921,6 +943,58 @@ public class StateCache {
         }
     }
 
+    public void registerNoteInputObservers(Arpeggiator arpeggiator, NoteLatch noteLatch) {
+        // Arpeggiator observers
+        arpeggiator.isEnabled().markInterested();
+        arpeggiator.isEnabled().addValueObserver((BooleanValueChangedCallback) v -> arpEnabled = v);
+
+        arpeggiator.mode().markInterested();
+        arpeggiator.mode().addValueObserver((EnumValueChangedCallback) v -> arpMode = (String) v);
+
+        arpeggiator.octaves().markInterested();
+        arpeggiator.octaves().addValueObserver((IntegerValueChangedCallback) v -> arpOctaves = v);
+
+        arpeggiator.rate().markInterested();
+        arpeggiator.rate().addValueObserver((DoubleValueChangedCallback) v -> arpRate = v);
+
+        arpeggiator.gateLength().markInterested();
+        arpeggiator.gateLength().addValueObserver((DoubleValueChangedCallback) v -> arpGateLength = v);
+
+        arpeggiator.shuffle().markInterested();
+        arpeggiator.shuffle().addValueObserver((BooleanValueChangedCallback) v -> arpShuffle = v);
+
+        arpeggiator.humanize().markInterested();
+        arpeggiator.humanize().addValueObserver((DoubleValueChangedCallback) v -> arpHumanize = v);
+
+        arpeggiator.isFreeRunning().markInterested();
+        arpeggiator.isFreeRunning().addValueObserver((BooleanValueChangedCallback) v -> arpFreeRunning = v);
+
+        arpeggiator.enableOverlappingNotes().markInterested();
+        arpeggiator.enableOverlappingNotes().addValueObserver((BooleanValueChangedCallback) v -> arpOverlappingNotes = v);
+
+        arpeggiator.usePressureToVelocity().markInterested();
+        arpeggiator.usePressureToVelocity().addValueObserver((BooleanValueChangedCallback) v -> arpUsePressureToVelocity = v);
+
+        arpeggiator.terminateNotesImmediately().markInterested();
+        arpeggiator.terminateNotesImmediately().addValueObserver((BooleanValueChangedCallback) v -> arpTerminateNotesImmediately = v);
+
+        // NoteLatch observers
+        noteLatch.isEnabled().markInterested();
+        noteLatch.isEnabled().addValueObserver((BooleanValueChangedCallback) v -> noteLatchEnabled = v);
+
+        noteLatch.mode().markInterested();
+        noteLatch.mode().addValueObserver((EnumValueChangedCallback) v -> noteLatchMode = (String) v);
+
+        noteLatch.mono().markInterested();
+        noteLatch.mono().addValueObserver((BooleanValueChangedCallback) v -> noteLatchMono = v);
+
+        noteLatch.velocityThreshold().markInterested();
+        noteLatch.velocityThreshold().addValueObserver((IntegerValueChangedCallback) v -> noteLatchVelocityThreshold = v);
+
+        noteLatch.activeNotes().markInterested();
+        noteLatch.activeNotes().addValueObserver((IntegerValueChangedCallback) v -> noteLatchActiveNotes = v);
+    }
+
     public CursorBrowserFilterItem[] getFilterCursors() {
         return filterCursors;
     }
@@ -1006,6 +1080,8 @@ public class StateCache {
         snapshot.add("arrangement", getArrangementState());
         snapshot.add("masterDevice", getMasterDeviceState());
         snapshot.add("browser", getBrowserState());
+        snapshot.add("arpeggiator", getArpeggiatorState());
+        snapshot.add("noteLatch", getNoteLatchState());
         return snapshot;
     }
 
@@ -1051,6 +1127,12 @@ public class StateCache {
 
         h = getBrowserState().toString().hashCode();
         if (h != prevBrowserHash) { changed.add("browser"); prevBrowserHash = h; }
+
+        h = getArpeggiatorState().toString().hashCode();
+        if (h != prevArpeggiatorHash) { changed.add("arpeggiator"); prevArpeggiatorHash = h; }
+
+        h = getNoteLatchState().toString().hashCode();
+        if (h != prevNoteLatchHash) { changed.add("noteLatch"); prevNoteLatchHash = h; }
 
         return changed;
     }
@@ -1475,4 +1557,30 @@ public class StateCache {
     public boolean hasMutedTracks() { return hasMutedTracks; }
     public boolean hasArmedTracks() { return hasArmedTracks; }
     public boolean isModified() { return isModified; }
+
+    public JsonObject getArpeggiatorState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("isEnabled", arpEnabled);
+        obj.addProperty("mode", arpMode);
+        obj.addProperty("octaves", arpOctaves);
+        obj.addProperty("rate", arpRate);
+        obj.addProperty("gateLength", arpGateLength);
+        obj.addProperty("shuffle", arpShuffle);
+        obj.addProperty("humanize", arpHumanize);
+        obj.addProperty("isFreeRunning", arpFreeRunning);
+        obj.addProperty("enableOverlappingNotes", arpOverlappingNotes);
+        obj.addProperty("usePressureToVelocity", arpUsePressureToVelocity);
+        obj.addProperty("terminateNotesImmediately", arpTerminateNotesImmediately);
+        return obj;
+    }
+
+    public JsonObject getNoteLatchState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("isEnabled", noteLatchEnabled);
+        obj.addProperty("mode", noteLatchMode);
+        obj.addProperty("mono", noteLatchMono);
+        obj.addProperty("velocityThreshold", noteLatchVelocityThreshold);
+        obj.addProperty("activeNotes", noteLatchActiveNotes);
+        return obj;
+    }
 }

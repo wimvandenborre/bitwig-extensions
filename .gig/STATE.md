@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.22.6` |
-| **Phase** | 22 — NoteStep Expressive Properties |
+| **Version** | `0.23.5` |
+| **Phase** | 23 — NoteInput & Arpeggiator |
 | **Status** | `GOVERNED` |
-| **Last Batch** | Smoke tests |
-| **Last Updated** | 2026-03-04 |
+| **Last Batch** | 23.5 — Smoke tests |
+| **Last Updated** | 2026-03-05 |
 
 ---
 
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| `0.23.5` | 23 | Smoke tests | PLANNED | DONE | 2026-03-04 |
+| `0.23.4` | 23 | Tool schemas + system prompt update | PLANNED | DONE | 2026-03-04 |
+| `0.23.3` | 23 | Unit tests | PLANNED | DONE | 2026-03-04 |
+| `0.23.2` | 23 | NoteInputHandler — 10 RPC methods | PLANNED | DONE | 2026-03-04 |
+| `0.23.1` | 23 | NoteInput infrastructure + snapshot observers | PLANNED | DONE | 2026-03-04 |
 | 0.22.6 | 22 | Smoke tests | PLANNED | done | 2026-03-04 |
 | 0.22.5 | 22 | Tool schemas + system prompt update | PLANNED | done | 2026-03-04 |
 | 0.22.4 | 22 | Unit tests | PLANNED | done | 2026-03-04 |

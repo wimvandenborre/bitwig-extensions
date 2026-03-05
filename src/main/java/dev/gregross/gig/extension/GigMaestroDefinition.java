@@ -49,7 +49,7 @@ public class GigMaestroDefinition extends ControllerExtensionDefinition {
 
     @Override
     public int getNumMidiInPorts() {
-        return 0;
+        return 1;
     }
 
     @Override
