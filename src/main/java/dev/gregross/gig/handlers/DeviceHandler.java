@@ -18,10 +18,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 public class DeviceHandler {
 
     private static final int PARAM_COUNT = 8;
+    static final Set<String> VALID_PAGE_TAGS = Set.of(
+        "env", "eq", "filter", "fx", "lfo", "mixer", "osc", "perf"
+    );
 
     private final CursorTrack cursorTrack;
     private final CursorDevice cursorDevice;
@@ -312,6 +316,49 @@ public class DeviceHandler {
             return new JsonPrimitive("ok");
         });
 
+        // Layer and drum pad navigation
+        dispatcher.register("device/enterLayer", params -> {
+            boolean hasIndex = params.has("index") && !params.get("index").isJsonNull();
+            boolean hasName = params.has("name") && !params.get("name").isJsonNull();
+            if (!hasIndex && !hasName) {
+                throw new IllegalArgumentException("must provide 'index' or 'name' parameter");
+            }
+            if (hasIndex && hasName) {
+                throw new IllegalArgumentException("'index' and 'name' are mutually exclusive — provide one, not both");
+            }
+            if (hasIndex) {
+                cursorDevice.selectFirstInLayer(params.get("index").getAsInt());
+            } else {
+                cursorDevice.selectFirstInLayer(params.get("name").getAsString());
+            }
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/enterKeyPad", params -> {
+            int key = requireInt(params, "key");
+            if (key < 0 || key > 127) {
+                throw new IllegalArgumentException("key must be 0-127, got " + key);
+            }
+            cursorDevice.selectFirstInKeyPad(key);
+            return new JsonPrimitive("ok");
+        });
+
+        // Parameter page tag filtering
+        dispatcher.register("device/selectPageByTag", params -> {
+            String tag = requireString(params, "tag").toLowerCase();
+            validatePageTag(tag);
+            String direction = optionalString(params, "direction", "next");
+            boolean cycle = params.has("cycle") ? params.get("cycle").getAsBoolean() : true;
+            if ("next".equals(direction)) {
+                remoteControlsPage.selectNextPageMatching(tag, cycle);
+            } else if ("previous".equals(direction)) {
+                remoteControlsPage.selectPreviousPageMatching(tag, cycle);
+            } else {
+                throw new IllegalArgumentException("direction must be 'next' or 'previous', got: " + direction);
+            }
+            return new JsonPrimitive("ok");
+        });
+
         // Cursor track navigation
         dispatcher.register("cursor/selectTrack", params -> {
             String direction = requireString(params, "direction");
@@ -378,6 +425,13 @@ public class DeviceHandler {
             return defaultValue;
         }
         return el.getAsString();
+    }
+
+    static void validatePageTag(String tag) {
+        if (!VALID_PAGE_TAGS.contains(tag)) {
+            throw new IllegalArgumentException(
+                "Invalid page tag '" + tag + "'. Valid tags: " + VALID_PAGE_TAGS);
+        }
     }
 
     private InsertionPoint getInsertionPoint(String position) {
