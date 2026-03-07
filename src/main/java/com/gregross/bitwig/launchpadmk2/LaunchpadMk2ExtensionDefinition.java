@@ -84,6 +84,12 @@ public class LaunchpadMk2ExtensionDefinition extends ControllerExtensionDefiniti
    }
 
    @Override
+   public String getHelpFilePath()
+   {
+      return "README.md";
+   }
+
+   @Override
    public LaunchpadMk2Extension createInstance(final ControllerHost host)
    {
       return new LaunchpadMk2Extension(this, host);
