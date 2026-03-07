@@ -6,6 +6,8 @@ import com.bitwig.extension.controller.api.ClipLauncherSlotBank;
 import com.bitwig.extension.controller.api.ControllerHost;
 import com.bitwig.extension.controller.api.MidiIn;
 import com.bitwig.extension.controller.api.MidiOut;
+import com.bitwig.extension.controller.api.SceneBank;
+import com.bitwig.extension.controller.api.Scene;
 import com.bitwig.extension.controller.api.Track;
 import com.bitwig.extension.controller.api.TrackBank;
 
@@ -15,9 +17,12 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
    private MidiOut midiOut;
    private TrackBank trackBank;
+   private SceneBank sceneBank;
 
    // Cached LED states to avoid redundant MIDI sends
    private final int[][] gridLedState = new int[GRID_SIZE][GRID_SIZE];
+   private final int[] sceneLedState = new int[GRID_SIZE];
+   private final int[] topRowLedState = new int[GRID_SIZE];
    private boolean ledsDirty = true;
 
    protected LaunchpadMk2Extension(
@@ -39,8 +44,9 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
       // Create track bank: 8 tracks, 0 sends, 8 scenes
       trackBank = host.createTrackBank(GRID_SIZE, 0, GRID_SIZE);
+      sceneBank = trackBank.sceneBank();
 
-      // Set up MIDI input callback for pad presses
+      // Set up MIDI input callbacks
       midiIn.setMidiCallback(this::onMidi);
 
       // Set up observers for each clip slot in the 8x8 grid
@@ -59,7 +65,6 @@ public class LaunchpadMk2Extension extends ControllerExtension
             slot.isStopQueued().markInterested();
             slot.isRecordingQueued().markInterested();
 
-            // Request flush whenever any state changes
             slot.hasContent().addValueObserver(v -> markDirty());
             slot.isPlaying().addValueObserver(v -> markDirty());
             slot.isRecording().addValueObserver(v -> markDirty());
@@ -72,6 +77,17 @@ public class LaunchpadMk2Extension extends ControllerExtension
          t.arm().addValueObserver(v -> markDirty());
       }
 
+      // Track bank scroll observers for navigation LED feedback
+      trackBank.canScrollBackwards().markInterested();
+      trackBank.canScrollForwards().markInterested();
+      sceneBank.canScrollBackwards().markInterested();
+      sceneBank.canScrollForwards().markInterested();
+
+      trackBank.canScrollBackwards().addValueObserver(v -> markDirty());
+      trackBank.canScrollForwards().addValueObserver(v -> markDirty());
+      sceneBank.canScrollBackwards().addValueObserver(v -> markDirty());
+      sceneBank.canScrollForwards().addValueObserver(v -> markDirty());
+
       // Reset all LEDs on startup
       midiOut.sendSysex(toHexString(LaunchpadMk2Colors.resetLeds()));
       ledsDirty = true;
@@ -82,7 +98,6 @@ public class LaunchpadMk2Extension extends ControllerExtension
    @Override
    public void exit()
    {
-      // Turn off all LEDs
       midiOut.sendSysex(toHexString(LaunchpadMk2Colors.resetLeds()));
       getHost().println("Launchpad MK2 exited");
    }
@@ -93,6 +108,13 @@ public class LaunchpadMk2Extension extends ControllerExtension
       if (!ledsDirty) return;
       ledsDirty = false;
 
+      flushGrid();
+      flushSceneLaunch();
+      flushTopRow();
+   }
+
+   private void flushGrid()
+   {
       for (int track = 0; track < GRID_SIZE; track++)
       {
          final Track t = trackBank.getItemAt(track);
@@ -112,17 +134,61 @@ public class LaunchpadMk2Extension extends ControllerExtension
                if (slot.isPlaybackQueued().get() || slot.isRecordingQueued().get()
                   || slot.isStopQueued().get())
                {
-                  // Use pulse mode for queued clips
                   midiOut.sendSysex(toHexString(
                      LaunchpadMk2Colors.pulseLed(note, color)));
                }
                else
                {
-                  // Standard note-on for steady LED
                   midiOut.sendMidi(0x90, note, color);
                }
             }
          }
+      }
+   }
+
+   private void flushSceneLaunch()
+   {
+      for (int scene = 0; scene < GRID_SIZE; scene++)
+      {
+         final int color = LaunchpadMk2Colors.SCENE_LAUNCH;
+         final int note = LaunchpadMk2Colors.sceneLaunchNote(scene);
+
+         if (sceneLedState[scene] != color)
+         {
+            sceneLedState[scene] = color;
+            midiOut.sendMidi(0x90, note, color);
+         }
+      }
+   }
+
+   private void flushTopRow()
+   {
+      // Up arrow — can scroll scenes backward (up)
+      sendTopRowCC(0, sceneBank.canScrollBackwards().get()
+         ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
+      // Down arrow — can scroll scenes forward (down)
+      sendTopRowCC(1, sceneBank.canScrollForwards().get()
+         ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
+      // Left arrow — can scroll tracks backward (left)
+      sendTopRowCC(2, trackBank.canScrollBackwards().get()
+         ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
+      // Right arrow — can scroll tracks forward (right)
+      sendTopRowCC(3, trackBank.canScrollForwards().get()
+         ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
+      // Session — always lit as active mode
+      sendTopRowCC(4, LaunchpadMk2Colors.MODE_ACTIVE);
+      // User1, User2, Mixer — reserved, off
+      sendTopRowCC(5, LaunchpadMk2Colors.MODE_INACTIVE);
+      sendTopRowCC(6, LaunchpadMk2Colors.MODE_INACTIVE);
+      sendTopRowCC(7, LaunchpadMk2Colors.MODE_INACTIVE);
+   }
+
+   private void sendTopRowCC(int index, int color)
+   {
+      if (topRowLedState[index] != color)
+      {
+         topRowLedState[index] = color;
+         midiOut.sendMidi(0xB0, LaunchpadMk2Colors.CC_UP + index, color);
       }
    }
 
@@ -145,27 +211,63 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
    private void onMidi(int status, int data1, int data2)
    {
-      // Only respond to note-on with velocity > 0 (pad press)
-      if ((status & 0xF0) != 0x90 || data2 == 0) return;
+      final int type = status & 0xF0;
 
-      // Check if this is a grid pad (notes 11-88, excluding column 9)
-      final int col = (data1 % 10) - 1;
-      final int row = (data1 / 10) - 1;
+      if (type == 0x90 && data2 > 0)
+      {
+         onNoteOn(data1);
+      }
+      else if (type == 0xB0 && data2 > 0)
+      {
+         onCC(data1);
+      }
+   }
 
+   private void onNoteOn(int note)
+   {
+      final int col = (note % 10) - 1;
+      final int row = (note / 10) - 1;
+
+      // Scene launch buttons (column 9 → col == 8)
+      if (col == 8 && row >= 0 && row < GRID_SIZE)
+      {
+         sceneBank.getItemAt(row).launch();
+         return;
+      }
+
+      // Grid pads
       if (col < 0 || col >= GRID_SIZE || row < 0 || row >= GRID_SIZE) return;
 
-      // col = track index, row = scene index
       final ClipLauncherSlotBank slotBank = trackBank.getItemAt(col).clipLauncherSlotBank();
       final ClipLauncherSlot slot = slotBank.getItemAt(row);
 
       if (slot.isPlaying().get())
       {
-         // If playing, stop the track's clips
          trackBank.getItemAt(col).stop();
       }
       else
       {
          slot.launch();
+      }
+   }
+
+   private void onCC(int cc)
+   {
+      switch (cc)
+      {
+         case LaunchpadMk2Colors.CC_UP:
+            sceneBank.scrollBackwards();
+            break;
+         case LaunchpadMk2Colors.CC_DOWN:
+            sceneBank.scrollForwards();
+            break;
+         case LaunchpadMk2Colors.CC_LEFT:
+            trackBank.scrollBackwards();
+            break;
+         case LaunchpadMk2Colors.CC_RIGHT:
+            trackBank.scrollForwards();
+            break;
+         // Session, User1, User2, Mixer — reserved, no-op
       }
    }
 
