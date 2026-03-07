@@ -38,7 +38,7 @@ public class LaunchpadMk2ExtensionDefinition extends ControllerExtensionDefiniti
    @Override
    public String getHardwareVendor()
    {
-      return "Novation";
+      return "Greg Ross";
    }
 
    @Override
