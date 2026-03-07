@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.1.0` |
-| **Phase** | 1 — Clip Launcher |
-| **Status** | `GATHERED` |
-| **Last Batch** | — |
+| **Version** | `0.1.6` |
+| **Phase** | — |
+| **Status** | `IDLE` |
+| **Last Batch** | Milestone v0.1.0 complete |
 | **Last Updated** | 2026-03-06 |
 
 ---
@@ -18,6 +18,12 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.1.6 | 1 | Manual testing fixes | UNPLANNED | done | 2026-03-06 |
+| 0.1.5 | 1 | Integration testing + polish | PLANNED | done | 2026-03-06 |
+| 0.1.4 | 1 | Scene launch buttons + top row navigation | PLANNED | done | 2026-03-06 |
+| 0.1.3 | 1 | Clip launcher grid (8x8 pads + LED feedback) | PLANNED | done | 2026-03-06 |
+| 0.1.2 | 1 | LED colors constants + SysEx helpers | PLANNED | done | 2026-03-06 |
+| 0.1.1 | 1 | Gradle project scaffold + extension definition | PLANNED | done | 2026-03-06 |
 | 0.0.1 | 0 | Project discovery & scaffold | PLANNED | done | 2026-03-06 |
 
 ---
