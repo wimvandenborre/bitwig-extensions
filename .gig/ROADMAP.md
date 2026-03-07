@@ -13,7 +13,7 @@
 
 | # | Name | Version Range | Status |
 |---|------|---------------|--------|
-| 2 | Track Filtering | v0.2.x | planned |
+| 2 | Track Filtering | v0.2.1 | complete |
 
 ## Completed Milestones
 

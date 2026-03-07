@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.2.0` |
-| **Phase** | 2 — Track Filtering |
-| **Status** | `IMPLEMENTING` |
-| **Last Batch** | 2.1 — Switch to createMainTrackBank |
+| **Version** | `0.2.1` |
+| **Phase** | — |
+| **Status** | `IDLE` |
+| **Last Batch** | Phase 2 complete |
 | **Last Updated** | 2026-03-07 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.2.1 | 2 | Track filtering + cursor track nav + nav colors | PLANNED | done | 2026-03-07 |
 | 0.1.7 | 1 | CCW rotation, empty slots off, pulse red, hue-aware color correction | UNPLANNED | done | 2026-03-07 |
 | 0.1.6 | 1 | Manual testing fixes | UNPLANNED | done | 2026-03-06 |
 | 0.1.5 | 1 | Integration testing + polish | PLANNED | done | 2026-03-06 |
@@ -33,9 +34,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- D-2.1: Use createMainTrackBank() to exclude FX/master
-- D-2.2: Track nav via CC_LEFT/CC_RIGHT (already done)
-- D-2.3: Single-line change in init()
+_None — phase archived._
 
 ---
 
