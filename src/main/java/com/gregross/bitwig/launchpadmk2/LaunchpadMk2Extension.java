@@ -48,7 +48,7 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
       midiOut.sendSysex(toHexString(LaunchpadMk2Colors.setSessionLayout()));
 
-      trackBank = host.createTrackBank(GRID_SIZE, 0, GRID_SIZE);
+      trackBank = host.createMainTrackBank(GRID_SIZE, 0, GRID_SIZE);
       trackBank.setShouldShowClipLauncherFeedback(true);
       sceneBank = trackBank.sceneBank();
 

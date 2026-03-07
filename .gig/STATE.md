@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.1.7` |
-| **Phase** | — |
-| **Status** | `IDLE` |
-| **Last Batch** | CCW rotation + color correction |
+| **Version** | `0.2.0` |
+| **Phase** | 2 — Track Filtering |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 2.1 — Switch to createMainTrackBank |
 | **Last Updated** | 2026-03-07 |
 
 ---
@@ -33,13 +33,9 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- D-1.1: Java + Gradle, standalone, extension-api:22
-- D-1.2: MK2 Session layout, decimal grid mapping
-- D-1.3: Clip launcher (8 tracks x 8 scenes)
-- D-1.4: Top row = navigation arrows + reserved mode buttons
-- D-1.5: Right-side = scene launch
-- D-1.6: RGB 128-color palette + pulse SysEx for queued
-- D-1.7: 3 classes (Definition, Extension, Colors) in launchpadmk2 package
+- D-2.1: Use createMainTrackBank() to exclude FX/master
+- D-2.2: Track nav via CC_LEFT/CC_RIGHT (already done)
+- D-2.3: Single-line change in init()
 
 ---
 
