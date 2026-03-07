@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.1.6` |
+| **Version** | `0.1.7` |
 | **Phase** | — |
 | **Status** | `IDLE` |
-| **Last Batch** | Milestone v0.1.0 complete |
-| **Last Updated** | 2026-03-06 |
+| **Last Batch** | CCW rotation + color correction |
+| **Last Updated** | 2026-03-07 |
 
 ---
 
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.1.7 | 1 | CCW rotation, empty slots off, pulse red, hue-aware color correction | UNPLANNED | done | 2026-03-07 |
 | 0.1.6 | 1 | Manual testing fixes | UNPLANNED | done | 2026-03-06 |
 | 0.1.5 | 1 | Integration testing + polish | PLANNED | done | 2026-03-06 |
 | 0.1.4 | 1 | Scene launch buttons + top row navigation | PLANNED | done | 2026-03-06 |

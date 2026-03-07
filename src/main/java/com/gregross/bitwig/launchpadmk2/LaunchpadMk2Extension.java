@@ -146,7 +146,9 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
             // Invert row: Bitwig scene 0 = top = Launchpad row 7
             final int padRow = (GRID_SIZE - 1) - scene;
-            final int note = LaunchpadMk2Colors.gridNote(padRow, track);
+            // Invert column for CCW rotation: track 0 = rightmost column (top when rotated)
+            final int padCol = (GRID_SIZE - 1) - track;
+            final int note = LaunchpadMk2Colors.gridNote(padRow, padCol);
 
             int mode;
             int color;
@@ -163,10 +165,9 @@ public class LaunchpadMk2Extension extends ControllerExtension
             }
             else if (slot.isPlaying().get() && slot.hasContent().get())
             {
-               // Playing: pulse with clip's hue-matched color — breathing makes it very obvious
-               final ColorValue c = slot.color();
+               // Playing: pulse bright red — stands out against colored stopped clips
                mode = MODE_PULSE;
-               color = LaunchpadMk2Colors.findClosestVelocity(c.red(), c.green(), c.blue());
+               color = 5; // bright red velocity
             }
             else if (slot.hasContent().get())
             {
@@ -182,9 +183,9 @@ public class LaunchpadMk2Extension extends ControllerExtension
             }
             else
             {
-               // Empty slot: dim outline
+               // Empty slot: off
                mode = MODE_VELOCITY;
-               color = LaunchpadMk2Colors.GRID_OUTLINE;
+               color = LaunchpadMk2Colors.OFF;
             }
 
             if (gridLedColor[track][scene] != color || gridLedMode[track][scene] != mode)
@@ -239,9 +240,10 @@ public class LaunchpadMk2Extension extends ControllerExtension
          ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       sendTopRowCC(1, sceneBank.canScrollForwards().get()
          ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
-      sendTopRowCC(2, trackBank.canScrollBackwards().get()
+      // Swapped for CCW rotation: left arrow (idx 2) now points down, right (idx 3) points up
+      sendTopRowCC(2, trackBank.canScrollForwards().get()
          ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
-      sendTopRowCC(3, trackBank.canScrollForwards().get()
+      sendTopRowCC(3, trackBank.canScrollBackwards().get()
          ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       sendTopRowCC(4, LaunchpadMk2Colors.MODE_ACTIVE);
       sendTopRowCC(5, LaunchpadMk2Colors.MODE_INACTIVE);
@@ -309,12 +311,14 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
       if (col < 0 || col >= GRID_SIZE || scene < 0 || scene >= GRID_SIZE) return;
 
-      final ClipLauncherSlotBank slotBank = trackBank.getItemAt(col).clipLauncherSlotBank();
+      // Invert column for CCW rotation: rightmost hardware col = track 0
+      final int track = (GRID_SIZE - 1) - col;
+      final ClipLauncherSlotBank slotBank = trackBank.getItemAt(track).clipLauncherSlotBank();
       final ClipLauncherSlot slot = slotBank.getItemAt(scene);
 
       if (slot.isPlaying().get())
       {
-         trackBank.getItemAt(col).stop();
+         trackBank.getItemAt(track).stop();
       }
       else
       {
@@ -333,10 +337,12 @@ public class LaunchpadMk2Extension extends ControllerExtension
             sceneBank.scrollForwards();
             break;
          case LaunchpadMk2Colors.CC_LEFT:
-            trackBank.scrollBackwards();
+            // After CCW rotation, left arrow points down → scroll tracks forward
+            trackBank.scrollForwards();
             break;
          case LaunchpadMk2Colors.CC_RIGHT:
-            trackBank.scrollForwards();
+            // After CCW rotation, right arrow points up → scroll tracks backward
+            trackBank.scrollBackwards();
             break;
       }
    }

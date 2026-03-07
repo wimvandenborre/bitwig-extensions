@@ -41,9 +41,67 @@ public class LaunchpadMk2Colors
    /**
     * Pack RGB floats (0.0-1.0) into a single int for caching.
     * MK2 SysEx RGB uses 6-bit values (0-63 per channel).
+    * Applies hue-aware color correction for MK2 LED pads.
     */
    public static int packRgb(float r, float g, float b)
    {
+      // Compute hue to apply targeted corrections
+      float max = Math.max(r, Math.max(g, b));
+      float min = Math.min(r, Math.min(g, b));
+      float delta = max - min;
+
+      if (delta > 0.05f && max > 0)
+      {
+         float hue;
+         if (max == r)
+            hue = 60 * (((g - b) / delta) % 6);
+         else if (max == g)
+            hue = 60 * (((b - r) / delta) + 2);
+         else
+            hue = 60 * (((r - g) / delta) + 4);
+         if (hue < 0) hue += 360;
+
+         // Red/pink (300-360, 0-30): kill green, keep red dominant
+         if (hue >= 300 || hue < 30)
+         {
+            g *= 0.15f;
+            b *= 0.5f;
+         }
+         // Orange (30-55): reduce blue, dim green slightly
+         else if (hue < 55)
+         {
+            b *= 0.1f;
+            g *= 0.6f;
+         }
+         // Yellow (55-80): kill blue, keep red+green
+         else if (hue < 80)
+         {
+            b *= 0.05f;
+         }
+         // Green (80-165): kill red, reduce blue
+         else if (hue < 165)
+         {
+            r *= 0.1f;
+            b *= 0.2f;
+         }
+         // Cyan (165-210): kill red, keep green+blue
+         else if (hue < 210)
+         {
+            r *= 0.05f;
+         }
+         // Blue (210-270): kill red, reduce green
+         else if (hue < 270)
+         {
+            r *= 0.1f;
+            g *= 0.15f;
+         }
+         // Purple/magenta (270-300): kill green, keep red+blue
+         else
+         {
+            g *= 0.1f;
+         }
+      }
+
       int ri = Math.min(63, (int)(r * 63));
       int gi = Math.min(63, (int)(g * 63));
       int bi = Math.min(63, (int)(b * 63));
