@@ -3,7 +3,10 @@ build/
 out/
 target/
 *.class
-*.jar
+*.bwextension
+
+# Gradle
+.gradle/
 
 # IDE
 .idea/
