@@ -343,19 +343,8 @@ public class LaunchpadMk2Extension extends ControllerExtension
       sendTopRowCC(3, cursorTrack.hasPrevious().get()
          ? LaunchpadMk2Colors.NAV_TRACK_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       // Utility buttons (after CCW rotation: bottom 4 on left column)
-      // CC 108 = Mode toggle — color indicates active mode
-      switch (utilityMode)
-      {
-         case UMODE_GLOBAL:
-            sendTopRowCC(4, 21); // green
-            break;
-         case UMODE_TRACK:
-            sendTopRowCC(4, 49); // purple
-            break;
-         case UMODE_UTILITY:
-            sendTopRowCC(4, 13); // yellow
-            break;
-      }
+      // CC 108 = Mode toggle — always white so it's distinct from action buttons
+      sendTopRowCC(4, 3); // white
 
       // CC 109-111: modal buttons
       switch (utilityMode)
@@ -387,9 +376,9 @@ public class LaunchpadMk2Extension extends ControllerExtension
                sendTopRowCC(6, 15); // dim yellow
             // Mixer = Mute
             if (cursorTrack.mute().get())
-               sendTopRowCCPulse(7, 9); // orange pulse when muted
+               sendTopRowCCPulse(7, 11); // dark orange pulse when muted
             else
-               sendTopRowCC(7, 11); // dim orange
+               sendTopRowCC(7, 10); // darker dim orange
             break;
          case UMODE_UTILITY:
             // User1 = Capture Scene — static yellow
