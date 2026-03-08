@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.3.0` |
-| **Phase** | 3 — Scene Launch Feedback |
-| **Status** | `IMPLEMENTING` |
-| **Last Batch** | 3.1 — Scene color observers + stateful LED feedback |
+| **Version** | `0.3.1` |
+| **Phase** | — |
+| **Status** | `IDLE` |
+| **Last Batch** | Phase 3 complete |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.3.1 | 3 | Scene launch feedback with colors + state | PLANNED | done | 2026-03-08 |
 | 0.2.1 | 2 | Track filtering + cursor track nav + nav colors | PLANNED | done | 2026-03-07 |
 | 0.1.7 | 1 | CCW rotation, empty slots off, pulse red, hue-aware color correction | UNPLANNED | done | 2026-03-07 |
 | 0.1.6 | 1 | Manual testing fixes | UNPLANNED | done | 2026-03-06 |
@@ -34,12 +35,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- D-3.1: Scene color via scene.color() + SysEx RGB
-- D-3.2: Playing inferred from clips
-- D-3.3: Queued inferred from clips
-- D-3.4: Playing = pulse red (vel 5)
-- D-3.5: Queued = pulse amber (vel 61)
-- D-3.6: Idle = scene color with hue correction
+_None — phase archived._
 
 ---
 

@@ -239,14 +239,22 @@ public class LaunchpadMk2Extension extends ControllerExtension
          final int note = LaunchpadMk2Colors.sceneLaunchNote(padRow);
 
          // Check clip states across all tracks for this scene
+         boolean allPlaying = true;
          boolean anyPlaying = false;
          boolean anyQueued = false;
+         boolean anyContent = false;
          for (int t = 0; t < GRID_SIZE; t++)
          {
             final ClipLauncherSlot slot = trackBank.getItemAt(t).clipLauncherSlotBank().getItemAt(scene);
-            if (slot.isPlaying().get()) anyPlaying = true;
+            if (slot.hasContent().get())
+            {
+               anyContent = true;
+               if (slot.isPlaying().get()) anyPlaying = true;
+               else allPlaying = false;
+            }
             if (slot.isPlaybackQueued().get() || slot.isStopQueued().get()) anyQueued = true;
          }
+         if (!anyContent) allPlaying = false;
 
          int mode;
          int color;
@@ -256,10 +264,17 @@ public class LaunchpadMk2Extension extends ControllerExtension
             mode = MODE_PULSE;
             color = LaunchpadMk2Colors.CLIP_QUEUED;
          }
-         else if (anyPlaying)
+         else if (allPlaying && anyContent)
          {
+            // All clips playing — pressing will stop; show pulse red
             mode = MODE_PULSE;
             color = LaunchpadMk2Colors.CLIP_RECORDING; // bright red velocity 5
+         }
+         else if (anyPlaying)
+         {
+            // Some but not all playing — pressing will launch; show pulse orange
+            mode = MODE_PULSE;
+            color = 9; // orange velocity
          }
          else
          {
@@ -339,21 +354,26 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
       if (col == 8 && scene >= 0 && scene < GRID_SIZE)
       {
-         // Check if any clip in this scene row is playing
-         boolean anyPlaying = false;
+         // Check if ALL tracks with content in this scene are playing
+         boolean allPlaying = true;
+         boolean anyContent = false;
          for (int t = 0; t < GRID_SIZE; t++)
          {
             final ClipLauncherSlot s = trackBank.getItemAt(t).clipLauncherSlotBank().getItemAt(scene);
-            if (s.isPlaying().get())
+            if (s.hasContent().get())
             {
-               anyPlaying = true;
-               break;
+               anyContent = true;
+               if (!s.isPlaying().get())
+               {
+                  allPlaying = false;
+                  break;
+               }
             }
          }
 
-         if (anyPlaying)
+         if (allPlaying && anyContent)
          {
-            // Stop all tracks
+            // All clips in scene are playing — stop all tracks
             for (int t = 0; t < GRID_SIZE; t++)
             {
                trackBank.getItemAt(t).stop();
@@ -361,6 +381,7 @@ public class LaunchpadMk2Extension extends ControllerExtension
          }
          else
          {
+            // Not all playing — launch the scene
             sceneBank.getItemAt(scene).launch();
          }
          return;
