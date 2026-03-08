@@ -474,17 +474,46 @@ public class LaunchpadMk2Extension extends ControllerExtension
             markDirty();
             break;
          case LaunchpadMk2Colors.CC_USER1:
-            // Stop all clips
-            for (int t = 0; t < GRID_SIZE; t++)
+            switch (utilityMode)
             {
-               trackBank.getItemAt(t).stop();
+               case UMODE_GLOBAL:
+                  transport.isArrangerRecordEnabled().toggle();
+                  break;
+               case UMODE_TRACK:
+                  cursorTrack.arm().toggle();
+                  break;
+               case UMODE_UTILITY:
+                  application.getAction("Create Scene From Playing Launcher Clips").invoke();
+                  break;
             }
             break;
          case LaunchpadMk2Colors.CC_USER2:
-            application.undo();
+            switch (utilityMode)
+            {
+               case UMODE_GLOBAL:
+                  transport.stop();
+                  break;
+               case UMODE_TRACK:
+                  cursorTrack.solo().toggle();
+                  break;
+               case UMODE_UTILITY:
+                  application.undo();
+                  break;
+            }
             break;
          case LaunchpadMk2Colors.CC_MIXER:
-            transport.togglePlay();
+            switch (utilityMode)
+            {
+               case UMODE_GLOBAL:
+                  transport.play();
+                  break;
+               case UMODE_TRACK:
+                  cursorTrack.mute().toggle();
+                  break;
+               case UMODE_UTILITY:
+                  application.redo();
+                  break;
+            }
             break;
       }
    }
