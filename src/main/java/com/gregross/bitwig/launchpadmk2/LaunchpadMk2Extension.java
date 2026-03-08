@@ -5,8 +5,10 @@ import com.bitwig.extension.controller.api.ClipLauncherSlot;
 import com.bitwig.extension.controller.api.ClipLauncherSlotBank;
 import com.bitwig.extension.controller.api.ColorValue;
 import com.bitwig.extension.controller.api.ControllerHost;
+import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.MidiIn;
 import com.bitwig.extension.controller.api.MidiOut;
+import com.bitwig.extension.controller.api.Scene;
 import com.bitwig.extension.controller.api.SceneBank;
 import com.bitwig.extension.controller.api.Track;
 import com.bitwig.extension.controller.api.TrackBank;
@@ -24,11 +26,13 @@ public class LaunchpadMk2Extension extends ControllerExtension
    private MidiOut midiOut;
    private TrackBank trackBank;
    private SceneBank sceneBank;
+   private CursorTrack cursorTrack;
 
    // Cached LED states: [track][scene] stores color value
    private final int[][] gridLedColor = new int[GRID_SIZE][GRID_SIZE];
    private final int[][] gridLedMode = new int[GRID_SIZE][GRID_SIZE];
-   private final int[] sceneLedState = new int[GRID_SIZE];
+   private final int[] sceneLedColor = new int[GRID_SIZE];
+   private final int[] sceneLedMode = new int[GRID_SIZE];
    private final int[] topRowLedState = new int[GRID_SIZE];
    private boolean ledsDirty = true;
 
@@ -48,6 +52,7 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
       midiOut.sendSysex(toHexString(LaunchpadMk2Colors.setSessionLayout()));
 
+      cursorTrack = host.createCursorTrack("LAUNCHPAD_MK2_CURSOR", "Cursor Track", 0, GRID_SIZE, true);
       trackBank = host.createMainTrackBank(GRID_SIZE, 0, GRID_SIZE);
       trackBank.setShouldShowClipLauncherFeedback(true);
       sceneBank = trackBank.sceneBank();
@@ -85,13 +90,20 @@ public class LaunchpadMk2Extension extends ControllerExtension
          t.color().addValueObserver((r, g, b) -> markDirty());
       }
 
-      trackBank.canScrollBackwards().markInterested();
-      trackBank.canScrollForwards().markInterested();
+      for (int scene = 0; scene < GRID_SIZE; scene++)
+      {
+         final Scene s = sceneBank.getScene(scene);
+         s.color().markInterested();
+         s.color().addValueObserver((r, g, b) -> markDirty());
+      }
+
+      cursorTrack.hasPrevious().markInterested();
+      cursorTrack.hasNext().markInterested();
       sceneBank.canScrollBackwards().markInterested();
       sceneBank.canScrollForwards().markInterested();
 
-      trackBank.canScrollBackwards().addValueObserver(v -> markDirty());
-      trackBank.canScrollForwards().addValueObserver(v -> markDirty());
+      cursorTrack.hasPrevious().addValueObserver(v -> markDirty());
+      cursorTrack.hasNext().addValueObserver(v -> markDirty());
       sceneBank.canScrollBackwards().addValueObserver(v -> markDirty());
       sceneBank.canScrollForwards().addValueObserver(v -> markDirty());
 
@@ -104,7 +116,8 @@ public class LaunchpadMk2Extension extends ControllerExtension
          }
       for (int i = 0; i < GRID_SIZE; i++)
       {
-         sceneLedState[i] = -1;
+         sceneLedColor[i] = -1;
+         sceneLedMode[i] = -1;
          topRowLedState[i] = -1;
       }
 
@@ -222,14 +235,58 @@ public class LaunchpadMk2Extension extends ControllerExtension
    {
       for (int scene = 0; scene < GRID_SIZE; scene++)
       {
-         final int color = LaunchpadMk2Colors.SCENE_LAUNCH;
          final int padRow = (GRID_SIZE - 1) - scene;
          final int note = LaunchpadMk2Colors.sceneLaunchNote(padRow);
 
-         if (sceneLedState[scene] != color)
+         // Check clip states across all tracks for this scene
+         boolean anyPlaying = false;
+         boolean anyQueued = false;
+         for (int t = 0; t < GRID_SIZE; t++)
          {
-            sceneLedState[scene] = color;
-            midiOut.sendMidi(0x90, note, color);
+            final ClipLauncherSlot slot = trackBank.getItemAt(t).clipLauncherSlotBank().getItemAt(scene);
+            if (slot.isPlaying().get()) anyPlaying = true;
+            if (slot.isPlaybackQueued().get() || slot.isStopQueued().get()) anyQueued = true;
+         }
+
+         int mode;
+         int color;
+
+         if (anyQueued)
+         {
+            mode = MODE_PULSE;
+            color = LaunchpadMk2Colors.CLIP_QUEUED;
+         }
+         else if (anyPlaying)
+         {
+            mode = MODE_PULSE;
+            color = LaunchpadMk2Colors.CLIP_RECORDING; // bright red velocity 5
+         }
+         else
+         {
+            // Idle: show scene's own color
+            final ColorValue c = sceneBank.getScene(scene).color();
+            mode = MODE_RGB;
+            color = LaunchpadMk2Colors.packRgb(c.red(), c.green(), c.blue());
+         }
+
+         if (sceneLedColor[scene] != color || sceneLedMode[scene] != mode)
+         {
+            sceneLedColor[scene] = color;
+            sceneLedMode[scene] = mode;
+
+            switch (mode)
+            {
+               case MODE_RGB:
+                  midiOut.sendSysex(toHexString(
+                     LaunchpadMk2Colors.setLedRgb(note, color)));
+                  break;
+               case MODE_PULSE:
+                  midiOut.sendMidi(0x92, note, color);
+                  break;
+               default:
+                  midiOut.sendMidi(0x90, note, color);
+                  break;
+            }
          }
       }
    }
@@ -237,14 +294,14 @@ public class LaunchpadMk2Extension extends ControllerExtension
    private void flushTopRow()
    {
       sendTopRowCC(0, sceneBank.canScrollBackwards().get()
-         ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
+         ? LaunchpadMk2Colors.NAV_SCENE_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       sendTopRowCC(1, sceneBank.canScrollForwards().get()
-         ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
-      // Swapped for CCW rotation: left arrow (idx 2) now points down, right (idx 3) points up
-      sendTopRowCC(2, trackBank.canScrollForwards().get()
-         ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
-      sendTopRowCC(3, trackBank.canScrollBackwards().get()
-         ? LaunchpadMk2Colors.NAV_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
+         ? LaunchpadMk2Colors.NAV_SCENE_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
+      // CCW rotation: left (idx 2) points down = next track, right (idx 3) points up = prev track
+      sendTopRowCC(2, cursorTrack.hasNext().get()
+         ? LaunchpadMk2Colors.NAV_TRACK_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
+      sendTopRowCC(3, cursorTrack.hasPrevious().get()
+         ? LaunchpadMk2Colors.NAV_TRACK_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       sendTopRowCC(4, LaunchpadMk2Colors.MODE_ACTIVE);
       sendTopRowCC(5, LaunchpadMk2Colors.MODE_INACTIVE);
       sendTopRowCC(6, LaunchpadMk2Colors.MODE_INACTIVE);
@@ -337,12 +394,12 @@ public class LaunchpadMk2Extension extends ControllerExtension
             sceneBank.scrollForwards();
             break;
          case LaunchpadMk2Colors.CC_LEFT:
-            // After CCW rotation, left arrow points down → scroll tracks forward
-            trackBank.scrollForwards();
+            // After CCW rotation, left arrow points down → select next track
+            cursorTrack.selectNext();
             break;
          case LaunchpadMk2Colors.CC_RIGHT:
-            // After CCW rotation, right arrow points up → scroll tracks backward
-            trackBank.scrollBackwards();
+            // After CCW rotation, right arrow points up → select previous track
+            cursorTrack.selectPrevious();
             break;
       }
    }

@@ -14,6 +14,7 @@
 | # | Name | Version Range | Status |
 |---|------|---------------|--------|
 | 2 | Track Filtering | v0.2.1 | complete |
+| 3 | Scene Launch Feedback | v0.3.x | planned |
 
 ## Completed Milestones
 

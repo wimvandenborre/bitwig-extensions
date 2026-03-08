@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.2.1` |
-| **Phase** | — |
-| **Status** | `IDLE` |
-| **Last Batch** | Phase 2 complete |
-| **Last Updated** | 2026-03-07 |
+| **Version** | `0.3.0` |
+| **Phase** | 3 — Scene Launch Feedback |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 3.1 — Scene color observers + stateful LED feedback |
+| **Last Updated** | 2026-03-08 |
 
 ---
 
@@ -34,7 +34,12 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-_None — phase archived._
+- D-3.1: Scene color via scene.color() + SysEx RGB
+- D-3.2: Playing inferred from clips
+- D-3.3: Queued inferred from clips
+- D-3.4: Playing = pulse red (vel 5)
+- D-3.5: Queued = pulse amber (vel 61)
+- D-3.6: Idle = scene color with hue correction
 
 ---
 
