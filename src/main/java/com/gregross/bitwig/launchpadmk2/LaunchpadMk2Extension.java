@@ -25,6 +25,12 @@ public class LaunchpadMk2Extension extends ControllerExtension
    private static final int MODE_PULSE = 2;
    private static final int MODE_FLASH = 3;
 
+   // Utility button modes
+   private static final int UMODE_GLOBAL = 0;
+   private static final int UMODE_TRACK = 1;
+   private static final int UMODE_UTILITY = 2;
+   private static final int UMODE_COUNT = 3;
+
    private MidiOut midiOut;
    private TrackBank trackBank;
    private SceneBank sceneBank;
@@ -39,6 +45,7 @@ public class LaunchpadMk2Extension extends ControllerExtension
    private final int[] sceneLedMode = new int[GRID_SIZE];
    private final int[] topRowLedState = new int[GRID_SIZE];
    private boolean ledsDirty = true;
+   private int utilityMode = UMODE_GLOBAL;
 
    protected LaunchpadMk2Extension(
       final LaunchpadMk2ExtensionDefinition definition, final ControllerHost host)
@@ -111,11 +118,17 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
       cursorTrack.hasPrevious().markInterested();
       cursorTrack.hasNext().markInterested();
+      cursorTrack.arm().markInterested();
+      cursorTrack.solo().markInterested();
+      cursorTrack.mute().markInterested();
       sceneBank.canScrollBackwards().markInterested();
       sceneBank.canScrollForwards().markInterested();
 
       cursorTrack.hasPrevious().addValueObserver(v -> markDirty());
       cursorTrack.hasNext().addValueObserver(v -> markDirty());
+      cursorTrack.arm().addValueObserver(v -> markDirty());
+      cursorTrack.solo().addValueObserver(v -> markDirty());
+      cursorTrack.mute().addValueObserver(v -> markDirty());
       sceneBank.canScrollBackwards().addValueObserver(v -> markDirty());
       sceneBank.canScrollForwards().addValueObserver(v -> markDirty());
 
@@ -330,20 +343,52 @@ public class LaunchpadMk2Extension extends ControllerExtension
       sendTopRowCC(3, cursorTrack.hasPrevious().get()
          ? LaunchpadMk2Colors.NAV_TRACK_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       // Utility buttons (after CCW rotation: bottom 4 on left column)
-      // CC 108 = Capture New Scene — static yellow
-      sendTopRowCC(4, 13); // yellow
+      // CC 108 = Mode toggle — always white so it's distinct from action buttons
+      sendTopRowCC(4, 3); // white
 
-      // CC 109 = Stop All — static red
-      sendTopRowCC(5, LaunchpadMk2Colors.CLIP_RECORDING);
-
-      // CC 110 = Undo — static white
-      sendTopRowCC(6, 3);
-
-      // CC 111 = Play/Stop
-      if (transport.isPlaying().get())
-         sendTopRowCCPulse(7, 21); // green pulse when playing
-      else
-         sendTopRowCC(7, 23); // dim green when stopped
+      // CC 109-111: modal buttons
+      switch (utilityMode)
+      {
+         case UMODE_GLOBAL:
+            // User1 = Record
+            if (transport.isArrangerRecordEnabled().get())
+               sendTopRowCCPulse(5, 5); // red pulse when recording
+            else
+               sendTopRowCC(5, 7); // dim red
+            // User2 = Stop — static red
+            sendTopRowCC(6, 5);
+            // Mixer = Play
+            if (transport.isPlaying().get())
+               sendTopRowCCPulse(7, 21); // green pulse when playing
+            else
+               sendTopRowCC(7, 23); // dim green
+            break;
+         case UMODE_TRACK:
+            // User1 = Arm
+            if (cursorTrack.arm().get())
+               sendTopRowCCPulse(5, 5); // red pulse when armed
+            else
+               sendTopRowCC(5, 7); // dim red
+            // User2 = Solo
+            if (cursorTrack.solo().get())
+               sendTopRowCCPulse(6, 13); // yellow pulse when soloed
+            else
+               sendTopRowCC(6, 15); // dim yellow
+            // Mixer = Mute
+            if (cursorTrack.mute().get())
+               sendTopRowCCPulse(7, 11); // dark orange pulse when muted
+            else
+               sendTopRowCC(7, 10); // darker dim orange
+            break;
+         case UMODE_UTILITY:
+            // User1 = Capture Scene — static yellow
+            sendTopRowCC(5, 13);
+            // User2 = Undo — static white
+            sendTopRowCC(6, 3);
+            // Mixer = Redo — static white
+            sendTopRowCC(7, 3);
+            break;
+      }
    }
 
    private void sendTopRowCC(int index, int color)
@@ -455,21 +500,52 @@ public class LaunchpadMk2Extension extends ControllerExtension
             cursorTrack.selectPrevious();
             break;
          case LaunchpadMk2Colors.CC_SESSION:
-            // Capture new scene from all currently playing clips
-            application.getAction("Create Scene From Playing Launcher Clips").invoke();
+            // Cycle utility mode: Global → Track → Utility → Global
+            utilityMode = (utilityMode + 1) % UMODE_COUNT;
+            getHost().println("Utility mode: " + utilityMode);
+            markDirty();
             break;
          case LaunchpadMk2Colors.CC_USER1:
-            // Stop all clips
-            for (int t = 0; t < GRID_SIZE; t++)
+            switch (utilityMode)
             {
-               trackBank.getItemAt(t).stop();
+               case UMODE_GLOBAL:
+                  transport.isArrangerRecordEnabled().toggle();
+                  break;
+               case UMODE_TRACK:
+                  cursorTrack.arm().toggle();
+                  break;
+               case UMODE_UTILITY:
+                  application.getAction("Create Scene From Playing Launcher Clips").invoke();
+                  break;
             }
             break;
          case LaunchpadMk2Colors.CC_USER2:
-            application.undo();
+            switch (utilityMode)
+            {
+               case UMODE_GLOBAL:
+                  transport.stop();
+                  break;
+               case UMODE_TRACK:
+                  cursorTrack.solo().toggle();
+                  break;
+               case UMODE_UTILITY:
+                  application.undo();
+                  break;
+            }
             break;
          case LaunchpadMk2Colors.CC_MIXER:
-            transport.togglePlay();
+            switch (utilityMode)
+            {
+               case UMODE_GLOBAL:
+                  transport.play();
+                  break;
+               case UMODE_TRACK:
+                  cursorTrack.mute().toggle();
+                  break;
+               case UMODE_UTILITY:
+                  application.redo();
+                  break;
+            }
             break;
       }
    }

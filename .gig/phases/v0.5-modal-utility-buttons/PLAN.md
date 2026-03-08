@@ -7,9 +7,17 @@
 
 ## Active Phase
 
-<!-- Populated by gig:plan. Cleared and archived by gig:verify on completion. -->
+### Phase 5 — Modal Utility Buttons (v0.5.x)
 
-_No active phase. Run `gig:decide` then `gig:plan` to start._
+> Replace the fixed utility buttons (CC 108-111) with a 3-mode system. Session button cycles between Global Transport, Track Control, and Utility modes. The other 3 buttons change function per mode with state-aware LED feedback.
+
+**Decisions:** D-1.1, D-1.2a, D-1.3, D-1.4, D-1.5, D-1.6, D-1.7, D-1.8
+
+| Batch | Version | Title | Delegation | Status |
+|-------|---------|-------|------------|--------|
+| 5.1 | `0.5.1` | Mode state + toggle + CursorTrack properties | in-session | done |
+| 5.2 | `0.5.2` | Modal button actions (all 3 modes) | in-session | done |
+| 5.3 | `0.5.3` | Modal LED feedback (all 3 modes) | in-session | done |
 
 ### Batch 5.1 — Mode state + toggle + CursorTrack properties
 

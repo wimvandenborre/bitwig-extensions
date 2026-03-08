@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.4.1` |
+| **Version** | `0.5.3` |
 | **Phase** | — |
 | **Status** | `IDLE` |
-| **Last Batch** | Phase 4 complete |
+| **Last Batch** | Phase 5 complete |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.5.3 | 5 | Modal utility buttons — 3-mode system with LED feedback | PLANNED | done | 2026-03-08 |
 | 0.4.1 | 4 | Utility buttons — capture scene, stop all, undo, play/stop | PLANNED | done | 2026-03-08 |
 | 0.3.1 | 3 | Scene launch feedback with colors + state | PLANNED | done | 2026-03-08 |
 | 0.2.1 | 2 | Track filtering + cursor track nav + nav colors | PLANNED | done | 2026-03-07 |
