@@ -15,7 +15,7 @@
 |---|------|---------------|--------|
 | 2 | Track Filtering | v0.2.1 | complete |
 | 3 | Scene Launch Feedback | v0.3.1 | complete |
-| 4 | Utility Buttons | v0.4.x | planned |
+| 4 | Utility Buttons | v0.4.1 | complete |
 
 ## Completed Milestones
 

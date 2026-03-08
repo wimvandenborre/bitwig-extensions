@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.4.0` |
-| **Phase** | 4 — Utility Buttons |
-| **Status** | `IMPLEMENTING` |
-| **Last Batch** | 4.1 — Transport, Stop All, Undo, Record |
+| **Version** | `0.4.1` |
+| **Phase** | — |
+| **Status** | `IDLE` |
+| **Last Batch** | Phase 4 complete |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.4.1 | 4 | Utility buttons — capture scene, stop all, undo, play/stop | PLANNED | done | 2026-03-08 |
 | 0.3.1 | 3 | Scene launch feedback with colors + state | PLANNED | done | 2026-03-08 |
 | 0.2.1 | 2 | Track filtering + cursor track nav + nav colors | PLANNED | done | 2026-03-07 |
 | 0.1.7 | 1 | CCW rotation, empty slots off, pulse red, hue-aware color correction | UNPLANNED | done | 2026-03-07 |
@@ -35,12 +36,7 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-- D-4.1: Session = Play/Stop toggle
-- D-4.2: User1 = Stop All Clips
-- D-4.3: User2 = Undo
-- D-4.4: Mixer = Record toggle
-- D-4.5: LED colors per button
-- D-4.6: Transport + Application API objects
+_None — phase archived._
 
 ---
 

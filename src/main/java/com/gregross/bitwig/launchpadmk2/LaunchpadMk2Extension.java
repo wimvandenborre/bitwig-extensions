@@ -330,11 +330,8 @@ public class LaunchpadMk2Extension extends ControllerExtension
       sendTopRowCC(3, cursorTrack.hasPrevious().get()
          ? LaunchpadMk2Colors.NAV_TRACK_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       // Utility buttons (after CCW rotation: bottom 4 on left column)
-      // CC 108 = Play/Stop
-      if (transport.isPlaying().get())
-         sendTopRowCCPulse(4, 21); // green pulse when playing
-      else
-         sendTopRowCC(4, 23); // dim green when stopped
+      // CC 108 = Capture New Scene — static yellow
+      sendTopRowCC(4, 13); // yellow
 
       // CC 109 = Stop All — static red
       sendTopRowCC(5, LaunchpadMk2Colors.CLIP_RECORDING);
@@ -342,11 +339,11 @@ public class LaunchpadMk2Extension extends ControllerExtension
       // CC 110 = Undo — static white
       sendTopRowCC(6, 3);
 
-      // CC 111 = Record
-      if (transport.isArrangerRecordEnabled().get())
-         sendTopRowCCPulse(7, 5); // red pulse when recording
+      // CC 111 = Play/Stop
+      if (transport.isPlaying().get())
+         sendTopRowCCPulse(7, 21); // green pulse when playing
       else
-         sendTopRowCC(7, 0); // off when not recording
+         sendTopRowCC(7, 23); // dim green when stopped
    }
 
    private void sendTopRowCC(int index, int color)
@@ -458,7 +455,8 @@ public class LaunchpadMk2Extension extends ControllerExtension
             cursorTrack.selectPrevious();
             break;
          case LaunchpadMk2Colors.CC_SESSION:
-            transport.togglePlay();
+            // Capture new scene from all currently playing clips
+            application.getAction("Create Scene From Playing Launcher Clips").invoke();
             break;
          case LaunchpadMk2Colors.CC_USER1:
             // Stop all clips
@@ -471,7 +469,7 @@ public class LaunchpadMk2Extension extends ControllerExtension
             application.undo();
             break;
          case LaunchpadMk2Colors.CC_MIXER:
-            transport.isArrangerRecordEnabled().toggle();
+            transport.togglePlay();
             break;
       }
    }

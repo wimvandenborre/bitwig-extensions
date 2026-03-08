@@ -11,7 +11,8 @@ public class LaunchpadMk2Colors
    public static final int SCENE_LAUNCH = 65;      // dim cyan
 
    // Top row button colors
-   public static final int NAV_ACTIVE = 119;       // dim white
+   public static final int NAV_SCENE_ACTIVE = 37;  // cyan — scene scroll (left/right after rotation)
+   public static final int NAV_TRACK_ACTIVE = 9;   // orange — track select (up/down after rotation)
    public static final int NAV_INACTIVE = 0;       // off
    public static final int MODE_ACTIVE = 21;       // bright green
    public static final int MODE_INACTIVE = 0;      // off
