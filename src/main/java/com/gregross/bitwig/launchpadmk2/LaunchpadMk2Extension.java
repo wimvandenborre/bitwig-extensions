@@ -343,20 +343,63 @@ public class LaunchpadMk2Extension extends ControllerExtension
       sendTopRowCC(3, cursorTrack.hasPrevious().get()
          ? LaunchpadMk2Colors.NAV_TRACK_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       // Utility buttons (after CCW rotation: bottom 4 on left column)
-      // CC 108 = Capture New Scene — static yellow
-      sendTopRowCC(4, 13); // yellow
+      // CC 108 = Mode toggle — color indicates active mode
+      switch (utilityMode)
+      {
+         case UMODE_GLOBAL:
+            sendTopRowCC(4, 21); // green
+            break;
+         case UMODE_TRACK:
+            sendTopRowCC(4, 49); // purple
+            break;
+         case UMODE_UTILITY:
+            sendTopRowCC(4, 13); // yellow
+            break;
+      }
 
-      // CC 109 = Stop All — static red
-      sendTopRowCC(5, LaunchpadMk2Colors.CLIP_RECORDING);
-
-      // CC 110 = Undo — static white
-      sendTopRowCC(6, 3);
-
-      // CC 111 = Play/Stop
-      if (transport.isPlaying().get())
-         sendTopRowCCPulse(7, 21); // green pulse when playing
-      else
-         sendTopRowCC(7, 23); // dim green when stopped
+      // CC 109-111: modal buttons
+      switch (utilityMode)
+      {
+         case UMODE_GLOBAL:
+            // User1 = Record
+            if (transport.isArrangerRecordEnabled().get())
+               sendTopRowCCPulse(5, 5); // red pulse when recording
+            else
+               sendTopRowCC(5, 7); // dim red
+            // User2 = Stop — static red
+            sendTopRowCC(6, 5);
+            // Mixer = Play
+            if (transport.isPlaying().get())
+               sendTopRowCCPulse(7, 21); // green pulse when playing
+            else
+               sendTopRowCC(7, 23); // dim green
+            break;
+         case UMODE_TRACK:
+            // User1 = Arm
+            if (cursorTrack.arm().get())
+               sendTopRowCCPulse(5, 5); // red pulse when armed
+            else
+               sendTopRowCC(5, 7); // dim red
+            // User2 = Solo
+            if (cursorTrack.solo().get())
+               sendTopRowCCPulse(6, 13); // yellow pulse when soloed
+            else
+               sendTopRowCC(6, 15); // dim yellow
+            // Mixer = Mute
+            if (cursorTrack.mute().get())
+               sendTopRowCCPulse(7, 9); // orange pulse when muted
+            else
+               sendTopRowCC(7, 11); // dim orange
+            break;
+         case UMODE_UTILITY:
+            // User1 = Capture Scene — static yellow
+            sendTopRowCC(5, 13);
+            // User2 = Undo — static white
+            sendTopRowCC(6, 3);
+            // Mixer = Redo — static white
+            sendTopRowCC(7, 3);
+            break;
+      }
    }
 
    private void sendTopRowCC(int index, int color)
