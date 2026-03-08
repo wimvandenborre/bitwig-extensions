@@ -4,6 +4,7 @@ import com.bitwig.extension.controller.ControllerExtension;
 import com.bitwig.extension.controller.api.ClipLauncherSlot;
 import com.bitwig.extension.controller.api.ClipLauncherSlotBank;
 import com.bitwig.extension.controller.api.ColorValue;
+import com.bitwig.extension.controller.api.Application;
 import com.bitwig.extension.controller.api.ControllerHost;
 import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.MidiIn;
@@ -12,6 +13,7 @@ import com.bitwig.extension.controller.api.Scene;
 import com.bitwig.extension.controller.api.SceneBank;
 import com.bitwig.extension.controller.api.Track;
 import com.bitwig.extension.controller.api.TrackBank;
+import com.bitwig.extension.controller.api.Transport;
 
 public class LaunchpadMk2Extension extends ControllerExtension
 {
@@ -27,6 +29,8 @@ public class LaunchpadMk2Extension extends ControllerExtension
    private TrackBank trackBank;
    private SceneBank sceneBank;
    private CursorTrack cursorTrack;
+   private Transport transport;
+   private Application application;
 
    // Cached LED states: [track][scene] stores color value
    private final int[][] gridLedColor = new int[GRID_SIZE][GRID_SIZE];
@@ -96,6 +100,14 @@ public class LaunchpadMk2Extension extends ControllerExtension
          s.color().markInterested();
          s.color().addValueObserver((r, g, b) -> markDirty());
       }
+
+      transport = host.createTransport();
+      transport.isPlaying().markInterested();
+      transport.isPlaying().addValueObserver(v -> markDirty());
+      transport.isArrangerRecordEnabled().markInterested();
+      transport.isArrangerRecordEnabled().addValueObserver(v -> markDirty());
+
+      application = host.createApplication();
 
       cursorTrack.hasPrevious().markInterested();
       cursorTrack.hasNext().markInterested();
@@ -317,10 +329,24 @@ public class LaunchpadMk2Extension extends ControllerExtension
          ? LaunchpadMk2Colors.NAV_TRACK_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
       sendTopRowCC(3, cursorTrack.hasPrevious().get()
          ? LaunchpadMk2Colors.NAV_TRACK_ACTIVE : LaunchpadMk2Colors.NAV_INACTIVE);
-      sendTopRowCC(4, LaunchpadMk2Colors.MODE_ACTIVE);
-      sendTopRowCC(5, LaunchpadMk2Colors.MODE_INACTIVE);
-      sendTopRowCC(6, LaunchpadMk2Colors.MODE_INACTIVE);
-      sendTopRowCC(7, LaunchpadMk2Colors.MODE_INACTIVE);
+      // Utility buttons (after CCW rotation: bottom 4 on left column)
+      // CC 108 = Play/Stop
+      if (transport.isPlaying().get())
+         sendTopRowCCPulse(4, 21); // green pulse when playing
+      else
+         sendTopRowCC(4, 23); // dim green when stopped
+
+      // CC 109 = Stop All — static red
+      sendTopRowCC(5, LaunchpadMk2Colors.CLIP_RECORDING);
+
+      // CC 110 = Undo — static white
+      sendTopRowCC(6, 3);
+
+      // CC 111 = Record
+      if (transport.isArrangerRecordEnabled().get())
+         sendTopRowCCPulse(7, 5); // red pulse when recording
+      else
+         sendTopRowCC(7, 0); // off when not recording
    }
 
    private void sendTopRowCC(int index, int color)
@@ -329,6 +355,15 @@ public class LaunchpadMk2Extension extends ControllerExtension
       {
          topRowLedState[index] = color;
          midiOut.sendMidi(0xB0, LaunchpadMk2Colors.CC_UP + index, color);
+      }
+   }
+
+   private void sendTopRowCCPulse(int index, int color)
+   {
+      if (topRowLedState[index] != color)
+      {
+         topRowLedState[index] = color;
+         midiOut.sendMidi(0xB2, LaunchpadMk2Colors.CC_UP + index, color);
       }
    }
 
@@ -421,6 +456,22 @@ public class LaunchpadMk2Extension extends ControllerExtension
          case LaunchpadMk2Colors.CC_RIGHT:
             // After CCW rotation, right arrow points up → select previous track
             cursorTrack.selectPrevious();
+            break;
+         case LaunchpadMk2Colors.CC_SESSION:
+            transport.togglePlay();
+            break;
+         case LaunchpadMk2Colors.CC_USER1:
+            // Stop all clips
+            for (int t = 0; t < GRID_SIZE; t++)
+            {
+               trackBank.getItemAt(t).stop();
+            }
+            break;
+         case LaunchpadMk2Colors.CC_USER2:
+            application.undo();
+            break;
+         case LaunchpadMk2Colors.CC_MIXER:
+            transport.isArrangerRecordEnabled().toggle();
             break;
       }
    }

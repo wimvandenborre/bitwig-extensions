@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.3.1` |
-| **Phase** | — |
-| **Status** | `IDLE` |
-| **Last Batch** | Phase 3 complete |
+| **Version** | `0.4.0` |
+| **Phase** | 4 — Utility Buttons |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 4.1 — Transport, Stop All, Undo, Record |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -35,7 +35,12 @@
 
 <!-- Decisions that affect current/upcoming work -->
 
-_None — phase archived._
+- D-4.1: Session = Play/Stop toggle
+- D-4.2: User1 = Stop All Clips
+- D-4.3: User2 = Undo
+- D-4.4: Mixer = Record toggle
+- D-4.5: LED colors per button
+- D-4.6: Transport + Application API objects
 
 ---
 
