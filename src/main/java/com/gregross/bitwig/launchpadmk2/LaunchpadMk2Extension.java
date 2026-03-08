@@ -25,6 +25,12 @@ public class LaunchpadMk2Extension extends ControllerExtension
    private static final int MODE_PULSE = 2;
    private static final int MODE_FLASH = 3;
 
+   // Utility button modes
+   private static final int UMODE_GLOBAL = 0;
+   private static final int UMODE_TRACK = 1;
+   private static final int UMODE_UTILITY = 2;
+   private static final int UMODE_COUNT = 3;
+
    private MidiOut midiOut;
    private TrackBank trackBank;
    private SceneBank sceneBank;
@@ -39,6 +45,7 @@ public class LaunchpadMk2Extension extends ControllerExtension
    private final int[] sceneLedMode = new int[GRID_SIZE];
    private final int[] topRowLedState = new int[GRID_SIZE];
    private boolean ledsDirty = true;
+   private int utilityMode = UMODE_GLOBAL;
 
    protected LaunchpadMk2Extension(
       final LaunchpadMk2ExtensionDefinition definition, final ControllerHost host)
@@ -111,11 +118,17 @@ public class LaunchpadMk2Extension extends ControllerExtension
 
       cursorTrack.hasPrevious().markInterested();
       cursorTrack.hasNext().markInterested();
+      cursorTrack.arm().markInterested();
+      cursorTrack.solo().markInterested();
+      cursorTrack.mute().markInterested();
       sceneBank.canScrollBackwards().markInterested();
       sceneBank.canScrollForwards().markInterested();
 
       cursorTrack.hasPrevious().addValueObserver(v -> markDirty());
       cursorTrack.hasNext().addValueObserver(v -> markDirty());
+      cursorTrack.arm().addValueObserver(v -> markDirty());
+      cursorTrack.solo().addValueObserver(v -> markDirty());
+      cursorTrack.mute().addValueObserver(v -> markDirty());
       sceneBank.canScrollBackwards().addValueObserver(v -> markDirty());
       sceneBank.canScrollForwards().addValueObserver(v -> markDirty());
 
@@ -455,8 +468,10 @@ public class LaunchpadMk2Extension extends ControllerExtension
             cursorTrack.selectPrevious();
             break;
          case LaunchpadMk2Colors.CC_SESSION:
-            // Capture new scene from all currently playing clips
-            application.getAction("Create Scene From Playing Launcher Clips").invoke();
+            // Cycle utility mode: Global → Track → Utility → Global
+            utilityMode = (utilityMode + 1) % UMODE_COUNT;
+            getHost().println("Utility mode: " + utilityMode);
+            markDirty();
             break;
          case LaunchpadMk2Colors.CC_USER1:
             // Stop all clips
