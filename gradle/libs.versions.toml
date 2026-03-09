@@ -3,6 +3,7 @@ bitwig-api = "25"
 java-websocket = "1.6.0"
 gson = "2.12.1"
 junit-jupiter = "5.12.1"
+mockito = "5.15.2"
 picocli = "4.7.6"
 
 [libraries]
@@ -10,6 +11,8 @@ bitwig-api = { module = "com.bitwig:extension-api", version.ref = "bitwig-api" }
 java-websocket = { module = "org.java-websocket:Java-WebSocket", version.ref = "java-websocket" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 
 [plugins]
