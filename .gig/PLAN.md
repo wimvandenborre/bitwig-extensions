@@ -15,10 +15,10 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 5.1 | `0.5.1` | Add Mockito dependency | in-session | pending |
-| 5.2 | `0.5.2` | ProjectHandler + MasterHandler mock tests | team | pending |
-| 5.3 | `0.5.3` | TrackHandler mock tests | team | pending |
-| 5.4 | `0.5.4` | Verify full build | in-session | pending |
+| 5.1 | `0.5.1` | Add Mockito dependency | in-session | done |
+| 5.2 | `0.5.2` | ProjectHandler + MasterHandler mock tests | in-session | done |
+| 5.3 | `0.5.3` | TrackHandler mock tests | in-session | done |
+| 5.4 | `0.5.4` | Verify full build | in-session | done |
 
 ### Batch 5.1 — Add Mockito dependency
 
