@@ -378,17 +378,6 @@ public class DeviceHandler {
         });
     }
 
-    private JsonArray requireArray(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        if (!el.isJsonArray()) {
-            throw new IllegalArgumentException("'" + key + "' must be an array");
-        }
-        return el.getAsJsonArray();
-    }
-
     static void validatePageTag(String tag) {
         if (!VALID_PAGE_TAGS.contains(tag)) {
             throw new IllegalArgumentException(

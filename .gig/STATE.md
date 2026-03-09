@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.3.2` |
-| **Phase** | 3 — gig-maestro: Extract JsonParamValidator |
+| **Version** | `0.4.4` |
+| **Phase** | 4 — gig-maestro: Test Coverage Expansion |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 3.2 — Verify tests pass |
+| **Last Batch** | 4.4 — Verify full build |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.4.4 | 4 | Verify full build | PLANNED | done | 2026-03-08 |
+| 0.4.3 | 4 | ClipHandler + ProjectHandler validation tests | PLANNED | done | 2026-03-08 |
+| 0.4.2 | 4 | TrackHandler + NoteHandler validation tests | PLANNED | done | 2026-03-08 |
+| 0.4.1 | 4 | Extract requireArray + JsonParamValidatorTest | PLANNED | done | 2026-03-08 |
 | 0.3.2 | 3 | Verify tests pass | PLANNED | done | 2026-03-08 |
 | 0.3.1 | 3 | Create JsonParamValidator + update handlers | PLANNED | done | 2026-03-08 |
 | 0.2.4 | 2 | Verify build and final cleanup | PLANNED | done | 2026-03-08 |
@@ -34,7 +38,7 @@
 
 ## Active Decisions
 
-_None — Phase 3 decisions archived._
+_None — Phase 4 decisions archived._
 
 ---
 

@@ -225,6 +225,41 @@ class ClipHandlerTest {
         assertContains(response, "semitones");
     }
 
+    // --- scene/launch validation ---
+
+    @Test
+    void sceneLaunch_indexOutOfRange_returnsError() {
+        String response = dispatcher.handle(rpc("scene/launch", "{\"index\": 5}"));
+        assertContains(response, "-32602");
+        assertContains(response, "out of range");
+    }
+
+    @Test
+    void sceneLaunch_partialOptions_returnsError() {
+        String response = dispatcher.handle(rpc("scene/launch",
+            "{\"index\": 0, \"quantization\": \"1\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "both be provided");
+    }
+
+    // --- clip/launch option validation ---
+
+    @Test
+    void clipLaunch_invalidQuantization_returnsError() {
+        String response = dispatcher.handle(rpc("clip/launch",
+            "{\"trackIndex\": 0, \"slotIndex\": 0, \"quantization\": \"invalid\", \"launchMode\": \"from_start\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "invalid launch quantization");
+    }
+
+    @Test
+    void clipLaunch_invalidLaunchMode_returnsError() {
+        String response = dispatcher.handle(rpc("clip/launch",
+            "{\"trackIndex\": 0, \"slotIndex\": 0, \"quantization\": \"1\", \"launchMode\": \"invalid\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "invalid launch mode");
+    }
+
     // --- Helpers ---
 
     private String rpc(String method, String params) {
