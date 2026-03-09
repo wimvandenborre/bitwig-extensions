@@ -50,7 +50,7 @@ public class LaunchpadMk2ExtensionDefinition extends ControllerExtensionDefiniti
    @Override
    public int getRequiredAPIVersion()
    {
-      return 22;
+      return 25;
    }
 
    @Override
