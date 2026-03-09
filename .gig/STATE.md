@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.3.2` |
 | **Phase** | 3 — gig-maestro: Extract JsonParamValidator |
-| **Status** | `IMPLEMENTING` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 3.2 — Verify tests pass |
 | **Last Updated** | 2026-03-08 |
 
@@ -34,8 +34,7 @@
 
 ## Active Decisions
 
-- D-3.1: No shared module — overlap too thin
-- D-3.2: Extract JsonParamValidator within gig-maestro (internal refactor)
+_None — Phase 3 decisions archived._
 
 ---
 
