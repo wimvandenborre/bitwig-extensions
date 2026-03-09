@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.2.0` |
+| **Version** | `0.2.2` |
 | **Phase** | 2 — Git Consolidation |
-| **Status** | `GATHERED` |
-| **Last Batch** | — |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | Namespace tags and clean up |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,8 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.2.2 | 2 | Namespace tags and clean up | PLANNED | done | 2026-03-08 |
+| 0.2.1 | 2 | Import subproject histories via subtree | PLANNED | done | 2026-03-08 |
 | 0.1.4 | 1 | Verify full build | PLANNED | done | 2026-03-08 |
 | 0.1.3 | 1 | Convert launchpad-mk2 build | PLANNED | done | 2026-03-08 |
 | 0.1.2 | 1 | Convert gig-maestro build | PLANNED | done | 2026-03-08 |
