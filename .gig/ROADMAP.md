@@ -1,0 +1,21 @@
+# Roadmap
+
+## Current Milestone
+
+| Field | Value |
+|-------|-------|
+| **Name** | Gradle Multi-Module Unification |
+| **Version** | 0.1.0 |
+| **Status** | in-progress |
+| **Description** | Unify gig-maestro and launchpad-mk2 into a single Gradle multi-module project with shared build configuration, version catalog, and Bitwig API v25 from Maven. |
+
+## Phases
+
+| # | Name | Version Range | Status |
+|---|------|---------------|--------|
+| 1 | Gradle Multi-Module Setup | v0.1.x | planned |
+
+## Completed Milestones
+
+<!-- Milestones moved here by gig:milestone on completion -->
+<!-- Format: ### v{X.Y} — {Name} (completed YYYY-MM-DD) -->
