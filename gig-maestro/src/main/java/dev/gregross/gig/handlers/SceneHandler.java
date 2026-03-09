@@ -3,11 +3,12 @@ package dev.gregross.gig.handlers;
 import com.bitwig.extension.controller.api.Project;
 import com.bitwig.extension.controller.api.Scene;
 import com.bitwig.extension.controller.api.SceneBank;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+
+import static dev.gregross.gig.rpc.JsonParamValidator.*;
 import dev.gregross.gig.rpc.RpcException;
 
 public class SceneHandler {
@@ -134,27 +135,4 @@ public class SceneHandler {
         return result;
     }
 
-    private int requireInt(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsInt();
-    }
-
-    private String requireString(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsString();
-    }
-
-    private double requireDouble(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsDouble();
-    }
 }

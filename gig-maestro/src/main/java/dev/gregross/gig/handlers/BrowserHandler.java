@@ -6,11 +6,12 @@ import com.bitwig.extension.controller.api.CursorBrowserFilterItem;
 import com.bitwig.extension.controller.api.CursorDevice;
 import com.bitwig.extension.controller.api.PopupBrowser;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+
+import static dev.gregross.gig.rpc.JsonParamValidator.*;
 
 import java.util.Map;
 import java.util.Set;
@@ -176,27 +177,4 @@ public class BrowserHandler {
         return idx;
     }
 
-    private static int requireInt(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null || el.isJsonNull()) {
-            throw new IllegalArgumentException("Missing required parameter: " + key);
-        }
-        return el.getAsInt();
-    }
-
-    private static boolean requireBoolean(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null || el.isJsonNull()) {
-            throw new IllegalArgumentException("Missing required parameter: " + key);
-        }
-        return el.getAsBoolean();
-    }
-
-    private static String requireString(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null || el.isJsonNull()) {
-            throw new IllegalArgumentException("Missing required parameter: " + key);
-        }
-        return el.getAsString();
-    }
 }

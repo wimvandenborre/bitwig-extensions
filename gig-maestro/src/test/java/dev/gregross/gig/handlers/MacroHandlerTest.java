@@ -137,7 +137,7 @@ class MacroHandlerTest {
     void createTrack_missingType() {
         String response = handle("macro/createTrack", "{}");
         assertTrue(response.contains("error"));
-        assertTrue(response.contains("Missing required param: type"));
+        assertTrue(response.contains("missing") && response.contains("type"));
     }
 
     // --- macro/createClip ---
