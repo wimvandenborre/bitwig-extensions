@@ -130,6 +130,33 @@ class TrackHandlerTest {
         assertContains(response, "mutually exclusive");
     }
 
+    // --- track/select validation ---
+
+    @Test
+    void select_missingIndex_returnsError() {
+        String response = dispatcher.handle(rpc("track/select", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "index");
+    }
+
+    // --- track/setCrossfade validation ---
+
+    @Test
+    void setCrossfade_missingIndex_returnsError() {
+        String response = dispatcher.handle(rpc("track/setCrossfade", "{\"mode\":\"A\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "index");
+    }
+
+    // --- track/setMonitor validation ---
+
+    @Test
+    void setMonitor_missingIndex_returnsError() {
+        String response = dispatcher.handle(rpc("track/setMonitor", "{\"mode\":\"ON\"}"));
+        assertContains(response, "-32602");
+        assertContains(response, "index");
+    }
+
     // --- Helpers ---
 
     private String rpc(String method, String params) {
