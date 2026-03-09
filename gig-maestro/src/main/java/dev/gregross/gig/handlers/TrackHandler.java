@@ -5,11 +5,12 @@ import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.NoteInput;
 import com.bitwig.extension.controller.api.Track;
 import com.bitwig.extension.controller.api.TrackBank;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+
+import static dev.gregross.gig.rpc.JsonParamValidator.*;
 import dev.gregross.gig.rpc.RpcException;
 
 public class TrackHandler {
@@ -241,27 +242,4 @@ public class TrackHandler {
         return result;
     }
 
-    private int requireInt(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsInt();
-    }
-
-    private String requireString(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsString();
-    }
-
-    private int optionalInt(JsonObject params, String key, int defaultValue) {
-        JsonElement el = params.get(key);
-        if (el == null || el.isJsonNull()) {
-            return defaultValue;
-        }
-        return el.getAsInt();
-    }
 }

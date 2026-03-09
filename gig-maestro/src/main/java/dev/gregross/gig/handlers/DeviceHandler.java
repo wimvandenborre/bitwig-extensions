@@ -14,6 +14,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 
+import static dev.gregross.gig.rpc.JsonParamValidator.*;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -376,38 +378,6 @@ public class DeviceHandler {
         });
     }
 
-    private int requireInt(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsInt();
-    }
-
-    private double requireDouble(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsDouble();
-    }
-
-    private boolean requireBoolean(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsBoolean();
-    }
-
-    private String requireString(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsString();
-    }
-
     private JsonArray requireArray(JsonObject params, String key) {
         JsonElement el = params.get(key);
         if (el == null) {
@@ -417,14 +387,6 @@ public class DeviceHandler {
             throw new IllegalArgumentException("'" + key + "' must be an array");
         }
         return el.getAsJsonArray();
-    }
-
-    private String optionalString(JsonObject params, String key, String defaultValue) {
-        JsonElement el = params.get(key);
-        if (el == null || el.isJsonNull()) {
-            return defaultValue;
-        }
-        return el.getAsString();
     }
 
     static void validatePageTag(String tag) {

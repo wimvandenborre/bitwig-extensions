@@ -5,6 +5,8 @@ import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import dev.gregross.gig.rpc.TaskScheduler;
 
+import static dev.gregross.gig.rpc.JsonParamValidator.*;
+
 public class MacroHandler {
 
     private static final long FLUSH_DELAY_MS = 100;
@@ -279,30 +281,6 @@ public class MacroHandler {
     }
 
     // --- Parameter helpers ---
-
-    private static String requireString(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null || el.isJsonNull()) {
-            throw new IllegalArgumentException("Missing required param: " + key);
-        }
-        return el.getAsString();
-    }
-
-    private static int requireInt(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null || el.isJsonNull()) {
-            throw new IllegalArgumentException("Missing required param: " + key);
-        }
-        return el.getAsInt();
-    }
-
-    private static double requireDouble(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null || el.isJsonNull()) {
-            throw new IllegalArgumentException("Missing required param: " + key);
-        }
-        return el.getAsDouble();
-    }
 
     private static JsonArray requireArray(JsonObject params, String key) {
         JsonElement el = params.get(key);

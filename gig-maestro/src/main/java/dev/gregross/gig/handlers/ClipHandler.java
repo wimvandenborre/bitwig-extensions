@@ -10,6 +10,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import static dev.gregross.gig.rpc.JsonParamValidator.*;
+
 import java.util.Set;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
@@ -302,37 +304,7 @@ public class ClipHandler {
         return track.clipLauncherSlotBank();
     }
 
-    private int requireInt(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsInt();
-    }
 
-    private String requireString(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsString();
-    }
-
-    private boolean requireBoolean(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsBoolean();
-    }
-
-    private double requireDouble(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsDouble();
-    }
 
     private void validateColorComponent(float value, String name) {
         if (value < 0.0f || value > 1.0f) {

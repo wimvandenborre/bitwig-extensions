@@ -10,6 +10,8 @@ import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 
+import static dev.gregross.gig.rpc.JsonParamValidator.*;
+
 public class NoteHandler {
 
     private static final int GRID_WIDTH = 256;
@@ -303,22 +305,6 @@ public class NoteHandler {
             cursorClip.scrollToStep(offset);
             return new JsonPrimitive("ok");
         });
-    }
-
-    private int requireInt(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsInt();
-    }
-
-    private double requireDouble(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsDouble();
     }
 
     private JsonArray requireArray(JsonObject params, String key) {
