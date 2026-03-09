@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.3.2` |
-| **Phase** | 3 — gig-maestro: Extract JsonParamValidator |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 3.2 — Verify tests pass |
+| **Version** | `0.4.0` |
+| **Phase** | 4 — gig-maestro: Test Coverage Expansion |
+| **Status** | `GATHERED` |
+| **Last Batch** | — |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -34,7 +34,10 @@
 
 ## Active Decisions
 
-_None — Phase 3 decisions archived._
+- D-4.1: Scope — validation + infrastructure tests only, no mocking
+- D-4.2: Priority — TrackHandler, NoteHandler, ClipHandler, ProjectHandler; skip BrowserHandler
+- D-4.3: Add dedicated JsonParamValidatorTest
+- D-4.4: Move requireArray() to JsonParamValidator (completes Phase 3 extraction)
 
 ---
 
