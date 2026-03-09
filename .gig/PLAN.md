@@ -15,10 +15,10 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 1.1 | `0.1.1` | Root project scaffold | in-session | pending |
-| 1.2 | `0.1.2` | Convert gig-maestro build | in-session | pending |
-| 1.3 | `0.1.3` | Convert launchpad-mk2 build | in-session | pending |
-| 1.4 | `0.1.4` | Verify full build | in-session | pending |
+| 1.1 | `0.1.1` | Root project scaffold | in-session | done |
+| 1.2 | `0.1.2` | Convert gig-maestro build | in-session | done |
+| 1.3 | `0.1.3` | Convert launchpad-mk2 build | in-session | done |
+| 1.4 | `0.1.4` | Verify full build | in-session | done |
 
 ### Batch 1.1 — Root project scaffold
 
