@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.1.0` |
+| **Version** | `0.1.4` |
 | **Phase** | 1 — Gradle Multi-Module Setup |
-| **Status** | `GATHERED` |
-| **Last Batch** | — |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | Verify full build |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.1.4 | 1 | Verify full build | PLANNED | done | 2026-03-08 |
+| 0.1.3 | 1 | Convert launchpad-mk2 build | PLANNED | done | 2026-03-08 |
+| 0.1.2 | 1 | Convert gig-maestro build | PLANNED | done | 2026-03-08 |
+| 0.1.1 | 1 | Root project scaffold | PLANNED | done | 2026-03-08 |
 | 0.0.1 | 0 | Project discovery & scaffold | PLANNED | done | 2026-03-08 |
 
 ---
