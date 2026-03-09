@@ -13,7 +13,8 @@
 
 | # | Name | Version Range | Status |
 |---|------|---------------|--------|
-| 1 | Gradle Multi-Module Setup | v0.1.x | planned |
+| 1 | Gradle Multi-Module Setup | v0.1.1–v0.1.4 | complete |
+| 2 | Git Consolidation | v0.2.x | planned |
 
 ## Completed Milestones
 

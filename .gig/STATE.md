@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.1.4` |
-| **Phase** | 1 — Gradle Multi-Module Setup |
-| **Status** | `IMPLEMENTED` |
-| **Last Batch** | Verify full build |
+| **Version** | `0.2.0` |
+| **Phase** | 2 — Git Consolidation |
+| **Status** | `GATHERED` |
+| **Last Batch** | — |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -28,13 +28,12 @@
 
 ## Active Decisions
 
-- D-1.1: Kotlin DSL for all build files
-- D-1.2: Maven `extension-api:25` for both modules
-- D-1.3: `compileOnly` scope for Bitwig API
-- D-1.4: Root version catalog with Bitwig API entry
-- D-1.5: Root build defines shared config; modules own specifics
-- D-1.6: Single Gradle wrapper at root
-- D-1.7: New root git repo; subproject `.git/` untouched
+- D-2.1: Monorepo via `git subtree add` — import full history, remove nested `.git/`
+- D-2.2: Prefix imported tags: `gig-maestro/v0.X.Y`, `launchpad-mk2/v0.X.Y`
+- D-2.3: Move subproject `.gig/` to `.gig/modules/{name}/`
+- D-2.4: Consolidate `.claude/CLAUDE.md` to root
+- D-2.5: Merge `.gitignore` into root, delete subproject copies
+- D-2.6: Module name in phase name for branch convention
 
 ---
 
