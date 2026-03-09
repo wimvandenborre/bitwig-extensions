@@ -15,8 +15,8 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 3.1 | `0.3.1` | Create JsonParamValidator + update handlers | in-session | pending |
-| 3.2 | `0.3.2` | Verify tests pass | in-session | pending |
+| 3.1 | `0.3.1` | Create JsonParamValidator + update handlers | in-session | done |
+| 3.2 | `0.3.2` | Verify tests pass | in-session | done |
 
 ### Batch 3.1 — Create JsonParamValidator + update handlers
 

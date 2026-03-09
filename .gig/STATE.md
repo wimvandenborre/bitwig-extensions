@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.3.0` |
+| **Version** | `0.3.2` |
 | **Phase** | 3 — gig-maestro: Extract JsonParamValidator |
-| **Status** | `GATHERED` |
-| **Last Batch** | — |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 3.2 — Verify tests pass |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,8 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.3.2 | 3 | Verify tests pass | PLANNED | done | 2026-03-08 |
+| 0.3.1 | 3 | Create JsonParamValidator + update handlers | PLANNED | done | 2026-03-08 |
 | 0.2.4 | 2 | Verify build and final cleanup | PLANNED | done | 2026-03-08 |
 | 0.2.3 | 2 | Consolidate .gig/, .claude/, .gitignore | PLANNED | done | 2026-03-08 |
 | 0.2.2 | 2 | Namespace tags and clean up | PLANNED | done | 2026-03-08 |
