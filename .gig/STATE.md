@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.5.4` |
 | **Phase** | 5 — gig-maestro: Mockito Behavioral Testing |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 5.4 — Verify full build |
 | **Last Updated** | 2026-03-08 |
 
