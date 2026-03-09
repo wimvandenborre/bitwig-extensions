@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.4.4` |
 | **Phase** | 4 — gig-maestro: Test Coverage Expansion |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 4.4 — Verify full build |
 | **Last Updated** | 2026-03-08 |
 
@@ -38,10 +38,7 @@
 
 ## Active Decisions
 
-- D-4.1: Scope — validation + infrastructure tests only, no mocking
-- D-4.2: Priority — TrackHandler, NoteHandler, ClipHandler, ProjectHandler; skip BrowserHandler
-- D-4.3: Add dedicated JsonParamValidatorTest
-- D-4.4: Move requireArray() to JsonParamValidator (completes Phase 3 extraction)
+_None — Phase 4 decisions archived._
 
 ---
 

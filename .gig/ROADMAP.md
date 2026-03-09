@@ -16,7 +16,7 @@
 | 1 | Gradle Multi-Module Setup | v0.1.1–v0.1.4 | complete |
 | 2 | Git Consolidation | v0.2.1–v0.2.4 | complete |
 | 3 | gig-maestro: Extract JsonParamValidator | v0.3.1–v0.3.2 | complete |
-| 4 | gig-maestro: Test Coverage Expansion | v0.4.x | planned |
+| 4 | gig-maestro: Test Coverage Expansion | v0.4.1–v0.4.4 | complete |
 
 ## Completed Milestones
 
