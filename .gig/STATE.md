@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.2.4` |
-| **Phase** | 2 — Git Consolidation |
-| **Status** | `GOVERNED` |
-| **Last Batch** | Verify build and final cleanup |
+| **Version** | `0.3.0` |
+| **Phase** | 3 — gig-maestro: Extract JsonParamValidator |
+| **Status** | `GATHERED` |
+| **Last Batch** | — |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -32,12 +32,8 @@
 
 ## Active Decisions
 
-- D-2.1: Monorepo via `git subtree add` — import full history, remove nested `.git/`
-- D-2.2: Prefix imported tags: `gig-maestro/v0.X.Y`, `launchpad-mk2/v0.X.Y`
-- D-2.3: Move subproject `.gig/` to `.gig/modules/{name}/`
-- D-2.4: Consolidate `.claude/CLAUDE.md` to root
-- D-2.5: Merge `.gitignore` into root, delete subproject copies
-- D-2.6: Module name in phase name for branch convention
+- D-3.1: No shared module — overlap too thin
+- D-3.2: Extract JsonParamValidator within gig-maestro (internal refactor)
 
 ---
 
