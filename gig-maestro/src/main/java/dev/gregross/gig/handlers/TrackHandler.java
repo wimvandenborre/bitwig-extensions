@@ -1,0 +1,267 @@
+package dev.gregross.gig.handlers;
+
+import com.bitwig.extension.controller.api.Application;
+import com.bitwig.extension.controller.api.CursorTrack;
+import com.bitwig.extension.controller.api.NoteInput;
+import com.bitwig.extension.controller.api.Track;
+import com.bitwig.extension.controller.api.TrackBank;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import dev.gregross.gig.extension.StateCache;
+import dev.gregross.gig.rpc.JsonRpcDispatcher;
+import dev.gregross.gig.rpc.RpcException;
+
+public class TrackHandler {
+
+    private static final int SEND_COUNT = 4;
+    private static final int SCENE_COUNT = 5;
+
+    private final TrackBank trackBank;
+    private final Application application;
+    private final CursorTrack cursorTrack;
+    private final TrackBankManager trackBankManager;
+    private final StateCache stateCache;
+    private final NoteInput noteInput;
+
+    public TrackHandler(TrackBank trackBank, Application application,
+                        CursorTrack cursorTrack, TrackBankManager trackBankManager,
+                        StateCache stateCache, NoteInput noteInput) {
+        this.trackBank = trackBank;
+        this.application = application;
+        this.cursorTrack = cursorTrack;
+        this.trackBankManager = trackBankManager;
+        this.stateCache = stateCache;
+        this.noteInput = noteInput;
+    }
+
+    public void register(JsonRpcDispatcher dispatcher) {
+        dispatcher.register("track/setVolume", params -> {
+            Track track = getTrack(params.get("index").getAsInt());
+            double value = params.get("value").getAsDouble();
+            track.volume().value().setImmediately(value);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("track/setPan", params -> {
+            Track track = getTrack(params.get("index").getAsInt());
+            double value = params.get("value").getAsDouble();
+            track.pan().value().setImmediately(value);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("track/setMute", params -> {
+            Track track = getTrack(params.get("index").getAsInt());
+            boolean muted = params.get("muted").getAsBoolean();
+            track.mute().set(muted);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("track/setSolo", params -> {
+            Track track = getTrack(params.get("index").getAsInt());
+            boolean soloed = params.get("soloed").getAsBoolean();
+            track.solo().set(soloed);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("track/setArm", params -> {
+            Track track = getTrack(params.get("index").getAsInt());
+            boolean armed = params.get("armed").getAsBoolean();
+            track.arm().set(armed);
+            return new JsonPrimitive("ok");
+        });
+
+        // --- Phase 6: Track management methods ---
+
+        dispatcher.register("track/createAudio", params -> {
+            int position = optionalInt(params, "position", -1);
+            application.createAudioTrack(position);
+            return cursorResponse();
+        });
+
+        dispatcher.register("track/createInstrument", params -> {
+            int position = optionalInt(params, "position", -1);
+            application.createInstrumentTrack(position);
+            return cursorResponse();
+        });
+
+        dispatcher.register("track/createEffect", params -> {
+            int position = optionalInt(params, "position", -1);
+            application.createEffectTrack(position);
+            return cursorResponse();
+        });
+
+        dispatcher.register("track/select", params -> {
+            int index = requireInt(params, "index");
+            trackBankManager.selectByIndex(index);
+            // Return bank track name (accurate) — cursorTrack name is stale until next flush
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            result.addProperty("trackName", stateCache.getTrackName(index));
+            result.addProperty("trackIndex", index);
+            return result;
+        });
+
+        dispatcher.register("track/rename", params -> {
+            String name = requireString(params, "name");
+            cursorTrack.name().set(name);
+            return cursorResponse();
+        });
+
+        dispatcher.register("track/deleteSelected", params -> {
+            cursorTrack.deleteObject();
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            return result;
+        });
+
+        dispatcher.register("track/duplicate", params -> {
+            cursorTrack.duplicate();
+            return cursorResponse();
+        });
+
+        // --- Phase 13: Mixer methods ---
+
+        dispatcher.register("track/setColor", params -> {
+            Track track = getTrack(requireInt(params, "index"));
+            float r = params.get("r").getAsFloat();
+            float g = params.get("g").getAsFloat();
+            float b = params.get("b").getAsFloat();
+            track.color().set(r, g, b);
+            return ok();
+        });
+
+        dispatcher.register("track/setCrossfade", params -> {
+            Track track = getTrack(requireInt(params, "index"));
+            String mode = requireString(params, "mode").toUpperCase();
+            if (!mode.equals("A") && !mode.equals("B") && !mode.equals("AB")) {
+                throw new IllegalArgumentException("invalid crossfade mode: " + mode + " (expected A, B, or AB)");
+            }
+            track.crossFadeMode().set(mode);
+            return ok();
+        });
+
+        dispatcher.register("track/setMonitor", params -> {
+            Track track = getTrack(requireInt(params, "index"));
+            String mode = requireString(params, "mode").toUpperCase();
+            if (!mode.equals("ON") && !mode.equals("OFF") && !mode.equals("AUTO")) {
+                throw new IllegalArgumentException("invalid monitor mode: " + mode + " (expected ON, OFF, or AUTO)");
+            }
+            track.monitorMode().set(mode);
+            return ok();
+        });
+
+        // --- Phase 25: Group & routing methods ---
+
+        dispatcher.register("track/setGroupExpanded", params -> {
+            boolean hasExpanded = params.has("expanded") && !params.get("expanded").isJsonNull();
+            boolean hasToggle = params.has("toggle") && !params.get("toggle").isJsonNull();
+            if (!hasExpanded && !hasToggle) {
+                throw new IllegalArgumentException("must provide 'expanded' or 'toggle' parameter");
+            }
+            if (hasExpanded && hasToggle) {
+                throw new IllegalArgumentException("'expanded' and 'toggle' are mutually exclusive — provide one, not both");
+            }
+            if (hasToggle) {
+                cursorTrack.isGroupExpanded().toggle();
+            } else {
+                cursorTrack.isGroupExpanded().set(params.get("expanded").getAsBoolean());
+            }
+            return ok();
+        });
+
+        dispatcher.register("track/navigateInto", params -> {
+            application.navigateIntoTrackGroup(cursorTrack);
+            return ok();
+        });
+
+        dispatcher.register("track/navigateToParent", params -> {
+            application.navigateToParentTrackGroup();
+            return ok();
+        });
+
+        dispatcher.register("track/createGroup", params -> {
+            cursorTrack.createParentTrack(SEND_COUNT, SCENE_COUNT);
+            return ok();
+        });
+
+        dispatcher.register("track/addNoteSource", params -> {
+            cursorTrack.addNoteSource(noteInput);
+            return ok();
+        });
+
+        dispatcher.register("track/removeNoteSource", params -> {
+            cursorTrack.removeNoteSource(noteInput);
+            return ok();
+        });
+
+        // --- Track bank scroll methods ---
+
+        dispatcher.register("trackBank/scrollTo", params -> {
+            int position = requireInt(params, "position");
+            int itemCount = stateCache.getTrackItemCount();
+            if (position < 0 || position >= itemCount) {
+                JsonObject error = new JsonObject();
+                error.addProperty("itemCount", itemCount);
+                error.addProperty("requestedPosition", position);
+                throw new RpcException(-32001, "POSITION_OUT_OF_RANGE", error);
+            }
+            trackBank.scrollPosition().set(position);
+            return ok();
+        });
+
+        dispatcher.register("trackBank/scrollBy", params -> {
+            int amount = requireInt(params, "amount");
+            trackBank.scrollBy(amount);
+            return ok();
+        });
+
+        dispatcher.register("trackBank/getScrollInfo", params -> {
+            return stateCache.getTrackBankScrollInfo();
+        });
+    }
+
+    private Track getTrack(int index) {
+        if (index < 0 || index >= trackBank.getSizeOfBank()) {
+            throw new IllegalArgumentException("track index out of range: " + index);
+        }
+        return (Track) trackBank.getItemAt(index);
+    }
+
+    private JsonObject ok() {
+        JsonObject result = new JsonObject();
+        result.addProperty("ok", true);
+        return result;
+    }
+
+    private JsonObject cursorResponse() {
+        JsonObject result = new JsonObject();
+        result.addProperty("ok", true);
+        result.addProperty("cursorTrackName", cursorTrack.name().get());
+        return result;
+    }
+
+    private int requireInt(JsonObject params, String key) {
+        JsonElement el = params.get(key);
+        if (el == null) {
+            throw new IllegalArgumentException("missing '" + key + "' parameter");
+        }
+        return el.getAsInt();
+    }
+
+    private String requireString(JsonObject params, String key) {
+        JsonElement el = params.get(key);
+        if (el == null) {
+            throw new IllegalArgumentException("missing '" + key + "' parameter");
+        }
+        return el.getAsString();
+    }
+
+    private int optionalInt(JsonObject params, String key, int defaultValue) {
+        JsonElement el = params.get(key);
+        if (el == null || el.isJsonNull()) {
+            return defaultValue;
+        }
+        return el.getAsInt();
+    }
+}

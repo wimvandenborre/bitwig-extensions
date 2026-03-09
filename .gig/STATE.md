@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.2.0` |
+| **Version** | `0.2.4` |
 | **Phase** | 2 — Git Consolidation |
-| **Status** | `GATHERED` |
-| **Last Batch** | — |
+| **Status** | `GOVERNED` |
+| **Last Batch** | Verify build and final cleanup |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.2.4 | 2 | Verify build and final cleanup | PLANNED | done | 2026-03-08 |
+| 0.2.3 | 2 | Consolidate .gig/, .claude/, .gitignore | PLANNED | done | 2026-03-08 |
+| 0.2.2 | 2 | Namespace tags and clean up | PLANNED | done | 2026-03-08 |
+| 0.2.1 | 2 | Import subproject histories via subtree | PLANNED | done | 2026-03-08 |
 | 0.1.4 | 1 | Verify full build | PLANNED | done | 2026-03-08 |
 | 0.1.3 | 1 | Convert launchpad-mk2 build | PLANNED | done | 2026-03-08 |
 | 0.1.2 | 1 | Convert gig-maestro build | PLANNED | done | 2026-03-08 |
@@ -48,15 +52,13 @@ _None._
 ## Working Memory
 
 - **Root dir:** `/Users/gregrossdev/Devl/bitwig/extensions`
-- **Modules:** `gig-maestro` (Kotlin DSL, shadow plugin, CLI source set) and `launchpad-mk2` (Groovy DSL, simple JAR)
-- **Gradle version:** 9.3.1 (both modules already match)
-- **Java:** 21 (both modules)
-- **Bitwig API:** v25 available on `maven.bitwig.com` — standardize both modules on Maven dep
-- **gig-maestro** uses local JAR (`bitwigApiPath`) — switch to Maven
-- **launchpad-mk2** uses Maven v22 — upgrade to v25, bump `getRequiredAPIVersion()` to 25
-- **Version catalog:** gig-maestro has `libs.versions.toml`, launchpad-mk2 does not — promote to root
-- **Each module has independent `.git/` and `.gig/`** — preserve these, root manages build only
-- **bitwigExtensionsDir:** `~/Documents/Bitwig Studio/Extensions` (used by both for install)
+- **Monorepo:** Single git repo, 198 commits, 31 tags
+- **Modules:** `gig-maestro` (shadow plugin, CLI source set) and `launchpad-mk2` (simple JAR)
+- **Build:** Gradle 9.3.1, Java 21, Bitwig API v25 from Maven
+- **Tags:** `gig-maestro/v0.X.Y` (26), `launchpad-mk2/v0.X.Y` (4), root `v0.1.4`
+- **Module history:** `.gig/modules/gig-maestro/` (25 phases), `.gig/modules/launchpad-mk2/` (5 phases)
+- **Claude context:** `.claude/CLAUDE.md` at root covers both modules
+- **Build commands:** `./gradlew :gig-maestro:shadowJar`, `./gradlew :launchpad-mk2:build`, etc.
 
 ---
 
