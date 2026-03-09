@@ -17,8 +17,8 @@
 |-------|---------|-------|------------|--------|
 | 2.1 | `0.2.1` | Import subproject histories via subtree | in-session | done |
 | 2.2 | `0.2.2` | Namespace tags and clean up | in-session | done |
-| 2.3 | `0.2.3` | Consolidate .gig/, .claude/, .gitignore | in-session | pending |
-| 2.4 | `0.2.4` | Verify build and final cleanup | in-session | pending |
+| 2.3 | `0.2.3` | Consolidate .gig/, .claude/, .gitignore | in-session | done |
+| 2.4 | `0.2.4` | Verify build and final cleanup | in-session | done |
 
 ### Batch 2.1 — Import subproject histories via subtree
 
