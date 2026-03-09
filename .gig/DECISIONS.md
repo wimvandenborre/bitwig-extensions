@@ -4,4 +4,4 @@
 > Active decisions for the current phase live here.
 > When a phase completes, its decisions are archived to `phases/`.
 
-_No active decisions. Previous decisions archived to `phases/v0.4-gig-maestro-test-coverage-expansion/`._
+_No active decisions. Next phase decisions will appear here after `/gig:gather`._

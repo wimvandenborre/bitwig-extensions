@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.4.4` |
-| **Phase** | 4 — gig-maestro: Test Coverage Expansion |
+| **Version** | `0.5.4` |
+| **Phase** | 5 — gig-maestro: Mockito Behavioral Testing |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 4.4 — Verify full build |
+| **Last Batch** | 5.4 — Verify full build |
 | **Last Updated** | 2026-03-08 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.5.4 | 5 | Verify full build | PLANNED | done | 2026-03-08 |
+| 0.5.3 | 5 | TrackHandler mock tests | PLANNED | done | 2026-03-08 |
+| 0.5.2 | 5 | ProjectHandler + MasterHandler mock tests | PLANNED | done | 2026-03-08 |
+| 0.5.1 | 5 | Add Mockito dependency | PLANNED | done | 2026-03-08 |
 | 0.4.4 | 4 | Verify full build | PLANNED | done | 2026-03-08 |
 | 0.4.3 | 4 | ClipHandler + ProjectHandler validation tests | PLANNED | done | 2026-03-08 |
 | 0.4.2 | 4 | TrackHandler + NoteHandler validation tests | PLANNED | done | 2026-03-08 |
@@ -38,7 +42,10 @@
 
 ## Active Decisions
 
-_None — Phase 4 decisions archived._
+- D-5.1: Mockito 5.x (core + junit-jupiter) via version catalog
+- D-5.2: 3 handlers first — ProjectHandler, MasterHandler, TrackHandler
+- D-5.3: @ExtendWith(MockitoExtension) + @Mock fields + arrange-act-verify
+- D-5.4: Keep null-API validation tests, add mock tests alongside
 
 ---
 

@@ -1,20 +1,70 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.Application;
+import com.bitwig.extension.controller.api.CursorTrack;
+import com.bitwig.extension.controller.api.NoteInput;
+import com.bitwig.extension.controller.api.Parameter;
+import com.bitwig.extension.controller.api.SettableBooleanValue;
+import com.bitwig.extension.controller.api.SettableColorValue;
+import com.bitwig.extension.controller.api.SettableEnumValue;
+import com.bitwig.extension.controller.api.SettableRangedValue;
+import com.bitwig.extension.controller.api.SettableStringValue;
+import com.bitwig.extension.controller.api.SoloValue;
+import com.bitwig.extension.controller.api.Track;
+import com.bitwig.extension.controller.api.TrackBank;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class TrackHandlerTest {
+
+    @Mock private TrackBank mockTrackBank;
+    @Mock private Application mockApplication;
+    @Mock private CursorTrack mockCursorTrack;
+    @Mock private TrackBankManager mockTrackBankManager;
+    @Mock private NoteInput mockNoteInput;
+    @Mock private Track mockTrack;
+
+    // Chain mocks
+    @Mock private Parameter mockVolumeParam;
+    @Mock private Parameter mockPanParam;
+    @Mock private SettableRangedValue mockVolumeValue;
+    @Mock private SettableRangedValue mockPanValue;
+    @Mock private SettableBooleanValue mockMuteValue;
+    @Mock private SoloValue mockSoloValue;
+    @Mock private SettableBooleanValue mockArmValue;
+    @Mock private SettableColorValue mockColorValue;
+    @Mock private SettableEnumValue mockCrossfadeMode;
+    @Mock private SettableEnumValue mockMonitorMode;
+    @Mock private SettableStringValue mockNameValue;
+    @Mock private SettableBooleanValue mockGroupExpanded;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new TrackHandler(null, null, null, null, new StateCache(), null).register(dispatcher);
+        new TrackHandler(mockTrackBank, mockApplication, mockCursorTrack,
+            mockTrackBankManager, new StateCache(), mockNoteInput).register(dispatcher);
+
+        // Common stub: trackBank returns track at index 0
+        when(mockTrackBank.getSizeOfBank()).thenReturn(8);
+        when(mockTrackBank.getItemAt(0)).thenReturn(mockTrack);
+
+        // Common stub: cursorTrack.name() for cursorResponse()
+        when(mockCursorTrack.name()).thenReturn(mockNameValue);
+        when(mockNameValue.get()).thenReturn("TestTrack");
     }
 
     // --- Registration ---
@@ -155,6 +205,148 @@ class TrackHandlerTest {
         String response = dispatcher.handle(rpc("track/setMonitor", "{\"mode\":\"ON\"}"));
         assertContains(response, "-32602");
         assertContains(response, "index");
+    }
+
+    // --- Behavioral tests (Mockito) — 3-level chains ---
+
+    @Test
+    void setVolume_callsTrackVolume() {
+        when(mockTrack.volume()).thenReturn(mockVolumeParam);
+        when(mockVolumeParam.value()).thenReturn(mockVolumeValue);
+
+        dispatcher.handle(rpc("track/setVolume", "{\"index\":0,\"value\":0.75}"));
+
+        verify(mockVolumeValue).setImmediately(0.75);
+    }
+
+    @Test
+    void setPan_callsTrackPan() {
+        when(mockTrack.pan()).thenReturn(mockPanParam);
+        when(mockPanParam.value()).thenReturn(mockPanValue);
+
+        dispatcher.handle(rpc("track/setPan", "{\"index\":0,\"value\":0.5}"));
+
+        verify(mockPanValue).setImmediately(0.5);
+    }
+
+    // --- Behavioral tests — 2-level chains ---
+
+    @Test
+    void setMute_callsTrackMute() {
+        when(mockTrack.mute()).thenReturn(mockMuteValue);
+
+        dispatcher.handle(rpc("track/setMute", "{\"index\":0,\"muted\":true}"));
+
+        verify(mockMuteValue).set(true);
+    }
+
+    @Test
+    void setSolo_callsTrackSolo() {
+        when(mockTrack.solo()).thenReturn(mockSoloValue);
+
+        dispatcher.handle(rpc("track/setSolo", "{\"index\":0,\"soloed\":true}"));
+
+        verify(mockSoloValue).set(true);
+    }
+
+    @Test
+    void setArm_callsTrackArm() {
+        when(mockTrack.arm()).thenReturn(mockArmValue);
+
+        dispatcher.handle(rpc("track/setArm", "{\"index\":0,\"armed\":true}"));
+
+        verify(mockArmValue).set(true);
+    }
+
+    @Test
+    void setColor_callsTrackColor() {
+        when(mockTrack.color()).thenReturn(mockColorValue);
+
+        dispatcher.handle(rpc("track/setColor", "{\"index\":0,\"r\":0.5,\"g\":0.3,\"b\":0.8}"));
+
+        verify(mockColorValue).set(0.5f, 0.3f, 0.8f);
+    }
+
+    @Test
+    void setCrossfade_callsTrackCrossfadeMode() {
+        when(mockTrack.crossFadeMode()).thenReturn(mockCrossfadeMode);
+
+        dispatcher.handle(rpc("track/setCrossfade", "{\"index\":0,\"mode\":\"A\"}"));
+
+        verify(mockCrossfadeMode).set("A");
+    }
+
+    // --- Behavioral tests — 1-level Application calls ---
+
+    @Test
+    void createAudio_callsApplicationCreateAudioTrack() {
+        dispatcher.handle(rpc("track/createAudio", "{}"));
+
+        verify(mockApplication).createAudioTrack(-1);
+    }
+
+    @Test
+    void createInstrument_callsApplicationCreateInstrumentTrack() {
+        dispatcher.handle(rpc("track/createInstrument", "{}"));
+
+        verify(mockApplication).createInstrumentTrack(-1);
+    }
+
+    @Test
+    void createEffect_callsApplicationCreateEffectTrack() {
+        dispatcher.handle(rpc("track/createEffect", "{}"));
+
+        verify(mockApplication).createEffectTrack(-1);
+    }
+
+    // --- Behavioral tests — 1-level CursorTrack calls ---
+
+    @Test
+    void rename_callsCursorTrackNameSet() {
+        dispatcher.handle(rpc("track/rename", "{\"name\":\"NewName\"}"));
+
+        verify(mockNameValue).set("NewName");
+    }
+
+    @Test
+    void deleteSelected_callsCursorTrackDeleteObject() {
+        dispatcher.handle(rpc("track/deleteSelected", "{}"));
+
+        verify(mockCursorTrack).deleteObject();
+    }
+
+    @Test
+    void duplicate_callsCursorTrackDuplicate() {
+        dispatcher.handle(rpc("track/duplicate", "{}"));
+
+        verify(mockCursorTrack).duplicate();
+    }
+
+    @Test
+    void createGroup_callsCursorTrackCreateParentTrack() {
+        dispatcher.handle(rpc("track/createGroup", "{}"));
+
+        verify(mockCursorTrack).createParentTrack(4, 5);
+    }
+
+    @Test
+    void setGroupExpanded_withExpanded_callsIsGroupExpandedSet() {
+        when(mockCursorTrack.isGroupExpanded()).thenReturn(mockGroupExpanded);
+
+        dispatcher.handle(rpc("track/setGroupExpanded", "{\"expanded\":true}"));
+
+        verify(mockGroupExpanded).set(true);
+    }
+
+    // --- Behavioral tests — monitor mode ---
+
+    @Test
+    void setMonitor_callsTrackMonitorMode() {
+        when(mockTrack.monitorMode()).thenReturn(mockMonitorMode);
+
+        dispatcher.handle(rpc("track/setMonitor", "{\"index\":0,\"mode\":\"AUTO\"}"));
+
+        verify(mockMonitorMode).set("AUTO");
     }
 
     // --- Helpers ---
