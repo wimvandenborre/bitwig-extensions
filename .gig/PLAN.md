@@ -15,10 +15,10 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 4.1 | `0.4.1` | Extract requireArray + JsonParamValidatorTest | in-session | pending |
-| 4.2 | `0.4.2` | TrackHandler + NoteHandler validation tests | team | pending |
-| 4.3 | `0.4.3` | ClipHandler + ProjectHandler validation tests | team | pending |
-| 4.4 | `0.4.4` | Verify full build | in-session | pending |
+| 4.1 | `0.4.1` | Extract requireArray + JsonParamValidatorTest | in-session | done |
+| 4.2 | `0.4.2` | TrackHandler + NoteHandler validation tests | team | done |
+| 4.3 | `0.4.3` | ClipHandler + ProjectHandler validation tests | team | done |
+| 4.4 | `0.4.4` | Verify full build | in-session | done |
 
 ### Batch 4.1 — Extract requireArray + JsonParamValidatorTest
 
