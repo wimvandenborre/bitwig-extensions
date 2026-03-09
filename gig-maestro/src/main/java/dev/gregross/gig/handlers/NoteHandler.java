@@ -307,11 +307,4 @@ public class NoteHandler {
         });
     }
 
-    private JsonArray requireArray(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null) {
-            throw new IllegalArgumentException("missing '" + key + "' parameter");
-        }
-        return el.getAsJsonArray();
-    }
 }

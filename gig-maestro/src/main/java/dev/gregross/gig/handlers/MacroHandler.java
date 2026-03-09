@@ -280,13 +280,4 @@ public class MacroHandler {
         dispatcher.handleInternal("clip/select", params);
     }
 
-    // --- Parameter helpers ---
-
-    private static JsonArray requireArray(JsonObject params, String key) {
-        JsonElement el = params.get(key);
-        if (el == null || !el.isJsonArray()) {
-            throw new IllegalArgumentException("Missing required param: " + key);
-        }
-        return el.getAsJsonArray();
-    }
 }
