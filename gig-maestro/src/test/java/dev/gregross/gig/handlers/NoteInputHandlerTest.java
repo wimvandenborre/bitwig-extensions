@@ -1,23 +1,61 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.Arpeggiator;
+import com.bitwig.extension.controller.api.NoteLatch;
+import com.bitwig.extension.controller.api.NoteInput;
+import com.bitwig.extension.controller.api.SettableBooleanValue;
+import com.bitwig.extension.controller.api.SettableDoubleValue;
+import com.bitwig.extension.controller.api.SettableEnumValue;
+import com.bitwig.extension.controller.api.SettableIntegerValue;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.lang.reflect.Field;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class NoteInputHandlerTest {
+
+    @Mock private NoteInput mockNoteInput;
+    @Mock private Arpeggiator mockArpeggiator;
+    @Mock private NoteLatch mockNoteLatch;
+
+    // Arpeggiator chain mocks
+    @Mock private SettableEnumValue mockArpMode;
+    @Mock private SettableIntegerValue mockArpOctaves;
+    @Mock private SettableDoubleValue mockArpRate;
+    @Mock private SettableDoubleValue mockArpGateLength;
+    @Mock private SettableBooleanValue mockArpShuffle;
+    @Mock private SettableDoubleValue mockArpHumanize;
+    @Mock private SettableBooleanValue mockArpFreeRunning;
+    @Mock private SettableBooleanValue mockArpOverlappingNotes;
+    @Mock private SettableBooleanValue mockArpPressureToVelocity;
+    @Mock private SettableBooleanValue mockArpTerminateImmediately;
+    @Mock private SettableBooleanValue mockArpEnabled;
+
+    // NoteLatch chain mocks
+    @Mock private SettableEnumValue mockLatchMode;
+    @Mock private SettableBooleanValue mockLatchMono;
+    @Mock private SettableIntegerValue mockLatchVelocityThreshold;
+    @Mock private SettableBooleanValue mockLatchEnabled;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new NoteInputHandler(null, null, null, new StateCache()).register(dispatcher);
+        new NoteInputHandler(mockNoteInput, mockArpeggiator, mockNoteLatch, new StateCache()).register(dispatcher);
     }
 
     // --- Registration ---
@@ -108,5 +146,100 @@ class NoteInputHandlerTest {
         assertTrue(modes.contains("chord"));
         assertTrue(modes.contains("toggle"));
         assertTrue(modes.contains("velocity"));
+    }
+
+    // --- Behavioral tests (Mockito) — NoteInput ---
+
+    @Test
+    void sendNote_callsNoteInputSendRawMidiEvent() {
+        dispatcher.handle(rpc("noteInput/sendNote", "{\"note\":60,\"velocity\":100}"));
+
+        verify(mockNoteInput).sendRawMidiEvent(0x90, 60, 100);
+    }
+
+    @Test
+    void sendMidi_callsNoteInputSendRawMidiEvent() {
+        dispatcher.handle(rpc("noteInput/sendMidi", "{\"status\":176,\"data0\":1,\"data1\":64}"));
+
+        verify(mockNoteInput).sendRawMidiEvent(176, 1, 64);
+    }
+
+    // --- Behavioral tests (Mockito) — Arpeggiator ---
+
+    @Test
+    void arpeggiatorConfigure_callsArpeggiatorSetters() {
+        when(mockArpeggiator.mode()).thenReturn(mockArpMode);
+        when(mockArpeggiator.octaves()).thenReturn(mockArpOctaves);
+        when(mockArpeggiator.rate()).thenReturn(mockArpRate);
+        when(mockArpeggiator.gateLength()).thenReturn(mockArpGateLength);
+        when(mockArpeggiator.shuffle()).thenReturn(mockArpShuffle);
+
+        dispatcher.handle(rpc("arpeggiator/configure",
+            "{\"mode\":\"up\",\"octaves\":3,\"rate\":0.25,\"gateLength\":0.5,\"shuffle\":true}"));
+
+        verify(mockArpMode).set("up");
+        verify(mockArpOctaves).set(3);
+        verify(mockArpRate).set(0.25);
+        verify(mockArpGateLength).set(0.5);
+        verify(mockArpShuffle).set(true);
+    }
+
+    @Test
+    void arpeggiatorSetEnabled_callsArpeggiatorIsEnabledSet() {
+        when(mockArpeggiator.isEnabled()).thenReturn(mockArpEnabled);
+
+        dispatcher.handle(rpc("arpeggiator/setEnabled", "{\"enabled\":true}"));
+
+        verify(mockArpEnabled).set(true);
+    }
+
+    @Test
+    void arpeggiatorReleaseNotes_callsArpeggiatorReleaseNotes() {
+        dispatcher.handle(rpc("arpeggiator/releaseNotes", "{}"));
+
+        verify(mockArpeggiator).releaseNotes();
+    }
+
+    // --- Behavioral tests (Mockito) — NoteLatch ---
+
+    @Test
+    void noteLatchConfigure_callsNoteLatchSetters() {
+        when(mockNoteLatch.mode()).thenReturn(mockLatchMode);
+        when(mockNoteLatch.mono()).thenReturn(mockLatchMono);
+        when(mockNoteLatch.velocityThreshold()).thenReturn(mockLatchVelocityThreshold);
+
+        dispatcher.handle(rpc("noteLatch/configure",
+            "{\"mode\":\"toggle\",\"mono\":true,\"velocityThreshold\":64}"));
+
+        verify(mockLatchMode).set("toggle");
+        verify(mockLatchMono).set(true);
+        verify(mockLatchVelocityThreshold).set(64);
+    }
+
+    @Test
+    void noteLatchSetEnabled_callsNoteLatchIsEnabledSet() {
+        when(mockNoteLatch.isEnabled()).thenReturn(mockLatchEnabled);
+
+        dispatcher.handle(rpc("noteLatch/setEnabled", "{\"enabled\":true}"));
+
+        verify(mockLatchEnabled).set(true);
+    }
+
+    @Test
+    void noteLatchReleaseNotes_callsNoteLatchReleaseNotes() {
+        dispatcher.handle(rpc("noteLatch/releaseNotes", "{}"));
+
+        verify(mockNoteLatch).releaseNotes();
+    }
+
+    // --- Helpers ---
+
+    private String rpc(String method, String params) {
+        return "{\"jsonrpc\":\"2.0\",\"method\":\"" + method + "\",\"params\":" + params + ",\"id\":1}";
+    }
+
+    private void assertContains(String actual, String expected) {
+        assertTrue(actual.contains(expected),
+            "Expected '" + expected + "' in: " + actual);
     }
 }

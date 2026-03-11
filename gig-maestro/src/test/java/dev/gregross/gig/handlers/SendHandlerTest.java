@@ -1,19 +1,48 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.Send;
+import com.bitwig.extension.controller.api.SendBank;
+import com.bitwig.extension.controller.api.SettableBooleanValue;
+import com.bitwig.extension.controller.api.SettableEnumValue;
+import com.bitwig.extension.controller.api.SettableRangedValue;
+import com.bitwig.extension.controller.api.Track;
+import com.bitwig.extension.controller.api.TrackBank;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class SendHandlerTest {
+
+    @Mock private TrackBank mockTrackBank;
+    @Mock private Track mockTrack;
+    @Mock private SendBank mockSendBank;
+    @Mock private Send mockSend;
+    @Mock private SettableRangedValue mockSendValue;
+    @Mock private SettableEnumValue mockSendMode;
+    @Mock private SettableBooleanValue mockSendEnabled;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new SendHandler(null, 4).register(dispatcher);
+        new SendHandler(mockTrackBank, 4).register(dispatcher);
+
+        // Common stub: trackBank returns track, track returns sendBank, sendBank returns send
+        when(mockTrackBank.getSizeOfBank()).thenReturn(8);
+        when(mockTrackBank.getItemAt(0)).thenReturn(mockTrack);
+        when(mockTrack.sendBank()).thenReturn(mockSendBank);
+        when(mockSendBank.getItemAt(0)).thenReturn(mockSend);
     }
 
     // --- Registration ---
@@ -41,17 +70,6 @@ class SendHandlerTest {
         assertContains(response, "-32602");
     }
 
-    // --- send/setMode validation ---
-
-    @Test
-    void sendSetMode_invalidMode_returnsError() {
-        // TrackBank is null so we can't actually call getSend, but we can test
-        // that the method is registered. Full validation requires Bitwig running.
-        String response = dispatcher.handle(rpc("send/setMode", "{\"trackIndex\":0,\"sendIndex\":0,\"mode\":\"AUTO\"}"));
-        // Will fail with NPE since trackBank is null, but method is registered
-        assertContains(response, "error");
-    }
-
     // --- send/setEnabled validation ---
 
     @Test
@@ -59,6 +77,35 @@ class SendHandlerTest {
         String response = dispatcher.handle(rpc("send/setEnabled", "{\"sendIndex\":0,\"enabled\":true}"));
         assertContains(response, "-32602");
         assertContains(response, "trackIndex");
+    }
+
+    // --- Behavioral tests (Mockito) ---
+
+    @Test
+    void setLevel_callsSendValueSetImmediately() {
+        when(mockSend.value()).thenReturn(mockSendValue);
+
+        dispatcher.handle(rpc("send/setLevel", "{\"trackIndex\":0,\"sendIndex\":0,\"value\":0.8}"));
+
+        verify(mockSendValue).setImmediately(0.8);
+    }
+
+    @Test
+    void setMode_callsSendModeSet() {
+        when(mockSend.sendMode()).thenReturn(mockSendMode);
+
+        dispatcher.handle(rpc("send/setMode", "{\"trackIndex\":0,\"sendIndex\":0,\"mode\":\"PRE\"}"));
+
+        verify(mockSendMode).set("PRE");
+    }
+
+    @Test
+    void setEnabled_callsSendIsEnabledSet() {
+        when(mockSend.isEnabled()).thenReturn(mockSendEnabled);
+
+        dispatcher.handle(rpc("send/setEnabled", "{\"trackIndex\":0,\"sendIndex\":0,\"enabled\":true}"));
+
+        verify(mockSendEnabled).set(true);
     }
 
     // --- Helpers ---

@@ -1,19 +1,41 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.CursorDevice;
+import com.bitwig.extension.controller.api.InsertionPoint;
+import com.bitwig.extension.controller.api.PopupBrowser;
+import com.bitwig.extension.controller.api.SettableBooleanValue;
+import com.bitwig.extension.controller.api.SettableIntegerValue;
+import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class BrowserHandlerTest {
+
+    @Mock private PopupBrowser mockPopupBrowser;
+    @Mock private CursorDevice mockCursorDevice;
+
+    // Chain mocks
+    @Mock private InsertionPoint mockInsertionPoint;
+    @Mock private SettableIntegerValue mockContentTypeIndex;
+    @Mock private SettableBooleanValue mockShouldAudition;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new BrowserHandler(null, null, null).register(dispatcher);
+        new BrowserHandler(mockPopupBrowser, mockCursorDevice, new StateCache()).register(dispatcher);
     }
 
     // --- Registration ---
@@ -104,6 +126,78 @@ class BrowserHandlerTest {
             "{\"direction\": \"sideways\"}"));
         assertContains(response, "-32602");
         assertContains(response, "sideways");
+    }
+
+    // --- Behavioral tests (Mockito) — Browser opening ---
+
+    @Test
+    void browsePresets_callsCursorDeviceReplaceInsertionPointBrowse() {
+        when(mockCursorDevice.replaceDeviceInsertionPoint()).thenReturn(mockInsertionPoint);
+        dispatcher.handle(rpc("browser/browsePresets", "{}"));
+        verify(mockInsertionPoint).browse();
+    }
+
+    @Test
+    void browseInsertDevice_callsCursorDeviceAfterInsertionPointBrowse() {
+        when(mockCursorDevice.afterDeviceInsertionPoint()).thenReturn(mockInsertionPoint);
+        dispatcher.handle(rpc("browser/browseInsertDevice", "{}"));
+        verify(mockInsertionPoint).browse();
+    }
+
+    // --- Behavioral tests (Mockito) — Result navigation ---
+
+    @Test
+    void selectNextFile_callsPopupBrowserSelectNextFile() {
+        dispatcher.handle(rpc("browser/selectNextFile", "{}"));
+        verify(mockPopupBrowser).selectNextFile();
+    }
+
+    @Test
+    void selectPreviousFile_callsPopupBrowserSelectPreviousFile() {
+        dispatcher.handle(rpc("browser/selectPreviousFile", "{}"));
+        verify(mockPopupBrowser).selectPreviousFile();
+    }
+
+    @Test
+    void selectFirstFile_callsPopupBrowserSelectFirstFile() {
+        dispatcher.handle(rpc("browser/selectFirstFile", "{}"));
+        verify(mockPopupBrowser).selectFirstFile();
+    }
+
+    @Test
+    void selectLastFile_callsPopupBrowserSelectLastFile() {
+        dispatcher.handle(rpc("browser/selectLastFile", "{}"));
+        verify(mockPopupBrowser).selectLastFile();
+    }
+
+    // --- Behavioral tests (Mockito) — Commit / cancel ---
+
+    @Test
+    void commit_callsPopupBrowserCommit() {
+        dispatcher.handle(rpc("browser/commit", "{}"));
+        verify(mockPopupBrowser).commit();
+    }
+
+    @Test
+    void cancel_callsPopupBrowserCancel() {
+        dispatcher.handle(rpc("browser/cancel", "{}"));
+        verify(mockPopupBrowser).cancel();
+    }
+
+    // --- Behavioral tests (Mockito) — Settings ---
+
+    @Test
+    void setContentType_callsPopupBrowserSelectedContentTypeIndexSet() {
+        when(mockPopupBrowser.selectedContentTypeIndex()).thenReturn(mockContentTypeIndex);
+        dispatcher.handle(rpc("browser/setContentType", "{\"index\":2}"));
+        verify(mockContentTypeIndex).set(2);
+    }
+
+    @Test
+    void setShouldAudition_callsPopupBrowserShouldAuditionSet() {
+        when(mockPopupBrowser.shouldAudition()).thenReturn(mockShouldAudition);
+        dispatcher.handle(rpc("browser/setShouldAudition", "{\"enabled\":true}"));
+        verify(mockShouldAudition).set(true);
     }
 
     // --- Helpers ---
