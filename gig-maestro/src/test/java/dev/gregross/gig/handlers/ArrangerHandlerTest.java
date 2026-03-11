@@ -1,22 +1,60 @@
 package dev.gregross.gig.handlers;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.bitwig.extension.controller.api.Arranger;
+import com.bitwig.extension.controller.api.CueMarker;
+import com.bitwig.extension.controller.api.CueMarkerBank;
+import com.bitwig.extension.controller.api.SettableBeatTimeValue;
+import com.bitwig.extension.controller.api.SettableBooleanValue;
+import com.bitwig.extension.controller.api.SettableIntegerValue;
+import com.bitwig.extension.controller.api.SettableStringValue;
+import com.bitwig.extension.controller.api.Transport;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ArrangerHandlerTest {
+
+    @Mock private Arranger mockArranger;
+    @Mock private Transport mockTransport;
+    @Mock private CueMarkerBank mockCueMarkerBank;
+    @Mock private CueMarker mockCueMarker;
+
+    // Arranger 2-level chain mocks
+    @Mock private SettableBooleanValue mockPlaybackFollow;
+    @Mock private SettableBooleanValue mockClipLauncherVisible;
+    @Mock private SettableBooleanValue mockTimelineVisible;
+    @Mock private SettableBooleanValue mockCueMarkersVisible;
+    @Mock private SettableBooleanValue mockEffectTracksVisible;
+    @Mock private SettableBooleanValue mockIoSectionVisible;
+    @Mock private SettableBooleanValue mockDoubleRowTrackHeight;
+
+    // CueMarker chain mocks
+    @Mock private SettableStringValue mockCueMarkerName;
+    @Mock private SettableBeatTimeValue mockCueMarkerPosition;
+
+    // CueMarkerBank scroll mock
+    @Mock private SettableIntegerValue mockScrollPosition;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new ArrangerHandler(null, null, null, new StateCache()).register(dispatcher);
+        new ArrangerHandler(mockArranger, mockTransport, mockCueMarkerBank, new StateCache()).register(dispatcher);
+
+        // Common stub: cueMarkerBank returns cueMarker at index 0
+        when(mockCueMarkerBank.getItemAt(0)).thenReturn(mockCueMarker);
     }
 
     // --- Registration ---
@@ -240,7 +278,6 @@ class ArrangerHandlerTest {
 
     @Test
     void cueMarkerBankScrollTo_positionBeyondItemCount_returnsOutOfRange() {
-        // StateCache defaults to itemCount=0, so position 0 is out of range
         String response = dispatcher.handle(rpc("cueMarkerBank/scrollTo", "{\"position\": 0}"));
         assertContains(response, "-32001");
         assertContains(response, "itemCount");
@@ -266,6 +303,105 @@ class ArrangerHandlerTest {
         assertContains(response, "bankSize");
         assertContains(response, "canScrollForwards");
         assertContains(response, "canScrollBackwards");
+    }
+
+    // --- Behavioral tests (Mockito) — Arranger setters ---
+
+    @Test
+    void setPlaybackFollow_callsArrangerSet() {
+        when(mockArranger.isPlaybackFollowEnabled()).thenReturn(mockPlaybackFollow);
+        dispatcher.handle(rpc("arranger/setPlaybackFollow", "{\"enabled\":true}"));
+        verify(mockPlaybackFollow).set(true);
+    }
+
+    @Test
+    void setClipLauncherVisible_callsArrangerSet() {
+        when(mockArranger.isClipLauncherVisible()).thenReturn(mockClipLauncherVisible);
+        dispatcher.handle(rpc("arranger/setClipLauncherVisible", "{\"enabled\":true}"));
+        verify(mockClipLauncherVisible).set(true);
+    }
+
+    @Test
+    void setTimelineVisible_callsArrangerSet() {
+        when(mockArranger.isTimelineVisible()).thenReturn(mockTimelineVisible);
+        dispatcher.handle(rpc("arranger/setTimelineVisible", "{\"enabled\":false}"));
+        verify(mockTimelineVisible).set(false);
+    }
+
+    @Test
+    void setCueMarkersVisible_callsArrangerSet() {
+        when(mockArranger.areCueMarkersVisible()).thenReturn(mockCueMarkersVisible);
+        dispatcher.handle(rpc("arranger/setCueMarkersVisible", "{\"enabled\":true}"));
+        verify(mockCueMarkersVisible).set(true);
+    }
+
+    @Test
+    void setEffectTracksVisible_callsArrangerSet() {
+        when(mockArranger.areEffectTracksVisible()).thenReturn(mockEffectTracksVisible);
+        dispatcher.handle(rpc("arranger/setEffectTracksVisible", "{\"enabled\":true}"));
+        verify(mockEffectTracksVisible).set(true);
+    }
+
+    @Test
+    void setIoSectionVisible_callsArrangerSet() {
+        when(mockArranger.isIoSectionVisible()).thenReturn(mockIoSectionVisible);
+        dispatcher.handle(rpc("arranger/setIoSectionVisible", "{\"enabled\":true}"));
+        verify(mockIoSectionVisible).set(true);
+    }
+
+    @Test
+    void setDoubleRowTrackHeight_callsArrangerSet() {
+        when(mockArranger.hasDoubleRowTrackHeight()).thenReturn(mockDoubleRowTrackHeight);
+        dispatcher.handle(rpc("arranger/setDoubleRowTrackHeight", "{\"enabled\":true}"));
+        verify(mockDoubleRowTrackHeight).set(true);
+    }
+
+    // --- Behavioral tests (Mockito) — Cue marker operations ---
+
+    @Test
+    void addAtPlayhead_callsTransportAddCueMarker() {
+        dispatcher.handle(rpc("cueMarker/addAtPlayhead", "{}"));
+        verify(mockTransport).addCueMarkerAtPlaybackPosition();
+    }
+
+    @Test
+    void cueMarkerLaunch_callsCueMarkerLaunch() {
+        dispatcher.handle(rpc("cueMarker/launch", "{\"index\":0,\"quantized\":true}"));
+        verify(mockCueMarker).launch(true);
+    }
+
+    @Test
+    void cueMarkerRename_callsCueMarkerNameSet() {
+        when(mockCueMarker.name()).thenReturn(mockCueMarkerName);
+        dispatcher.handle(rpc("cueMarker/rename", "{\"index\":0,\"name\":\"Chorus\"}"));
+        verify(mockCueMarkerName).set("Chorus");
+    }
+
+    @Test
+    void cueMarkerSetPosition_callsCueMarkerPositionSet() {
+        when(mockCueMarker.position()).thenReturn(mockCueMarkerPosition);
+        dispatcher.handle(rpc("cueMarker/setPosition", "{\"index\":0,\"beats\":8.0}"));
+        verify(mockCueMarkerPosition).set(8.0);
+    }
+
+    @Test
+    void cueMarkerDuplicate_callsCueMarkerDuplicateObject() {
+        dispatcher.handle(rpc("cueMarker/duplicate", "{\"index\":0}"));
+        verify(mockCueMarker).duplicateObject();
+    }
+
+    @Test
+    void cueMarkerDelete_callsCueMarkerDeleteObject() {
+        dispatcher.handle(rpc("cueMarker/delete", "{\"index\":0}"));
+        verify(mockCueMarker).deleteObject();
+    }
+
+    // --- Behavioral tests (Mockito) — CueMarkerBank scroll ---
+
+    @Test
+    void cueMarkerBankScrollBy_callsCueMarkerBankScrollBy() {
+        dispatcher.handle(rpc("cueMarkerBank/scrollBy", "{\"amount\":4}"));
+        verify(mockCueMarkerBank).scrollBy(4);
     }
 
     // --- Helpers ---

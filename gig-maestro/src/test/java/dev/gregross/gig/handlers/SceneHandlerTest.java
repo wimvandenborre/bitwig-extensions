@@ -1,21 +1,46 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.Project;
+import com.bitwig.extension.controller.api.Scene;
+import com.bitwig.extension.controller.api.SceneBank;
+import com.bitwig.extension.controller.api.SettableColorValue;
+import com.bitwig.extension.controller.api.SettableIntegerValue;
+import com.bitwig.extension.controller.api.SettableStringValue;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class SceneHandlerTest {
+
+    @Mock private SceneBank mockSceneBank;
+    @Mock private Project mockProject;
+    @Mock private Scene mockScene;
+
+    // Chain mocks
+    @Mock private SettableStringValue mockSceneName;
+    @Mock private SettableColorValue mockSceneColor;
+    @Mock private SettableIntegerValue mockScrollPosition;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        // StateCache with defaults (itemCount=0) — sufficient for param validation tests
-        new SceneHandler(null, null, new StateCache()).register(dispatcher);
+        new SceneHandler(mockSceneBank, mockProject, new StateCache()).register(dispatcher);
+
+        // Common stub: sceneBank returns scene at index 0
+        when(mockSceneBank.getScene(0)).thenReturn(mockScene);
     }
 
     // --- Registration ---
@@ -40,7 +65,6 @@ class SceneHandlerTest {
 
     @Test
     void registersExactlyTwelveMethods() {
-        // 5 scene + 3 scroll + 4 grid enhancements
         assertEquals(12, dispatcher.getRegisteredMethods().size());
     }
 
@@ -173,7 +197,6 @@ class SceneHandlerTest {
 
     @Test
     void sceneBankScrollTo_positionBeyondItemCount_returnsOutOfRange() {
-        // StateCache defaults to itemCount=0, so position 0 is out of range
         String response = dispatcher.handle(rpc("sceneBank/scrollTo", "{\"position\": 0}"));
         assertContains(response, "-32001");
         assertContains(response, "itemCount");
@@ -199,6 +222,74 @@ class SceneHandlerTest {
         assertContains(response, "bankSize");
         assertContains(response, "canScrollForwards");
         assertContains(response, "canScrollBackwards");
+    }
+
+    // --- Behavioral tests (Mockito) — Project calls ---
+
+    @Test
+    void create_callsProjectCreateScene() {
+        dispatcher.handle(rpc("scene/create", "{}"));
+        verify(mockProject).createScene();
+    }
+
+    @Test
+    void createFromPlaying_callsProjectCreateSceneFromPlayingLauncherClips() {
+        dispatcher.handle(rpc("scene/createFromPlaying", "{}"));
+        verify(mockProject).createSceneFromPlayingLauncherClips();
+    }
+
+    // --- Behavioral tests (Mockito) — Scene operations ---
+
+    @Test
+    void duplicate_callsSceneDuplicateObject() {
+        dispatcher.handle(rpc("scene/duplicate", "{\"index\":0}"));
+        verify(mockScene).duplicateObject();
+    }
+
+    @Test
+    void rename_callsSceneNameSet() {
+        when(mockScene.name()).thenReturn(mockSceneName);
+        dispatcher.handle(rpc("scene/rename", "{\"index\":0,\"name\":\"Verse\"}"));
+        verify(mockSceneName).set("Verse");
+    }
+
+    @Test
+    void delete_callsSceneDeleteObject() {
+        dispatcher.handle(rpc("scene/delete", "{\"index\":0}"));
+        verify(mockScene).deleteObject();
+    }
+
+    @Test
+    void setColor_callsSceneColorSet() {
+        when(mockScene.color()).thenReturn(mockSceneColor);
+        dispatcher.handle(rpc("scene/setColor", "{\"index\":0,\"r\":0.5,\"g\":0.3,\"b\":0.8}"));
+        verify(mockSceneColor).set(0.5f, 0.3f, 0.8f);
+    }
+
+    @Test
+    void launchAlt_callsSceneLaunchAlt() {
+        dispatcher.handle(rpc("scene/launchAlt", "{\"index\":0}"));
+        verify(mockScene).launchAlt();
+    }
+
+    @Test
+    void launchRelease_callsSceneLaunchRelease() {
+        dispatcher.handle(rpc("scene/launchRelease", "{\"index\":0}"));
+        verify(mockScene).launchRelease();
+    }
+
+    @Test
+    void launchReleaseAlt_callsSceneLaunchReleaseAlt() {
+        dispatcher.handle(rpc("scene/launchReleaseAlt", "{\"index\":0}"));
+        verify(mockScene).launchReleaseAlt();
+    }
+
+    // --- Behavioral tests (Mockito) — SceneBank scroll ---
+
+    @Test
+    void sceneBankScrollBy_callsSceneBankScrollBy() {
+        dispatcher.handle(rpc("sceneBank/scrollBy", "{\"amount\":2}"));
+        verify(mockSceneBank).scrollBy(2);
     }
 
     // --- Helpers ---
