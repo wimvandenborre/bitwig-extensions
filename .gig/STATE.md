@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.6.7` |
 | **Phase** | 6 — gig-maestro: Expand Mockito Coverage |
-| **Status** | `IMPLEMENTING` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 6.7 — Verify full build |
 | **Last Updated** | 2026-03-11 |
 

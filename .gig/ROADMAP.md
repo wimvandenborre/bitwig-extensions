@@ -18,7 +18,7 @@
 | 3 | gig-maestro: Extract JsonParamValidator | v0.3.1–v0.3.2 | complete |
 | 4 | gig-maestro: Test Coverage Expansion | v0.4.1–v0.4.4 | complete |
 | 5 | gig-maestro: Mockito Behavioral Testing | v0.5.1–v0.5.4 | complete |
-| 6 | gig-maestro: Expand Mockito Coverage | v0.6.x | planned |
+| 6 | gig-maestro: Expand Mockito Coverage | v0.6.1–v0.6.7 | complete |
 
 ## Completed Milestones
 
