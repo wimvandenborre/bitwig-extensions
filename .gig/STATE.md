@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.5.4` |
-| **Phase** | 5 — gig-maestro: Mockito Behavioral Testing |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 5.4 — Verify full build |
-| **Last Updated** | 2026-03-08 |
+| **Version** | `0.6.7` |
+| **Phase** | 6 — gig-maestro: Expand Mockito Coverage |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 6.7 — Verify full build |
+| **Last Updated** | 2026-03-11 |
 
 ---
 
@@ -18,6 +18,13 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.6.7 | 6 | Verify full build | PLANNED | done | 2026-03-11 |
+| 0.6.6 | 6 | BrowserHandler | PLANNED | done | 2026-03-11 |
+| 0.6.5 | 6 | DeviceHandler + MasterDeviceHandler | PLANNED | done | 2026-03-11 |
+| 0.6.4 | 6 | ClipHandler + NoteHandler | PLANNED | done | 2026-03-11 |
+| 0.6.3 | 6 | ArrangerHandler + SceneHandler | PLANNED | done | 2026-03-09 |
+| 0.6.2 | 6 | TransportHandler | PLANNED | done | 2026-03-09 |
+| 0.6.1 | 6 | ApplicationHandler + SendHandler + NoteInputHandler | PLANNED | done | 2026-03-09 |
 | 0.5.4 | 5 | Verify full build | PLANNED | done | 2026-03-08 |
 | 0.5.3 | 5 | TrackHandler mock tests | PLANNED | done | 2026-03-08 |
 | 0.5.2 | 5 | ProjectHandler + MasterHandler mock tests | PLANNED | done | 2026-03-08 |
@@ -42,10 +49,10 @@
 
 ## Active Decisions
 
-- D-5.1: Mockito 5.x (core + junit-jupiter) via version catalog
-- D-5.2: 3 handlers first — ProjectHandler, MasterHandler, TrackHandler
-- D-5.3: @ExtendWith(MockitoExtension) + @Mock fields + arrange-act-verify
-- D-5.4: Keep null-API validation tests, add mock tests alongside
+- D-6.1: 11 direct-API handlers; defer MacroHandler + TransactionHandler
+- D-6.2: Test Bitwig API calls only; skip StateCache-only methods
+- D-6.3: Same Phase 5 conventions (@ExtendWith, @Mock, arrange-act-verify)
+- D-6.4: 7 batches grouped by domain affinity
 
 ---
 
