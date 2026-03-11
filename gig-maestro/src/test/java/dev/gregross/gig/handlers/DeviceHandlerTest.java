@@ -1,21 +1,59 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.ControllerHost;
+import com.bitwig.extension.controller.api.CursorDevice;
+import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
+import com.bitwig.extension.controller.api.CursorTrack;
+import com.bitwig.extension.controller.api.DrumPadBank;
+import com.bitwig.extension.controller.api.InsertionPoint;
+import com.bitwig.extension.controller.api.RemoteControl;
+import com.bitwig.extension.controller.api.SettableBooleanValue;
+import com.bitwig.extension.controller.api.SettableIntegerValue;
+import com.bitwig.extension.controller.api.SettableRangedValue;
+import com.bitwig.extension.controller.api.Transport;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DeviceHandlerTest {
+
+    @Mock private CursorTrack mockCursorTrack;
+    @Mock private CursorDevice mockCursorDevice;
+    @Mock private CursorRemoteControlsPage mockRemoteControlsPage;
+    @Mock private DrumPadBank mockDrumPadBank;
+    @Mock private DeviceLibrary mockDeviceLibrary;
+    @Mock private Transport mockTransport;
+    @Mock private ControllerHost mockHost;
+
+    // Chain mocks
+    @Mock private SettableBooleanValue mockDeviceEnabled;
+    @Mock private SettableIntegerValue mockPageIndex;
+    @Mock private RemoteControl mockRemoteControl;
+    @Mock private SettableRangedValue mockParamValue;
+    @Mock private InsertionPoint mockInsertionPoint;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
-        // Pass null for Bitwig API objects — we only test parameter validation,
-        // not actual API calls (those would NPE on null objects)
         dispatcher = new JsonRpcDispatcher();
-        new DeviceHandler(null, null, null, null, null, null, null).register(dispatcher);
+        new DeviceHandler(mockCursorTrack, mockCursorDevice, mockRemoteControlsPage,
+            mockDrumPadBank, mockDeviceLibrary, mockTransport, mockHost).register(dispatcher);
+
+        // Common stubs
+        when(mockRemoteControlsPage.getParameter(0)).thenReturn(mockRemoteControl);
     }
 
     // --- Registration ---
@@ -70,7 +108,6 @@ class DeviceHandlerTest {
 
     @Test
     void registersExactlyTwentyThreeMethods() {
-        // 17 existing + 2 chain nav + 1 getDrumPads + 3 sound design nav
         assertEquals(23, dispatcher.getRegisteredMethods().size());
     }
 
@@ -178,13 +215,13 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void writeEnvelope_missingPoints_returnsError() {
-        // Index valid (0) but points missing — hits precondition check (transport NPE)
-        // which returns internal error, not param error. Test that index=0 passes validation.
-        // Missing points is tested indirectly via the NPE on transport (valid index proceeds past index check).
-        String response = dispatcher.handle(rpc("device/writeEnvelope", "{\"index\": 0}"));
-        // With null transport, this NPEs at the precondition check (after index validation passes)
-        assertContains(response, "-32603"); // internal error from NPE
+    void writeEnvelope_automationWriteDisabled_returnsError() {
+        SettableBooleanValue mockAutoWriteEnabled = mock(SettableBooleanValue.class);
+        when(mockTransport.isArrangerAutomationWriteEnabled()).thenReturn(mockAutoWriteEnabled);
+        when(mockAutoWriteEnabled.get()).thenReturn(false);
+        String response = dispatcher.handle(rpc("device/writeEnvelope",
+            "{\"index\": 0, \"points\": [{\"position\": 0, \"value\": 0.5}]}"));
+        assertContains(response, "automation write must be enabled");
     }
 
     // --- device/enterSlot validation ---
@@ -196,7 +233,7 @@ class DeviceHandlerTest {
         assertContains(response, "name");
     }
 
-    // --- device/setParameterValue validation (existing) ---
+    // --- device/setParameterValue validation ---
 
     @Test
     void setParameterValue_missingIndex_returnsError() {
@@ -291,6 +328,182 @@ class DeviceHandlerTest {
         assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("mixer"));
         assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("osc"));
         assertTrue(DeviceHandler.VALID_PAGE_TAGS.contains("perf"));
+    }
+
+    // --- Behavioral tests (Mockito) — Device navigation ---
+
+    @Test
+    void selectNext_callsCursorDeviceSelectNext() {
+        dispatcher.handle(rpc("device/selectNext", "{}"));
+        verify(mockCursorDevice).selectNext();
+    }
+
+    @Test
+    void selectPrevious_callsCursorDeviceSelectPrevious() {
+        dispatcher.handle(rpc("device/selectPrevious", "{}"));
+        verify(mockCursorDevice).selectPrevious();
+    }
+
+    @Test
+    void setEnabled_callsCursorDeviceIsEnabledSet() {
+        when(mockCursorDevice.isEnabled()).thenReturn(mockDeviceEnabled);
+        dispatcher.handle(rpc("device/setEnabled", "{\"enabled\":true}"));
+        verify(mockDeviceEnabled).set(true);
+    }
+
+    @Test
+    void remove_callsCursorDeviceDeleteObject() {
+        dispatcher.handle(rpc("device/remove", "{}"));
+        verify(mockCursorDevice).deleteObject();
+    }
+
+    // --- Behavioral tests (Mockito) — Page navigation ---
+
+    @Test
+    void selectPage_callsRemoteControlsPageSelectedPageIndexSet() {
+        when(mockRemoteControlsPage.selectedPageIndex()).thenReturn(mockPageIndex);
+        dispatcher.handle(rpc("device/selectPage", "{\"index\":2}"));
+        verify(mockPageIndex).set(2);
+    }
+
+    @Test
+    void nextPage_callsRemoteControlsPageSelectNextPage() {
+        dispatcher.handle(rpc("device/nextPage", "{}"));
+        verify(mockRemoteControlsPage).selectNextPage(false);
+    }
+
+    @Test
+    void previousPage_callsRemoteControlsPageSelectPreviousPage() {
+        dispatcher.handle(rpc("device/previousPage", "{}"));
+        verify(mockRemoteControlsPage).selectPreviousPage(false);
+    }
+
+    // --- Behavioral tests (Mockito) — Parameter mutation ---
+
+    @Test
+    void setParameterValue_callsParamValueSetImmediately() {
+        when(mockRemoteControl.value()).thenReturn(mockParamValue);
+        dispatcher.handle(rpc("device/setParameterValue", "{\"index\":0,\"value\":0.75}"));
+        verify(mockParamValue).setImmediately(0.75);
+    }
+
+    // --- Behavioral tests (Mockito) — Automation ---
+
+    @Test
+    void deleteAllAutomation_callsParamDeleteAllAutomation() {
+        dispatcher.handle(rpc("device/deleteAllAutomation", "{\"index\":0}"));
+        verify(mockRemoteControl).deleteAllAutomation();
+    }
+
+    @Test
+    void restoreAutomationControl_callsParamRestoreAutomationControl() {
+        dispatcher.handle(rpc("device/restoreAutomationControl", "{\"index\":0}"));
+        verify(mockRemoteControl).restoreAutomationControl();
+    }
+
+    @Test
+    void touch_callsParamTouch() {
+        dispatcher.handle(rpc("device/touch", "{\"index\":0,\"touched\":true}"));
+        verify(mockRemoteControl).touch(true);
+    }
+
+    // --- Behavioral tests (Mockito) — Device insertion ---
+
+    @Test
+    void insertBitwigDevice_callsInsertionPointInsertFile() {
+        when(mockDeviceLibrary.resolve("E-Clap")).thenReturn(Path.of("/devices/E-Clap.bwdevice"));
+        when(mockCursorTrack.endOfDeviceChainInsertionPoint()).thenReturn(mockInsertionPoint);
+        dispatcher.handle(rpc("device/insertBitwigDevice", "{\"name\":\"E-Clap\"}"));
+        verify(mockInsertionPoint).insertFile("/devices/E-Clap.bwdevice");
+    }
+
+    @Test
+    void insertPluginDevice_vst3_callsInsertionPointInsertVST3Device() {
+        when(mockCursorTrack.endOfDeviceChainInsertionPoint()).thenReturn(mockInsertionPoint);
+        dispatcher.handle(rpc("device/insertPluginDevice", "{\"type\":\"vst3\",\"id\":\"com.example.synth\"}"));
+        verify(mockInsertionPoint).insertVST3Device("com.example.synth");
+    }
+
+    @Test
+    void insertPluginDevice_clap_callsInsertionPointInsertCLAPDevice() {
+        when(mockCursorTrack.endOfDeviceChainInsertionPoint()).thenReturn(mockInsertionPoint);
+        dispatcher.handle(rpc("device/insertPluginDevice", "{\"type\":\"clap\",\"id\":\"com.example.fx\"}"));
+        verify(mockInsertionPoint).insertCLAPDevice("com.example.fx");
+    }
+
+    @Test
+    void insertPluginDevice_vst2_callsInsertionPointInsertVST2Device() {
+        when(mockCursorTrack.endOfDeviceChainInsertionPoint()).thenReturn(mockInsertionPoint);
+        dispatcher.handle(rpc("device/insertPluginDevice", "{\"type\":\"vst2\",\"id\":\"12345\"}"));
+        verify(mockInsertionPoint).insertVST2Device(12345);
+    }
+
+    @Test
+    void insertBitwigDevice_beforePosition_callsBeforeInsertionPoint() {
+        when(mockDeviceLibrary.resolve("Delay-2")).thenReturn(Path.of("/devices/Delay-2.bwdevice"));
+        when(mockCursorDevice.beforeDeviceInsertionPoint()).thenReturn(mockInsertionPoint);
+        dispatcher.handle(rpc("device/insertBitwigDevice", "{\"name\":\"Delay-2\",\"position\":\"before\"}"));
+        verify(mockInsertionPoint).insertFile("/devices/Delay-2.bwdevice");
+    }
+
+    // --- Behavioral tests (Mockito) — Chain navigation ---
+
+    @Test
+    void enterSlot_callsCursorDeviceSelectFirstInSlot() {
+        dispatcher.handle(rpc("device/enterSlot", "{\"name\":\"FX Layer\"}"));
+        verify(mockCursorDevice).selectFirstInSlot("FX Layer");
+    }
+
+    @Test
+    void exitToParent_callsCursorDeviceSelectParent() {
+        dispatcher.handle(rpc("device/exitToParent", "{}"));
+        verify(mockCursorDevice).selectParent();
+    }
+
+    @Test
+    void enterLayer_byIndex_callsCursorDeviceSelectFirstInLayer() {
+        dispatcher.handle(rpc("device/enterLayer", "{\"index\":2}"));
+        verify(mockCursorDevice).selectFirstInLayer(2);
+    }
+
+    @Test
+    void enterLayer_byName_callsCursorDeviceSelectFirstInLayer() {
+        dispatcher.handle(rpc("device/enterLayer", "{\"name\":\"Layer 1\"}"));
+        verify(mockCursorDevice).selectFirstInLayer("Layer 1");
+    }
+
+    @Test
+    void enterKeyPad_callsCursorDeviceSelectFirstInKeyPad() {
+        dispatcher.handle(rpc("device/enterKeyPad", "{\"key\":36}"));
+        verify(mockCursorDevice).selectFirstInKeyPad(36);
+    }
+
+    // --- Behavioral tests (Mockito) — Page tag filtering ---
+
+    @Test
+    void selectPageByTag_next_callsSelectNextPageMatching() {
+        dispatcher.handle(rpc("device/selectPageByTag", "{\"tag\":\"filter\"}"));
+        verify(mockRemoteControlsPage).selectNextPageMatching("filter", true);
+    }
+
+    @Test
+    void selectPageByTag_previous_callsSelectPreviousPageMatching() {
+        dispatcher.handle(rpc("device/selectPageByTag", "{\"tag\":\"osc\",\"direction\":\"previous\"}"));
+        verify(mockRemoteControlsPage).selectPreviousPageMatching("osc", true);
+    }
+
+    // --- Behavioral tests (Mockito) — Cursor track ---
+
+    @Test
+    void cursorSelectTrack_next_callsCursorTrackSelectNext() {
+        dispatcher.handle(rpc("cursor/selectTrack", "{\"direction\":\"next\"}"));
+        verify(mockCursorTrack).selectNext();
+    }
+
+    @Test
+    void cursorSelectTrack_previous_callsCursorTrackSelectPrevious() {
+        dispatcher.handle(rpc("cursor/selectTrack", "{\"direction\":\"previous\"}"));
+        verify(mockCursorTrack).selectPrevious();
     }
 
     // --- Helpers ---
