@@ -44,7 +44,8 @@ class MasterDeviceHandlerTest {
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
         new MasterDeviceHandler(mockMasterTrack, mockCursorDevice,
-            mockRemoteControlsPage, mockDeviceLibrary).register(dispatcher);
+            mockRemoteControlsPage, mockDeviceLibrary,
+            (task, delay) -> task.run()).register(dispatcher);
 
         // Common stubs
         when(mockRemoteControlsPage.getParameter(0)).thenReturn(mockRemoteControl);
@@ -70,7 +71,7 @@ class MasterDeviceHandlerTest {
         assertTrue(methods.contains("masterDevice/enterLayer"));
         assertTrue(methods.contains("masterDevice/enterKeyPad"));
         assertTrue(methods.contains("masterDevice/selectPageByTag"));
-        assertEquals(21, methods.size());
+        assertEquals(22, methods.size());
     }
 
     // --- setEnabled validation ---

@@ -50,7 +50,8 @@ class DeviceHandlerTest {
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
         new DeviceHandler(mockCursorTrack, mockCursorDevice, mockRemoteControlsPage,
-            mockDrumPadBank, mockDeviceLibrary, mockTransport, mockHost).register(dispatcher);
+            mockDrumPadBank, mockDeviceLibrary, mockTransport, mockHost,
+            (task, delay) -> task.run()).register(dispatcher);
 
         // Common stubs
         when(mockRemoteControlsPage.getParameter(0)).thenReturn(mockRemoteControl);
@@ -108,7 +109,7 @@ class DeviceHandlerTest {
 
     @Test
     void registersExactlyTwentyNineMethods() {
-        assertEquals(29, dispatcher.getRegisteredMethods().size());
+        assertEquals(30, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---

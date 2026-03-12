@@ -83,11 +83,11 @@ class HandlerRegistrationIntegrationTest {
         new TrackHandler(mockTrackBank, mockApplication, mockCursorTrack, trackBankManager, stateCache, mockNoteInput).register(dispatcher);
         new MasterHandler(mockMasterTrack).register(dispatcher);
         new ClipHandler(mockTrackBank, mockSceneBank, mockCursorClip, stateCache).register(dispatcher);
-        new DeviceHandler(mockCursorTrack, mockCursorDevice, mockRemoteControlsPage, mockDrumPadBank, deviceLibrary, mockTransport, mockHost).register(dispatcher);
+        new DeviceHandler(mockCursorTrack, mockCursorDevice, mockRemoteControlsPage, mockDrumPadBank, deviceLibrary, mockTransport, mockHost, (task, delay) -> task.run()).register(dispatcher);
         new NoteHandler(mockCursorClip, stateCache).register(dispatcher);
         new SceneHandler(mockSceneBank, mockProject, stateCache).register(dispatcher);
         new ArrangerHandler(mockArranger, mockTransport, mockCueMarkerBank, stateCache).register(dispatcher);
-        new MasterDeviceHandler(mockMasterTrack, mockMasterCursorDevice, mockMasterRemoteControlsPage, deviceLibrary).register(dispatcher);
+        new MasterDeviceHandler(mockMasterTrack, mockMasterCursorDevice, mockMasterRemoteControlsPage, deviceLibrary, (task, delay) -> task.run()).register(dispatcher);
         new SendHandler(mockTrackBank, 4).register(dispatcher);
         new ProjectHandler(mockProject, stateCache).register(dispatcher);
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);

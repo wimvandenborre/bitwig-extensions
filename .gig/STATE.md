@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.15.5` |
-| **Phase** | 15 — gig-maestro: Sound Design Device Control |
-| **Status** | `GOVERNED` |
+| **Phase** | 16 — gig-maestro: Custom Preset Creation |
+| **Status** | `IMPLEMENTING` |
 | **Last Batch** | 15.5 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
@@ -79,7 +79,7 @@
 
 ## Active Decisions
 
-_None — Phase 15 archived._
+D-16.1 (Scope), D-16.2 (Batch Setter), D-16.3 (System Prompt), D-16.4 (Testing) — all ACTIVE
 
 ---
 

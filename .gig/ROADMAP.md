@@ -28,6 +28,7 @@
 | 13 | gig-maestro: E2E Integration Testing | v0.13.1–v0.13.3 | complete |
 | 14 | gig-maestro: StateCache Unit Tests | v0.14.1–v0.14.5 | complete |
 | 15 | gig-maestro: Sound Design Device Control | v0.15.1–v0.15.5 | complete |
+| 16 | gig-maestro: Custom Preset Creation | v0.16.1–v0.16.5 | in-progress |
 
 ## Completed Milestones
 
