@@ -43,6 +43,37 @@ public class MasterDeviceHandler {
             return new JsonPrimitive("ok");
         });
 
+        // Preset navigation
+        dispatcher.register("masterDevice/nextPreset", params -> {
+            cursorDevice.switchToNextPreset();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/previousPreset", params -> {
+            cursorDevice.switchToPreviousPreset();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/nextPresetCategory", params -> {
+            cursorDevice.switchToNextPresetCategory();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/previousPresetCategory", params -> {
+            cursorDevice.switchToPreviousPresetCategory();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/nextPresetCreator", params -> {
+            cursorDevice.switchToNextPresetCreator();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/previousPresetCreator", params -> {
+            cursorDevice.switchToPreviousPresetCreator();
+            return new JsonPrimitive("ok");
+        });
+
         // Device state
         dispatcher.register("masterDevice/setEnabled", params -> {
             boolean enabled = requireBoolean(params, "enabled");
