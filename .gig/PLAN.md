@@ -34,7 +34,7 @@
 
 **Test criteria:** Compiles, existing tests still pass
 
-**Status:** pending
+**Status:** done
 
 ---
 
@@ -51,7 +51,7 @@
 
 **Test criteria:** JSON validates cleanly
 
-**Status:** pending
+**Status:** done
 
 ---
 
@@ -73,7 +73,7 @@
 
 **Test criteria:** All new + existing tests pass
 
-**Status:** pending
+**Status:** done
 
 ---
 
@@ -103,7 +103,7 @@
 
 **Test criteria:** System prompt reads coherently, workflow references correct RPC methods
 
-**Status:** pending
+**Status:** done
 
 ---
 
@@ -118,4 +118,4 @@
 
 **Test criteria:** Clean build, all tests green
 
-**Status:** pending
+**Status:** done
