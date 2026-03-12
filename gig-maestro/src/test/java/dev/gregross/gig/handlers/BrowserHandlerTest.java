@@ -1,10 +1,14 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.BrowserFilterColumn;
+import com.bitwig.extension.controller.api.BrowserResultsItemBank;
+import com.bitwig.extension.controller.api.CursorBrowserFilterItem;
 import com.bitwig.extension.controller.api.CursorDevice;
 import com.bitwig.extension.controller.api.InsertionPoint;
 import com.bitwig.extension.controller.api.PopupBrowser;
 import com.bitwig.extension.controller.api.SettableBooleanValue;
 import com.bitwig.extension.controller.api.SettableIntegerValue;
+import com.google.gson.JsonObject;
 import dev.gregross.gig.extension.StateCache;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,18 +28,46 @@ class BrowserHandlerTest {
 
     @Mock private PopupBrowser mockPopupBrowser;
     @Mock private CursorDevice mockCursorDevice;
+    @Mock private StateCache mockStateCache;
 
     // Chain mocks
     @Mock private InsertionPoint mockInsertionPoint;
     @Mock private SettableIntegerValue mockContentTypeIndex;
     @Mock private SettableBooleanValue mockShouldAudition;
+    @Mock private CursorBrowserFilterItem mockFilterCursor;
+    @Mock private BrowserFilterColumn mockFilterColumn;
+    @Mock private CursorBrowserFilterItem mockWildcard;
+    @Mock private SettableBooleanValue mockWildcardSelected;
+    @Mock private BrowserResultsItemBank mockResultBank;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
+        // Stub filter cursors — index 0 = "category"
+        CursorBrowserFilterItem[] cursors = new CursorBrowserFilterItem[8];
+        cursors[0] = mockFilterCursor;
+        when(mockStateCache.getFilterCursors()).thenReturn(cursors);
+
+        // Stub filter columns — index 0 = "category"
+        BrowserFilterColumn[] columns = new BrowserFilterColumn[8];
+        columns[0] = mockFilterColumn;
+        when(mockStateCache.getFilterColumns()).thenReturn(columns);
+        when(mockFilterColumn.getWildcardItem()).thenReturn(mockWildcard);
+        when(mockWildcard.isSelected()).thenReturn(mockWildcardSelected);
+
+        // Stub result bank
+        when(mockStateCache.getResultBank()).thenReturn(mockResultBank);
+
+        // Stub state queries
+        JsonObject browserState = new JsonObject();
+        JsonObject filters = new JsonObject();
+        browserState.add("filters", filters);
+        when(mockStateCache.getBrowserState()).thenReturn(browserState);
+        when(mockStateCache.getResultBankState()).thenReturn(new JsonObject());
+
         dispatcher = new JsonRpcDispatcher();
-        new BrowserHandler(mockPopupBrowser, mockCursorDevice, new StateCache()).register(dispatcher);
+        new BrowserHandler(mockPopupBrowser, mockCursorDevice, mockStateCache).register(dispatcher);
     }
 
     // --- Registration ---
@@ -198,6 +230,80 @@ class BrowserHandlerTest {
         when(mockPopupBrowser.shouldAudition()).thenReturn(mockShouldAudition);
         dispatcher.handle(rpc("browser/setShouldAudition", "{\"enabled\":true}"));
         verify(mockShouldAudition).set(true);
+    }
+
+    // --- Behavioral tests (Mockito) — Filter cursor navigation ---
+
+    @Test
+    void filterSelectNext_callsCursorSelectNext() {
+        dispatcher.handle(rpc("browser/filterSelectNext", "{\"column\":\"category\"}"));
+        verify(mockFilterCursor).selectNext();
+    }
+
+    @Test
+    void filterSelectPrevious_callsCursorSelectPrevious() {
+        dispatcher.handle(rpc("browser/filterSelectPrevious", "{\"column\":\"category\"}"));
+        verify(mockFilterCursor).selectPrevious();
+    }
+
+    @Test
+    void filterSelectFirst_callsCursorSelectFirst() {
+        dispatcher.handle(rpc("browser/filterSelectFirst", "{\"column\":\"category\"}"));
+        verify(mockFilterCursor).selectFirst();
+    }
+
+    @Test
+    void filterSelectLast_callsCursorSelectLast() {
+        dispatcher.handle(rpc("browser/filterSelectLast", "{\"column\":\"category\"}"));
+        verify(mockFilterCursor).selectLast();
+    }
+
+    @Test
+    void filterSelectParent_callsCursorSelectParent() {
+        dispatcher.handle(rpc("browser/filterSelectParent", "{\"column\":\"category\"}"));
+        verify(mockFilterCursor).selectParent();
+    }
+
+    @Test
+    void filterSelectFirstChild_callsCursorSelectFirstChild() {
+        dispatcher.handle(rpc("browser/filterSelectFirstChild", "{\"column\":\"category\"}"));
+        verify(mockFilterCursor).selectFirstChild();
+    }
+
+    // --- Behavioral tests (Mockito) — Filter reset ---
+
+    @Test
+    void filterReset_setsWildcardSelectedTrue() {
+        dispatcher.handle(rpc("browser/filterReset", "{\"column\":\"category\"}"));
+        verify(mockWildcardSelected).set(true);
+    }
+
+    // --- Behavioral tests (Mockito) — State queries ---
+
+    @Test
+    void getFilters_returnsBrowserStateFilters() {
+        String response = dispatcher.handle(rpc("browser/getFilters", "{}"));
+        assertContains(response, "\"result\"");
+    }
+
+    @Test
+    void getResults_returnsResultBankState() {
+        String response = dispatcher.handle(rpc("browser/getResults", "{}"));
+        assertContains(response, "\"result\"");
+    }
+
+    // --- Behavioral tests (Mockito) — Scroll results ---
+
+    @Test
+    void scrollResults_forward_callsBankScrollForwards() {
+        dispatcher.handle(rpc("browser/scrollResults", "{\"direction\":\"forward\"}"));
+        verify(mockResultBank).scrollForwards();
+    }
+
+    @Test
+    void scrollResults_pageBackward_callsBankScrollPageBackwards() {
+        dispatcher.handle(rpc("browser/scrollResults", "{\"direction\":\"pageBackward\"}"));
+        verify(mockResultBank).scrollPageBackwards();
     }
 
     // --- Helpers ---

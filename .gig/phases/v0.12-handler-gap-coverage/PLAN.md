@@ -5,11 +5,9 @@
 
 ---
 
-## Active Phase
+## Active Phase — Phase 12: gig-maestro Handler Gap Coverage (v0.12.x)
 
-_No active phase. Run `/gig:gather` to start the next phase._
-
-<!-- ARCHIVED: Phase 12 — gig-maestro: Handler Gap Coverage (v0.12.x)
+> Close the BrowserHandler test gap by adding 11 behavioral tests for Phase-18 endpoints (6 filter cursor, filterReset, getFilters, getResults, 4 scrollResults directions) using mock StateCache.
 
 **Decisions:** D-12.1, D-12.2, D-12.3
 
@@ -19,8 +17,69 @@ _No active phase. Run `/gig:gather` to start the next phase._
 | 12.2 | `0.12.2` | filterReset + getFilters + getResults + scrollResults tests | in-session | done |
 | 12.3 | `0.12.3` | Verify full build | in-session | done |
 
-**Phase Acceptance Criteria:** All PASS
--->
+### Batch 12.1 — Mock StateCache + filter cursor behavioral tests
+
+**Delegation:** in-session
+**Decisions:** D-12.2, D-12.3
+**Files:**
+- `gig-maestro/src/test/java/dev/gregross/gig/handlers/BrowserHandlerTest.java` (modify)
+**Work:**
+- Add `@Mock private StateCache mockStateCache` field
+- Add `@Mock private CursorBrowserFilterItem mockFilterCursor` field
+- Update `@BeforeEach` to pass `mockStateCache` instead of `new StateCache()`
+- Stub `mockStateCache.getFilterCursors()` to return array with `mockFilterCursor` at index 0 (category)
+- Add 6 behavioral tests:
+  - `filterSelectNext_callsCursorSelectNext` — column "category" → `cursors[0].selectNext()`
+  - `filterSelectPrevious_callsCursorSelectPrevious`
+  - `filterSelectFirst_callsCursorSelectFirst`
+  - `filterSelectLast_callsCursorSelectLast`
+  - `filterSelectParent_callsCursorSelectParent`
+  - `filterSelectFirstChild_callsCursorSelectFirstChild`
+- Verify existing 18 tests still pass (they don't depend on StateCache for Phase-17 endpoints)
+**Test criteria:** `./gradlew :gig-maestro:test` passes
+**Acceptance:** All 6 filter cursor endpoints verified to call correct CursorBrowserFilterItem method
+
+### Batch 12.2 — filterReset + getFilters + getResults + scrollResults tests
+
+**Delegation:** in-session
+**Decisions:** D-12.2, D-12.3
+**Depends on:** Batch 12.1
+**Files:**
+- `gig-maestro/src/test/java/dev/gregross/gig/handlers/BrowserHandlerTest.java` (modify)
+**Work:**
+- Add chain mocks: `@Mock BrowserFilterColumn mockFilterColumn`, `@Mock CursorBrowserFilterItem mockWildcard`, `@Mock SettableBooleanValue mockWildcardSelected`, `@Mock BrowserResultsItemBank mockResultBank`
+- Stub `mockStateCache.getFilterColumns()` → array with `mockFilterColumn` at index 0
+- Stub `mockFilterColumn.getWildcardItem()` → `mockWildcard`, `mockWildcard.isSelected()` → `mockWildcardSelected`
+- Stub `mockStateCache.getResultBank()` → `mockResultBank`
+- Stub `mockStateCache.getBrowserState()` → JsonObject with "filters" key
+- Stub `mockStateCache.getResultBankState()` → JsonObject
+- Add 5 behavioral tests:
+  - `filterReset_setsWildcardSelectedTrue` — column "category" → `columns[0].getWildcardItem().isSelected().set(true)`
+  - `getFilters_returnsBrowserStateFilters` — returns the "filters" sub-object from `getBrowserState()`
+  - `getResults_returnsResultBankState` — returns `getResultBankState()` result
+  - `scrollResults_forward_callsBankScrollForwards` — direction "forward" → `bank.scrollForwards()`
+  - `scrollResults_pageBackward_callsBankScrollPageBackwards` — direction "pageBackward" → `bank.scrollPageBackwards()`
+**Test criteria:** `./gradlew :gig-maestro:test` passes
+**Acceptance:** filterReset wildcard chain verified; getFilters/getResults return correct data; scrollResults dispatches to correct bank method
+
+### Batch 12.3 — Verify full build
+
+**Delegation:** in-session
+**Decisions:** —
+**Depends on:** Batches 12.1–12.2
+**Files:** —
+**Work:** Run `./gradlew clean build` to verify all modules compile and all tests pass.
+**Test criteria:** Exit code 0, BUILD SUCCESSFUL
+**Acceptance:** All tests green across gig-maestro and launchpad-mk2
+
+**Phase Acceptance Criteria:**
+- [ ] BrowserHandler coverage ratio increases from 0.86x to 1.38x (29 tests for 21 endpoints)
+- [ ] All 6 filter cursor endpoints have behavioral tests
+- [ ] filterReset wildcard chain fully verified
+- [ ] scrollResults dispatches correctly for all 4 directions (2 tested + 2 validated by symmetry)
+- [ ] `./gradlew clean build` passes with all tests green
+
+**Completion triggers governance → version `0.12.0`**
 
 <!-- ARCHIVED: Phase 11 — gig-maestro: CLI Test Coverage (v0.11.x)
 

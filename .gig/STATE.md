@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.11.5` |
-| **Phase** | 11 — gig-maestro: CLI Test Coverage |
+| **Version** | `0.12.3` |
+| **Phase** | 12 — gig-maestro: Handler Gap Coverage |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 11.5 — Verify full build |
+| **Last Batch** | 12.3 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,9 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.12.3 | 12 | Verify full build | PLANNED | done | 2026-03-12 |
+| 0.12.2 | 12 | filterReset + getFilters + getResults + scrollResults tests | PLANNED | done | 2026-03-12 |
+| 0.12.1 | 12 | Mock StateCache + filter cursor behavioral tests | PLANNED | done | 2026-03-12 |
 | 0.11.5 | 11 | Verify full build | PLANNED | done | 2026-03-12 |
 | 0.11.4 | 11 | DeviceNoteCommandTest | PLANNED | done | 2026-03-12 |
 | 0.11.3 | 11 | TransportCommandTest + TrackCommandTest | PLANNED | done | 2026-03-12 |
@@ -65,7 +68,7 @@
 
 ## Active Decisions
 
-_None — phase 11 archived._
+_None — phase 12 archived._
 
 ---
 
