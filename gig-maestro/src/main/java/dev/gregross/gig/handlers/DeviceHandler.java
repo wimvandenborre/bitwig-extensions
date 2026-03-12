@@ -13,6 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+import dev.gregross.gig.rpc.TaskScheduler;
 
 import static dev.gregross.gig.rpc.JsonParamValidator.*;
 
@@ -25,6 +26,7 @@ import java.util.Set;
 public class DeviceHandler {
 
     private static final int PARAM_COUNT = 8;
+    private static final long FLUSH_DELAY_MS = 100;
     static final Set<String> VALID_PAGE_TAGS = Set.of(
         "env", "eq", "filter", "fx", "lfo", "mixer", "osc", "perf"
     );
@@ -36,12 +38,13 @@ public class DeviceHandler {
     private final DeviceLibrary deviceLibrary;
     private final Transport transport;
     private final ControllerHost host;
+    private final TaskScheduler scheduler;
 
     public DeviceHandler(CursorTrack cursorTrack, CursorDevice cursorDevice,
                          CursorRemoteControlsPage remoteControlsPage,
                          DrumPadBank drumPadBank,
                          DeviceLibrary deviceLibrary, Transport transport,
-                         ControllerHost host) {
+                         ControllerHost host, TaskScheduler scheduler) {
         this.cursorTrack = cursorTrack;
         this.cursorDevice = cursorDevice;
         this.remoteControlsPage = remoteControlsPage;
@@ -49,6 +52,7 @@ public class DeviceHandler {
         this.deviceLibrary = deviceLibrary;
         this.transport = transport;
         this.host = host;
+        this.scheduler = scheduler;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -128,6 +132,75 @@ public class DeviceHandler {
             RemoteControl param = remoteControlsPage.getParameter(index);
             param.value().setImmediately(value);
             return new JsonPrimitive("ok");
+        });
+
+        // Batch parameter setter across pages
+        dispatcher.register("device/setParameters", params -> {
+            JsonArray pages = requireArray(params, "pages");
+            if (pages.isEmpty()) {
+                throw new IllegalArgumentException("pages array must not be empty");
+            }
+
+            int totalParams = 0;
+            // Validate all pages up front before applying anything
+            for (JsonElement pageEl : pages) {
+                JsonObject page = pageEl.getAsJsonObject();
+                if (!page.has("pageIndex")) {
+                    throw new IllegalArgumentException("each page must have 'pageIndex'");
+                }
+                JsonArray pageParams = requireArray(page, "params");
+                if (pageParams.isEmpty()) {
+                    throw new IllegalArgumentException("each page must have a non-empty 'params' array");
+                }
+                for (JsonElement paramEl : pageParams) {
+                    JsonObject p = paramEl.getAsJsonObject();
+                    if (!p.has("index") || !p.has("value")) {
+                        throw new IllegalArgumentException("each param must have 'index' and 'value'");
+                    }
+                    int idx = p.get("index").getAsInt();
+                    if (idx < 0 || idx >= PARAM_COUNT) {
+                        throw new IllegalArgumentException("parameter index out of range: 0-7, got " + idx);
+                    }
+                    double val = p.get("value").getAsDouble();
+                    if (val < 0.0 || val > 1.0) {
+                        throw new IllegalArgumentException("parameter value out of range: 0.0-1.0, got " + val);
+                    }
+                    totalParams++;
+                }
+            }
+
+            // Apply first page immediately (this flush cycle)
+            JsonObject firstPage = pages.get(0).getAsJsonObject();
+            int firstPageIndex = firstPage.get("pageIndex").getAsInt();
+            JsonArray firstPageParams = firstPage.getAsJsonArray("params");
+            remoteControlsPage.selectedPageIndex().set(firstPageIndex);
+            for (JsonElement paramEl : firstPageParams) {
+                JsonObject p = paramEl.getAsJsonObject();
+                remoteControlsPage.getParameter(p.get("index").getAsInt())
+                    .value().setImmediately(p.get("value").getAsDouble());
+            }
+
+            // Schedule subsequent pages across flush cycles
+            for (int i = 1; i < pages.size(); i++) {
+                JsonObject page = pages.get(i).getAsJsonObject();
+                int pageIndex = page.get("pageIndex").getAsInt();
+                JsonArray pageParams = page.getAsJsonArray("params");
+                long delay = FLUSH_DELAY_MS * i;
+                scheduler.schedule(() -> {
+                    remoteControlsPage.selectedPageIndex().set(pageIndex);
+                    for (JsonElement paramEl : pageParams) {
+                        JsonObject p = paramEl.getAsJsonObject();
+                        remoteControlsPage.getParameter(p.get("index").getAsInt())
+                            .value().setImmediately(p.get("value").getAsDouble());
+                    }
+                }, delay);
+            }
+
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            result.addProperty("pageCount", pages.size());
+            result.addProperty("paramCount", totalParams);
+            return result;
         });
 
         // Device insertion

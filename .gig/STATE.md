@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.15.5` |
-| **Phase** | 15 — gig-maestro: Sound Design Device Control |
+| **Version** | `0.16.5` |
+| **Phase** | 16 — gig-maestro: Custom Preset Creation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 15.5 — Verify full build |
+| **Last Batch** | 16.5 — Build verification |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.16.5 | 16 | Build verification | PLANNED | done | 2026-03-12 |
+| 0.16.4 | 16 | System prompt rewrite | PLANNED | done | 2026-03-12 |
+| 0.16.3 | 16 | Handler tests | PLANNED | done | 2026-03-12 |
+| 0.16.2 | 16 | Tool definitions | PLANNED | done | 2026-03-12 |
+| 0.16.1 | 16 | Batch parameter setter methods | PLANNED | done | 2026-03-12 |
 | 0.15.5 | 15 | Verify full build | PLANNED | done | 2026-03-12 |
 | 0.15.4 | 15 | Handler + StateCache tests | PLANNED | done | 2026-03-12 |
 | 0.15.3 | 15 | Tool definitions + system prompt | PLANNED | done | 2026-03-12 |
@@ -79,7 +84,7 @@
 
 ## Active Decisions
 
-_None — Phase 15 archived._
+_None — Phase 16 archived._
 
 ---
 

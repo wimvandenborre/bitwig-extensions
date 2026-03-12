@@ -662,6 +662,48 @@
     }
   },
   {
+    "name": "masterDevice_setParameters",
+    "description": "Set multiple parameters across multiple pages on the master track device in one batch call. Navigates pages and sets parameter values using TaskScheduler for cross-flush-cycle execution. First page is applied immediately, subsequent pages are scheduled at 100ms intervals. Use this for creating sounds from scratch — set all parameters in one call instead of 20+ sequential setParameterValue calls.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pages": {
+          "type": "array",
+          "description": "Array of page objects, each with pageIndex and params to set on that page.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pageIndex": {
+                "type": "integer",
+                "description": "Remote controls page index (0-based)."
+              },
+              "params": {
+                "type": "array",
+                "description": "Parameters to set on this page.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "index": {
+                      "type": "integer",
+                      "description": "Parameter index within the page (0-7)."
+                    },
+                    "value": {
+                      "type": "number",
+                      "description": "Normalized parameter value (0.0 to 1.0)."
+                    }
+                  },
+                  "required": ["index", "value"]
+                }
+              }
+            },
+            "required": ["pageIndex", "params"]
+          }
+        }
+      },
+      "required": ["pages"]
+    }
+  },
+  {
     "name": "masterDevice_enterSlot",
     "description": "Navigate into a nested device chain (slot) of the current master bus device. Check masterDevice snapshot hasSlots and slotNames before calling. After entering, the masterDevice cursor points to the first device inside that slot.",
     "input_schema": {
@@ -1064,6 +1106,48 @@
         "index",
         "value"
       ]
+    }
+  },
+  {
+    "name": "device_setParameters",
+    "description": "Set multiple parameters across multiple pages in one batch call. Navigates pages and sets parameter values using TaskScheduler for cross-flush-cycle execution. First page is applied immediately, subsequent pages are scheduled at 100ms intervals. Use this for creating sounds from scratch — set all parameters in one call instead of 20+ sequential setParameterValue calls.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pages": {
+          "type": "array",
+          "description": "Array of page objects, each with pageIndex and params to set on that page.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pageIndex": {
+                "type": "integer",
+                "description": "Remote controls page index (0-based)."
+              },
+              "params": {
+                "type": "array",
+                "description": "Parameters to set on this page.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "index": {
+                      "type": "integer",
+                      "description": "Parameter index within the page (0-7)."
+                    },
+                    "value": {
+                      "type": "number",
+                      "description": "Normalized parameter value (0.0 to 1.0)."
+                    }
+                  },
+                  "required": ["index", "value"]
+                }
+              }
+            },
+            "required": ["pageIndex", "params"]
+          }
+        }
+      },
+      "required": ["pages"]
     }
   },
   {
