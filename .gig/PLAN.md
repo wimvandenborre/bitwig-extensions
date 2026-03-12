@@ -5,9 +5,132 @@
 
 ---
 
-## Active Phase
+## Active Phase — Phase 14: gig-maestro StateCache Unit Tests (v0.14.x)
 
-_No active phase. Run `/gig:gather` to start the next phase._
+> Test StateCache's snapshot serialization, getter methods, and observer wiring using reflection-based field injection and selective ArgumentCaptor callback capture. Covers the largest untested production class (1,609 lines, 179 fields) without requiring a live Bitwig instance.
+
+**Decisions:** D-14.1, D-14.2, D-14.3, D-14.4, D-14.5
+
+| Batch | Version | Title | Delegation | Status |
+|-------|---------|-------|------------|--------|
+| 14.1 | `0.14.1` | StateCacheTestHelper | in-session | done |
+| 14.2 | `0.14.2` | StateCacheSnapshotTest | in-session | done |
+| 14.3 | `0.14.3` | StateCacheGetterTest | in-session | done |
+| 14.4 | `0.14.4` | StateCacheObserverTest | in-session | done |
+| 14.5 | `0.14.5` | Verify full build | in-session | done |
+
+### Batch 14.1 — StateCacheTestHelper
+
+**Delegation:** in-session
+**Decisions:** D-14.1, D-14.5
+**Files:**
+- `gig-maestro/src/test/java/dev/gregross/gig/extension/StateCacheTestHelper.java` (create)
+**Work:**
+- Create utility class with static reflection methods:
+  - `setField(StateCache cache, String fieldName, Object value)` — sets a private field via reflection
+  - `setArrayElement(StateCache cache, String fieldName, int index, Object value)` — sets element of a private array field
+  - `set2DArrayElement(StateCache cache, String fieldName, int i, int j, Object value)` — sets element of 2D array
+  - `populateTransport(StateCache cache)` — sets known transport values (isPlaying=true, tempo=120.0, etc.)
+  - `populateTracks(StateCache cache)` — sets known track values for index 0 (name, volume, pan, color, etc.)
+  - `populateScenes(StateCache cache)` — sets known scene values for index 0
+  - `populateDevice(StateCache cache)` — sets known device values
+  - `populateClip(StateCache cache)` — sets known clip values
+**Test criteria:** Compiles without error
+**Acceptance:** Helper methods work with StateCache's private volatile fields
+
+### Batch 14.2 — StateCacheSnapshotTest
+
+**Delegation:** in-session
+**Decisions:** D-14.2, D-14.5
+**Depends on:** Batch 14.1
+**Files:**
+- `gig-maestro/src/test/java/dev/gregross/gig/extension/StateCacheSnapshotTest.java` (create)
+**Work:**
+- 13 tests, one per snapshot section:
+  - `snapshot_transport_containsAllFields` — inject transport values, verify 15 keys
+  - `snapshot_tracks_containsTrackArray` — inject track 0 values, verify nested structure (name, volume, pan, mute, solo, arm, color{r,g,b}, clips[], sends[])
+  - `snapshot_scenes_containsSceneArray` — inject scene 0, verify (name, clipCount, color, scrollInfo)
+  - `snapshot_device_containsAllFields` — inject device values, verify nested remoteControls
+  - `snapshot_clip_containsAllFields` — inject clip values, verify 15+ keys
+  - `snapshot_master_containsAllFields` — inject master values, verify (volume, pan, mute, solo, color)
+  - `snapshot_application_containsAllFields` — inject app values, verify 9 keys
+  - `snapshot_arranger_containsAllFields` — inject arranger booleans, verify 7 keys
+  - `snapshot_arrangement_containsNestedStructure` — verify loop{}, punch{}, automation{}, cueMarkers{}
+  - `snapshot_masterDevice_containsAllFields` — inject master device, verify structure
+  - `snapshot_browser_containsFilters` — inject browser values, verify filters sub-object
+  - `snapshot_arpeggiator_containsAllFields` — inject arp values, verify 11 keys
+  - `snapshot_noteLatch_containsAllFields` — inject note latch values, verify 5 keys
+**Test criteria:** `./gradlew :gig-maestro:test` passes
+**Acceptance:** Every snapshot section's JSON keys validated with injected data
+
+### Batch 14.3 — StateCacheGetterTest
+
+**Delegation:** in-session
+**Decisions:** D-14.3, D-14.5
+**Depends on:** Batch 14.1
+**Files:**
+- `gig-maestro/src/test/java/dev/gregross/gig/extension/StateCacheGetterTest.java` (create)
+**Work:**
+- ~20 tests:
+  - `getTrackName_validIndex_returnsName` — inject name, verify
+  - `getTrackName_outOfBounds_returnsEmpty` — index -1 and 8
+  - `clipHasContent_validIndices_returnsTrue` — inject content, verify
+  - `clipHasContent_outOfBounds_returnsFalse` — invalid track/slot
+  - `getClipStepSize_defaultValue` — verify 0.0 default
+  - `setClipStepSize_updatesValue` — set and get
+  - `hasSoloedTracks_true` / `hasMutedTracks_true` / `hasArmedTracks_true` — inject and verify
+  - `isModified_defaultFalse` — verify default
+  - `getSceneBankScrollInfo_structure` — verify JSON keys (scrollPosition, itemCount, bankSize, canScroll*)
+  - `getTrackBankScrollInfo_structure` — verify JSON keys
+  - `getCueMarkerBankScrollInfo_structure` — verify JSON keys
+  - `getSceneItemCount_default` / `getTrackItemCount_default` / `getCueMarkerItemCount_default`
+  - `getBrowserState_structure` — verify top-level keys
+  - `getResultBankState_structure` — verify items array + entryCount
+  - `getClipLaunchSettings_structure` — verify 5 keys
+  - `getClipPlaybackSettings_structure` — verify 5 keys
+  - `getArpeggiatorState_structure` — verify 11 keys
+  - `getNoteLatchState_structure` — verify 5 keys
+**Test criteria:** `./gradlew :gig-maestro:test` passes
+**Acceptance:** All public getters tested with known values and boundary conditions
+
+### Batch 14.4 — StateCacheObserverTest
+
+**Delegation:** in-session
+**Decisions:** D-14.4, D-14.5
+**Files:**
+- `gig-maestro/src/test/java/dev/gregross/gig/extension/StateCacheObserverTest.java` (create)
+**Work:**
+- Mock Transport and its value objects (SettableBooleanValue for isPlaying, SettableDoubleValue for tempo, etc.)
+- Mock TrackBank, MasterTrack, Application, Project (needed by registerObservers signature)
+- Call `cache.registerObservers(transport, trackBank, masterTrack, application, project)`
+- Capture callbacks via ArgumentCaptor on transport.isPlaying().addValueObserver(), transport.tempo().addValueObserver(), transport.playPosition().addValueObserver()
+- ~5 tests:
+  - `registerObservers_registersTransportPlayingCallback` — capture and invoke with true, verify snapshot transport.isPlaying == true
+  - `registerObservers_registersTempoCallback` — invoke with 140.0, verify snapshot transport.tempo == 140.0
+  - `registerObservers_registersPlayPositionCallback` — invoke with 8.5, verify snapshot transport.playPosition == 8.5
+  - `registerObservers_registersTrackNameCallback` — capture track name callback, invoke, verify getTrackName(0) returns set value
+  - `registerObservers_callbackUpdatesChangedSections` — invoke transport callback, verify getChangedSections() includes "transport"
+**Test criteria:** `./gradlew :gig-maestro:test` passes
+**Acceptance:** Transport callback→field→snapshot pipeline verified end-to-end
+
+### Batch 14.5 — Verify full build
+
+**Delegation:** in-session
+**Decisions:** —
+**Depends on:** Batches 14.1–14.4
+**Files:** —
+**Work:** Run `./gradlew clean build` to verify all modules compile and all tests pass.
+**Test criteria:** Exit code 0, BUILD SUCCESSFUL
+**Acceptance:** All tests green across gig-maestro and launchpad-mk2
+
+**Phase Acceptance Criteria:**
+- [ ] StateCacheTestHelper provides reflection-based field injection for all field types
+- [ ] StateCacheSnapshotTest validates JSON structure of all 13 snapshot sections
+- [ ] StateCacheGetterTest covers all public getters with known values and bounds checking
+- [ ] StateCacheObserverTest proves callback→field→snapshot pipeline for transport
+- [ ] `./gradlew clean build` passes with all tests green
+
+**Completion triggers governance → version `0.14.0`**
 
 <!-- ARCHIVED: Phase 13 — gig-maestro: E2E Integration Testing (v0.13.x)
 

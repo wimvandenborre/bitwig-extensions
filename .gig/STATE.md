@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.13.3` |
-| **Phase** | 13 — gig-maestro: E2E Integration Testing |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 13.3 — Verify full build |
+| **Version** | `0.14.5` |
+| **Phase** | 14 — gig-maestro: StateCache Unit Tests |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 14.5 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,9 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.14.5 | 14 | Verify full build | PLANNED | done | 2026-03-12 |
+| 0.14.4 | 14 | StateCacheObserverTest | PLANNED | done | 2026-03-12 |
+| 0.14.1-3 | 14 | StateCacheTestHelper + SnapshotTest + GetterTest | PLANNED | done | 2026-03-12 |
 | 0.13.3 | 13 | Verify full build | PLANNED | done | 2026-03-12 |
 | 0.13.2 | 13 | HttpPipelineIntegrationTest | PLANNED | done | 2026-03-12 |
 | 0.13.1 | 13 | CommandQueueTest (pre-existing) | PLANNED | done | 2026-03-12 |
@@ -71,7 +74,7 @@
 
 ## Active Decisions
 
-_None — phase 13 archived._
+D-14.1 (Strategy), D-14.2 (Snapshot), D-14.3 (Getters), D-14.4 (Observer), D-14.5 (Organization) — all ACTIVE
 
 ---
 
