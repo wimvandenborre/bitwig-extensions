@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.17.4` |
 | **Phase** | 17 — gig-maestro: Live Parameter Feedback |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 17.4 — Build verification |
 | **Last Updated** | 2026-03-12 |
 
@@ -88,7 +88,7 @@
 
 ## Active Decisions
 
-D-17.1 (Notification content), D-17.2 (getDelta method), D-17.3 (Section-level granularity), D-17.4 (Testing) — all ACTIVE
+_None — Phase 17 archived._
 
 ---
 
