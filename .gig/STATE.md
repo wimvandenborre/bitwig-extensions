@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.12.3` |
-| **Phase** | 12 — gig-maestro: Handler Gap Coverage |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 12.3 — Verify full build |
+| **Version** | `0.13.3` |
+| **Phase** | 13 — gig-maestro: E2E Integration Testing |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 13.3 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -68,7 +68,7 @@
 
 ## Active Decisions
 
-_None — phase 12 archived._
+D-13.1 (Scope), D-13.2 (CommandQueue), D-13.3 (HTTP Pipeline), D-13.4 (Test Organization) — all ACTIVE
 
 ---
 

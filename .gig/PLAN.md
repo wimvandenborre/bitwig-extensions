@@ -5,9 +5,72 @@
 
 ---
 
-## Active Phase
+## Active Phase — Phase 13: gig-maestro E2E Integration Testing (v0.13.x)
 
-_No active phase. Run `/gig:gather` to start the next phase._
+> Add end-to-end integration tests covering the two untested layers: CommandQueue (async enqueue → sync drain → future completion) and the full HTTP pipeline (HttpRpcServer → CommandQueue → JsonRpcDispatcher → response). These tests prove the full request lifecycle works without requiring a live Bitwig instance.
+
+**Decisions:** D-13.1, D-13.2, D-13.3, D-13.4
+
+| Batch | Version | Title | Delegation | Status |
+|-------|---------|-------|------------|--------|
+| 13.1 | `0.13.1` | CommandQueueTest | in-session | done (pre-existing) |
+| 13.2 | `0.13.2` | HttpPipelineIntegrationTest | in-session | done |
+| 13.3 | `0.13.3` | Verify full build | in-session | done |
+
+### Batch 13.1 — CommandQueueTest
+
+**Delegation:** in-session
+**Decisions:** D-13.2, D-13.4
+**Files:**
+- `gig-maestro/src/test/java/dev/gregross/gig/rpc/CommandQueueTest.java` (create)
+**Work:**
+- Create `CommandQueueTest` with a real `JsonRpcDispatcher` and a simple registered echo handler
+- 5 tests:
+  - `enqueue_returnsPendingFuture` — future is not done immediately after enqueue
+  - `drainAndExecute_completesFutureWithResponse` — enqueue + drain → future.get() returns JSON-RPC response
+  - `drainAndExecute_returnsProcessedCount` — enqueue 3 commands → drain returns 3
+  - `multipleEnqueues_drainInFifoOrder` — enqueue A then B → drain → A completes before B, responses match
+  - `handlerException_completesFutureExceptionally` — handler throws → future.isCompletedExceptionally()
+**Test criteria:** `./gradlew :gig-maestro:test` passes
+**Acceptance:** All 5 tests verify the CommandQueue async→sync handoff contract
+
+### Batch 13.2 — HttpPipelineIntegrationTest
+
+**Delegation:** in-session
+**Decisions:** D-13.3, D-13.4
+**Files:**
+- `gig-maestro/src/test/java/dev/gregross/gig/server/HttpPipelineIntegrationTest.java` (create)
+**Work:**
+- Wire real HttpRpcServer (on test port) → CommandQueue → JsonRpcDispatcher with registered echo handler
+- HttpRpcServer's requestHandler enqueues into CommandQueue, returns the CompletableFuture
+- A `ScheduledExecutorService` drains the CommandQueue every 10ms (simulating Bitwig's flush cycle)
+- `@BeforeEach` starts server + drain thread, `@AfterEach` stops both
+- 5 tests:
+  - `postRpc_validMethod_returnsJsonRpcResponse` — POST echo request → 200 + correct result
+  - `postRpc_unknownMethod_returnsMethodNotFound` — POST unknown → 200 + error -32601
+  - `postRpc_invalidJson_returnsParseError` — POST garbage → 200 + error -32700
+  - `postRpc_notification_returns204` — POST without id → 204
+  - `postRpc_batchRequest_returnsArrayResponse` — POST array of 2 requests → array of 2 responses
+**Test criteria:** `./gradlew :gig-maestro:test` passes
+**Acceptance:** Full HTTP→Queue→Dispatch→Response pipeline verified end-to-end
+
+### Batch 13.3 — Verify full build
+
+**Delegation:** in-session
+**Decisions:** —
+**Depends on:** Batches 13.1–13.2
+**Files:** —
+**Work:** Run `./gradlew clean build` to verify all modules compile and all tests pass.
+**Test criteria:** Exit code 0, BUILD SUCCESSFUL
+**Acceptance:** All tests green across gig-maestro and launchpad-mk2
+
+**Phase Acceptance Criteria:**
+- [ ] CommandQueue enqueue→drain→future lifecycle fully tested (5 tests)
+- [ ] Full HTTP pipeline (server→queue→dispatcher→response) tested end-to-end (5 tests)
+- [ ] No port conflicts with existing HttpRpcServerTest (different test ports)
+- [ ] `./gradlew clean build` passes with all tests green
+
+**Completion triggers governance → version `0.13.0`**
 
 <!-- ARCHIVED: Phase 12 — gig-maestro: Handler Gap Coverage (v0.12.x)
 
