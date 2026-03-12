@@ -1,5 +1,6 @@
 package dev.gregross.gig.extension;
 
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -74,5 +75,70 @@ class StateCacheDeltaTest {
             List<String> changed = cache.getChangedSections();
             assertTrue(changed.isEmpty(), "Iteration " + i + " reported changes: " + changed);
         }
+    }
+
+    // --- getDelta() tests ---
+
+    @Test
+    void getDelta_firstCallReturnsAllSectionsWithData() {
+        JsonObject delta = cache.getDelta();
+        assertNotNull(delta);
+        assertEquals(13, delta.getAsJsonArray("changed").size());
+        JsonObject data = delta.getAsJsonObject("data");
+        assertEquals(13, data.size());
+        assertTrue(data.has("transport"));
+        assertTrue(data.has("device"));
+        assertTrue(data.has("tracks"));
+        // Verify data contains actual state, not just names
+        assertTrue(data.getAsJsonObject("transport").has("isPlaying"));
+        assertTrue(data.getAsJsonObject("device").has("remoteControls"));
+    }
+
+    @Test
+    void getDelta_returnsNullWhenNothingChanged() {
+        cache.getDelta(); // init hashes
+        JsonObject delta = cache.getDelta();
+        assertNull(delta, "Expected null delta when nothing changed");
+    }
+
+    @Test
+    void getDelta_clearsChangedState() {
+        cache.getDelta(); // first call sets hashes
+        // Mutate a field via reflection
+        StateCacheTestHelper.setField(cache, "tempo", 140.0);
+        JsonObject delta1 = cache.getDelta();
+        assertNotNull(delta1);
+        assertTrue(delta1.getAsJsonArray("changed").toString().contains("transport"));
+
+        // Second call with no further changes
+        JsonObject delta2 = cache.getDelta();
+        assertNull(delta2, "Expected null after change was already reported");
+    }
+
+    @Test
+    void getDelta_reportsOnlyChangedSections() {
+        cache.getDelta(); // init hashes
+        // Change only transport
+        StateCacheTestHelper.setField(cache, "isPlaying", true);
+        JsonObject delta = cache.getDelta();
+        assertNotNull(delta);
+        JsonObject data = delta.getAsJsonObject("data");
+        assertEquals(1, data.size(), "Only transport should have changed");
+        assertTrue(data.has("transport"));
+        assertTrue(data.getAsJsonObject("transport").get("isPlaying").getAsBoolean());
+    }
+
+    @Test
+    void getDelta_multipleSectionsChanged() {
+        cache.getDelta(); // init
+        // Change transport and device
+        StateCacheTestHelper.setField(cache, "tempo", 90.0);
+        StateCacheTestHelper.setField(cache, "deviceName", "Polysynth");
+        JsonObject delta = cache.getDelta();
+        assertNotNull(delta);
+        JsonObject data = delta.getAsJsonObject("data");
+        assertTrue(data.has("transport"));
+        assertTrue(data.has("device"));
+        assertEquals(data.size(), delta.getAsJsonArray("changed").size());
     }
 }
