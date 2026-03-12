@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.15.5` |
 | **Phase** | 15 — gig-maestro: Sound Design Device Control |
-| **Status** | `IMPLEMENTING` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 15.5 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
@@ -79,7 +79,7 @@
 
 ## Active Decisions
 
-D-15.1 (Scope), D-15.2 (Preset Nav), D-15.3 (Modulated Values), D-15.4 (System Prompt), D-15.5 (Tools), D-15.6 (Testing) — all ACTIVE
+_None — Phase 15 archived._
 
 ---
 
