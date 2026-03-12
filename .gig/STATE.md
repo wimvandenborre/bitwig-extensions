@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.16.5` |
-| **Phase** | 16 — gig-maestro: Custom Preset Creation |
-| **Status** | `GOVERNED` |
+| **Phase** | 17 — gig-maestro: Live Parameter Feedback |
+| **Status** | `GATHERED` |
 | **Last Batch** | 16.5 — Build verification |
 | **Last Updated** | 2026-03-12 |
 
@@ -84,7 +84,7 @@
 
 ## Active Decisions
 
-_None — Phase 16 archived._
+D-17.1 (Notification content), D-17.2 (getDelta method), D-17.3 (Section-level granularity), D-17.4 (Testing) — all ACTIVE
 
 ---
 

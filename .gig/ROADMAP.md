@@ -29,6 +29,7 @@
 | 14 | gig-maestro: StateCache Unit Tests | v0.14.1–v0.14.5 | complete |
 | 15 | gig-maestro: Sound Design Device Control | v0.15.1–v0.15.5 | complete |
 | 16 | gig-maestro: Custom Preset Creation | v0.16.1–v0.16.5 | complete |
+| 17 | gig-maestro: Live Parameter Feedback | v0.17.1–v0.17.4 | planned |
 
 ## Completed Milestones
 

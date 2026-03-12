@@ -1119,50 +1119,96 @@ public class StateCache {
      * Updates the stored hashes for the next comparison.
      */
     public List<String> getChangedSections() {
+        JsonObject delta = getDelta();
+        if (delta == null) {
+            return List.of();
+        }
         List<String> changed = new ArrayList<>();
-
-        int h;
-
-        h = getTransportState().toString().hashCode();
-        if (h != prevTransportHash) { changed.add("transport"); prevTransportHash = h; }
-
-        h = getTracksState().toString().hashCode();
-        if (h != prevTracksHash) { changed.add("tracks"); prevTracksHash = h; }
-
-        h = getScenesState().toString().hashCode();
-        if (h != prevScenesHash) { changed.add("scenes"); prevScenesHash = h; }
-
-        h = getDeviceState().toString().hashCode();
-        if (h != prevDeviceHash) { changed.add("device"); prevDeviceHash = h; }
-
-        h = getClipState().toString().hashCode();
-        if (h != prevClipHash) { changed.add("clip"); prevClipHash = h; }
-
-        h = getMasterState().toString().hashCode();
-        if (h != prevMasterHash) { changed.add("master"); prevMasterHash = h; }
-
-        h = getApplicationState().toString().hashCode();
-        if (h != prevApplicationHash) { changed.add("application"); prevApplicationHash = h; }
-
-        h = getArrangerState().toString().hashCode();
-        if (h != prevArrangerHash) { changed.add("arranger"); prevArrangerHash = h; }
-
-        h = getArrangementState().toString().hashCode();
-        if (h != prevArrangementHash) { changed.add("arrangement"); prevArrangementHash = h; }
-
-        h = getMasterDeviceState().toString().hashCode();
-        if (h != prevMasterDeviceHash) { changed.add("masterDevice"); prevMasterDeviceHash = h; }
-
-        h = getBrowserState().toString().hashCode();
-        if (h != prevBrowserHash) { changed.add("browser"); prevBrowserHash = h; }
-
-        h = getArpeggiatorState().toString().hashCode();
-        if (h != prevArpeggiatorHash) { changed.add("arpeggiator"); prevArpeggiatorHash = h; }
-
-        h = getNoteLatchState().toString().hashCode();
-        if (h != prevNoteLatchHash) { changed.add("noteLatch"); prevNoteLatchHash = h; }
-
+        for (var entry : delta.getAsJsonObject("data").entrySet()) {
+            changed.add(entry.getKey());
+        }
         return changed;
+    }
+
+    /**
+     * Compare current section hashes against previous flush.
+     * Returns a JsonObject with "changed" (section names) and "data" (section state)
+     * for sections that changed, or null if nothing changed.
+     * Updates the stored hashes for the next comparison.
+     */
+    public JsonObject getDelta() {
+        JsonArray changed = new JsonArray();
+        JsonObject data = new JsonObject();
+
+        checkSection("transport", getTransportState(), changed, data);
+        checkSection("tracks", getTracksState(), changed, data);
+        checkSection("scenes", getScenesState(), changed, data);
+        checkSection("device", getDeviceState(), changed, data);
+        checkSection("clip", getClipState(), changed, data);
+        checkSection("master", getMasterState(), changed, data);
+        checkSection("application", getApplicationState(), changed, data);
+        checkSection("arranger", getArrangerState(), changed, data);
+        checkSection("arrangement", getArrangementState(), changed, data);
+        checkSection("masterDevice", getMasterDeviceState(), changed, data);
+        checkSection("browser", getBrowserState(), changed, data);
+        checkSection("arpeggiator", getArpeggiatorState(), changed, data);
+        checkSection("noteLatch", getNoteLatchState(), changed, data);
+
+        if (changed.isEmpty()) {
+            return null;
+        }
+
+        JsonObject delta = new JsonObject();
+        delta.add("changed", changed);
+        delta.add("data", data);
+        return delta;
+    }
+
+    private void checkSection(String name, JsonObject state, JsonArray changed, JsonObject data) {
+        int h = state.toString().hashCode();
+        int prev = getSectionHash(name);
+        if (h != prev) {
+            changed.add(name);
+            data.add(name, state);
+            setSectionHash(name, h);
+        }
+    }
+
+    private int getSectionHash(String name) {
+        return switch (name) {
+            case "transport" -> prevTransportHash;
+            case "tracks" -> prevTracksHash;
+            case "scenes" -> prevScenesHash;
+            case "device" -> prevDeviceHash;
+            case "clip" -> prevClipHash;
+            case "master" -> prevMasterHash;
+            case "application" -> prevApplicationHash;
+            case "arranger" -> prevArrangerHash;
+            case "arrangement" -> prevArrangementHash;
+            case "masterDevice" -> prevMasterDeviceHash;
+            case "browser" -> prevBrowserHash;
+            case "arpeggiator" -> prevArpeggiatorHash;
+            case "noteLatch" -> prevNoteLatchHash;
+            default -> 0;
+        };
+    }
+
+    private void setSectionHash(String name, int hash) {
+        switch (name) {
+            case "transport" -> prevTransportHash = hash;
+            case "tracks" -> prevTracksHash = hash;
+            case "scenes" -> prevScenesHash = hash;
+            case "device" -> prevDeviceHash = hash;
+            case "clip" -> prevClipHash = hash;
+            case "master" -> prevMasterHash = hash;
+            case "application" -> prevApplicationHash = hash;
+            case "arranger" -> prevArrangerHash = hash;
+            case "arrangement" -> prevArrangementHash = hash;
+            case "masterDevice" -> prevMasterDeviceHash = hash;
+            case "browser" -> prevBrowserHash = hash;
+            case "arpeggiator" -> prevArpeggiatorHash = hash;
+            case "noteLatch" -> prevNoteLatchHash = hash;
+        }
     }
 
     private JsonObject getTransportState() {
