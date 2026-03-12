@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.9.3` |
-| **Phase** | 9 — launchpad-mk2: Test Coverage |
+| **Version** | `0.10.4` |
+| **Phase** | 10 — launchpad-mk2: Extension Behavioral Tests |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 9.3 — Verify full build |
+| **Last Batch** | 10.4 — Verify full build |
 | **Last Updated** | 2026-03-11 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.10.4 | 10 | Verify full build | PLANNED | done | 2026-03-11 |
+| 0.10.3 | 10 | LaunchpadMk2InitTest | PLANNED | done | 2026-03-11 |
+| 0.10.2 | 10 | LaunchpadMk2MidiInputTest | PLANNED | done | 2026-03-11 |
+| 0.10.1 | 10 | Shared mock setup + LaunchpadMk2FlushTest | PLANNED | done | 2026-03-11 |
 | 0.9.3 | 9 | Verify full build | PLANNED | done | 2026-03-11 |
 | 0.9.2 | 9 | LaunchpadMk2ColorsTest + LaunchpadMk2ExtensionDefinitionTest | PLANNED | done | 2026-03-11 |
 | 0.9.1 | 9 | Add test dependencies to launchpad-mk2 | PLANNED | done | 2026-03-11 |
@@ -56,7 +60,7 @@
 
 ## Active Decisions
 
-_None — phase 9 archived._
+_None — phase 10 archived._
 
 ---
 
