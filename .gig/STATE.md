@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.6.7` |
-| **Phase** | 6 — gig-maestro: Expand Mockito Coverage |
+| **Version** | `0.7.2` |
+| **Phase** | 7 — gig-maestro: MacroHandler + TransactionHandler Tests |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 6.7 — Verify full build |
+| **Last Batch** | 7.2 — Verify full build |
 | **Last Updated** | 2026-03-11 |
 
 ---
@@ -18,6 +18,8 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.7.2 | 7 | Verify full build | PLANNED | done | 2026-03-11 |
+| 0.7.1 | 7 | MacroHandler + TransactionHandler edge-case tests | PLANNED | done | 2026-03-11 |
 | 0.6.7 | 6 | Verify full build | PLANNED | done | 2026-03-11 |
 | 0.6.6 | 6 | BrowserHandler | PLANNED | done | 2026-03-11 |
 | 0.6.5 | 6 | DeviceHandler + MasterDeviceHandler | PLANNED | done | 2026-03-11 |
@@ -49,10 +51,7 @@
 
 ## Active Decisions
 
-- D-6.1: 11 direct-API handlers; defer MacroHandler + TransactionHandler
-- D-6.2: Test Bitwig API calls only; skip StateCache-only methods
-- D-6.3: Same Phase 5 conventions (@ExtendWith, @Mock, arrange-act-verify)
-- D-6.4: 7 batches grouped by domain affinity
+_None — phase 7 archived._
 
 ---
 

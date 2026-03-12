@@ -27,7 +27,8 @@ class MacroHandlerTest {
 
         // Register stub handlers that log calls
         dispatcher.register("track/createAudio", params -> {
-            callLog.add("track/createAudio");
+            callLog.add("track/createAudio" + (params.has("position")
+                ? ":pos=" + params.get("position").getAsInt() : ""));
             return new JsonPrimitive("ok");
         });
         dispatcher.register("track/createInstrument", params -> {
@@ -140,6 +141,13 @@ class MacroHandlerTest {
         assertTrue(response.contains("missing") && response.contains("type"));
     }
 
+    @Test
+    void createTrack_withPosition_forwardsPosition() {
+        handle("macro/createTrack", """
+            {"type":"audio","position":3}""");
+        assertEquals(List.of("track/createAudio:pos=3"), callLog);
+    }
+
     // --- macro/createClip ---
 
     @Test
@@ -154,6 +162,22 @@ class MacroHandlerTest {
         String response = handle("macro/createClip", """
             {"sceneIndex":0,"lengthBeats":8}""");
         assertTrue(response.contains("error"));
+    }
+
+    @Test
+    void createClip_missingSceneIndex_returnsError() {
+        String response = handle("macro/createClip", """
+            {"trackIndex":0,"lengthBeats":8}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("sceneIndex"));
+    }
+
+    @Test
+    void createClip_missingLengthBeats_returnsError() {
+        String response = handle("macro/createClip", """
+            {"trackIndex":0,"sceneIndex":1}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("lengthBeats"));
     }
 
     // --- macro/writeClip ---
@@ -204,6 +228,24 @@ class MacroHandlerTest {
         String response = handle("macro/writeClip", """
             {"trackIndex":0,"sceneIndex":0,"lengthBeats":4,"stepSize":0.25}""");
         assertTrue(response.contains("error"));
+    }
+
+    @Test
+    void writeClip_missingStepSize_returnsError() {
+        String response = handle("macro/writeClip", """
+            {"trackIndex":0,"sceneIndex":0,"lengthBeats":4,
+             "notes":[{"x":0,"y":60,"velocity":100,"duration":1}]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("stepSize"));
+    }
+
+    @Test
+    void writeClip_missingTrackIndex_returnsError() {
+        String response = handle("macro/writeClip", """
+            {"sceneIndex":0,"lengthBeats":4,"stepSize":0.25,
+             "notes":[{"x":0,"y":60,"velocity":100,"duration":1}]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("trackIndex"));
     }
 
     // --- macro/buildSection ---
@@ -305,6 +347,28 @@ class MacroHandlerTest {
         assertEquals(1, result.get("clipCount").getAsInt());
     }
 
+    @Test
+    void buildSection_clipMissingTrackIndex_returnsError() {
+        String response = handle("macro/buildSection", """
+            {"sceneName":"Test","clips":[
+                {"lengthBeats":8,"stepSize":0.25,
+                 "notes":[{"x":0,"y":60,"velocity":100,"duration":1}]}
+            ]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("trackIndex"));
+    }
+
+    @Test
+    void buildSection_clipMissingLengthBeats_returnsError() {
+        String response = handle("macro/buildSection", """
+            {"sceneName":"Test","clips":[
+                {"trackIndex":0,"stepSize":0.25,
+                 "notes":[{"x":0,"y":60,"velocity":100,"duration":1}]}
+            ]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("lengthBeats"));
+    }
+
     // --- macro/setupScenes ---
 
     @Test
@@ -337,6 +401,14 @@ class MacroHandlerTest {
         JsonObject result = parseResult(response);
         assertEquals(2, result.get("created").getAsInt());
         assertEquals(2, result.get("renamed").getAsInt());
+    }
+
+    @Test
+    void setupScenes_sceneMissingName_returnsError() {
+        String response = handle("macro/setupScenes", """
+            {"scenes":[{"index":0}]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("name"));
     }
 
     @Test

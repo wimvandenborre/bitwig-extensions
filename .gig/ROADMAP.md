@@ -19,6 +19,7 @@
 | 4 | gig-maestro: Test Coverage Expansion | v0.4.1–v0.4.4 | complete |
 | 5 | gig-maestro: Mockito Behavioral Testing | v0.5.1–v0.5.4 | complete |
 | 6 | gig-maestro: Expand Mockito Coverage | v0.6.1–v0.6.7 | complete |
+| 7 | gig-maestro: MacroHandler + TransactionHandler Tests | v0.7.1–v0.7.2 | complete |
 
 ## Completed Milestones
 
