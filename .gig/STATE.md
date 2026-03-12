@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.7.2` |
-| **Phase** | 7 — gig-maestro: MacroHandler + TransactionHandler Tests |
+| **Version** | `0.8.2` |
+| **Phase** | 8 — gig-maestro: Integration Tests |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 7.2 — Verify full build |
+| **Last Batch** | 8.2 — Verify full build |
 | **Last Updated** | 2026-03-11 |
 
 ---
@@ -18,6 +18,8 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.8.2 | 8 | Verify full build | PLANNED | done | 2026-03-11 |
+| 0.8.1 | 8 | HandlerRegistrationIntegrationTest + GigMaestroDefinitionTest | PLANNED | done | 2026-03-11 |
 | 0.7.2 | 7 | Verify full build | PLANNED | done | 2026-03-11 |
 | 0.7.1 | 7 | MacroHandler + TransactionHandler edge-case tests | PLANNED | done | 2026-03-11 |
 | 0.6.7 | 6 | Verify full build | PLANNED | done | 2026-03-11 |
@@ -51,7 +53,7 @@
 
 ## Active Decisions
 
-_None — phase 7 archived._
+_None — phase 8 archived._
 
 ---
 
