@@ -7,9 +7,9 @@
 
 ## Active Phase
 
-_No active phase. Run `/gig:gather` to start the next phase._
+### Phase 11 — gig-maestro: CLI Test Coverage (v0.11.x)
 
-<!-- ARCHIVED: Phase 11 — gig-maestro: CLI Test Coverage (v0.11.x)
+> Add comprehensive unit tests for the gig-maestro CLI (`src/cli/`) covering RPC client formatting, command structure validation, and behavioral tests for all command subcommands (Transport, Track, Device, Note) using a FakeRpcClient that intercepts calls without HTTP. Rename existing SongCommandTest to CliCommandStructureTest and expand coverage.
 
 **Decisions:** D-11.1, D-11.2, D-11.3, D-11.4, D-11.5
 
@@ -127,7 +127,6 @@ _No active phase. Run `/gig:gather` to start the next phase._
 - [ ] `./gradlew clean build` passes with all tests green
 
 **Completion triggers Phase 12 → version `0.12.0`**
--->
 
 <!-- ARCHIVED: Phase 10 — launchpad-mk2: Extension Behavioral Tests (v0.10.x)
 
