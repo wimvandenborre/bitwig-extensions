@@ -116,6 +116,7 @@ public class StateCache {
     private final double[] paramValues = new double[PARAM_COUNT];
     private final String[] paramDisplayedValues = new String[PARAM_COUNT];
     private final boolean[] paramHasAutomation = new boolean[PARAM_COUNT];
+    private final double[] paramModulatedValues = new double[PARAM_COUNT];
 
     // Master device state (master cursor device)
     private volatile String masterDeviceName = "";
@@ -140,6 +141,7 @@ public class StateCache {
     private final String[] masterParamNames = new String[PARAM_COUNT];
     private final double[] masterParamValues = new double[PARAM_COUNT];
     private final String[] masterParamDisplayedValues = new String[PARAM_COUNT];
+    private final double[] masterParamModulatedValues = new double[PARAM_COUNT];
 
     // Cursor clip state
     private volatile int clipPlayingStep = -1;
@@ -582,6 +584,9 @@ public class StateCache {
 
             param.hasAutomation().markInterested();
             param.hasAutomation().addValueObserver((BooleanValueChangedCallback) v -> paramHasAutomation[idx] = v);
+
+            param.modulatedValue().markInterested();
+            param.modulatedValue().addValueObserver((DoubleValueChangedCallback) v -> paramModulatedValues[idx] = v);
         }
     }
 
@@ -873,6 +878,9 @@ public class StateCache {
 
             param.value().displayedValue().markInterested();
             param.value().displayedValue().addValueObserver((StringValueChangedCallback) v -> masterParamDisplayedValues[idx] = (String) v);
+
+            param.modulatedValue().markInterested();
+            param.modulatedValue().addValueObserver((DoubleValueChangedCallback) v -> masterParamModulatedValues[idx] = v);
         }
     }
 
@@ -1321,6 +1329,7 @@ public class StateCache {
             param.addProperty("index", i);
             param.addProperty("name", paramNames[i] != null ? paramNames[i] : "");
             param.addProperty("value", paramValues[i]);
+            param.addProperty("modulatedValue", paramModulatedValues[i]);
             param.addProperty("displayedValue", paramDisplayedValues[i] != null ? paramDisplayedValues[i] : "");
             param.addProperty("hasAutomation", paramHasAutomation[i]);
             params.add(param);
@@ -1372,6 +1381,7 @@ public class StateCache {
             param.addProperty("index", i);
             param.addProperty("name", masterParamNames[i] != null ? masterParamNames[i] : "");
             param.addProperty("value", masterParamValues[i]);
+            param.addProperty("modulatedValue", masterParamModulatedValues[i]);
             param.addProperty("displayedValue", masterParamDisplayedValues[i] != null ? masterParamDisplayedValues[i] : "");
             params.add(param);
         }
