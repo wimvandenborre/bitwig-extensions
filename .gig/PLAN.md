@@ -15,10 +15,10 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 17.1 | `0.17.1` | StateCache getDelta() method | in-session | pending |
-| 17.2 | `0.17.2` | Flush loop: broadcast delta data | in-session | pending |
-| 17.3 | `0.17.3` | Delta notification tests | in-session | pending |
-| 17.4 | `0.17.4` | Build verification | in-session | pending |
+| 17.1 | `0.17.1` | StateCache getDelta() method | in-session | done |
+| 17.2 | `0.17.2` | Flush loop: broadcast delta data | in-session | done |
+| 17.3 | `0.17.3` | Delta notification tests | in-session | done |
+| 17.4 | `0.17.4` | Build verification | in-session | done |
 
 ### Batch 17.1 — StateCache getDelta() method
 
