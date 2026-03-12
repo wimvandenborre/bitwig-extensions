@@ -18,6 +18,8 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -323,6 +325,102 @@ class MasterDeviceHandlerTest {
     void selectPageByTag_previous_callsSelectPreviousPageMatching() {
         dispatcher.handle(rpc("masterDevice/selectPageByTag", "{\"tag\":\"lfo\",\"direction\":\"previous\"}"));
         verify(mockRemoteControlsPage).selectPreviousPageMatching("lfo", true);
+    }
+
+    // --- masterDevice/setParameters validation ---
+
+    @Test
+    void setParameters_missingPages_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/setParameters", "{}"));
+        assertContains(response, "-32602");
+        assertContains(response, "pages");
+    }
+
+    @Test
+    void setParameters_emptyPages_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/setParameters", "{\"pages\":[]}"));
+        assertContains(response, "-32602");
+        assertContains(response, "empty");
+    }
+
+    @Test
+    void setParameters_paramIndexOutOfRange_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/setParameters",
+            "{\"pages\":[{\"pageIndex\":0,\"params\":[{\"index\":8,\"value\":0.5}]}]}"));
+        assertContains(response, "-32602");
+        assertContains(response, "out of range");
+    }
+
+    @Test
+    void setParameters_paramValueOutOfRange_returnsError() {
+        String response = dispatcher.handle(rpc("masterDevice/setParameters",
+            "{\"pages\":[{\"pageIndex\":0,\"params\":[{\"index\":0,\"value\":1.5}]}]}"));
+        assertContains(response, "-32602");
+        assertContains(response, "out of range");
+    }
+
+    // --- masterDevice/setParameters behavioral ---
+
+    @Test
+    void setParameters_singlePage_setsParametersImmediately() {
+        List<Runnable> scheduledTasks = new ArrayList<>();
+        JsonRpcDispatcher localDispatcher = new JsonRpcDispatcher();
+        new MasterDeviceHandler(mockMasterTrack, mockCursorDevice,
+            mockRemoteControlsPage, mockDeviceLibrary,
+            (task, delay) -> scheduledTasks.add(task)).register(localDispatcher);
+
+        when(mockRemoteControlsPage.selectedPageIndex()).thenReturn(mockPageIndex);
+        RemoteControl mockParam0 = mock(RemoteControl.class);
+        RemoteControl mockParam1 = mock(RemoteControl.class);
+        SettableRangedValue mockVal0 = mock(SettableRangedValue.class);
+        SettableRangedValue mockVal1 = mock(SettableRangedValue.class);
+        when(mockRemoteControlsPage.getParameter(0)).thenReturn(mockParam0);
+        when(mockRemoteControlsPage.getParameter(1)).thenReturn(mockParam1);
+        when(mockParam0.value()).thenReturn(mockVal0);
+        when(mockParam1.value()).thenReturn(mockVal1);
+
+        String response = localDispatcher.handle(rpc("masterDevice/setParameters",
+            "{\"pages\":[{\"pageIndex\":0,\"params\":[{\"index\":0,\"value\":0.25},{\"index\":1,\"value\":0.75}]}]}"));
+
+        assertContains(response, "\"ok\":true");
+        verify(mockPageIndex).set(0);
+        verify(mockVal0).setImmediately(0.25);
+        verify(mockVal1).setImmediately(0.75);
+        assertTrue(scheduledTasks.isEmpty(), "Single page should not schedule any tasks");
+    }
+
+    @Test
+    void setParameters_multiPage_schedulesSubsequentPages() {
+        List<Runnable> scheduledTasks = new ArrayList<>();
+        JsonRpcDispatcher localDispatcher = new JsonRpcDispatcher();
+        new MasterDeviceHandler(mockMasterTrack, mockCursorDevice,
+            mockRemoteControlsPage, mockDeviceLibrary,
+            (task, delay) -> scheduledTasks.add(task)).register(localDispatcher);
+
+        when(mockRemoteControlsPage.selectedPageIndex()).thenReturn(mockPageIndex);
+        RemoteControl mockParam0 = mock(RemoteControl.class);
+        RemoteControl mockParam2 = mock(RemoteControl.class);
+        SettableRangedValue mockVal0 = mock(SettableRangedValue.class);
+        SettableRangedValue mockVal2 = mock(SettableRangedValue.class);
+        when(mockRemoteControlsPage.getParameter(0)).thenReturn(mockParam0);
+        when(mockRemoteControlsPage.getParameter(2)).thenReturn(mockParam2);
+        when(mockParam0.value()).thenReturn(mockVal0);
+        when(mockParam2.value()).thenReturn(mockVal2);
+
+        String response = localDispatcher.handle(rpc("masterDevice/setParameters",
+            "{\"pages\":["
+            + "{\"pageIndex\":0,\"params\":[{\"index\":0,\"value\":0.5}]},"
+            + "{\"pageIndex\":1,\"params\":[{\"index\":2,\"value\":0.9}]}"
+            + "]}"));
+
+        assertContains(response, "\"ok\":true");
+        verify(mockPageIndex).set(0);
+        verify(mockVal0).setImmediately(0.5);
+        assertEquals(1, scheduledTasks.size(), "Second page should be scheduled");
+
+        scheduledTasks.get(0).run();
+        verify(mockPageIndex).set(1);
+        verify(mockVal2).setImmediately(0.9);
     }
 
     // --- Helpers ---
