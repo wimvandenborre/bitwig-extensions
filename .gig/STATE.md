@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.16.5` |
 | **Phase** | 16 — gig-maestro: Custom Preset Creation |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 16.5 — Build verification |
 | **Last Updated** | 2026-03-12 |
 
@@ -84,7 +84,7 @@
 
 ## Active Decisions
 
-D-16.1 (Scope), D-16.2 (Batch Setter), D-16.3 (System Prompt), D-16.4 (Testing) — all ACTIVE
+_None — Phase 16 archived._
 
 ---
 
