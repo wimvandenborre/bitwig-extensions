@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.12.3` |
 | **Phase** | 12 — gig-maestro: Handler Gap Coverage |
-| **Status** | `IMPLEMENTING` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 12.3 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
@@ -18,6 +18,9 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.12.3 | 12 | Verify full build | PLANNED | done | 2026-03-12 |
+| 0.12.2 | 12 | filterReset + getFilters + getResults + scrollResults tests | PLANNED | done | 2026-03-12 |
+| 0.12.1 | 12 | Mock StateCache + filter cursor behavioral tests | PLANNED | done | 2026-03-12 |
 | 0.11.5 | 11 | Verify full build | PLANNED | done | 2026-03-12 |
 | 0.11.4 | 11 | DeviceNoteCommandTest | PLANNED | done | 2026-03-12 |
 | 0.11.3 | 11 | TransportCommandTest + TrackCommandTest | PLANNED | done | 2026-03-12 |
@@ -65,7 +68,7 @@
 
 ## Active Decisions
 
-D-12.1 (Audit Result), D-12.2 (StateCache Mocking), D-12.3 (Test Structure) — all ACTIVE
+_None — phase 12 archived._
 
 ---
 
