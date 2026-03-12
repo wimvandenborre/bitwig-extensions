@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.13.3` |
 | **Phase** | 13 — gig-maestro: E2E Integration Testing |
-| **Status** | `IMPLEMENTING` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 13.3 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
@@ -18,6 +18,9 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.13.3 | 13 | Verify full build | PLANNED | done | 2026-03-12 |
+| 0.13.2 | 13 | HttpPipelineIntegrationTest | PLANNED | done | 2026-03-12 |
+| 0.13.1 | 13 | CommandQueueTest (pre-existing) | PLANNED | done | 2026-03-12 |
 | 0.12.3 | 12 | Verify full build | PLANNED | done | 2026-03-12 |
 | 0.12.2 | 12 | filterReset + getFilters + getResults + scrollResults tests | PLANNED | done | 2026-03-12 |
 | 0.12.1 | 12 | Mock StateCache + filter cursor behavioral tests | PLANNED | done | 2026-03-12 |
@@ -68,7 +71,7 @@
 
 ## Active Decisions
 
-D-13.1 (Scope), D-13.2 (CommandQueue), D-13.3 (HTTP Pipeline), D-13.4 (Test Organization) — all ACTIVE
+_None — phase 13 archived._
 
 ---
 
