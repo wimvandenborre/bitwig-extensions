@@ -7,9 +7,7 @@
 
 ## Active Phase
 
-_No active phase. Run `/gig:gather` to start the next phase._
-
-<!-- ARCHIVED: Phase 10 — launchpad-mk2: Extension Behavioral Tests (v0.10.x)
+### Phase 10 — launchpad-mk2: Extension Behavioral Tests (v0.10.x)
 
 > Add comprehensive behavioral tests for `LaunchpadMk2Extension` covering LED flush rendering (grid, scene launch, top row), MIDI input handling (pad press, CC navigation, modal utility actions), and init wiring verification. Uses real constructor with mock ControllerHost and a shared 8×8 mock grid setup.
 
@@ -140,7 +138,6 @@ _No active phase. Run `/gig:gather` to start the next phase._
 - [ ] `./gradlew clean build` passes with all tests green
 
 **Completion triggers Phase 11 → version `0.11.0`**
--->
 
 ---
 
