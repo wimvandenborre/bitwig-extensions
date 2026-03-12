@@ -468,6 +468,60 @@
     }
   },
   {
+    "name": "masterDevice_nextPreset",
+    "description": "Switch to the next preset on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_previousPreset",
+    "description": "Switch to the previous preset on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_nextPresetCategory",
+    "description": "Jump to the next preset category on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_previousPresetCategory",
+    "description": "Jump to the previous preset category on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_nextPresetCreator",
+    "description": "Jump to the next preset creator on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_previousPresetCreator",
+    "description": "Jump to the previous preset creator on the currently selected master device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
     "name": "masterDevice_setEnabled",
     "description": "Enable or disable (bypass) the currently selected device on the master track.",
     "input_schema": {
@@ -881,6 +935,60 @@
   {
     "name": "device_selectPrevious",
     "description": "Select the previous device in the current track's device chain. The cursor device moves to the previous device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_nextPreset",
+    "description": "Switch to the next preset on the currently selected device. Use for quick preset auditioning during sound design.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_previousPreset",
+    "description": "Switch to the previous preset on the currently selected device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_nextPresetCategory",
+    "description": "Jump to the next preset category on the currently selected device. Categories group presets by type (Bass, Lead, Pad, Keys, etc.).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_previousPresetCategory",
+    "description": "Jump to the previous preset category on the currently selected device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_nextPresetCreator",
+    "description": "Jump to the next preset creator (author/vendor) on the currently selected device.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_previousPresetCreator",
+    "description": "Jump to the previous preset creator (author/vendor) on the currently selected device.",
     "input_schema": {
       "type": "object",
       "properties": {},

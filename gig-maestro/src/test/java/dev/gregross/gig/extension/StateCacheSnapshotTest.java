@@ -133,6 +133,7 @@ class StateCacheSnapshotTest {
         JsonObject p0 = params.get(0).getAsJsonObject();
         assertEquals("Cutoff", p0.get("name").getAsString());
         assertEquals(0.75, p0.get("value").getAsDouble(), 0.001);
+        assertEquals(0.62, p0.get("modulatedValue").getAsDouble(), 0.001);
         assertEquals("75%", p0.get("displayedValue").getAsString());
         assertTrue(p0.get("hasAutomation").getAsBoolean());
     }
@@ -261,6 +262,7 @@ class StateCacheSnapshotTest {
         assertEquals(8, params.size());
         assertEquals("Gain", params.get(0).getAsJsonObject().get("name").getAsString());
         assertEquals(0.5, params.get(0).getAsJsonObject().get("value").getAsDouble(), 0.001);
+        assertEquals(0.5, params.get(0).getAsJsonObject().get("modulatedValue").getAsDouble(), 0.001);
     }
 
     @Test

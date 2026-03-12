@@ -107,8 +107,8 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlyTwentyThreeMethods() {
-        assertEquals(23, dispatcher.getRegisteredMethods().size());
+    void registersExactlyTwentyNineMethods() {
+        assertEquals(29, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---
@@ -515,5 +515,54 @@ class DeviceHandlerTest {
     private void assertContains(String actual, String expected) {
         assertTrue(actual.contains(expected),
             "Expected '" + expected + "' in: " + actual);
+    }
+
+    // --- Preset navigation ---
+
+    @Test
+    void registersPresetNavigationMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("device/nextPreset"));
+        assertTrue(methods.contains("device/previousPreset"));
+        assertTrue(methods.contains("device/nextPresetCategory"));
+        assertTrue(methods.contains("device/previousPresetCategory"));
+        assertTrue(methods.contains("device/nextPresetCreator"));
+        assertTrue(methods.contains("device/previousPresetCreator"));
+    }
+
+    @Test
+    void nextPreset_callsSwitchToNextPreset() {
+        dispatcher.handle(rpc("device/nextPreset", "{}"));
+        verify(mockCursorDevice).switchToNextPreset();
+    }
+
+    @Test
+    void previousPreset_callsSwitchToPreviousPreset() {
+        dispatcher.handle(rpc("device/previousPreset", "{}"));
+        verify(mockCursorDevice).switchToPreviousPreset();
+    }
+
+    @Test
+    void nextPresetCategory_callsSwitchToNextPresetCategory() {
+        dispatcher.handle(rpc("device/nextPresetCategory", "{}"));
+        verify(mockCursorDevice).switchToNextPresetCategory();
+    }
+
+    @Test
+    void previousPresetCategory_callsSwitchToPreviousPresetCategory() {
+        dispatcher.handle(rpc("device/previousPresetCategory", "{}"));
+        verify(mockCursorDevice).switchToPreviousPresetCategory();
+    }
+
+    @Test
+    void nextPresetCreator_callsSwitchToNextPresetCreator() {
+        dispatcher.handle(rpc("device/nextPresetCreator", "{}"));
+        verify(mockCursorDevice).switchToNextPresetCreator();
+    }
+
+    @Test
+    void previousPresetCreator_callsSwitchToPreviousPresetCreator() {
+        dispatcher.handle(rpc("device/previousPresetCreator", "{}"));
+        verify(mockCursorDevice).switchToPreviousPresetCreator();
     }
 }
