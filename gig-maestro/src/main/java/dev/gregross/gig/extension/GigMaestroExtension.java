@@ -30,7 +30,6 @@ import dev.gregross.gig.server.ServerManager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class GigMaestroExtension extends ControllerExtension {
@@ -181,20 +180,14 @@ public class GigMaestroExtension extends ControllerExtension {
     public void flush() {
         commandQueue.drainAndExecute(dispatcher);
 
-        // Broadcast state change notifications to WebSocket clients
+        // Broadcast state change notifications with delta data to WebSocket clients
         if (serverManager.getWsClientCount() > 0) {
-            List<String> changed = stateCache.getChangedSections();
-            if (!changed.isEmpty()) {
+            JsonObject delta = stateCache.getDelta();
+            if (delta != null) {
                 JsonObject notification = new JsonObject();
                 notification.addProperty("jsonrpc", "2.0");
                 notification.addProperty("method", "state/changed");
-                JsonObject params = new JsonObject();
-                JsonArray changedArr = new JsonArray();
-                for (String section : changed) {
-                    changedArr.add(section);
-                }
-                params.add("changed", changedArr);
-                notification.add("params", params);
+                notification.add("params", delta);
                 serverManager.broadcast(notification.toString());
             }
         }
