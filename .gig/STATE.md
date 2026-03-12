@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.11.5` |
-| **Phase** | 11 — gig-maestro: CLI Test Coverage |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 11.5 — Verify full build |
+| **Version** | `0.12.3` |
+| **Phase** | 12 — gig-maestro: Handler Gap Coverage |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 12.3 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -65,7 +65,7 @@
 
 ## Active Decisions
 
-_None — phase 11 archived._
+D-12.1 (Audit Result), D-12.2 (StateCache Mocking), D-12.3 (Test Structure) — all ACTIVE
 
 ---
 
