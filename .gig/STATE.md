@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.14.5` |
 | **Phase** | 14 — gig-maestro: StateCache Unit Tests |
-| **Status** | `IMPLEMENTING` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 14.5 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
@@ -74,7 +74,7 @@
 
 ## Active Decisions
 
-D-14.1 (Strategy), D-14.2 (Snapshot), D-14.3 (Getters), D-14.4 (Observer), D-14.5 (Organization) — all ACTIVE
+_None — Phase 14 archived._
 
 ---
 
