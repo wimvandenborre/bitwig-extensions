@@ -271,6 +271,50 @@ class TransactionHandlerTest {
         assertEquals(0, undoCallCount);
     }
 
+    @Test
+    void transactionRollbackOnIllegalArgumentError() {
+        String response = handle("""
+            {"operations":[
+                {"method":"test/add","params":{"a":1,"b":2}},
+                {"method":"test/badParam","params":{}}
+            ],"rollback":"undoAll"}""");
+        JsonObject data = parseError(response).getAsJsonObject("data");
+        assertEquals(1, data.get("completedCount").getAsInt());
+        assertTrue(data.has("rollback"));
+        JsonObject rollback = data.getAsJsonObject("rollback");
+        assertTrue(rollback.get("rolledBack").getAsBoolean());
+        assertEquals(1, rollback.get("undoCount").getAsInt());
+        assertEquals(1, undoCallCount);
+    }
+
+    @Test
+    void transactionRollbackOnIllegalArgCountsCorrectly() {
+        String response = handle("""
+            {"operations":[
+                {"method":"test/add","params":{"a":1,"b":2}},
+                {"method":"test/add","params":{"a":3,"b":4}},
+                {"method":"test/badParam","params":{}}
+            ],"rollback":"undoAll"}""");
+        JsonObject data = parseError(response).getAsJsonObject("data");
+        assertEquals(2, data.get("completedCount").getAsInt());
+        JsonObject rollback = data.getAsJsonObject("rollback");
+        assertEquals(2, rollback.get("undoCount").getAsInt());
+        assertEquals(2, undoCallCount);
+    }
+
+    @Test
+    void transactionRollbackWithPostSnapshot() {
+        String response = handle("""
+            {"operations":[
+                {"method":"test/add","params":{"a":1,"b":2}},
+                {"method":"test/fail","params":{}}
+            ],"rollback":"undoAll","postSnapshot":true}""");
+        JsonObject data = parseError(response).getAsJsonObject("data");
+        assertTrue(data.has("rollback"));
+        assertTrue(data.has("postSnapshot"));
+        assertEquals(1, data.getAsJsonObject("rollback").get("undoCount").getAsInt());
+    }
+
     // --- Validation ---
 
     @Test
@@ -292,6 +336,16 @@ class TransactionHandlerTest {
     void transactionInvalidOperationNotObject() {
         String response = handle("""
             {"operations":["not an object"]}""");
+        JsonObject error = parseError(response);
+        assertEquals(JsonRpcError.INVALID_PARAMS, error.get("code").getAsInt());
+    }
+
+    @Test
+    void transactionInvalidParamsType_returnsError() {
+        String response = handle("""
+            {"operations":[
+                {"method":"test/add","params":[1,2]}
+            ]}""");
         JsonObject error = parseError(response);
         assertEquals(JsonRpcError.INVALID_PARAMS, error.get("code").getAsInt());
     }
