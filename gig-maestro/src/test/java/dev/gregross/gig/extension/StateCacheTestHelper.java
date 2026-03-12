@@ -119,6 +119,7 @@ class StateCacheTestHelper {
         setField(cache, "devicePageNames", new String[]{"Main", "Modulation"});
         setArrayElement(cache, "paramNames", 0, "Cutoff");
         setArrayElement(cache, "paramValues", 0, 0.75);
+        setArrayElement(cache, "paramModulatedValues", 0, 0.62);
         setArrayElement(cache, "paramDisplayedValues", 0, "75%");
         setArrayElement(cache, "paramHasAutomation", 0, true);
     }
@@ -259,6 +260,7 @@ class StateCacheTestHelper {
         setField(cache, "masterDevicePageNames", new String[]{"Main"});
         setArrayElement(cache, "masterParamNames", 0, "Gain");
         setArrayElement(cache, "masterParamValues", 0, 0.5);
+        setArrayElement(cache, "masterParamModulatedValues", 0, 0.5);
         setArrayElement(cache, "masterParamDisplayedValues", 0, "0 dB");
     }
 }

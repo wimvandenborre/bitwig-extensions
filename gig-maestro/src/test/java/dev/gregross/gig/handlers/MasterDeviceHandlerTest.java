@@ -53,7 +53,7 @@ class MasterDeviceHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersFifteenMethods() {
+    void registersTwentyOneMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("masterDevice/selectNext"));
         assertTrue(methods.contains("masterDevice/selectPrevious"));
@@ -70,7 +70,7 @@ class MasterDeviceHandlerTest {
         assertTrue(methods.contains("masterDevice/enterLayer"));
         assertTrue(methods.contains("masterDevice/enterKeyPad"));
         assertTrue(methods.contains("masterDevice/selectPageByTag"));
-        assertEquals(15, methods.size());
+        assertEquals(21, methods.size());
     }
 
     // --- setEnabled validation ---
@@ -333,5 +333,54 @@ class MasterDeviceHandlerTest {
     private void assertContains(String actual, String expected) {
         assertTrue(actual.contains(expected),
             "Expected '" + expected + "' in: " + actual);
+    }
+
+    // --- Preset navigation ---
+
+    @Test
+    void registersPresetNavigationMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("masterDevice/nextPreset"));
+        assertTrue(methods.contains("masterDevice/previousPreset"));
+        assertTrue(methods.contains("masterDevice/nextPresetCategory"));
+        assertTrue(methods.contains("masterDevice/previousPresetCategory"));
+        assertTrue(methods.contains("masterDevice/nextPresetCreator"));
+        assertTrue(methods.contains("masterDevice/previousPresetCreator"));
+    }
+
+    @Test
+    void nextPreset_callsSwitchToNextPreset() {
+        dispatcher.handle(rpc("masterDevice/nextPreset", "{}"));
+        verify(mockCursorDevice).switchToNextPreset();
+    }
+
+    @Test
+    void previousPreset_callsSwitchToPreviousPreset() {
+        dispatcher.handle(rpc("masterDevice/previousPreset", "{}"));
+        verify(mockCursorDevice).switchToPreviousPreset();
+    }
+
+    @Test
+    void nextPresetCategory_callsSwitchToNextPresetCategory() {
+        dispatcher.handle(rpc("masterDevice/nextPresetCategory", "{}"));
+        verify(mockCursorDevice).switchToNextPresetCategory();
+    }
+
+    @Test
+    void previousPresetCategory_callsSwitchToPreviousPresetCategory() {
+        dispatcher.handle(rpc("masterDevice/previousPresetCategory", "{}"));
+        verify(mockCursorDevice).switchToPreviousPresetCategory();
+    }
+
+    @Test
+    void nextPresetCreator_callsSwitchToNextPresetCreator() {
+        dispatcher.handle(rpc("masterDevice/nextPresetCreator", "{}"));
+        verify(mockCursorDevice).switchToNextPresetCreator();
+    }
+
+    @Test
+    void previousPresetCreator_callsSwitchToPreviousPresetCreator() {
+        dispatcher.handle(rpc("masterDevice/previousPresetCreator", "{}"));
+        verify(mockCursorDevice).switchToPreviousPresetCreator();
     }
 }
