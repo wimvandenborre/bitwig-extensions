@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.14.5` |
-| **Phase** | 14 — gig-maestro: StateCache Unit Tests |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 14.5 — Verify full build |
+| **Version** | `0.15.5` |
+| **Phase** | 15 — gig-maestro: Sound Design Device Control |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 15.5 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.15.5 | 15 | Verify full build | PLANNED | done | 2026-03-12 |
+| 0.15.4 | 15 | Handler + StateCache tests | PLANNED | done | 2026-03-12 |
+| 0.15.3 | 15 | Tool definitions + system prompt | PLANNED | done | 2026-03-12 |
+| 0.15.2 | 15 | Modulated parameter values | PLANNED | done | 2026-03-12 |
+| 0.15.1 | 15 | Preset navigation RPC methods | PLANNED | done | 2026-03-12 |
 | 0.14.5 | 14 | Verify full build | PLANNED | done | 2026-03-12 |
 | 0.14.4 | 14 | StateCacheObserverTest | PLANNED | done | 2026-03-12 |
 | 0.14.1-3 | 14 | StateCacheTestHelper + SnapshotTest + GetterTest | PLANNED | done | 2026-03-12 |
@@ -74,7 +79,7 @@
 
 ## Active Decisions
 
-_None — Phase 14 archived._
+D-15.1 (Scope), D-15.2 (Preset Nav), D-15.3 (Modulated Values), D-15.4 (System Prompt), D-15.5 (Tools), D-15.6 (Testing) — all ACTIVE
 
 ---
 
