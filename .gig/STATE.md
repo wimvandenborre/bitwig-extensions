@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.16.5` |
-| **Phase** | 16 — gig-maestro: Custom Preset Creation |
+| **Version** | `0.17.4` |
+| **Phase** | 17 — gig-maestro: Live Parameter Feedback |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 16.5 — Build verification |
+| **Last Batch** | 17.4 — Build verification |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.17.4 | 17 | Build verification | PLANNED | done | 2026-03-12 |
+| 0.17.3 | 17 | Delta notification tests | PLANNED | done | 2026-03-12 |
+| 0.17.2 | 17 | Flush loop: broadcast delta data | PLANNED | done | 2026-03-12 |
+| 0.17.1 | 17 | StateCache getDelta() method | PLANNED | done | 2026-03-12 |
 | 0.16.5 | 16 | Build verification | PLANNED | done | 2026-03-12 |
 | 0.16.4 | 16 | System prompt rewrite | PLANNED | done | 2026-03-12 |
 | 0.16.3 | 16 | Handler tests | PLANNED | done | 2026-03-12 |
@@ -84,7 +88,7 @@
 
 ## Active Decisions
 
-_None — Phase 16 archived._
+_None — Phase 17 archived._
 
 ---
 
