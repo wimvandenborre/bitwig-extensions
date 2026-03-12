@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.12.3` |
-| **Phase** | 12 — gig-maestro: Handler Gap Coverage |
+| **Version** | `0.13.3` |
+| **Phase** | 13 — gig-maestro: E2E Integration Testing |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 12.3 — Verify full build |
+| **Last Batch** | 13.3 — Verify full build |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,9 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.13.3 | 13 | Verify full build | PLANNED | done | 2026-03-12 |
+| 0.13.2 | 13 | HttpPipelineIntegrationTest | PLANNED | done | 2026-03-12 |
+| 0.13.1 | 13 | CommandQueueTest (pre-existing) | PLANNED | done | 2026-03-12 |
 | 0.12.3 | 12 | Verify full build | PLANNED | done | 2026-03-12 |
 | 0.12.2 | 12 | filterReset + getFilters + getResults + scrollResults tests | PLANNED | done | 2026-03-12 |
 | 0.12.1 | 12 | Mock StateCache + filter cursor behavioral tests | PLANNED | done | 2026-03-12 |
@@ -68,7 +71,7 @@
 
 ## Active Decisions
 
-_None — phase 12 archived._
+_None — phase 13 archived._
 
 ---
 

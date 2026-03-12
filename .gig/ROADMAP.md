@@ -25,6 +25,7 @@
 | 10 | launchpad-mk2: Extension Behavioral Tests | v0.10.1–v0.10.4 | complete |
 | 11 | gig-maestro: CLI Test Coverage | v0.11.1–v0.11.5 | complete |
 | 12 | gig-maestro: Handler Gap Coverage | v0.12.1–v0.12.3 | complete |
+| 13 | gig-maestro: E2E Integration Testing | v0.13.1–v0.13.3 | complete |
 
 ## Completed Milestones
 
