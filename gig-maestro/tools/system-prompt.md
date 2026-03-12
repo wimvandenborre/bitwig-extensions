@@ -197,6 +197,116 @@ All 3 methods are also available on `masterDevice_*` for master bus devices.
 6. device_insertBitwigDevice(name: "Polymer")        // add different synth
 ```
 
+**Preset navigation** — quickly audition presets without the browser:
+```
+1. device_nextPreset()                               // cycle through presets
+2. device_previousPreset()                           // go back
+3. device_nextPresetCategory()                       // jump to next category (Bass → Lead → Pad)
+4. device_previousPresetCategory()                   // previous category
+5. device_nextPresetCreator()                        // filter by creator/vendor
+```
+
+**Modulated parameter values** — the snapshot's device parameters now include both `value` (base knob position) and `modulatedValue` (live value after modulation by LFOs, envelopes, etc.). Compare both to understand what modulation is doing to a parameter.
+
+### Sound Design Recipes
+
+Use these recipes as starting points for creating specific sound types. The workflow is: **insert device → load/browse preset → tweak parameters by tag → add FX chain**.
+
+#### Bass Sounds
+
+**Sub Bass** (deep, clean low-end):
+- Device: Polymer or Phase-4
+- Tags: `osc` → set to sine or triangle, `filter` → low-pass cutoff ~0.15–0.25, `env` → instant attack (0.0), medium release (0.3–0.4)
+- FX: Subtle saturation (Amp), low-pass EQ to remove harmonics above ~200Hz
+
+**Pluck Bass** (short, percussive):
+- Device: Polymer or Polysynth
+- Tags: `osc` → saw or square, `filter` → low-pass cutoff ~0.3 with moderate resonance (~0.4), envelope amount high, `env` → instant attack, short decay (0.15–0.25), low sustain (0.1–0.2)
+- FX: Light compression, short reverb or delay for space
+
+**Growl/Reese Bass** (aggressive, modulated):
+- Device: Polymer (wavetable) or Phase-4 (FM)
+- Tags: `osc` → detuned saw pair or FM ratio, `filter` → band-pass or low-pass with LFO modulation on cutoff, `lfo` → rate ~0.1–0.3 synced
+- FX: Distortion (Amp or Treemonster), stereo widener, EQ to tame highs
+
+#### Lead Sounds
+
+**Mono Lead** (classic analog-style):
+- Device: Polymer or Polysynth (set to mono/legato)
+- Tags: `osc` → saw or pulse with PWM, `filter` → low-pass cutoff ~0.4–0.6, moderate resonance, `env` → fast attack, medium sustain, `perf` → portamento/glide
+- FX: Delay (1/4 or dotted 1/8), reverb, subtle chorus
+
+**Poly Lead** (thick, detuned):
+- Device: Polysynth (polyphonic)
+- Tags: `osc` → 2 oscillators slightly detuned (±5-10 cents), `filter` → low-pass cutoff ~0.5–0.7, `env` → medium attack (0.05–0.1)
+- FX: Chorus or flanger, reverb, stereo delay
+
+**Pluck Lead** (short, bell-like):
+- Device: Polymer or FM-4
+- Tags: `osc` → FM or wavetable, `filter` → low-pass with high envelope amount, `env` → instant attack, very short decay (0.05–0.15), zero sustain
+- FX: Long reverb, ping-pong delay
+
+#### Pad Sounds
+
+**Warm Pad** (smooth, analog-style):
+- Device: Polysynth or Polymer
+- Tags: `osc` → saw or triangle, 2+ voices detuned, `filter` → low-pass cutoff ~0.3–0.5, low resonance, `env` → slow attack (0.4–0.7), full sustain, slow release (0.5–0.8)
+- FX: Chorus, long reverb (hall/plate), subtle delay
+
+**Evolving Pad** (movement, texture):
+- Device: Polymer (wavetable mode)
+- Tags: `osc` → wavetable with LFO on position, `lfo` → slow rate (0.02–0.08), `filter` → gentle LFO on cutoff
+- FX: Phaser or flanger, long reverb, stereo widener
+
+**Ambient Pad** (ethereal, spacious):
+- Device: Polymer or Polysynth
+- Tags: `osc` → soft waveform (sine/triangle blend), `filter` → low-pass cutoff ~0.2–0.4, `env` → very slow attack (0.6–0.9), very slow release (0.7–0.9)
+- FX: Heavy reverb (100% wet send), long delay with high feedback (0.5–0.7), EQ to roll off lows
+
+#### Ambient / Texture Sounds
+
+**Drone** (sustained, evolving texture):
+- Use Instrument Layer with 2-3 layers of different pads
+- Each layer: slow LFO on filter cutoff at different rates
+- FX: Reverb → Delay → Reverb chain, heavy wet mix
+
+**Riser** (building tension):
+- Device: Polymer
+- Tags: `osc` → noise or bright waveform, `filter` → automate cutoff from ~0.05 to ~0.8 over time using `device_writeEnvelope`
+- Pair with clip automation on filter cutoff for precise control
+
+**Atmosphere** (background texture):
+- Device: Sampler with textural source or Polymer with noise oscillator
+- Tags: `filter` → band-pass with slow LFO, `env` → slow attack/release
+- FX: Granular delay, long reverb, EQ to carve frequency space
+
+#### Drums / Percussion
+
+**Layered Kick:**
+- Device: Drum Machine → enter key 36 (C2)
+- Layer 1: Sine sub (Phase-4, pure sine, pitch envelope down)
+- Layer 2: Click transient (short noise burst, high-pass filtered)
+- FX per pad: Compression, EQ, subtle saturation
+
+**Snare:**
+- Device: Drum Machine → enter key 38 (D2)
+- Layer 1: Body (triangle/sine, pitch envelope, medium decay)
+- Layer 2: Noise (white noise, band-pass, short decay)
+- FX: Compression, reverb send
+
+**Hi-Hat:**
+- Device: Drum Machine → enter key 42 (F#2, closed) / 46 (Bb2, open)
+- Noise source with high-pass filter, very short envelope for closed, longer for open
+- FX: Gentle EQ to shape brightness
+
+#### Sound Design Workflow
+
+1. **Start from a preset:** Insert a device, then use `device_nextPresetCategory` to jump to the right category (Bass, Lead, Pad, etc.), then `device_nextPreset` to audition presets as starting points.
+2. **Tweak by section:** Use `device_selectPageByTag` to navigate directly to oscillator, filter, envelope, or LFO pages. Adjust parameters with `device_setParameterValue`.
+3. **Check modulation:** After adjusting, call `session_snapshot` and compare `value` vs `modulatedValue` on parameters to see how modulation affects the sound.
+4. **Add FX:** Use `device_insertBitwigDevice` to add effects after the synth. Common chains: Chorus → Delay → Reverb for pads, Distortion → EQ → Compression for bass.
+5. **Layer for thickness:** Use Instrument Layer device to stack multiple synths for rich, complex sounds.
+
 ### Track Management
 
 You can create, select, rename, delete, and duplicate tracks:
