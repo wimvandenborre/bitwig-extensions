@@ -176,15 +176,31 @@ Navigate inside complex devices to access nested layers, drum pads, and specific
 
 All 3 methods are also available on `masterDevice_*` for master bus devices.
 
-**Sound design workflow:**
+**From-scratch sound design workflow:**
 ```
-1. device_insertBitwigDevice(name: "Polymer")       // insert synth
-2. device_selectPageByTag(tag: "osc")                // jump to oscillator page
-3. device_setParameterValue(index: 0, value: 0.7)    // tweak oscillator params
-4. device_selectPageByTag(tag: "filter")             // jump to filter page
-5. device_setParameterValue(index: 0, value: 0.3)    // set filter cutoff
-6. device_selectPageByTag(tag: "env")                // jump to envelope
-7. device_setParameterValue(index: 2, value: 0.5)    // adjust decay
+1. device_insertBitwigDevice(name: "Polymer")        // insert synth
+2. device_selectPage(index: 0)                       // go to first page
+3. session_snapshot()                                 // read page name + params
+4. device_selectPage(index: 1)                       // next page
+5. session_snapshot()                                 // read — repeat to map all pages
+6. // Now you know the device layout. Apply synthesis knowledge:
+7. device_selectPageByTag(tag: "osc")                // jump to oscillator page
+8. device_setParameterValue(index: 0, value: 0.7)    // set waveform/shape
+9. device_selectPageByTag(tag: "filter")             // jump to filter page
+10. device_setParameterValue(index: 0, value: 0.3)   // set filter cutoff
+11. device_selectPageByTag(tag: "env")               // jump to envelope
+12. device_setParameterValue(index: 2, value: 0.5)   // adjust decay
+```
+Or batch multiple parameter changes across pages using `session_transaction`:
+```
+session_transaction(operations: [
+  {method: "device/selectPageByTag", params: {tag: "osc"}},
+  {method: "device/setParameterValue", params: {index: 0, value: 0.7}},
+  {method: "device/selectPageByTag", params: {tag: "filter"}},
+  {method: "device/setParameterValue", params: {index: 0, value: 0.3}},
+  {method: "device/selectPageByTag", params: {tag: "env"}},
+  {method: "device/setParameterValue", params: {index: 2, value: 0.5}}
+], postSnapshot: true)
 ```
 
 **Layer editing workflow (Instrument Layer):**
@@ -197,115 +213,258 @@ All 3 methods are also available on `masterDevice_*` for master bus devices.
 6. device_insertBitwigDevice(name: "Polymer")        // add different synth
 ```
 
-**Preset navigation** — quickly audition presets without the browser:
+**Preset navigation** — presets can serve as starting points to customize, but the primary workflow is from-scratch creation (see "Creating Sounds From Scratch" below):
 ```
-1. device_nextPreset()                               // cycle through presets
-2. device_previousPreset()                           // go back
-3. device_nextPresetCategory()                       // jump to next category (Bass → Lead → Pad)
-4. device_previousPresetCategory()                   // previous category
-5. device_nextPresetCreator()                        // filter by creator/vendor
+1. device_nextPresetCategory()                       // jump to a category (Bass, Lead, Pad, etc.)
+2. device_nextPreset()                               // audition presets within category
+3. device_previousPreset()                           // go back
+4. session_snapshot()                                // read current parameter values
+5. // Now tweak: use device_selectPageByTag + device_setParameterValue to customize
 ```
+When using presets as starting points, always snapshot after loading to understand the current parameter state before making changes.
 
 **Modulated parameter values** — the snapshot's device parameters now include both `value` (base knob position) and `modulatedValue` (live value after modulation by LFOs, envelopes, etc.). Compare both to understand what modulation is doing to a parameter.
 
-### Sound Design Recipes
+### Creating Sounds From Scratch
 
-Use these recipes as starting points for creating specific sound types. The workflow is: **insert device → load/browse preset → tweak parameters by tag → add FX chain**.
+The primary workflow for sound design is creating sounds from scratch by discovering a device's parameters, applying synthesis knowledge, and writing values directly. This produces intentional, understood sounds rather than relying on preset hunting.
 
-#### Bass Sounds
+#### Three-Phase Workflow
 
-**Sub Bass** (deep, clean low-end):
-- Device: Polymer or Phase-4
-- Tags: `osc` → set to sine or triangle, `filter` → low-pass cutoff ~0.15–0.25, `env` → instant attack (0.0), medium release (0.3–0.4)
-- FX: Subtle saturation (Amp), low-pass EQ to remove harmonics above ~200Hz
+**Phase 1: Discover** — Scan the device to build a mental map of its controls.
 
-**Pluck Bass** (short, percussive):
-- Device: Polymer or Polysynth
-- Tags: `osc` → saw or square, `filter` → low-pass cutoff ~0.3 with moderate resonance (~0.4), envelope amount high, `env` → instant attack, short decay (0.15–0.25), low sustain (0.1–0.2)
-- FX: Light compression, short reverb or delay for space
+Every Bitwig synth organizes parameters into pages (8 parameters per page). Page names and tags tell you what each page controls. You must discover these before designing.
 
-**Growl/Reese Bass** (aggressive, modulated):
-- Device: Polymer (wavetable) or Phase-4 (FM)
-- Tags: `osc` → detuned saw pair or FM ratio, `filter` → band-pass or low-pass with LFO modulation on cutoff, `lfo` → rate ~0.1–0.3 synced
-- FX: Distortion (Amp or Treemonster), stereo widener, EQ to tame highs
+```
+1. device_insertBitwigDevice(name: "Polymer")       // insert the synth
+2. device_selectPage(index: 0)                       // go to first page
+3. session_snapshot()                                 // read: pageName, pageTag, parameters[]
+4. device_selectPage(index: 1)                       // advance to next page
+5. session_snapshot()                                 // read — note page name/tag + param names
+6. // Repeat until you've seen all pages (check pageCount in snapshot)
+```
 
-#### Lead Sounds
+Faster alternative — use tag-based jumping to find specific sections:
+```
+1. device_selectPageByTag(tag: "osc")                // jump to first oscillator page
+2. session_snapshot()                                 // read oscillator parameters
+3. device_selectPageByTag(tag: "osc", direction: "next")  // next osc page if multiple
+4. device_selectPageByTag(tag: "filter")             // jump to filter section
+5. session_snapshot()                                 // read filter parameters
+```
 
-**Mono Lead** (classic analog-style):
-- Device: Polymer or Polysynth (set to mono/legato)
-- Tags: `osc` → saw or pulse with PWM, `filter` → low-pass cutoff ~0.4–0.6, moderate resonance, `env` → fast attack, medium sustain, `perf` → portamento/glide
-- FX: Delay (1/4 or dotted 1/8), reverb, subtle chorus
+What to note during discovery:
+- **Page names and tags** — tells you what section you are in (oscillator, filter, envelope, etc.)
+- **Parameter names** — device-specific labels (e.g., "Shape", "Cutoff", "Decay", "Rate")
+- **Current values** — the default starting point (normalized 0.0–1.0)
+- **Parameter count per page** — some pages may have fewer than 8 active parameters
 
-**Poly Lead** (thick, detuned):
-- Device: Polysynth (polyphonic)
-- Tags: `osc` → 2 oscillators slightly detuned (±5-10 cents), `filter` → low-pass cutoff ~0.5–0.7, `env` → medium attack (0.05–0.1)
-- FX: Chorus or flanger, reverb, stereo delay
+**Phase 2: Design** — Apply synthesis knowledge to choose target values.
 
-**Pluck Lead** (short, bell-like):
-- Device: Polymer or FM-4
-- Tags: `osc` → FM or wavetable, `filter` → low-pass with high envelope amount, `env` → instant attack, very short decay (0.05–0.15), zero sustain
-- FX: Long reverb, ping-pong delay
+Before touching any parameters, think about the target sound:
+- What is the fundamental waveform? (Determines harmonic content)
+- How should the filter shape the spectrum? (Brightness, warmth, character)
+- What is the amplitude envelope? (Percussive, sustained, swelling)
+- What modulation creates movement? (LFO targets, rates, depths)
 
-#### Pad Sounds
+Map these decisions to the parameters you discovered. Choose specific values (normalized 0.0–1.0) with reasoning for each.
 
-**Warm Pad** (smooth, analog-style):
-- Device: Polysynth or Polymer
-- Tags: `osc` → saw or triangle, 2+ voices detuned, `filter` → low-pass cutoff ~0.3–0.5, low resonance, `env` → slow attack (0.4–0.7), full sustain, slow release (0.5–0.8)
-- FX: Chorus, long reverb (hall/plate), subtle delay
+**Phase 3: Apply** — Write all parameter values.
 
-**Evolving Pad** (movement, texture):
-- Device: Polymer (wavetable mode)
-- Tags: `osc` → wavetable with LFO on position, `lfo` → slow rate (0.02–0.08), `filter` → gentle LFO on cutoff
-- FX: Phaser or flanger, long reverb, stereo widener
+Use `session_transaction` to batch all changes efficiently:
+```
+session_transaction(operations: [
+  {method: "device/selectPageByTag", params: {tag: "osc"}},
+  {method: "device/setParameterValue", params: {index: 0, value: 0.75}},
+  {method: "device/setParameterValue", params: {index: 1, value: 0.5}},
+  {method: "device/selectPageByTag", params: {tag: "filter"}},
+  {method: "device/setParameterValue", params: {index: 0, value: 0.3}},
+  {method: "device/setParameterValue", params: {index: 1, value: 0.2}},
+  {method: "device/selectPageByTag", params: {tag: "env"}},
+  {method: "device/setParameterValue", params: {index: 0, value: 0.0}},
+  {method: "device/setParameterValue", params: {index: 2, value: 0.4}}
+], postSnapshot: true)
+```
 
-**Ambient Pad** (ethereal, spacious):
-- Device: Polymer or Polysynth
-- Tags: `osc` → soft waveform (sine/triangle blend), `filter` → low-pass cutoff ~0.2–0.4, `env` → very slow attack (0.6–0.9), very slow release (0.7–0.9)
-- FX: Heavy reverb (100% wet send), long delay with high feedback (0.5–0.7), EQ to roll off lows
+Or set parameters one at a time with snapshots between for verification:
+```
+1. device_selectPageByTag(tag: "osc")
+2. device_setParameterValue(index: 0, value: 0.75)
+3. session_snapshot()                                // verify value took effect
+```
 
-#### Ambient / Texture Sounds
+After applying, always snapshot and compare `value` vs `modulatedValue` on parameters to understand how internal modulation (LFOs, envelopes) affects the live sound.
 
-**Drone** (sustained, evolving texture):
-- Use Instrument Layer with 2-3 layers of different pads
-- Each layer: slow LFO on filter cutoff at different rates
-- FX: Reverb → Delay → Reverb chain, heavy wet mix
+#### Synthesis Principles
 
-**Riser** (building tension):
-- Device: Polymer
-- Tags: `osc` → noise or bright waveform, `filter` → automate cutoff from ~0.05 to ~0.8 over time using `device_writeEnvelope`
-- Pair with clip automation on filter cutoff for precise control
+Reference for choosing parameter values when designing sounds.
 
-**Atmosphere** (background texture):
-- Device: Sampler with textural source or Polymer with noise oscillator
-- Tags: `filter` → band-pass with slow LFO, `env` → slow attack/release
-- FX: Granular delay, long reverb, EQ to carve frequency space
+**Oscillators** — the raw harmonic content:
+- **Saw** (value ~0.7–0.8 on shape params): Bright, harmonically rich. All harmonics present. Best for: leads, basses, pads that need presence.
+- **Square/Pulse** (~0.5 on shape): Hollow, woody, odd harmonics only. Best for: basses, chiptune, reedy tones. Pulse width modulation adds movement.
+- **Triangle** (~0.3 on shape): Soft, few harmonics, slightly brighter than sine. Best for: sub basses, gentle pads, bell layers.
+- **Sine** (~0.0 on shape): Pure fundamental, no harmonics. Best for: sub basses, FM carriers, clean tones.
+- **Noise**: No pitch, broadband spectrum. Best for: percussion, risers, texture layers, breath/air effects.
+- **Wavetable**: Morphable timbres — position parameter sweeps through different waveshapes. Best for: evolving sounds, unique timbres.
 
-#### Drums / Percussion
+Note: Shape/waveform parameter mapping varies by device. During the Discover phase, look for parameters named "Shape", "Wave", "Waveform", "Osc Type", or similar on `osc`-tagged pages.
+
+**Filters** — sculpt the harmonic spectrum:
+- **Low-pass** (most common): Removes harmonics above the cutoff frequency. Lower cutoff = warmer/darker, higher = brighter. Use for: taming brightness, warmth, classic synth sounds.
+- **High-pass**: Removes low frequencies below cutoff. Use for: thinning out sounds, removing mud, creating space for other instruments.
+- **Band-pass**: Passes only frequencies around the cutoff. Use for: nasal/vocal qualities, resonance focus, telephone effect.
+- **Notch**: Removes a narrow band at cutoff. Use for: subtle character, phaser-like effects.
+- **Cutoff** (~0.0–1.0): Controls the filter frequency. 0.0 = fully closed (dark), 1.0 = fully open (bright). Most sounds live between 0.15–0.6.
+- **Resonance** (~0.0–1.0): Emphasizes frequencies at the cutoff point. Low (0.0–0.2) = subtle, medium (0.3–0.5) = character, high (0.6+) = aggressive/self-oscillating.
+
+**Envelopes** — shape how parameters change over the life of a note:
+- **Attack** (0.0 = instant, 1.0 = very slow): Instant (0.0) for percussive/plucky sounds. Slow (0.4–0.9) for pads, swells, strings.
+- **Decay** (0.0 = instant, 1.0 = very long): How quickly the sound falls from peak to sustain. Short (0.05–0.2) for plucks, medium (0.2–0.5) for natural sounds.
+- **Sustain** (0.0 = silent, 1.0 = full level): Level held while note is pressed. Zero = fully percussive. Full = organ-like sustain.
+- **Release** (0.0 = instant, 1.0 = very long): How long the sound rings after note release. Short (0.0–0.1) for tight/staccato, long (0.4–0.8) for ambient/reverb-like tails.
+
+Common envelope shapes:
+- Pluck: Attack 0.0, Decay 0.1–0.2, Sustain 0.0–0.1, Release 0.1
+- Pad: Attack 0.4–0.7, Decay 0.3, Sustain 0.7–1.0, Release 0.5–0.8
+- Percussive: Attack 0.0, Decay 0.05–0.15, Sustain 0.0, Release 0.05
+
+**Modulation** — adds movement and expression:
+- **LFO → Filter Cutoff**: Wah/wobble effect. Slow rate (0.02–0.1) = gentle sweep. Fast rate (0.3–0.6) = dubstep wobble.
+- **LFO → Pitch**: Vibrato. Very subtle depth (~0.01–0.03). Rate ~0.4–0.6 for natural vibrato.
+- **LFO → Amplitude**: Tremolo. Rate and depth to taste.
+- **Envelope → Filter**: Classic synth sweep. Filter opens on attack, closes on decay. Adjust envelope amount on filter page.
+- **Velocity → Filter**: Expressive playing — harder hits open the filter more.
+
+On `lfo`-tagged pages, look for: Rate/Speed, Amount/Depth, Shape/Wave, Target/Destination.
+
+#### From-Scratch Recipes
+
+Each recipe describes a workflow: which page tags to visit, what kinds of parameters to look for, and target value ranges. Parameter names vary between devices — use the Discover phase to find the actual names.
+
+##### Bass
+
+**Sub Bass** (deep, clean, fundamental-only):
+- **Goal**: Pure low-end weight, minimal harmonics, tight response.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Find waveform/shape parameter. Set to sine or triangle range (~0.0–0.3). If there is a second oscillator, disable it or set to same range.
+  2. `filter` pages: Find cutoff parameter. Set low-pass cutoff low (~0.15–0.25) to remove upper harmonics. Resonance near zero (~0.0–0.1).
+  3. `env` pages: Find amplitude envelope. Attack instant (0.0), decay medium (0.3), sustain full (1.0), release short-to-medium (0.15–0.3).
+- **FX chain**: `device_insertBitwigDevice` to add subtle saturation (Amp), then EQ to roll off everything above ~200Hz.
+
+**Pluck Bass** (short, percussive, punchy):
+- **Goal**: Defined attack, quick decay, enough harmonics to cut through a mix.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Saw or square waveform (~0.5–0.8). Brighter shapes give more pluck definition.
+  2. `filter` pages: Low-pass cutoff moderate (~0.3–0.4), resonance moderate (~0.3–0.4). Look for filter envelope amount — set high so the filter sweeps down on each note.
+  3. `env` pages: Attack instant (0.0), decay short (0.15–0.25), sustain low (0.1–0.2), release short (0.1–0.15).
+- **FX chain**: Light compression, optional short delay for space.
+
+**Growl/Reese Bass** (aggressive, modulated, moving):
+- **Goal**: Thick, detuned, with filter movement creating growl.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Saw waveform (~0.7–0.8). If detune parameter exists, set moderate (~0.3–0.5) for thickness. If two oscillators, detune them against each other.
+  2. `filter` pages: Low-pass or band-pass. Cutoff moderate (~0.3–0.5), resonance moderate (~0.3–0.5).
+  3. `lfo` pages: Find rate and amount parameters. Route LFO to filter cutoff. Rate slow-to-medium (~0.1–0.3), amount moderate (~0.3–0.5) for wobble.
+  4. `env` pages: Attack instant (0.0), sustain full (1.0), release short (0.1).
+- **FX chain**: Distortion (Amp), EQ to tame harsh highs, optional stereo widener.
+
+##### Leads
+
+**Mono Lead** (classic analog-style, single voice):
+- **Goal**: Cutting, expressive, sits on top of a mix.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Saw waveform (~0.7–0.8) for brightness, or pulse/square (~0.5) for character. Look for voice/polyphony — set to mono if available.
+  2. `filter` pages: Low-pass cutoff medium-high (~0.4–0.6), resonance light-to-moderate (~0.2–0.4). Filter envelope amount medium for attack character.
+  3. `env` pages: Attack fast but not instant (~0.02–0.05), sustain medium-high (0.6–0.8), release medium (0.2–0.3).
+  4. `perf` pages: Look for portamento/glide — set to a small value for legato slides.
+- **FX chain**: Delay (rhythmic, 1/4 or dotted 1/8), reverb (medium), subtle chorus.
+
+**Poly Lead** (thick, detuned, chordal):
+- **Goal**: Rich, wide, multiple voices stacked.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Saw waveform. If detune or unison parameters exist, set detune moderate (~0.2–0.4) and voice count high.
+  2. `filter` pages: Low-pass cutoff higher (~0.5–0.7) to keep brightness, low resonance (~0.1–0.2).
+  3. `env` pages: Attack slightly soft (~0.03–0.08), sustain high (0.7–0.9), release medium (0.25–0.4).
+- **FX chain**: Chorus or flanger for width, reverb, stereo delay.
+
+**Pluck Lead** (short, bell-like, melodic):
+- **Goal**: Bright transient that decays quickly, bell or marimba character.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Wavetable or FM-style waveform if available. Otherwise bright saw/square. Look for harmonic/ratio controls on FM devices.
+  2. `filter` pages: Low-pass with high envelope amount — the filter should open bright on attack then close. Cutoff moderate (~0.3–0.5), resonance low (~0.1–0.2).
+  3. `env` pages: Attack instant (0.0), decay very short (0.05–0.15), sustain zero (0.0), release short (0.1).
+- **FX chain**: Long reverb (hall), ping-pong delay for space.
+
+##### Pads
+
+**Warm Pad** (smooth, analog, enveloping):
+- **Goal**: Soft, blended, fills the frequency spectrum without harshness.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Saw or triangle waveform (~0.3–0.7). If detune/unison exists, light detune (~0.15–0.3) for warmth. Multiple voices if available.
+  2. `filter` pages: Low-pass cutoff moderate (~0.3–0.5), resonance low (~0.0–0.15). The filter should remove harshness but keep body.
+  3. `env` pages: Attack slow (0.4–0.7), sustain full (0.9–1.0), release slow (0.5–0.8). The slow attack is what makes it a pad.
+- **FX chain**: Chorus for width, long reverb (hall or plate), subtle delay.
+
+**Evolving Pad** (movement, textural, shifting):
+- **Goal**: Timbre changes over time — never static, always morphing.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Wavetable waveform if available — look for a position/morph parameter. If not wavetable, use saw with PWM or detune.
+  2. `lfo` pages: This is the key section. Route LFO to wavetable position or filter cutoff. Rate very slow (~0.02–0.08) for gradual evolution. Amount moderate (~0.3–0.5).
+  3. `filter` pages: Low-pass or band-pass, cutoff moderate (~0.3–0.5). Optionally add a second LFO to filter at a different rate for complex movement.
+  4. `env` pages: Attack slow (0.5–0.8), sustain full (1.0), release long (0.6–0.9).
+- **FX chain**: Phaser or flanger (slow rate), long reverb, stereo widener.
+
+**Ambient Pad** (ethereal, spacious, distant):
+- **Goal**: Background wash, subtle and atmospheric, lives in the reverb.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Soft waveform — sine, triangle, or gentle wavetable position (~0.0–0.3 on shape).
+  2. `filter` pages: Low-pass cutoff low (~0.2–0.4) to make it distant and soft. Resonance near zero.
+  3. `env` pages: Very slow attack (0.6–0.9) — the sound fades in gradually. Sustain full (1.0). Very slow release (0.7–0.9) — long tail after note-off.
+- **FX chain**: This sound lives in its effects. Heavy reverb (long decay, high wet), long delay with high feedback (0.5–0.7), EQ to roll off low mud.
+
+##### Ambient / Texture
+
+**Drone** (sustained, slowly evolving harmonic bed):
+- **Goal**: Continuous texture that fills space and shifts subtly over time.
+- **Approach**: Use `device_insertBitwigDevice(name: "Instrument Layer")` with 2–3 layers, each containing a different pad sound. Enter each layer with `device_enterLayer(index: N)`, insert a synth, configure it as a pad with different LFO rates on filter cutoff per layer, then `device_exitToParent()`.
+- **FX chain on parent**: Reverb → Delay → Reverb chain with heavy wet mix. The layered LFO movement at different rates creates constantly shifting texture.
+
+**Riser** (building tension, sweeping upward):
+- **Goal**: Sound that increases in brightness/intensity over time.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Noise or bright waveform (saw ~0.8). Noise is classic for risers.
+  2. `filter` pages: Low-pass, cutoff starts very low (~0.05). The cutoff will be automated upward.
+  3. `env` pages: Attack instant (0.0), sustain full (1.0).
+  4. Use `device_writeEnvelope` to automate the filter cutoff from ~0.05 to ~0.8 over the desired duration. Or use clip automation for precise control.
+- **FX chain**: Reverb with increasing send, delay.
+
+**Atmosphere** (background texture, non-melodic):
+- **Goal**: Subtle, non-intrusive soundscape element that adds depth.
+- **Discover → Design → Apply**:
+  1. `osc` pages: Noise-based or very soft wavetable. Look for noise mix/level parameters.
+  2. `filter` pages: Band-pass for focused character — cutoff moderate (~0.4–0.6) with slow LFO.
+  3. `lfo` pages: Very slow rate (~0.01–0.05), moderate amount. Route to filter cutoff for gentle sweeping.
+  4. `env` pages: Slow attack (0.5–0.7), slow release (0.5–0.7).
+- **FX chain**: Long reverb, granular-style delay, EQ to carve out space for other instruments.
+
+##### Drums / Percussion
 
 **Layered Kick:**
-- Device: Drum Machine → enter key 36 (C2)
-- Layer 1: Sine sub (Phase-4, pure sine, pitch envelope down)
-- Layer 2: Click transient (short noise burst, high-pass filtered)
-- FX per pad: Compression, EQ, subtle saturation
+- Use `device_insertBitwigDevice(name: "Drum Machine")`, then `device_enterKeyPad(key: 36)` (C2).
+- Layer 1: Insert Phase-4 or similar, set to pure sine, look for pitch envelope — set it to sweep down for the kick body.
+- Layer 2: Short noise burst — high-pass filtered for the click transient.
+- FX per pad: Compression, EQ, subtle saturation.
 
 **Snare:**
-- Device: Drum Machine → enter key 38 (D2)
-- Layer 1: Body (triangle/sine, pitch envelope, medium decay)
-- Layer 2: Noise (white noise, band-pass, short decay)
-- FX: Compression, reverb send
+- Enter key 38 (D2) via `device_enterKeyPad(key: 38)`.
+- Layer 1: Body — triangle or sine with pitch envelope, medium decay.
+- Layer 2: Noise — white noise through band-pass filter, short decay for snap.
+- FX: Compression, reverb send.
 
 **Hi-Hat:**
-- Device: Drum Machine → enter key 42 (F#2, closed) / 46 (Bb2, open)
-- Noise source with high-pass filter, very short envelope for closed, longer for open
-- FX: Gentle EQ to shape brightness
-
-#### Sound Design Workflow
-
-1. **Start from a preset:** Insert a device, then use `device_nextPresetCategory` to jump to the right category (Bass, Lead, Pad, etc.), then `device_nextPreset` to audition presets as starting points.
-2. **Tweak by section:** Use `device_selectPageByTag` to navigate directly to oscillator, filter, envelope, or LFO pages. Adjust parameters with `device_setParameterValue`.
-3. **Check modulation:** After adjusting, call `session_snapshot` and compare `value` vs `modulatedValue` on parameters to see how modulation affects the sound.
-4. **Add FX:** Use `device_insertBitwigDevice` to add effects after the synth. Common chains: Chorus → Delay → Reverb for pads, Distortion → EQ → Compression for bass.
-5. **Layer for thickness:** Use Instrument Layer device to stack multiple synths for rich, complex sounds.
+- Enter key 42 (F#2, closed) or key 46 (Bb2, open) via `device_enterKeyPad`.
+- Noise source through high-pass filter. Very short envelope for closed hat, longer decay for open.
+- FX: Gentle EQ to shape brightness.
 
 ### Track Management
 
