@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.10.4` |
-| **Phase** | 10 — launchpad-mk2: Extension Behavioral Tests |
+| **Version** | `0.11.5` |
+| **Phase** | 11 — gig-maestro: CLI Test Coverage |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 10.4 — Verify full build |
-| **Last Updated** | 2026-03-11 |
+| **Last Batch** | 11.5 — Verify full build |
+| **Last Updated** | 2026-03-12 |
 
 ---
 
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.11.5 | 11 | Verify full build | PLANNED | done | 2026-03-12 |
+| 0.11.4 | 11 | DeviceNoteCommandTest | PLANNED | done | 2026-03-12 |
+| 0.11.3 | 11 | TransportCommandTest + TrackCommandTest | PLANNED | done | 2026-03-12 |
+| 0.11.2 | 11 | Rename SongCommandTest → CliCommandStructureTest + expand | PLANNED | done | 2026-03-12 |
+| 0.11.1 | 11 | FakeRpcClient + TestableGigCli + RpcClientFormatTest | PLANNED | done | 2026-03-12 |
 | 0.10.4 | 10 | Verify full build | PLANNED | done | 2026-03-11 |
 | 0.10.3 | 10 | LaunchpadMk2InitTest | PLANNED | done | 2026-03-11 |
 | 0.10.2 | 10 | LaunchpadMk2MidiInputTest | PLANNED | done | 2026-03-11 |
@@ -60,7 +65,7 @@
 
 ## Active Decisions
 
-_None — phase 10 archived._
+_None — phase 11 archived._
 
 ---
 
