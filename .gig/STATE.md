@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.8.2` |
-| **Phase** | 8 — gig-maestro: Integration Tests |
+| **Version** | `0.9.3` |
+| **Phase** | 9 — launchpad-mk2: Test Coverage |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 8.2 — Verify full build |
+| **Last Batch** | 9.3 — Verify full build |
 | **Last Updated** | 2026-03-11 |
 
 ---
@@ -18,6 +18,9 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.9.3 | 9 | Verify full build | PLANNED | done | 2026-03-11 |
+| 0.9.2 | 9 | LaunchpadMk2ColorsTest + LaunchpadMk2ExtensionDefinitionTest | PLANNED | done | 2026-03-11 |
+| 0.9.1 | 9 | Add test dependencies to launchpad-mk2 | PLANNED | done | 2026-03-11 |
 | 0.8.2 | 8 | Verify full build | PLANNED | done | 2026-03-11 |
 | 0.8.1 | 8 | HandlerRegistrationIntegrationTest + GigMaestroDefinitionTest | PLANNED | done | 2026-03-11 |
 | 0.7.2 | 7 | Verify full build | PLANNED | done | 2026-03-11 |
@@ -53,7 +56,7 @@
 
 ## Active Decisions
 
-_None — phase 8 archived._
+_None — phase 9 archived._
 
 ---
 

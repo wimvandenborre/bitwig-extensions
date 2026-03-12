@@ -21,6 +21,7 @@
 | 6 | gig-maestro: Expand Mockito Coverage | v0.6.1–v0.6.7 | complete |
 | 7 | gig-maestro: MacroHandler + TransactionHandler Tests | v0.7.1–v0.7.2 | complete |
 | 8 | gig-maestro: Integration Tests | v0.8.1–v0.8.2 | complete |
+| 9 | launchpad-mk2: Test Coverage | v0.9.1–v0.9.3 | complete |
 
 ## Completed Milestones
 
