@@ -15,10 +15,10 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 18.1 | `0.18.1` | macro/createSound implementation | in-session | pending |
-| 18.2 | `0.18.2` | Tool definition + system prompt update | in-session | pending |
-| 18.3 | `0.18.3` | MacroHandler tests for createSound | in-session | pending |
-| 18.4 | `0.18.4` | Build verification | in-session | pending |
+| 18.1 | `0.18.1` | macro/createSound implementation | in-session | done |
+| 18.2 | `0.18.2` | Tool definition + system prompt update | in-session | done |
+| 18.3 | `0.18.3` | MacroHandler tests for createSound | in-session | done |
+| 18.4 | `0.18.4` | Build verification | in-session | done |
 
 ### Batch 18.1 — macro/createSound implementation
 
