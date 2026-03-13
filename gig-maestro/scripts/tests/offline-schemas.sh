@@ -182,6 +182,15 @@ ALL_TOOLS=(
   app_deactivateEngine
   app_showNotification
   app_setPanelLayout
+  app_toggleInspector
+  app_toggleDevices
+  app_toggleMixer
+  app_toggleNoteEditor
+  app_toggleAutomationEditor
+  app_toggleBrowser
+  app_toggleFullScreen
+  app_previousSubPanel
+  app_nextSubPanel
   project_unsoloAll
   project_unmuteAll
   project_unarmAll
@@ -706,6 +715,11 @@ PROMPT_CHECKS=(
   # gig phase 18 — macro createSound
   "system prompt mentions macro_createSound|macro_createSound"
   "system prompt mentions Creating Sounds From Scratch|Creating Sounds From Scratch"
+  # gig phase 21 — panel visibility toggles
+  "system prompt has panel visibility section|Panel visibility toggles"
+  "system prompt mentions app_toggleDevices|app_toggleDevices"
+  "system prompt mentions app_toggleNoteEditor|app_toggleNoteEditor"
+  "system prompt mentions app_previousSubPanel|app_previousSubPanel"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do

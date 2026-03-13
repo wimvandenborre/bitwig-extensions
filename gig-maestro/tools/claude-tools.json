@@ -2893,6 +2893,87 @@
     }
   },
   {
+    "name": "app_toggleInspector",
+    "description": "Toggle the visibility of the inspector panel in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_toggleDevices",
+    "description": "Toggle the visibility of the device chain panel in Bitwig Studio. Use this to show or hide the device panel without changing the panel layout.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_toggleMixer",
+    "description": "Toggle the visibility of the mixer panel in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_toggleNoteEditor",
+    "description": "Toggle the visibility of the note editor (piano roll) panel in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_toggleAutomationEditor",
+    "description": "Toggle the visibility of the automation editor panel in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_toggleBrowser",
+    "description": "Toggle the visibility of the browser panel in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_toggleFullScreen",
+    "description": "Toggle between full screen and windowed mode in Bitwig Studio.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_previousSubPanel",
+    "description": "Switch to the previous detail sub-panel (cycles between note editor, device, automation).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_nextSubPanel",
+    "description": "Switch to the next detail sub-panel (cycles between note editor, device, automation).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
     "name": "project_unsoloAll",
     "description": "Unsolo all tracks in the project. Clears all solo states at once.",
     "input_schema": {
