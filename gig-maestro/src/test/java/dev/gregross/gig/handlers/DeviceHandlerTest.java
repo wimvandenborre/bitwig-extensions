@@ -355,9 +355,10 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void remove_callsCursorDeviceDeleteObject() {
+    void remove_callsDeleteObjectThenSelectFirstInChannel() {
         dispatcher.handle(rpc("device/remove", "{}"));
         verify(mockCursorDevice).deleteObject();
+        verify(mockCursorDevice).selectFirstInChannel(mockCursorTrack);
     }
 
     // --- Behavioral tests (Mockito) — Page navigation ---

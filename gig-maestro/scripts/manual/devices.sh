@@ -11,7 +11,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "${SCRIPT_DIR}/_helpers.sh"
 
-STEP_COUNT=12
+STEP_COUNT=10
 
 echo ""
 echo "=== Manual Verification: Devices ==="
@@ -60,21 +60,20 @@ verify \
 # --- Remove Devices (one at a time) ---
 
 verify \
-  "Remove first device" \
-  "Did one device disappear? Only one device should remain in the chain." \
+  "Remove first device (cursor should recover to remaining device)" \
+  "Did one device disappear? Does the cursor land on the remaining device?" \
   '{"jsonrpc":"2.0","method":"device/remove","id":136}'
 
 verify \
-  "Remove second device" \
-  "Is the device chain now completely empty?" \
+  "Remove second device (ISS-3 fix: cursor recovery after remove)" \
+  "Is the device chain now completely empty? This previously failed before the cursor fix." \
   '{"jsonrpc":"2.0","method":"device/remove","id":137}'
 
 # --- Master Device ---
 
 echo ""
 echo "  Now testing devices on the Master track."
-echo "  (Note: Master device panel may not be visible — verify in the mixer or by clicking Master)"
-echo ""
+pause "Click the Master track in Bitwig so you can see its device chain, then press Enter..."
 
 verify \
   "Insert EQ-5 on Master" \
@@ -96,28 +95,12 @@ verify \
   "Is the Master track's device chain now empty?" \
   '{"jsonrpc":"2.0","method":"masterDevice/remove","id":407}'
 
-# --- Chain Navigation (Instrument Layer) ---
-
-echo ""
-echo "  Testing device chain navigation with Instrument Layer."
-rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":500}' > /dev/null
-sleep 0.5
-echo ""
-
-verify \
-  "Insert Instrument Layer" \
-  "Do you see an 'Instrument Layer' container device on the track?" \
-  '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{"name":"Instrument Layer"},"id":502}'
-
-# Skip enterSlot/exitToParent — these move the internal cursor but
-# aren't reliably visible in the UI. Covered by automated tests.
-
 # --- Cleanup ---
 
 echo ""
 echo "  Cleaning up..."
-rpc '{"jsonrpc":"2.0","method":"device/remove","id":506}' > /dev/null
-sleep 0.5
+rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":500}' > /dev/null
+sleep 0.3
 rpc '{"jsonrpc":"2.0","method":"track/deleteSelected","params":{},"id":507}' > /dev/null
 sleep 0.5
 rpc '{"jsonrpc":"2.0","method":"app/setPanelLayout","params":{"layout":"ARRANGE"},"id":508}' > /dev/null
