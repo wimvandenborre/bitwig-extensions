@@ -68,6 +68,53 @@ public class ApplicationHandler {
             application.setPanelLayout(layout);
             return new JsonPrimitive("ok");
         });
+
+        // Panel visibility toggles
+        dispatcher.register("app/toggleInspector", params -> {
+            application.toggleInspector();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/toggleDevices", params -> {
+            application.toggleDevices();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/toggleMixer", params -> {
+            application.toggleMixer();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/toggleNoteEditor", params -> {
+            application.toggleNoteEditor();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/toggleAutomationEditor", params -> {
+            application.toggleAutomationEditor();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/toggleBrowser", params -> {
+            application.toggleBrowserVisibility();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/toggleFullScreen", params -> {
+            application.toggleFullScreen();
+            return new JsonPrimitive("ok");
+        });
+
+        // Sub-panel navigation
+        dispatcher.register("app/previousSubPanel", params -> {
+            application.previousSubPanel();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/nextSubPanel", params -> {
+            application.nextSubPanel();
+            return new JsonPrimitive("ok");
+        });
     }
 
     private static final Set<String> PANEL_LAYOUTS = Set.of("ARRANGE", "MIX", "EDIT");
