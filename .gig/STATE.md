@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.19.8` |
 | **Phase** | 19 — gig-maestro: Smoke Test Overhaul |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 19.8 — Manual verification scripts + workflow [UNPLANNED] |
 | **Last Updated** | 2026-03-13 |
 
