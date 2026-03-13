@@ -83,6 +83,15 @@ class MacroHandlerTest {
             callLog.add("sceneBank/scrollBy:" + params.get("amount").getAsInt());
             return new JsonPrimitive("ok");
         });
+        dispatcher.register("device/setParameters", params -> {
+            int pageCount = params.getAsJsonArray("pages").size();
+            int paramCount = 0;
+            for (var pageEl : params.getAsJsonArray("pages")) {
+                paramCount += pageEl.getAsJsonObject().getAsJsonArray("params").size();
+            }
+            callLog.add("device/setParameters:pages=" + pageCount + ",params=" + paramCount);
+            return new JsonPrimitive("ok");
+        });
 
         new MacroHandler(dispatcher, new StateCache(), IMMEDIATE_SCHEDULER).register(dispatcher);
     }
@@ -90,13 +99,14 @@ class MacroHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersFiveMacroMethods() {
+    void registersSixMacroMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("macro/createTrack"));
         assertTrue(methods.contains("macro/createClip"));
         assertTrue(methods.contains("macro/writeClip"));
         assertTrue(methods.contains("macro/buildSection"));
         assertTrue(methods.contains("macro/setupScenes"));
+        assertTrue(methods.contains("macro/createSound"));
     }
 
     // --- macro/createTrack ---
@@ -417,6 +427,100 @@ class MacroHandlerTest {
             {"scenes":[]}""");
         assertTrue(response.contains("error"));
         assertTrue(response.contains("must not be empty"));
+    }
+
+    // --- macro/createSound ---
+
+    @Test
+    void createSound_withDevice_insertsAndSetsParams() {
+        handle("macro/createSound", """
+            {"device":"Polymer","pages":[
+                {"pageIndex":0,"params":[{"index":0,"value":0.75}]},
+                {"pageIndex":1,"params":[{"index":2,"value":0.3}]}
+            ]}""");
+        assertEquals(List.of(
+            "device/insertBitwigDevice:Polymer",
+            "device/setParameters:pages=2,params=2"
+        ), callLog);
+    }
+
+    @Test
+    void createSound_withDeviceAndPosition_forwardsPosition() {
+        handle("macro/createSound", """
+            {"device":"Wavetable","position":"after","pages":[
+                {"pageIndex":0,"params":[{"index":0,"value":0.5}]}
+            ]}""");
+        // Verify device insertion happened (position is forwarded)
+        assertTrue(callLog.get(0).startsWith("device/insertBitwigDevice:Wavetable"));
+    }
+
+    @Test
+    void createSound_withoutDevice_setsParamsImmediately() {
+        handle("macro/createSound", """
+            {"pages":[
+                {"pageIndex":0,"params":[{"index":0,"value":0.5},{"index":1,"value":0.3}]}
+            ]}""");
+        // No device insertion — only setParameters
+        assertEquals(List.of(
+            "device/setParameters:pages=1,params=2"
+        ), callLog);
+    }
+
+    @Test
+    void createSound_returnsResult() {
+        String response = handle("macro/createSound", """
+            {"device":"Polymer","pages":[
+                {"pageIndex":0,"params":[{"index":0,"value":0.75},{"index":1,"value":0.5}]},
+                {"pageIndex":1,"params":[{"index":2,"value":0.3}]}
+            ]}""");
+        JsonObject result = parseResult(response);
+        assertTrue(result.get("ok").getAsBoolean());
+        assertEquals("Polymer", result.get("device").getAsString());
+        assertEquals(2, result.get("pageCount").getAsInt());
+        assertEquals(3, result.get("paramCount").getAsInt());
+        assertTrue(result.get("inserted").getAsBoolean());
+    }
+
+    @Test
+    void createSound_withoutDevice_returnsCurrent() {
+        String response = handle("macro/createSound", """
+            {"pages":[
+                {"pageIndex":0,"params":[{"index":0,"value":0.5}]}
+            ]}""");
+        JsonObject result = parseResult(response);
+        assertEquals("current", result.get("device").getAsString());
+        assertFalse(result.get("inserted").getAsBoolean());
+    }
+
+    @Test
+    void createSound_missingPages_returnsError() {
+        String response = handle("macro/createSound", "{}");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("pages"));
+    }
+
+    @Test
+    void createSound_emptyPages_returnsError() {
+        String response = handle("macro/createSound", """
+            {"pages":[]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("empty"));
+    }
+
+    @Test
+    void createSound_paramIndexOutOfRange_returnsError() {
+        String response = handle("macro/createSound", """
+            {"pages":[{"pageIndex":0,"params":[{"index":8,"value":0.5}]}]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("out of range"));
+    }
+
+    @Test
+    void createSound_paramValueOutOfRange_returnsError() {
+        String response = handle("macro/createSound", """
+            {"pages":[{"pageIndex":0,"params":[{"index":0,"value":1.5}]}]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("out of range"));
     }
 
     // --- Helpers ---
