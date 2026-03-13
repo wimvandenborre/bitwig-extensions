@@ -37,6 +37,27 @@ The full Bitwig Controller API v25 reference is at `gig-maestro/docs/bitwig-api-
 - `gig-maestro/scripts/smoke-test.sh` — full smoke suite (requires Bitwig running)
 - `gig-maestro/scripts/smoke-test.sh --offline` — offline tests only
 
+## Testing Requirements
+
+Every phase MUST include all three testing layers during governance:
+
+### 1. Unit Tests (automated, no Bitwig)
+- `./gradlew :gig-maestro:test` — run before every commit
+- Mock-based, verifies logic and validation in isolation
+
+### 2. Smoke Tests (automated, requires Bitwig running)
+- `gig-maestro/scripts/smoke-test.sh` — full suite (online + offline)
+- `gig-maestro/scripts/smoke-test.sh --offline` — schema/build checks only
+- **Must be updated** when new RPC methods or tools are added in a phase
+- Run during governance to catch integration issues
+
+### 3. Manual Validation (requires Bitwig running)
+- Provide `curl` commands to `http://localhost:8787/rpc` for each new feature
+- Include expected responses and what to verify in the Bitwig UI
+- Run during governance before the approval gate
+
+**During `/gig:govern`:** Run all three layers. Report results. Do not skip manual validation.
+
 ## Git Preferences
 
 - **Merge strategy:** Always use regular merge (`--no-ff`), never squash. Do not ask.

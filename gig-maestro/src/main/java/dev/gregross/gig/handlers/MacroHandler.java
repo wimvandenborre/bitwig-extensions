@@ -27,6 +27,7 @@ public class MacroHandler {
         dispatcher.register("macro/writeClip", this::handleWriteClip);
         dispatcher.register("macro/buildSection", this::handleBuildSection);
         dispatcher.register("macro/setupScenes", this::handleSetupScenes);
+        dispatcher.register("macro/createSound", this::handleCreateSound);
     }
 
     private JsonElement handleCreateTrack(JsonObject params) throws Exception {
@@ -243,6 +244,81 @@ public class MacroHandler {
         JsonObject result = new JsonObject();
         result.addProperty("created", createCount);
         result.addProperty("renamed", scenes.size());
+        return result;
+    }
+
+    private JsonElement handleCreateSound(JsonObject params) throws Exception {
+        JsonArray pages = requireArray(params, "pages");
+        if (pages.isEmpty()) {
+            throw new IllegalArgumentException("pages array must not be empty");
+        }
+
+        // Validate all pages up front
+        int totalParams = 0;
+        for (JsonElement pageEl : pages) {
+            JsonObject page = pageEl.getAsJsonObject();
+            if (!page.has("pageIndex")) {
+                throw new IllegalArgumentException("each page must have 'pageIndex'");
+            }
+            JsonArray pageParams = requireArray(page, "params");
+            if (pageParams.isEmpty()) {
+                throw new IllegalArgumentException("each page must have a non-empty 'params' array");
+            }
+            for (JsonElement paramEl : pageParams) {
+                JsonObject p = paramEl.getAsJsonObject();
+                if (!p.has("index") || !p.has("value")) {
+                    throw new IllegalArgumentException("each param must have 'index' and 'value'");
+                }
+                int idx = p.get("index").getAsInt();
+                if (idx < 0 || idx >= 8) {
+                    throw new IllegalArgumentException("parameter index out of range: 0-7, got " + idx);
+                }
+                double val = p.get("value").getAsDouble();
+                if (val < 0.0 || val > 1.0) {
+                    throw new IllegalArgumentException("parameter value out of range: 0.0-1.0, got " + val);
+                }
+                totalParams++;
+            }
+        }
+
+        boolean inserted = false;
+        String deviceName = "current";
+
+        if (params.has("device") && !params.get("device").isJsonNull()) {
+            deviceName = params.get("device").getAsString();
+            String position = params.has("position") && !params.get("position").isJsonNull()
+                ? params.get("position").getAsString() : "end";
+
+            // Phase 1: insert device immediately
+            JsonObject deviceParams = new JsonObject();
+            deviceParams.addProperty("name", deviceName);
+            deviceParams.addProperty("position", position);
+            dispatcher.handleInternal("device/insertBitwigDevice", deviceParams);
+            inserted = true;
+
+            // Phase 2: set parameters after flush (device needs to initialize)
+            JsonObject setParamsPayload = new JsonObject();
+            setParamsPayload.add("pages", pages);
+            scheduler.schedule(() -> {
+                try {
+                    dispatcher.handleInternal("device/setParameters", setParamsPayload);
+                } catch (Exception e) {
+                    // Deferred parameter set failed
+                }
+            }, FLUSH_DELAY_MS);
+        } else {
+            // No device insertion — set parameters immediately
+            JsonObject setParamsPayload = new JsonObject();
+            setParamsPayload.add("pages", pages);
+            dispatcher.handleInternal("device/setParameters", setParamsPayload);
+        }
+
+        JsonObject result = new JsonObject();
+        result.addProperty("ok", true);
+        result.addProperty("device", deviceName);
+        result.addProperty("pageCount", pages.size());
+        result.addProperty("paramCount", totalParams);
+        result.addProperty("inserted", inserted);
         return result;
     }
 

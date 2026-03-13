@@ -271,27 +271,29 @@ Map these decisions to the parameters you discovered. Choose specific values (no
 
 **Phase 3: Apply** — Write all parameter values.
 
-Use `session_transaction` to batch all changes efficiently:
+**Preferred: Use `macro_createSound` for single-call sound creation.** This handles device insertion (optional) + multi-page parameter setting with proper flush-cycle timing:
+```
+macro_createSound(
+  device: "Polymer",                         // omit to reshape current device
+  pages: [
+    {pageIndex: 0, params: [{index: 0, value: 0.75}, {index: 1, value: 0.5}]},
+    {pageIndex: 1, params: [{index: 0, value: 0.3}, {index: 1, value: 0.2}]},
+    {pageIndex: 2, params: [{index: 0, value: 0.0}, {index: 2, value: 0.4}]}
+  ]
+)
+```
+
+**Alternative: Use `session_transaction` for page-tag-based navigation** (when you know tags but not page indices):
 ```
 session_transaction(operations: [
   {method: "device/selectPageByTag", params: {tag: "osc"}},
   {method: "device/setParameterValue", params: {index: 0, value: 0.75}},
-  {method: "device/setParameterValue", params: {index: 1, value: 0.5}},
   {method: "device/selectPageByTag", params: {tag: "filter"}},
-  {method: "device/setParameterValue", params: {index: 0, value: 0.3}},
-  {method: "device/setParameterValue", params: {index: 1, value: 0.2}},
-  {method: "device/selectPageByTag", params: {tag: "env"}},
-  {method: "device/setParameterValue", params: {index: 0, value: 0.0}},
-  {method: "device/setParameterValue", params: {index: 2, value: 0.4}}
+  {method: "device/setParameterValue", params: {index: 0, value: 0.3}}
 ], postSnapshot: true)
 ```
 
-Or set parameters one at a time with snapshots between for verification:
-```
-1. device_selectPageByTag(tag: "osc")
-2. device_setParameterValue(index: 0, value: 0.75)
-3. session_snapshot()                                // verify value took effect
-```
+**Tip:** Use `macro_createSound` without `device` to reshape an existing sound — same parameter-setting workflow, no device insertion.
 
 After applying, always snapshot and compare `value` vs `modulatedValue` on parameters to understand how internal modulation (LFOs, envelopes) affects the live sound.
 
