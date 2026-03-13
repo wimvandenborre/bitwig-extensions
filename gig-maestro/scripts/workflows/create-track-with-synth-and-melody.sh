@@ -54,7 +54,8 @@ verify \
 # 2. Add devices (ensure device panel is visible)
 # ============================================================
 
-pause "Make sure the device panel is visible (press D in Bitwig to toggle it), then press Enter..."
+rpc '{"jsonrpc":"2.0","method":"app/toggleDevices","id":4}' > /dev/null
+sleep 0.3
 
 verify \
   "Add Polymer synthesizer" \

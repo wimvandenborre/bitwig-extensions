@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.20.3` |
-| **Phase** | 20 — gig-maestro: Device Cursor Fix |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 20.3 — Update manual + smoke tests, resolve ISS-3 |
+| **Version** | `0.21.4` |
+| **Phase** | 21 — gig-maestro: Toggle Panel Visibility RPC |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | 21.4 — Update manual/workflow scripts + build verify |
 | **Last Updated** | 2026-03-13 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.21.4 | 21 | Update manual/workflow scripts + build verify | PLANNED | done | 2026-03-13 |
+| 0.21.3 | 21 | Tool definitions + system prompt | PLANNED | done | 2026-03-13 |
+| 0.21.2 | 21 | Unit tests | PLANNED | done | 2026-03-13 |
+| 0.21.1 | 21 | RPC method implementations | PLANNED | done | 2026-03-13 |
 | 0.20.3 | 20 | Update manual + smoke tests, resolve ISS-3 | PLANNED | done | 2026-03-13 |
 | 0.20.2 | 20 | Unit tests for cursor recovery | PLANNED | done | 2026-03-13 |
 | 0.20.1 | 20 | Fix device/remove cursor recovery | PLANNED | done | 2026-03-13 |
@@ -105,7 +109,7 @@
 
 ## Active Decisions
 
-D-20.1 (selectFirst after deleteObject), D-20.2 (fix master cursor too), D-20.3 (unit + manual tests) — all ACTIVE
+D-21.1 (9 panel toggle RPCs), D-21.2 (app/toggle naming), D-21.3 (tests + tools + scripts) — all ACTIVE
 
 ---
 
