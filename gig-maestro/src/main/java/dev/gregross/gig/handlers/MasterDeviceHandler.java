@@ -120,7 +120,7 @@ public class MasterDeviceHandler {
         // Device removal
         dispatcher.register("masterDevice/remove", params -> {
             cursorDevice.deleteObject();
-            cursorDevice.selectFirst();
+            scheduler.schedule(() -> cursorDevice.selectFirstInChannel(masterTrack), FLUSH_DELAY_MS);
             return new JsonPrimitive("ok");
         });
 

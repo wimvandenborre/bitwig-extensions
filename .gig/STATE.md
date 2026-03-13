@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.19.8` |
-| **Phase** | 19 — gig-maestro: Smoke Test Overhaul |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 19.8 — Manual verification scripts + workflow [UNPLANNED] |
+| **Version** | `0.20.3` |
+| **Phase** | 20 — gig-maestro: Device Cursor Fix |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | 20.3 — Update manual + smoke tests, resolve ISS-3 |
 | **Last Updated** | 2026-03-13 |
 
 ---
@@ -18,6 +18,9 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.20.3 | 20 | Update manual + smoke tests, resolve ISS-3 | PLANNED | done | 2026-03-13 |
+| 0.20.2 | 20 | Unit tests for cursor recovery | PLANNED | done | 2026-03-13 |
+| 0.20.1 | 20 | Fix device/remove cursor recovery | PLANNED | done | 2026-03-13 |
 | 0.19.8 | 19 | Manual verification scripts + workflow | UNPLANNED | done | 2026-03-13 |
 | 0.19.7 | 19 | Delete legacy + verify + docs | PLANNED | done | 2026-03-12 |
 | 0.19.6 | 19 | Fix remaining online failures | PLANNED | done | 2026-03-12 |
@@ -102,7 +105,7 @@
 
 ## Active Decisions
 
-D-19.1 (Script structure), D-19.2 (Shared helpers), D-19.3 (Fix online failures), D-19.4 (Consolidate offline), D-19.5 (Runner modes) — all ACTIVE
+D-20.1 (selectFirst after deleteObject), D-20.2 (fix master cursor too), D-20.3 (unit + manual tests) — all ACTIVE
 
 ---
 

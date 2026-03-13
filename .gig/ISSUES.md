@@ -37,7 +37,7 @@
 **Severity:** Minor
 **Source:** Manual Verification — Phase 19
 **Phase:** 19
-**Status:** OPEN
+**Status:** RESOLVED
 **Description:** After `device/remove` removes the cursor device, the CursorDevice drops to position -1 (no target). Subsequent `device/selectNext`, `device/selectPrevious`, and `device/remove` calls return `ok` but have no effect. The remaining devices on the track are unreachable via the cursor until the user manually clicks a device in the UI.
-**Evidence:** Manual test: insert EQ-5 + Compressor → remove Compressor (works) → remove EQ-5 (returns ok but EQ-5 remains). Snapshot shows `position: -1, name: ""` after first remove.
-**Batch:** —
+**Evidence:** Fixed by adding `selectFirst()` after `deleteObject()` in both device/remove and masterDevice/remove handlers. Unit tests verify call order. Manual double-remove now passes.
+**Batch:** v0.20.1

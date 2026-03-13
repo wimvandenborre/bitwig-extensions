@@ -243,7 +243,7 @@ public class DeviceHandler {
 
         dispatcher.register("device/remove", params -> {
             cursorDevice.deleteObject();
-            cursorDevice.selectFirst();
+            scheduler.schedule(() -> cursorDevice.selectFirstInChannel(cursorTrack), FLUSH_DELAY_MS);
             return new JsonPrimitive("ok");
         });
 
