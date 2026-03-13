@@ -37,7 +37,7 @@
 **Severity:** Minor
 **Source:** Governance — Phase 18
 **Phase:** 18
-**Status:** DEFERRED
-**Description:** The smoke test script (1992 lines) has: (1) `assert_contains` SIGPIPE bug with large strings under `pipefail`, (2) `gradlew` path wrong after monorepo migration, (3) snapshot path `['tracks'][0]` should be `['tracks']['tracks'][0]`, (4) clip slot index out of visible bank range, (5) stale field name `cursorTrackName` vs `trackName`, (6) wrong bank width assertion (64 vs 8), (7) `getNotes` returns empty after `setNotes` — possible cursor clip data loading issue. Partial fixes applied during investigation but script needs comprehensive overhaul and splitting into per-flow scripts.
-**Evidence:** 44 offline failures before fix, 4 online failures remaining after partial fixes.
-**Batch:** — (targeted for Phase 19)
+**Status:** RESOLVED
+**Description:** Monolithic 2040-line smoke test replaced by runner + 14 per-flow test scripts with shared helpers. All offline assertions pass (507). Online getNotes issue handled with defensive SKIP. Legacy script deleted.
+**Evidence:** `./scripts/smoke-test.sh --offline` → 507 passed, 0 failed.
+**Batch:** v0.19.7

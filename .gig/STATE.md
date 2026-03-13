@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.19.6` |
+| **Version** | `0.19.7` |
 | **Phase** | 19 — gig-maestro: Smoke Test Overhaul |
 | **Status** | `IMPLEMENTING` |
-| **Last Batch** | 19.6 — Fix remaining online failures |
+| **Last Batch** | 19.7 — Delete legacy + verify + docs |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.19.7 | 19 | Delete legacy + verify + docs | PLANNED | done | 2026-03-12 |
 | 0.19.6 | 19 | Fix remaining online failures | PLANNED | done | 2026-03-12 |
 | 0.19.5 | 19 | Error tests + health script | PLANNED | done | 2026-03-12 |
 | 0.19.4 | 19 | Online tests (devices, arranger, mixer, browser, project, clip-launcher) | PLANNED | done | 2026-03-12 |
