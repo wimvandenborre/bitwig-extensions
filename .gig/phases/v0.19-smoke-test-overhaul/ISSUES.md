@@ -32,6 +32,16 @@
 **Evidence:** `git tag -l 'launchpad-mk2/*'` shows 4 tags instead of 5. The commit itself is in the history — only the tag pointer was lost.
 **Batch:** —
 
+## ISS-2: Smoke test monolithic script has multiple stale/broken assertions
+
+**Severity:** Minor
+**Source:** Governance — Phase 18
+**Phase:** 18
+**Status:** RESOLVED
+**Description:** Monolithic 2040-line smoke test replaced by runner + 14 per-flow test scripts with shared helpers. All offline assertions pass (507). Online getNotes issue handled with defensive SKIP. Legacy script deleted.
+**Evidence:** `./scripts/smoke-test.sh --offline` → 507 passed, 0 failed.
+**Batch:** v0.19.7
+
 ## ISS-3: device/remove loses cursor after removing current device
 
 **Severity:** Minor

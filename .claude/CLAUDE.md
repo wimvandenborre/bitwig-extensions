@@ -11,7 +11,8 @@ RPC-based Bitwig controller extension + CLI tool.
 - Tests: `gig-maestro/src/test/java/dev/gregross/gig/`
 - Tool schemas: `gig-maestro/tools/claude-tools.json`
 - System prompt: `gig-maestro/tools/system-prompt.md`
-- Smoke tests: `gig-maestro/scripts/smoke-test.sh`
+- Smoke tests: `gig-maestro/scripts/smoke-test.sh` (runner)
+- Test scripts: `gig-maestro/scripts/tests/` (per-flow, shared helpers)
 
 ### launchpad-mk2
 Novation Launchpad MK2 controller extension.
@@ -45,9 +46,15 @@ Every phase MUST include all three testing layers during governance:
 - `./gradlew :gig-maestro:test` — run before every commit
 - Mock-based, verifies logic and validation in isolation
 
-### 2. Smoke Tests (automated, requires Bitwig running)
-- `gig-maestro/scripts/smoke-test.sh` — full suite (online + offline)
-- `gig-maestro/scripts/smoke-test.sh --offline` — schema/build checks only
+### 2. Smoke Tests (automated, per-flow scripts)
+- `gig-maestro/scripts/smoke-test.sh` — runner (all tests)
+- `gig-maestro/scripts/smoke-test.sh --offline` — schema/build checks only (no Bitwig)
+- `gig-maestro/scripts/smoke-test.sh --online` — online tests only (requires Bitwig)
+- `gig-maestro/scripts/smoke-test.sh --only NAME` — run specific test(s)
+- `gig-maestro/scripts/smoke-test.sh --list` — list available test scripts
+- Test scripts live in `gig-maestro/scripts/tests/`, each sourcing `_helpers.sh`
+- Offline scripts: `offline-schemas.sh` (data-driven), `offline-builds.sh`
+- Online scripts: `transport`, `tracks`, `clips`, `notes`, `devices`, `arranger`, `mixer`, `browser`, `project`, `clip-launcher`, `health`, `errors`
 - **Must be updated** when new RPC methods or tools are added in a phase
 - Run during governance to catch integration issues
 

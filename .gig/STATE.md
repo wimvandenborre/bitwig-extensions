@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.18.6` |
-| **Phase** | 18 — gig-maestro: Macro createSound |
+| **Version** | `0.19.8` |
+| **Phase** | 19 — gig-maestro: Smoke Test Overhaul |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 18.6 — Govern and archive |
-| **Last Updated** | 2026-03-12 |
+| **Last Batch** | 19.8 — Manual verification scripts + workflow [UNPLANNED] |
+| **Last Updated** | 2026-03-13 |
 
 ---
 
@@ -18,6 +18,14 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.19.8 | 19 | Manual verification scripts + workflow | UNPLANNED | done | 2026-03-13 |
+| 0.19.7 | 19 | Delete legacy + verify + docs | PLANNED | done | 2026-03-12 |
+| 0.19.6 | 19 | Fix remaining online failures | PLANNED | done | 2026-03-12 |
+| 0.19.5 | 19 | Error tests + health script | PLANNED | done | 2026-03-12 |
+| 0.19.4 | 19 | Online tests (devices, arranger, mixer, browser, project, clip-launcher) | PLANNED | done | 2026-03-12 |
+| 0.19.3 | 19 | Online tests (transport, tracks, clips, notes) | PLANNED | done | 2026-03-12 |
+| 0.19.2 | 19 | Offline test scripts | PLANNED | done | 2026-03-12 |
+| 0.19.1 | 19 | Helpers + runner scaffold | PLANNED | done | 2026-03-12 |
 | 0.18.6 | 18 | Govern and archive | PLANNED | done | 2026-03-12 |
 | 0.18.5 | 18 | Smoke test fixes | UNPLANNED | done | 2026-03-12 |
 | 0.18.4 | 18 | Build verification | PLANNED | done | 2026-03-12 |
@@ -94,7 +102,7 @@
 
 ## Active Decisions
 
-_None — Phase 18 archived._
+D-19.1 (Script structure), D-19.2 (Shared helpers), D-19.3 (Fix online failures), D-19.4 (Consolidate offline), D-19.5 (Runner modes) — all ACTIVE
 
 ---
 
