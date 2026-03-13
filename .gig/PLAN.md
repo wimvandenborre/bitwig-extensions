@@ -22,6 +22,37 @@
 | 19.5 | `0.19.5` | Error tests + cleanup script | in-session | done |
 | 19.6 | `0.19.6` | Fix remaining online failures | in-session | done |
 | 19.7 | `0.19.7` | Delete old script + verify full suite | in-session | done |
+| 19.8 | `0.19.8` | Manual verification scripts + workflow [UNPLANNED] | in-session | done |
+
+### Batch 19.8 — Manual verification scripts + workflow [UNPLANNED]
+
+**Delegation:** in-session
+**Files:**
+- `gig-maestro/scripts/manual/_helpers.sh` (new) — shared infrastructure: verify(), reset_project(), volume/dB conversion, bar math
+- `gig-maestro/scripts/manual/transport.sh` (new) — 9 steps
+- `gig-maestro/scripts/manual/arranger.sh` (new) — 6 steps
+- `gig-maestro/scripts/manual/tracks.sh` (new) — 10 steps
+- `gig-maestro/scripts/manual/clips.sh` (new) — 8 steps
+- `gig-maestro/scripts/manual/devices.sh` (new) — 12 steps
+- `gig-maestro/scripts/manual/mixer.sh` (new) — 7 steps
+- `gig-maestro/scripts/manual/project.sh` (new) — 6 steps
+- `gig-maestro/scripts/manual/notes.sh` (new) — 7 steps
+- `gig-maestro/scripts/manual/all.sh` (new) — runner with --only/--list
+- `gig-maestro/scripts/workflows/create-track-with-synth-and-melody.sh` (new) — 20-step e2e workflow
+- `.gig/ISSUES.md` (modified) — added ISS-3
+
+**Work:**
+1. Interactive manual verification scripts with y/n/s/r prompts for visual verification in Bitwig
+2. Shared helpers: reset_project (clean slate), verify (interactive), volume dB conversion, bar math from time signature
+3. Each script auto-prepares view context (EDIT for notes, MIX for mixer, etc.) and restores ARRANGE on cleanup
+4. End-to-end workflow: create track → add synth + FX → create clip → write melody → transpose duplicate → scene launch → loop
+5. Discovered ISS-3 (device/remove cursor loss) during manual testing
+
+**Test criteria:** All manual scripts pass when run interactively against Bitwig. Workflow completes 20/20 steps.
+
+**Results:** All 8 domain scripts passed (transport: 9/9, arranger: 6/6, tracks: 10/10, clips: 8/8, devices: 11/11+1 known ISS-3, mixer: 7/7, project: 6/6, notes: 7/7). Workflow: 17/17 verified steps passed.
+
+---
 
 ### Batch 19.1 — Helpers + runner scaffold
 
@@ -192,5 +223,7 @@ Each script: sources `_helpers.sh`, runs standalone, saves/restores state.
 - [ ] Runner supports `--offline`, `--online`, `--only`, `--list`
 - [ ] Each test script runnable standalone
 - [ ] ISS-2 resolved
+- [ ] Manual verification scripts for all domains (unplanned)
+- [ ] End-to-end workflow script (unplanned)
 
 **Completion triggers Phase 20 → version `0.20.0`**

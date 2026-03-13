@@ -41,3 +41,13 @@
 **Description:** Monolithic 2040-line smoke test replaced by runner + 14 per-flow test scripts with shared helpers. All offline assertions pass (507). Online getNotes issue handled with defensive SKIP. Legacy script deleted.
 **Evidence:** `./scripts/smoke-test.sh --offline` → 507 passed, 0 failed.
 **Batch:** v0.19.7
+
+## ISS-3: device/remove loses cursor after removing current device
+
+**Severity:** Minor
+**Source:** Manual Verification — Phase 19
+**Phase:** 19
+**Status:** OPEN
+**Description:** After `device/remove` removes the cursor device, the CursorDevice drops to position -1 (no target). Subsequent `device/selectNext`, `device/selectPrevious`, and `device/remove` calls return `ok` but have no effect. The remaining devices on the track are unreachable via the cursor until the user manually clicks a device in the UI.
+**Evidence:** Manual test: insert EQ-5 + Compressor → remove Compressor (works) → remove EQ-5 (returns ok but EQ-5 remains). Snapshot shows `position: -1, name: ""` after first remove.
+**Batch:** —
