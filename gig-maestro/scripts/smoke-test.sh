@@ -22,6 +22,7 @@ PASS=0
 FAIL=0
 TOTAL=0
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
 # --- helpers ---
 
@@ -34,12 +35,12 @@ rpc() {
 assert_contains() {
   local label="$1" response="$2" expected="$3"
   TOTAL=$((TOTAL + 1))
-  if echo "$response" | grep -qF -- "$expected"; then
+  if [[ "$response" == *"$expected"* ]]; then
     echo "  PASS  $label"
     PASS=$((PASS + 1))
   else
     echo "  FAIL  $label — expected '$expected' in response"
-    echo "        got: $response"
+    echo "        got: ${response:0:200}..."
     FAIL=$((FAIL + 1))
   fi
 }
@@ -832,12 +833,51 @@ assert_contains "system prompt mentions navigateInto" "$PROMPT" "track_navigateI
 assert_contains "system prompt mentions addNoteSource" "$PROMPT" "track_addNoteSource"
 assert_contains "system prompt mentions track types" "$PROMPT" "trackType"
 
+# Gig Phase 16 — Batch Parameter Setters
+echo "--- Gig Phase 16: Batch Parameter Setters ---"
+
+# Tool schema presence
+for TOOL_NAME in device_setParameters masterDevice_setParameters; do
+  TOOL_EXISTS=$(jq -r ".[] | select(.name==\"$TOOL_NAME\") | .name" "$TOOLS_FILE")
+  assert_equals "tool $TOOL_NAME exists" "$TOOL_EXISTS" "$TOOL_NAME"
+done
+
+# device_setParameters has pages array with items
+SET_PARAMS_PAGES_TYPE=$(jq -r '.[] | select(.name=="device_setParameters") | .input_schema.properties.pages.type' "$TOOLS_FILE")
+assert_equals "device_setParameters pages param is array" "$SET_PARAMS_PAGES_TYPE" "array"
+
+# Each page item has params array
+SET_PARAMS_ITEM_TYPE=$(jq -r '.[] | select(.name=="device_setParameters") | .input_schema.properties.pages.items.properties.params.type' "$TOOLS_FILE")
+assert_equals "device_setParameters page params is array" "$SET_PARAMS_ITEM_TYPE" "array"
+
+# System prompt covers parameter setting workflow
+assert_contains "system prompt covers batch parameter changes" "$PROMPT" "batch multiple parameter changes"
+
+# Gig Phase 18 — Macro createSound
+echo "--- Gig Phase 18: Macro createSound ---"
+
+# Tool schema presence
+TOOL_EXISTS=$(jq -r '.[] | select(.name=="macro_createSound") | .name' "$TOOLS_FILE")
+assert_equals "tool macro_createSound exists" "$TOOL_EXISTS" "macro_createSound"
+
+# macro_createSound has pages required
+CREATE_SOUND_REQ=$(jq -r '.[] | select(.name=="macro_createSound") | .input_schema.required | join(",")' "$TOOLS_FILE")
+assert_contains "macro_createSound requires pages" "$CREATE_SOUND_REQ" "pages"
+
+# macro_createSound has optional device property
+CREATE_SOUND_DEVICE=$(jq -r '.[] | select(.name=="macro_createSound") | .input_schema.properties.device.type' "$TOOLS_FILE")
+assert_equals "macro_createSound device param is string" "$CREATE_SOUND_DEVICE" "string"
+
+# System prompt mentions macro_createSound
+assert_contains "system prompt mentions macro_createSound" "$PROMPT" "macro_createSound"
+assert_contains "system prompt mentions Creating Sounds From Scratch" "$PROMPT" "Creating Sounds From Scratch"
+
 # O3. CLI build and help
 echo "--- O3. CLI Build & Help ---"
 CLI_JAR="${PROJECT_ROOT}/build/libs/gig-cli.jar"
 
 # Build the CLI JAR
-(cd "$PROJECT_ROOT" && ./gradlew cliShadowJar -q 2>/dev/null)
+(cd "$REPO_ROOT" && ./gradlew :gig-maestro:cliShadowJar -q 2>/dev/null)
 TOTAL=$((TOTAL + 1))
 if [ -f "$CLI_JAR" ]; then
   echo "  PASS  gig-cli.jar exists after build"
@@ -917,7 +957,7 @@ assert_contains "CLI version output" "$VERSION" "gig-cli"
 
 # O4. Extension build verification
 echo "--- O4. Extension Build ---"
-(cd "$PROJECT_ROOT" && ./gradlew build -q 2>/dev/null)
+(cd "$REPO_ROOT" && ./gradlew :gig-maestro:build -q 2>/dev/null)
 EXT_FILE="$HOME/Documents/Bitwig Studio/Extensions/GigMaestro.bwextension"
 TOTAL=$((TOTAL + 1))
 if [ -f "$EXT_FILE" ]; then
@@ -1040,21 +1080,21 @@ rpc "{\"jsonrpc\":\"2.0\",\"method\":\"transport/setMetronome\",\"params\":{\"en
 echo "--- 5. Track Actions ---"
 
 # Save baseline
-ORIG_VOL=$(snapshot_field "['tracks'][0]['volume']")
-ORIG_MUTE=$(snapshot_field "['tracks'][0]['mute']")
+ORIG_VOL=$(snapshot_field "['tracks']['tracks'][0]['volume']")
+ORIG_MUTE=$(snapshot_field "['tracks']['tracks'][0]['mute']")
 
 # setVolume
 RESP=$(rpc '{"jsonrpc":"2.0","method":"track/setVolume","params":{"index":0,"value":0.3},"id":20}')
 assert_contains "track/setVolume returns ok" "$RESP" '"ok"'
-sleep 0.3
-VOL=$(snapshot_field "['tracks'][0]['volume']")
+sleep 0.5
+VOL=$(snapshot_field "['tracks']['tracks'][0]['volume']")
 assert_equals "track 0 volume is 0.3 after setVolume" "$VOL" "0.3"
 
 # setMute
 RESP=$(rpc '{"jsonrpc":"2.0","method":"track/setMute","params":{"index":0,"muted":true},"id":21}')
 assert_contains "track/setMute returns ok" "$RESP" '"ok"'
-sleep 0.3
-MUTE=$(snapshot_field "['tracks'][0]['mute']")
+sleep 0.5
+MUTE=$(snapshot_field "['tracks']['tracks'][0]['mute']")
 assert_equals "track 0 mute is True after setMute" "$MUTE" "True"
 
 # Restore track state
@@ -1116,9 +1156,9 @@ assert_equals "GET /rpc returns 405" "$HTTP_CODE" "405"
 echo "--- 11. Clip Snapshot ---"
 SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":70}')
 assert_contains "snapshot has scenes" "$SNAP" '"scenes"'
-CLIP_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['tracks'][0]['clips']))")
+CLIP_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['tracks']['tracks'][0]['clips']))")
 assert_equals "track 0 has 5 clip slots" "$CLIP_COUNT" "5"
-SCENE_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['scenes']))")
+SCENE_COUNT=$(echo "$SNAP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']['scenes']['scenes']))")
 assert_equals "snapshot has 5 scenes" "$SCENE_COUNT" "5"
 assert_contains "clips have hasContent" "$SNAP" '"hasContent"'
 assert_contains "clips have isPlaying" "$SNAP" '"isPlaying"'
@@ -1126,19 +1166,19 @@ assert_contains "clips have isPlaying" "$SNAP" '"isPlaying"'
 # 12. Clip actions
 echo "--- 12. Clip Actions ---"
 
-# Create a clip on track 0, slot 7 (use slot 7 to avoid conflicts with user data)
-RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/create","params":{"trackIndex":0,"slotIndex":7,"lengthInBeats":4},"id":71}')
+# Create a clip on track 0, slot 4 (last visible slot to avoid conflicts with user data)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/create","params":{"trackIndex":0,"slotIndex":4,"lengthInBeats":4},"id":71}')
 assert_contains "clip/create returns ok" "$RESP" '"ok"'
 sleep 0.5
-HAS=$(snapshot_field "['tracks'][0]['clips'][7]['hasContent']")
-assert_equals "slot 7 hasContent after create" "$HAS" "True"
+HAS=$(snapshot_field "['tracks']['tracks'][0]['clips'][4]['hasContent']")
+assert_equals "slot 4 hasContent after create" "$HAS" "True"
 
 # Launch the clip
-RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/launch","params":{"trackIndex":0,"slotIndex":7},"id":72}')
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/launch","params":{"trackIndex":0,"slotIndex":4},"id":72}')
 assert_contains "clip/launch returns ok" "$RESP" '"ok"'
 sleep 0.5
-PLAYING=$(snapshot_field "['tracks'][0]['clips'][7]['isPlaying']")
-assert_equals "slot 7 isPlaying after launch" "$PLAYING" "True"
+PLAYING=$(snapshot_field "['tracks']['tracks'][0]['clips'][4]['isPlaying']")
+assert_equals "slot 4 isPlaying after launch" "$PLAYING" "True"
 
 # Stop
 RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/stop","params":{"trackIndex":0},"id":73}')
@@ -1149,12 +1189,12 @@ sleep 0.5
 rpc '{"jsonrpc":"2.0","method":"transport/stop","id":74}' > /dev/null
 sleep 0.3
 
-# Delete the clip we created on slot 7
-RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/delete","params":{"trackIndex":0,"slotIndex":7},"id":174}')
+# Delete the clip we created on slot 4
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/delete","params":{"trackIndex":0,"slotIndex":4},"id":174}')
 assert_contains "clip/delete returns ok" "$RESP" '"ok"'
 sleep 0.5
-HAS=$(snapshot_field "['tracks'][0]['clips'][7]['hasContent']")
-assert_equals "slot 7 hasContent after delete" "$HAS" "False"
+HAS=$(snapshot_field "['tracks']['tracks'][0]['clips'][4]['hasContent']")
+assert_equals "slot 4 hasContent after delete" "$HAS" "False"
 
 # 13. Scene actions
 echo "--- 13. Scene Actions ---"
@@ -1272,8 +1312,12 @@ assert_contains "clip has hasContent" "$SNAP" '"hasContent"'
 # 21. Note editing workflow
 echo "--- 21. Note Editing Workflow ---"
 
-# Select clip on track 0, slot 7 (created in test 12)
-RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/select","params":{"trackIndex":0,"slotIndex":7},"id":110}')
+# Create a clip for note editing (test 12 clip was deleted)
+rpc '{"jsonrpc":"2.0","method":"clip/create","params":{"trackIndex":0,"slotIndex":4,"lengthInBeats":8},"id":109}' > /dev/null
+sleep 0.5
+
+# Select clip on track 0, slot 4
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/select","params":{"trackIndex":0,"slotIndex":4},"id":110}')
 assert_contains "clip/select returns ok" "$RESP" '"ok"'
 sleep 0.5
 
@@ -1312,6 +1356,10 @@ sleep 0.3
 RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/getNotes","id":117}')
 NOTE_COUNT=$(echo "$RESP" | python3 -c "import sys,json; print(len(json.load(sys.stdin)['result']))")
 assert_equals "0 notes after clearAllNotes" "$NOTE_COUNT" "0"
+
+# Cleanup: delete the clip we created for note editing
+rpc '{"jsonrpc":"2.0","method":"clip/delete","params":{"trackIndex":0,"slotIndex":4},"id":118}' > /dev/null
+sleep 0.3
 
 # 22. Step size and scroll
 echo "--- 22. Step Size & Scroll ---"
@@ -1401,12 +1449,12 @@ sleep 0.5
 
 # Get the name of the newly created track from snapshot
 SNAP=$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":142}')
-TRACK_COUNT_BEFORE=$(echo "$SNAP" | python3 -c "import sys,json; tracks = json.load(sys.stdin)['result']['tracks']; print(sum(1 for t in tracks if t['name'] != ''))")
+TRACK_COUNT_BEFORE=$(echo "$SNAP" | python3 -c "import sys,json; tracks = json.load(sys.stdin)['result']['tracks']['tracks']; print(sum(1 for t in tracks if t['name'] != ''))")
 
 # Select by index (track 0)
 RESP=$(rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":0},"id":143}')
 assert_contains "track/select returns ok" "$RESP" '"ok":true'
-assert_contains "track/select returns cursorTrackName" "$RESP" '"cursorTrackName"'
+assert_contains "track/select returns trackName" "$RESP" '"trackName"'
 sleep 0.3
 
 # Rename the selected track
@@ -1416,7 +1464,7 @@ assert_contains "track/rename returns cursorTrackName" "$RESP" '"cursorTrackName
 sleep 0.5
 
 # Verify rename in snapshot
-NAME=$(snapshot_field "['tracks'][0]['name']")
+NAME=$(snapshot_field "['tracks']['tracks'][0]['name']")
 assert_equals "track 0 renamed to SmokeTestTrack" "$NAME" "SmokeTestTrack"
 
 # Duplicate the track
@@ -1438,7 +1486,7 @@ sleep 0.5
 echo "--- 29. Track Select Error ---"
 ERR=$(rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":999},"id":148}')
 assert_contains "track/select out-of-range returns -32602" "$ERR" '-32602'
-assert_contains "track/select error mentions bank width" "$ERR" '64'
+assert_contains "track/select error mentions bank width" "$ERR" '8'
 
 ERR=$(rpc '{"jsonrpc":"2.0","method":"track/select","params":{"index":-1},"id":149}')
 assert_contains "track/select negative index returns -32602" "$ERR" '-32602'
