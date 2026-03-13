@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.18.6` |
-| **Phase** | 18 — gig-maestro: Macro createSound |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 18.6 — Govern and archive |
+| **Version** | `0.19.0` |
+| **Phase** | 19 — gig-maestro: Smoke Test Overhaul |
+| **Status** | `GATHERED` |
+| **Last Batch** | — (not started) |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -94,7 +94,7 @@
 
 ## Active Decisions
 
-_None — Phase 18 archived._
+D-19.1 (Script structure), D-19.2 (Shared helpers), D-19.3 (Fix online failures), D-19.4 (Consolidate offline), D-19.5 (Runner modes) — all ACTIVE
 
 ---
 

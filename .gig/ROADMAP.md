@@ -30,7 +30,8 @@
 | 15 | gig-maestro: Sound Design Device Control | v0.15.1–v0.15.5 | complete |
 | 16 | gig-maestro: Custom Preset Creation | v0.16.1–v0.16.5 | complete |
 | 17 | gig-maestro: Live Parameter Feedback | v0.17.1–v0.17.4 | complete |
-| 18 | gig-maestro: Macro createSound | v0.18.1–v0.18.4 | planned |
+| 18 | gig-maestro: Macro createSound | v0.18.1–v0.18.6 | complete |
+| 19 | gig-maestro: Smoke Test Overhaul | v0.19.x | planned |
 
 ## Completed Milestones
 
