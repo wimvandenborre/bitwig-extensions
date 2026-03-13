@@ -862,6 +862,16 @@ Same pattern works for master bus: `masterDevice_enterSlot` / `masterDevice_exit
 
 **Panel layout:** `app_setPanelLayout({ layout: "ARRANGE" })` switches between ARRANGE, MIX, EDIT views. Current layout is in `application.panelLayout` in snapshot.
 
+**Panel visibility toggles** (show/hide panels without changing layout):
+- `app_toggleDevices` — toggle device chain panel
+- `app_toggleNoteEditor` — toggle note editor (piano roll) panel
+- `app_toggleAutomationEditor` — toggle automation editor panel
+- `app_toggleMixer` — toggle mixer panel
+- `app_toggleInspector` — toggle inspector panel
+- `app_toggleBrowser` — toggle browser panel
+- `app_toggleFullScreen` — toggle full screen mode
+- `app_previousSubPanel` / `app_nextSubPanel` — cycle between detail sub-panels (note editor, device, automation)
+
 **Notifications:** `app_showNotification({ text: "Done!" })` shows a temporary popup in Bitwig's UI — the only way to communicate status to the user inside the DAW.
 
 **Transport navigation:**
