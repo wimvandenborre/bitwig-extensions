@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.18.4` |
+| **Version** | `0.18.6` |
 | **Phase** | 18 — gig-maestro: Macro createSound |
-| **Status** | `IMPLEMENTED` |
-| **Last Batch** | 18.4 — Build verification |
+| **Status** | `GOVERNED` |
+| **Last Batch** | 18.6 — Govern and archive |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,8 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.18.6 | 18 | Govern and archive | PLANNED | done | 2026-03-12 |
+| 0.18.5 | 18 | Smoke test fixes | UNPLANNED | done | 2026-03-12 |
 | 0.18.4 | 18 | Build verification | PLANNED | done | 2026-03-12 |
 | 0.18.3 | 18 | MacroHandler tests | PLANNED | done | 2026-03-12 |
 | 0.18.2 | 18 | Tool definition + system prompt | PLANNED | done | 2026-03-12 |
@@ -92,7 +94,7 @@
 
 ## Active Decisions
 
-D-18.1 (Scope), D-18.2 (API shape), D-18.3 (Flush choreography), D-18.4 (Testing) — all ACTIVE
+_None — Phase 18 archived._
 
 ---
 
