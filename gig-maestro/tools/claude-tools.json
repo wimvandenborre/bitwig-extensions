@@ -2787,6 +2787,57 @@
     }
   },
   {
+    "name": "macro_createSound",
+    "description": "Create a sound from scratch in one call. Optionally inserts a Bitwig device, then batch-sets parameters across multiple pages. If 'device' is provided, the device is inserted first and parameter setting is deferred one flush cycle for initialization. If 'device' is omitted, parameters are applied immediately to the currently selected device (reshape mode). Use this as the Apply step in the discover-design-apply workflow. Returns { ok, device, pageCount, paramCount, inserted }.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "type": "string",
+          "description": "Bitwig device name to insert (e.g., 'Polymer', 'Wavetable'). Omit to apply parameters to the currently selected device."
+        },
+        "position": {
+          "type": "string",
+          "enum": ["end", "before", "after"],
+          "description": "Where to insert the device in the chain. Default: 'end'."
+        },
+        "pages": {
+          "type": "array",
+          "description": "Array of page objects, each with pageIndex and params to set on that page.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pageIndex": {
+                "type": "integer",
+                "description": "Remote controls page index (0-based)."
+              },
+              "params": {
+                "type": "array",
+                "description": "Parameters to set on this page.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "index": {
+                      "type": "integer",
+                      "description": "Parameter index within the page (0-7)."
+                    },
+                    "value": {
+                      "type": "number",
+                      "description": "Normalized parameter value (0.0 to 1.0)."
+                    }
+                  },
+                  "required": ["index", "value"]
+                }
+              }
+            },
+            "required": ["pageIndex", "params"]
+          }
+        }
+      },
+      "required": ["pages"]
+    }
+  },
+  {
     "name": "app_activateEngine",
     "description": "Activate the Bitwig audio engine. Use when the engine has been deactivated and needs to be restarted.",
     "input_schema": {
