@@ -221,9 +221,11 @@ class MasterDeviceHandlerTest {
     }
 
     @Test
-    void remove_callsCursorDeviceDeleteObject() {
+    void remove_callsDeleteObjectThenSelectFirst() {
         dispatcher.handle(rpc("masterDevice/remove", "{}"));
-        verify(mockCursorDevice).deleteObject();
+        var inOrder = org.mockito.Mockito.inOrder(mockCursorDevice);
+        inOrder.verify(mockCursorDevice).deleteObject();
+        inOrder.verify(mockCursorDevice).selectFirst();
     }
 
     // --- Behavioral tests (Mockito) — Page navigation ---
