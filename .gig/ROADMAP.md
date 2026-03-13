@@ -32,6 +32,7 @@
 | 17 | gig-maestro: Live Parameter Feedback | v0.17.1–v0.17.4 | complete |
 | 18 | gig-maestro: Macro createSound | v0.18.1–v0.18.6 | complete |
 | 19 | gig-maestro: Smoke Test Overhaul | v0.19.1–v0.19.8 | complete |
+| 20 | gig-maestro: Device Cursor Fix | v0.20.1–v0.20.3 | complete |
 
 ## Completed Milestones
 

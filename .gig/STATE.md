@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.20.3` |
 | **Phase** | 20 — gig-maestro: Device Cursor Fix |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 20.3 — Update manual + smoke tests, resolve ISS-3 |
 | **Last Updated** | 2026-03-13 |
 
