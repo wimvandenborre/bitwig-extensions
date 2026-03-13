@@ -32,7 +32,7 @@ class ApplicationHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersSevenMethods() {
+    void registersSixteenMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("app/undo"));
         assertTrue(methods.contains("app/redo"));
@@ -41,7 +41,16 @@ class ApplicationHandlerTest {
         assertTrue(methods.contains("app/deactivateEngine"));
         assertTrue(methods.contains("app/showNotification"));
         assertTrue(methods.contains("app/setPanelLayout"));
-        assertEquals(7, methods.size());
+        assertTrue(methods.contains("app/toggleInspector"));
+        assertTrue(methods.contains("app/toggleDevices"));
+        assertTrue(methods.contains("app/toggleMixer"));
+        assertTrue(methods.contains("app/toggleNoteEditor"));
+        assertTrue(methods.contains("app/toggleAutomationEditor"));
+        assertTrue(methods.contains("app/toggleBrowser"));
+        assertTrue(methods.contains("app/toggleFullScreen"));
+        assertTrue(methods.contains("app/previousSubPanel"));
+        assertTrue(methods.contains("app/nextSubPanel"));
+        assertEquals(16, methods.size());
     }
 
     // --- showNotification validation ---
@@ -112,6 +121,62 @@ class ApplicationHandlerTest {
         dispatcher.handle(rpc("app/setPanelLayout", "{\"layout\":\"ARRANGE\"}"));
 
         verify(mockApplication).setPanelLayout("ARRANGE");
+    }
+
+    // --- Panel toggle behavioral tests ---
+
+    @Test
+    void toggleInspector_callsApplicationToggleInspector() {
+        dispatcher.handle(rpc("app/toggleInspector", "{}"));
+        verify(mockApplication).toggleInspector();
+    }
+
+    @Test
+    void toggleDevices_callsApplicationToggleDevices() {
+        dispatcher.handle(rpc("app/toggleDevices", "{}"));
+        verify(mockApplication).toggleDevices();
+    }
+
+    @Test
+    void toggleMixer_callsApplicationToggleMixer() {
+        dispatcher.handle(rpc("app/toggleMixer", "{}"));
+        verify(mockApplication).toggleMixer();
+    }
+
+    @Test
+    void toggleNoteEditor_callsApplicationToggleNoteEditor() {
+        dispatcher.handle(rpc("app/toggleNoteEditor", "{}"));
+        verify(mockApplication).toggleNoteEditor();
+    }
+
+    @Test
+    void toggleAutomationEditor_callsApplicationToggleAutomationEditor() {
+        dispatcher.handle(rpc("app/toggleAutomationEditor", "{}"));
+        verify(mockApplication).toggleAutomationEditor();
+    }
+
+    @Test
+    void toggleBrowser_callsApplicationToggleBrowserVisibility() {
+        dispatcher.handle(rpc("app/toggleBrowser", "{}"));
+        verify(mockApplication).toggleBrowserVisibility();
+    }
+
+    @Test
+    void toggleFullScreen_callsApplicationToggleFullScreen() {
+        dispatcher.handle(rpc("app/toggleFullScreen", "{}"));
+        verify(mockApplication).toggleFullScreen();
+    }
+
+    @Test
+    void previousSubPanel_callsApplicationPreviousSubPanel() {
+        dispatcher.handle(rpc("app/previousSubPanel", "{}"));
+        verify(mockApplication).previousSubPanel();
+    }
+
+    @Test
+    void nextSubPanel_callsApplicationNextSubPanel() {
+        dispatcher.handle(rpc("app/nextSubPanel", "{}"));
+        verify(mockApplication).nextSubPanel();
     }
 
     // --- Helpers ---
