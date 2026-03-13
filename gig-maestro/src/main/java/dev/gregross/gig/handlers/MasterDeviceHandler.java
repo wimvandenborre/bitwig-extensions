@@ -120,6 +120,7 @@ public class MasterDeviceHandler {
         // Device removal
         dispatcher.register("masterDevice/remove", params -> {
             cursorDevice.deleteObject();
+            cursorDevice.selectFirst();
             return new JsonPrimitive("ok");
         });
 
