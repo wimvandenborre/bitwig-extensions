@@ -18,7 +18,7 @@ echo "--- Track Color ---"
 
 RESP=$(rpc '{"jsonrpc":"2.0","method":"track/setColor","params":{"index":0,"r":0.8,"g":0.2,"b":0.4},"id":302}')
 assert_contains "track/setColor returns ok" "$RESP" '"ok":true'
-sleep 0.5
+sleep 1.0
 R=$(echo "$(rpc '{"jsonrpc":"2.0","method":"session/snapshot","id":303}')" | python3 -c "import sys,json; c = json.load(sys.stdin)['result']['tracks']['tracks'][0]['color']; print(round(c['r'], 1))")
 assert_equals "track 0 color.r is 0.8 after setColor" "$R" "0.8"
 

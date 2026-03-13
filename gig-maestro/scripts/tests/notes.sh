@@ -7,8 +7,9 @@
 echo "--- Note Editing Workflow ---"
 
 # Create a clip for note editing
-rpc '{"jsonrpc":"2.0","method":"clip/create","params":{"trackIndex":0,"slotIndex":4,"lengthInBeats":8},"id":109}' > /dev/null
-sleep 0.5
+RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/create","params":{"trackIndex":0,"slotIndex":4,"lengthInBeats":8},"id":109}')
+assert_contains "clip/create for notes returns ok" "$RESP" '"ok"'
+sleep 1.5
 
 # Select clip on track 0, slot 4
 RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/select","params":{"trackIndex":0,"slotIndex":4},"id":110}')

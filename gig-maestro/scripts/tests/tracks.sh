@@ -13,14 +13,14 @@ ORIG_MUTE=$(snapshot_field "['tracks']['tracks'][0]['mute']")
 # setVolume
 RESP=$(rpc '{"jsonrpc":"2.0","method":"track/setVolume","params":{"index":0,"value":0.3},"id":20}')
 assert_contains "track/setVolume returns ok" "$RESP" '"ok"'
-sleep 0.5
+sleep 1.0
 VOL=$(snapshot_field "['tracks']['tracks'][0]['volume']")
 assert_equals "track 0 volume is 0.3 after setVolume" "$VOL" "0.3"
 
 # setMute
 RESP=$(rpc '{"jsonrpc":"2.0","method":"track/setMute","params":{"index":0,"muted":true},"id":21}')
 assert_contains "track/setMute returns ok" "$RESP" '"ok"'
-sleep 0.5
+sleep 1.0
 MUTE=$(snapshot_field "['tracks']['tracks'][0]['mute']")
 assert_equals "track 0 mute is True after setMute" "$MUTE" "True"
 

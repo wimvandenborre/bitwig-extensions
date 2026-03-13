@@ -20,14 +20,14 @@ echo "--- Clip Actions ---"
 # Create a clip on track 0, slot 4 (last visible slot to avoid conflicts)
 RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/create","params":{"trackIndex":0,"slotIndex":4,"lengthInBeats":4},"id":71}')
 assert_contains "clip/create returns ok" "$RESP" '"ok"'
-sleep 0.5
+sleep 1.0
 HAS=$(snapshot_field "['tracks']['tracks'][0]['clips'][4]['hasContent']")
 assert_equals "slot 4 hasContent after create" "$HAS" "True"
 
 # Launch the clip
 RESP=$(rpc '{"jsonrpc":"2.0","method":"clip/launch","params":{"trackIndex":0,"slotIndex":4},"id":72}')
 assert_contains "clip/launch returns ok" "$RESP" '"ok"'
-sleep 0.5
+sleep 1.0
 PLAYING=$(snapshot_field "['tracks']['tracks'][0]['clips'][4]['isPlaying']")
 assert_equals "slot 4 isPlaying after launch" "$PLAYING" "True"
 
