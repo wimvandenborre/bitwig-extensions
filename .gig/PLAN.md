@@ -15,11 +15,11 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 19.1 | `0.19.1` | Helpers + runner scaffold | in-session | pending |
-| 19.2 | `0.19.2` | Offline test scripts | in-session | pending |
-| 19.3 | `0.19.3` | Online test scripts (transport, tracks, clips, notes) | team | pending |
-| 19.4 | `0.19.4` | Online test scripts (devices, arranger, mixer, browser, project, clip-launcher) | team | pending |
-| 19.5 | `0.19.5` | Error tests + cleanup script | in-session | pending |
+| 19.1 | `0.19.1` | Helpers + runner scaffold | in-session | done |
+| 19.2 | `0.19.2` | Offline test scripts | in-session | done |
+| 19.3 | `0.19.3` | Online test scripts (transport, tracks, clips, notes) | team | done |
+| 19.4 | `0.19.4` | Online test scripts (devices, arranger, mixer, browser, project, clip-launcher) | team | done |
+| 19.5 | `0.19.5` | Error tests + cleanup script | in-session | done |
 | 19.6 | `0.19.6` | Fix remaining online failures | in-session | pending |
 | 19.7 | `0.19.7` | Delete old script + verify full suite | in-session | pending |
 

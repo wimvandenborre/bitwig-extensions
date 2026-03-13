@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.19.0` |
+| **Version** | `0.19.5` |
 | **Phase** | 19 — gig-maestro: Smoke Test Overhaul |
-| **Status** | `GATHERED` |
-| **Last Batch** | — (not started) |
+| **Status** | `IMPLEMENTING` |
+| **Last Batch** | 19.5 — Error tests + health script |
 | **Last Updated** | 2026-03-12 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.19.5 | 19 | Error tests + health script | PLANNED | done | 2026-03-12 |
+| 0.19.4 | 19 | Online tests (devices, arranger, mixer, browser, project, clip-launcher) | PLANNED | done | 2026-03-12 |
+| 0.19.3 | 19 | Online tests (transport, tracks, clips, notes) | PLANNED | done | 2026-03-12 |
+| 0.19.2 | 19 | Offline test scripts | PLANNED | done | 2026-03-12 |
+| 0.19.1 | 19 | Helpers + runner scaffold | PLANNED | done | 2026-03-12 |
 | 0.18.6 | 18 | Govern and archive | PLANNED | done | 2026-03-12 |
 | 0.18.5 | 18 | Smoke test fixes | UNPLANNED | done | 2026-03-12 |
 | 0.18.4 | 18 | Build verification | PLANNED | done | 2026-03-12 |
