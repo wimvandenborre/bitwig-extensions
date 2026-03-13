@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.17.4` |
-| **Phase** | 17 — gig-maestro: Live Parameter Feedback |
-| **Status** | `GOVERNED` |
+| **Phase** | 18 — gig-maestro: Macro createSound |
+| **Status** | `GATHERED` |
 | **Last Batch** | 17.4 — Build verification |
 | **Last Updated** | 2026-03-12 |
 
@@ -88,7 +88,7 @@
 
 ## Active Decisions
 
-_None — Phase 17 archived._
+D-18.1 (Scope), D-18.2 (API shape), D-18.3 (Flush choreography), D-18.4 (Testing) — all ACTIVE
 
 ---
 
