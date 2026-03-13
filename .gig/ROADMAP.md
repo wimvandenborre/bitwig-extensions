@@ -33,6 +33,7 @@
 | 18 | gig-maestro: Macro createSound | v0.18.1–v0.18.6 | complete |
 | 19 | gig-maestro: Smoke Test Overhaul | v0.19.1–v0.19.8 | complete |
 | 20 | gig-maestro: Device Cursor Fix | v0.20.1–v0.20.3 | complete |
+| 21 | gig-maestro: Toggle Panel Visibility RPC | v0.21.1–v0.21.4 | complete |
 
 ## Completed Milestones
 

@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.21.4` |
 | **Phase** | 21 — gig-maestro: Toggle Panel Visibility RPC |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 21.4 — Update manual/workflow scripts + build verify |
 | **Last Updated** | 2026-03-13 |
 
