@@ -151,6 +151,7 @@ ALL_TOOLS=(
   macro_writeClip
   macro_buildSection
   macro_buildSong
+  macro_writeAutomation
 
   # phase 13 — mixer & routing
   send_setLevel
@@ -395,6 +396,11 @@ PARAM_CHECKS=(
   "macro_writeClip|.input_schema.properties.notes.items.properties.recurrence.type|object"
   "macro_buildSection|.input_schema.properties.clips.items.properties.notes.items.properties.chance.type|number"
   "macro_buildSection|.input_schema.properties.clips.items.properties.notes.items.properties.expressions.type|object"
+  "macro_writeAutomation|.input_schema.properties.envelopes.type|array"
+  "macro_writeAutomation|.input_schema.properties.envelopes.items.properties.paramIndex.type|integer"
+  "macro_writeAutomation|.input_schema.properties.envelopes.items.properties.pageIndex.type|integer"
+  "macro_writeAutomation|.input_schema.properties.envelopes.items.properties.points.type|array"
+  "macro_writeAutomation|.input_schema.properties.envelopes.items.properties.points.items.properties.position.type|number"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -776,6 +782,10 @@ PROMPT_CHECKS=(
   # gig phase 27 — clip expression macros
   "system prompt documents inline expressions|inline expression properties"
   "system prompt documents expression grouping|grouped by type and applied in deferred flush"
+
+  # gig phase 28 — macro automation curves
+  "system prompt mentions macro_writeAutomation|macro_writeAutomation"
+  "system prompt documents arranger automation macro|Arranger automation"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do

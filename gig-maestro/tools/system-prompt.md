@@ -693,6 +693,7 @@ Macros are predefined compound operations that collapse common multi-call workfl
 | `macro_writeClip` | clip/create + clip/select + clip/setStepSize + clip/setNotes + clip/rename | 4–5 → 1 |
 | `macro_buildSection` | scene/create + scene/rename + N×(clip/create + clip/select + clip/setStepSize + clip/setNotes + clip/rename) | 10+ → 1 |
 | `macro_buildSong` | N×macro_createTrack + M×macro_buildSection | N+M → 1 |
+| `macro_writeAutomation` | N×(device/selectPage + device/writeEnvelope) + automation write toggle | N+2 → 1 |
 
 **`macro_buildSong`** is the highest-impact macro. An entire multi-track song with sections and clips that previously required N+M calls now takes 1. It creates tracks sequentially (with proper flush delays for sound parameters), then builds all sections after tracks complete. Use this for full song scaffolding.
 
@@ -821,6 +822,15 @@ macro_buildSong({
 })
 ```
 This collapses the entire workflow (steps 2-3) into a single call. Tracks are created sequentially with proper delays for sound parameter initialization. Sections are built after all tracks exist.
+
+**Arranger automation — use `macro_writeAutomation`:**
+```
+macro_writeAutomation({ envelopes: [
+  { paramIndex: 0, pageIndex: 0, points: [{ position: 0, value: 0 }, { position: 16, value: 1 }] },
+  { paramIndex: 3, pageIndex: 1, points: [{ position: 0, value: 0.5 }, { position: 8, value: 0.8 }] }
+]})
+```
+Writes automation envelopes for multiple device parameters in one call. Handles page switching automatically and enables arranger automation write. Each envelope targets a remote control parameter by index and page. Positions are in beats from the arrangement start. The cursor device must already be selected (e.g., after `macro_createTrack` or `device_insertBitwigDevice`).
 
 ### Song Persistence (CLI)
 
