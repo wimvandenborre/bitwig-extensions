@@ -5,6 +5,7 @@ import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.NoteInput;
 import com.bitwig.extension.controller.api.Track;
 import com.bitwig.extension.controller.api.TrackBank;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.extension.StateCache;
@@ -253,6 +254,28 @@ public class TrackHandler {
             info.addProperty("trackType", cursorTrack.trackType().get());
             info.addProperty("isPinned", cursorTrack.isPinned().get());
             return info;
+        });
+
+        // --- Activity feedback methods ---
+
+        dispatcher.register("track/getVuMeters", params -> {
+            int[] meters = stateCache.getVuMeters();
+            JsonArray arr = new JsonArray();
+            for (int v : meters) arr.add(v);
+            return arr;
+        });
+
+        dispatcher.register("track/getPlayingNotes", params -> {
+            int index = params.get("index").getAsInt();
+            int[] packed = stateCache.getPlayingNotes(index);
+            JsonArray arr = new JsonArray();
+            for (int n = 0; n < packed.length; n += 2) {
+                JsonObject note = new JsonObject();
+                note.addProperty("pitch", packed[n]);
+                note.addProperty("velocity", packed[n + 1]);
+                arr.add(note);
+            }
+            return arr;
         });
 
         // --- Track bank scroll methods ---

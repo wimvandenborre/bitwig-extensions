@@ -49,6 +49,9 @@ public class StateCache {
     private final boolean[] trackIsGroupExpanded = new boolean[TRACK_COUNT];
     private volatile boolean[] trackCanHoldNoteData = new boolean[TRACK_COUNT];
     private volatile boolean[] trackCanHoldAudioData = new boolean[TRACK_COUNT];
+    private volatile boolean[] trackMutedBySolo = new boolean[TRACK_COUNT];
+    private volatile int[] trackVuMeter = new int[TRACK_COUNT];
+    private volatile int[][] trackPlayingNotes = new int[TRACK_COUNT][0]; // [trackIdx] -> {pitch0, vel0, pitch1, vel1, ...}
 
     // Send state — [trackIndex][sendIndex]
     private volatile int sendCount = DEFAULT_SEND_COUNT;
@@ -363,6 +366,21 @@ public class StateCache {
 
             track.arm().markInterested();
             track.arm().addValueObserver((BooleanValueChangedCallback) v -> trackArms[idx] = v);
+
+            track.isMutedBySolo().markInterested();
+            track.isMutedBySolo().addValueObserver((BooleanValueChangedCallback) v -> trackMutedBySolo[idx] = v);
+
+            track.addVuMeterObserver(128, -1, false, v -> trackVuMeter[idx] = v);
+
+            track.playingNotes().markInterested();
+            track.playingNotes().addValueObserver(notes -> {
+                int[] packed = new int[notes.length * 2];
+                for (int n = 0; n < notes.length; n++) {
+                    packed[n * 2] = notes[n].pitch();
+                    packed[n * 2 + 1] = notes[n].velocity();
+                }
+                trackPlayingNotes[idx] = packed;
+            });
 
             track.color().markInterested();
             track.color().addValueObserver((ColorValueChangedCallback) (r, g, b) -> {
@@ -1131,6 +1149,17 @@ public class StateCache {
         return obj;
     }
 
+    public int[] getVuMeters() {
+        return trackVuMeter.clone();
+    }
+
+    public int[] getPlayingNotes(int trackIndex) {
+        if (trackIndex < 0 || trackIndex >= TRACK_COUNT) {
+            return new int[0];
+        }
+        return trackPlayingNotes[trackIndex].clone();
+    }
+
     public JsonObject getSnapshot() {
         JsonObject snapshot = new JsonObject();
         snapshot.add("transport", getTransportState());
@@ -1289,6 +1318,7 @@ public class StateCache {
             track.addProperty("mute", trackMutes[i]);
             track.addProperty("solo", trackSolos[i]);
             track.addProperty("arm", trackArms[i]);
+            track.addProperty("isMutedBySolo", trackMutedBySolo[i]);
 
             JsonObject color = new JsonObject();
             color.addProperty("r", trackColors[i][0]);
