@@ -72,6 +72,8 @@ class StateCacheSnapshotTest {
         assertEquals("Instrument", track0.get("trackType").getAsString());
         assertFalse(track0.get("isGroup").getAsBoolean());
         assertFalse(track0.get("isGroupExpanded").getAsBoolean());
+        assertFalse(track0.get("canHoldNoteData").getAsBoolean());
+        assertFalse(track0.get("canHoldAudioData").getAsBoolean());
 
         assertTrue(track0.has("sends"));
         assertTrue(track0.has("clips"));

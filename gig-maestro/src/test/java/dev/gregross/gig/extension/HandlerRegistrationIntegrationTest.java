@@ -49,6 +49,8 @@ class HandlerRegistrationIntegrationTest {
     @Mock private PopupBrowser mockPopupBrowser;
     @Mock private Arranger mockArranger;
     @Mock private CueMarkerBank mockCueMarkerBank;
+    @Mock private SettableBooleanValue mockIsPinned;
+    @Mock private StringValue mockCursorTrackType;
 
     @TempDir
     Path tempDir;
@@ -60,6 +62,10 @@ class HandlerRegistrationIntegrationTest {
     void setUp() throws IOException {
         // TrackBank.sceneBank() needed by ClipHandler and SceneHandler
         when(mockTrackBank.sceneBank()).thenReturn(mockSceneBank);
+
+        // CursorTrack properties needed by TrackHandler constructor markInterested() calls
+        when(mockCursorTrack.isPinned()).thenReturn(mockIsPinned);
+        when(mockCursorTrack.trackType()).thenReturn(mockCursorTrackType);
 
         dispatcher = new JsonRpcDispatcher();
 

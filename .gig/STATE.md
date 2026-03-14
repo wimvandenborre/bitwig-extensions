@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.31.5` |
-| **Phase** | 31 — gig-maestro: Mixer Visibility & Track Navigation |
+| **Version** | `0.32.5` |
+| **Phase** | 32 — gig-maestro: Track Queries & Cursor Navigation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 31.5 — Build verification |
+| **Last Batch** | 32.5 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.32.5 | 32 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.32.4 | 32 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.32.3 | 32 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.32.2 | 32 | Fix groove parameter observer deprecation | UNPLANNED | done | 2026-03-14 |
+| 0.32.1 | 32 | StateCache track capabilities + cursor navigation RPCs | PLANNED | done | 2026-03-14 |
 | 0.31.5 | 31 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.31.4 | 31 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.31.3 | 31 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -155,7 +160,7 @@
 
 ## Active Decisions
 
-_None — phase 31 archived._
+_None — phase 32 archived._
 
 ---
 

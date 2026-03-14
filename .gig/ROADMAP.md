@@ -44,6 +44,24 @@
 | 29 | gig-maestro: Song Dump Fidelity | v0.29.1–v0.29.3 | complete |
 | 30 | gig-maestro: Global Groove & High-Value API Gaps | v0.30.1–v0.30.5 | complete |
 | 31 | gig-maestro: Mixer Visibility & Track Navigation | v0.31.1–v0.31.5 | complete |
+| 32 | gig-maestro: Track Queries & Cursor Navigation | v0.32.1–v0.32.5 | complete |
+| 33 | gig-maestro: VU Metering & Activity Feedback | v0.33.x | upcoming |
+| 34 | gig-maestro: Project Cue Mix & Structure | v0.34.x | upcoming |
+| 35 | gig-maestro: Arranger Scroll & View Control | v0.35.x | upcoming |
+
+## Upcoming Phase Details
+
+### Phase 32 — Track Queries & Cursor Navigation
+Expose cached track type/isGroup/canHoldNoteData/canHoldAudioData as RPC queries. Add CursorTrack navigation: selectParent, selectFirstChild, isPinned/setPinned. Low effort, high value — enables Claude to make conditional decisions based on track capabilities.
+
+### Phase 33 — VU Metering & Activity Feedback
+Add VU meter observation (addVuMeterObserver), playingNotes query, isMutedBySolo detection. Enables live mixing feedback — dynamic volume balancing, detecting silent/clipping tracks. Requires observer wiring + delta integration.
+
+### Phase 34 — Project Cue Mix & Structure
+Expose cueVolume, cueMix on Project for headphone monitoring control. Add getRootTrackGroup for project structure queries. Small, focused additions.
+
+### Phase 35 — Arranger Scroll & View Control
+Arranger scroll position control, lane visibility toggles, track height beyond double-row. Enables Claude to frame the view on relevant sections during arrangement work.
 
 ## Completed Milestones
 
