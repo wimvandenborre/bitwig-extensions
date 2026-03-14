@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 135 ]; then
-  echo "  PASS  claude-tools.json has >= 135 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 137 ]; then
+  echo "  PASS  claude-tools.json has >= 137 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 135 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 137 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -334,6 +334,10 @@ ALL_TOOLS=(
   cursor_selectFirstChild
   cursor_setPinned
   cursor_getInfo
+
+  # gig phase 33 — VU metering & activity feedback
+  track_getVuMeters
+  track_getPlayingNotes
 )
 
 for tool in "${ALL_TOOLS[@]}"; do
@@ -437,6 +441,7 @@ PARAM_CHECKS=(
   "track_selectInMixer|.input_schema.properties.index.type|integer"
   "track_makeVisibleInMixer|.input_schema.properties.index.type|integer"
   "cursor_setPinned|.input_schema.properties.pinned.type|boolean"
+  "track_getPlayingNotes|.input_schema.properties.index.type|integer"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -530,6 +535,7 @@ assert_contains "snapshot mentions arpeggiator" "$SNAP_DESC" "arpeggiator"
 assert_contains "snapshot mentions noteLatch" "$SNAP_DESC" "noteLatch"
 assert_contains "snapshot mentions groove" "$SNAP_DESC" "groove state"
 assert_contains "snapshot mentions canHoldNoteData" "$SNAP_DESC" "canHoldNoteData"
+assert_contains "snapshot mentions isMutedBySolo" "$SNAP_DESC" "isMutedBySolo"
 
 GETNOTES_DESC=$(jq -r '.[] | select(.name=="clip_getNotes") | .description' "$TOOLS_FILE")
 assert_contains "clip_getNotes describes pan" "$GETNOTES_DESC" "pan"
@@ -855,6 +861,12 @@ PROMPT_CHECKS=(
   "system prompt mentions cursor_selectFirstChild|cursor_selectFirstChild"
   "system prompt mentions cursor_setPinned|cursor_setPinned"
   "system prompt mentions cursor_getInfo|cursor_getInfo"
+
+  # gig phase 33 — VU metering & activity feedback
+  "system prompt has Activity Feedback section|Activity Feedback"
+  "system prompt mentions track_getVuMeters|track_getVuMeters"
+  "system prompt mentions track_getPlayingNotes|track_getPlayingNotes"
+  "system prompt mentions isMutedBySolo|isMutedBySolo"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do
