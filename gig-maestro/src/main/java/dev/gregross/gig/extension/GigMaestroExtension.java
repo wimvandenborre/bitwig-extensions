@@ -13,6 +13,7 @@ import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
 import dev.gregross.gig.handlers.GrooveHandler;
 import dev.gregross.gig.handlers.MacroHandler;
+import dev.gregross.gig.handlers.MixerHandler;
 import dev.gregross.gig.handlers.MasterDeviceHandler;
 import dev.gregross.gig.handlers.MasterHandler;
 import dev.gregross.gig.handlers.NoteHandler;
@@ -102,6 +103,9 @@ public class GigMaestroExtension extends ControllerExtension {
         // Create groove
         Groove groove = host.createGroove();
 
+        // Create mixer
+        Mixer mixer = host.createMixer();
+
         // Create arranger and cue marker bank
         Arranger arranger = host.createArranger();
         CueMarkerBank cueMarkerBank = arranger.createCueMarkerBank(16);
@@ -170,6 +174,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new BrowserHandler(popupBrowser, cursorDevice, stateCache).register(dispatcher);
         new NoteInputHandler(noteInput, arpeggiator, noteLatch, stateCache).register(dispatcher);
         new GrooveHandler(groove).register(dispatcher);
+        new MixerHandler(mixer).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 
         // Start servers
