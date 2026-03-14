@@ -173,6 +173,63 @@ class SongCommand {
                         clipOut.addProperty("stepSize", clipSnap.get("stepSize").getAsDouble());
                         clipOut.add("color", clipInfo.getAsJsonObject("color"));
                         clipOut.add("notes", notes);
+
+                        // Capture clip launch settings (non-default only)
+                        JsonObject launchSettings = new JsonObject();
+                        String launchQuant = clipSnap.has("launchQuantization")
+                            ? clipSnap.get("launchQuantization").getAsString() : "default";
+                        String launchMode = clipSnap.has("launchMode")
+                            ? clipSnap.get("launchMode").getAsString() : "default";
+                        boolean shuffle = clipSnap.has("shuffle")
+                            && clipSnap.get("shuffle").getAsBoolean();
+                        double accent = clipSnap.has("accent")
+                            ? clipSnap.get("accent").getAsDouble() : 0.0;
+                        boolean useLoopRef = clipSnap.has("useLoopStartAsQuantizationReference")
+                            && clipSnap.get("useLoopStartAsQuantizationReference").getAsBoolean();
+
+                        if (!"default".equals(launchQuant))
+                            launchSettings.addProperty("launchQuantization", launchQuant);
+                        if (!"default".equals(launchMode))
+                            launchSettings.addProperty("launchMode", launchMode);
+                        if (shuffle)
+                            launchSettings.addProperty("shuffle", true);
+                        if (accent > 0.0)
+                            launchSettings.addProperty("accent", accent);
+                        if (useLoopRef)
+                            launchSettings.addProperty("useLoopStartAsQuantizationReference", true);
+
+                        if (launchSettings.size() > 0) {
+                            clipOut.add("launchSettings", launchSettings);
+                        }
+
+                        // Capture clip playback settings (non-default only)
+                        JsonObject playbackSettings = new JsonObject();
+                        double playStart = clipSnap.has("playStart")
+                            ? clipSnap.get("playStart").getAsDouble() : 0.0;
+                        double playStop = clipSnap.has("playStop")
+                            ? clipSnap.get("playStop").getAsDouble() : 0.0;
+                        double loopStart = clipSnap.has("loopStart")
+                            ? clipSnap.get("loopStart").getAsDouble() : 0.0;
+                        double loopLength = clipSnap.has("loopLength")
+                            ? clipSnap.get("loopLength").getAsDouble() : 0.0;
+                        boolean loopEnabled = !clipSnap.has("isLoopEnabled")
+                            || clipSnap.get("isLoopEnabled").getAsBoolean();
+
+                        if (playStart > 0.0)
+                            playbackSettings.addProperty("playStart", playStart);
+                        if (playStop > 0.0)
+                            playbackSettings.addProperty("playStop", playStop);
+                        if (loopStart > 0.0)
+                            playbackSettings.addProperty("loopStart", loopStart);
+                        if (loopLength > 0.0)
+                            playbackSettings.addProperty("loopLength", loopLength);
+                        if (!loopEnabled)
+                            playbackSettings.addProperty("isLoopEnabled", false);
+
+                        if (playbackSettings.size() > 0) {
+                            clipOut.add("playbackSettings", playbackSettings);
+                        }
+
                         allClips.add(clipOut);
 
                         clipCount++;
@@ -205,6 +262,32 @@ class SongCommand {
                         inst.addProperty("track", t);
                         inst.addProperty("device", deviceName);
                         inst.addProperty("preset", presetName != null ? presetName : "");
+
+                        // Discover device parameters (all pages)
+                        try {
+                            client.call("device/discoverAll", null);
+                            Thread.sleep(CLIP_SETTLE_MS * 2); // discovery needs time to iterate pages
+                            JsonObject discoveryParams = new JsonObject();
+                            discoveryParams.addProperty("format", "preset");
+                            JsonElement discoveryResult = client.call("device/getDiscoveryResult", discoveryParams);
+                            if (discoveryResult.isJsonObject()) {
+                                JsonObject disc = discoveryResult.getAsJsonObject();
+                                if (disc.has("pages") && disc.getAsJsonArray("pages").size() > 0) {
+                                    inst.add("pages", disc.getAsJsonArray("pages"));
+                                    int paramCount = 0;
+                                    for (JsonElement pageEl : disc.getAsJsonArray("pages")) {
+                                        paramCount += pageEl.getAsJsonObject().getAsJsonArray("params").size();
+                                    }
+                                    log.println("  Track " + t + ": " + deviceName
+                                        + " — " + disc.getAsJsonArray("pages").size() + " pages, "
+                                        + paramCount + " params");
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.println("  Warning: Could not discover params for track " + t
+                                + " (" + deviceName + "): " + e.getMessage());
+                        }
+
                         instruments.add(inst);
                     }
 
@@ -365,7 +448,9 @@ class SongCommand {
                 JsonArray clips = song.getAsJsonArray("clips");
                 JsonArray cueMarkers = song.has("cueMarkers") ? song.getAsJsonArray("cueMarkers") : new JsonArray();
 
-                int totalSteps = 7;
+                int totalSteps = 8;
+                JsonArray instruments = song.has("instruments")
+                    ? song.getAsJsonArray("instruments") : new JsonArray();
                 int step = 0;
 
                 // --- Step 1: Transport ---
@@ -577,6 +662,66 @@ class SongCommand {
                         client.call("clip/setNoteRecurrence", recParams);
                     }
 
+                    // Restore clip launch settings if present
+                    if (clip.has("launchSettings") && !clip.get("launchSettings").isJsonNull()) {
+                        JsonObject ls = clip.getAsJsonObject("launchSettings");
+                        if (ls.has("launchQuantization")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("quantization", ls.get("launchQuantization").getAsString());
+                            client.call("clip/setLaunchQuantization", p);
+                        }
+                        if (ls.has("launchMode")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("launchMode", ls.get("launchMode").getAsString());
+                            client.call("clip/setLaunchMode", p);
+                        }
+                        if (ls.has("shuffle")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("enabled", ls.get("shuffle").getAsBoolean());
+                            client.call("clip/setShuffle", p);
+                        }
+                        if (ls.has("accent")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("value", ls.get("accent").getAsDouble());
+                            client.call("clip/setAccent", p);
+                        }
+                        if (ls.has("useLoopStartAsQuantizationReference")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("enabled", ls.get("useLoopStartAsQuantizationReference").getAsBoolean());
+                            client.call("clip/setUseLoopStartAsQuantizationReference", p);
+                        }
+                    }
+
+                    // Restore clip playback settings if present
+                    if (clip.has("playbackSettings") && !clip.get("playbackSettings").isJsonNull()) {
+                        JsonObject ps = clip.getAsJsonObject("playbackSettings");
+                        if (ps.has("playStart")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("beats", ps.get("playStart").getAsDouble());
+                            client.call("clip/setPlayStart", p);
+                        }
+                        if (ps.has("playStop")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("beats", ps.get("playStop").getAsDouble());
+                            client.call("clip/setPlayStop", p);
+                        }
+                        if (ps.has("loopStart")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("beats", ps.get("loopStart").getAsDouble());
+                            client.call("clip/setLoopStart", p);
+                        }
+                        if (ps.has("loopLength")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("beats", ps.get("loopLength").getAsDouble());
+                            client.call("clip/setLoopLength", p);
+                        }
+                        if (ps.has("isLoopEnabled")) {
+                            JsonObject p = new JsonObject();
+                            p.addProperty("enabled", ps.get("isLoopEnabled").getAsBoolean());
+                            client.call("clip/setLoopEnabled", p);
+                        }
+                    }
+
                     log.println("  [" + (c + 1) + "/" + clips.size() + "] Track " + trackIndex
                         + " / Scene " + sceneAbsolute + " (" + notes.size() + " notes)");
                 }
@@ -675,7 +820,48 @@ class SongCommand {
                     }
                 }
 
-                // --- Step 6: Master mix ---
+                // --- Step 6: Device parameters ---
+                step++;
+                int paramRestoredCount = 0;
+                for (JsonElement instEl : instruments) {
+                    JsonObject inst = instEl.getAsJsonObject();
+                    if (!inst.has("pages") || inst.get("pages").isJsonNull()) continue;
+                    JsonArray pages = inst.getAsJsonArray("pages");
+                    if (pages.isEmpty()) continue;
+
+                    int trackIdx = inst.get("track").getAsInt();
+                    String deviceName = inst.get("device").getAsString();
+
+                    // Select the track
+                    JsonObject selectParams = new JsonObject();
+                    selectParams.addProperty("index", trackIdx);
+                    client.call("track/select", selectParams);
+                    Thread.sleep(CLIP_WRITE_MS);
+
+                    // Set parameters on the cursor device
+                    JsonObject setParams = new JsonObject();
+                    setParams.add("pages", pages);
+                    client.call("device/setParameters", setParams);
+
+                    // Wait for page writes: 100ms per page
+                    Thread.sleep(100L * pages.size() + CLIP_WRITE_MS);
+
+                    int paramCount = 0;
+                    for (JsonElement pageEl : pages) {
+                        paramCount += pageEl.getAsJsonObject().getAsJsonArray("params").size();
+                    }
+                    paramRestoredCount++;
+                    log.println("  Track " + trackIdx + ": " + deviceName
+                        + " — " + pages.size() + " pages, " + paramCount + " params");
+                }
+                if (paramRestoredCount > 0) {
+                    log.println("[" + step + "/" + totalSteps + "] Restored device parameters for "
+                        + paramRestoredCount + " instruments.");
+                } else {
+                    log.println("[" + step + "/" + totalSteps + "] No device parameters to restore.");
+                }
+
+                // --- Step 7: Master mix ---
                 step++;
                 log.println("[" + step + "/" + totalSteps + "] Setting master mix...");
 
@@ -740,15 +926,22 @@ class SongCommand {
                 log.println("Done! Rebuilt " + clips.size() + " clips across "
                     + scenes.size() + " scenes.");
 
-                // Print manual steps reminder
-                if (song.has("instruments") && song.getAsJsonArray("instruments").size() > 0) {
-                    log.println();
-                    log.println("Manual steps required:");
-                    for (JsonElement instEl : song.getAsJsonArray("instruments")) {
+                // Print manual steps reminder (only for instruments without captured params)
+                if (!instruments.isEmpty()) {
+                    boolean hasManualSteps = false;
+                    for (JsonElement instEl : instruments) {
                         JsonObject inst = instEl.getAsJsonObject();
-                        log.println("  Track " + inst.get("track").getAsInt()
-                            + ": Load " + inst.get("device").getAsString()
-                            + " → " + inst.get("preset").getAsString());
+                        if (!inst.has("pages") || inst.get("pages").isJsonNull()
+                                || inst.getAsJsonArray("pages").isEmpty()) {
+                            if (!hasManualSteps) {
+                                log.println();
+                                log.println("Manual steps required:");
+                                hasManualSteps = true;
+                            }
+                            log.println("  Track " + inst.get("track").getAsInt()
+                                + ": Load " + inst.get("device").getAsString()
+                                + " → " + inst.get("preset").getAsString());
+                        }
                     }
                 }
 
