@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 123 ]; then
-  echo "  PASS  claude-tools.json has >= 123 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 131 ]; then
+  echo "  PASS  claude-tools.json has >= 131 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 123 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 131 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -318,6 +318,16 @@ ALL_TOOLS=(
   app_zoomOut
   app_zoomToFit
   app_zoomToSelection
+
+  # gig phase 31 — mixer visibility & track navigation
+  mixer_getState
+  mixer_setSection
+  mixer_zoomInAll
+  mixer_zoomOutAll
+  mixer_zoomInSelected
+  mixer_zoomOutSelected
+  track_selectInMixer
+  track_makeVisibleInMixer
 )
 
 for tool in "${ALL_TOOLS[@]}"; do
@@ -416,6 +426,10 @@ PARAM_CHECKS=(
   "groove_setParameter|.input_schema.properties.value.type|number"
   "track_toggleSolo|.input_schema.properties.index.type|integer"
   "track_toggleSolo|.input_schema.properties.exclusive.type|boolean"
+  "mixer_setSection|.input_schema.properties.section.type|string"
+  "mixer_setSection|.input_schema.properties.visible.type|boolean"
+  "track_selectInMixer|.input_schema.properties.index.type|integer"
+  "track_makeVisibleInMixer|.input_schema.properties.index.type|integer"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -435,6 +449,7 @@ ENUM_CHECKS=(
   "track_setMonitor;.input_schema.properties.mode.enum | join(\",\");ON,OFF,AUTO"
   "masterDevice_insertBitwigDevice;.input_schema.properties.position.enum | join(\",\");end,before,after"
   "groove_setParameter;.input_schema.properties.name.enum | join(\",\");accentAmount,accentPhase,accentRate,shuffleAmount,shuffleRate"
+  "mixer_setSection;.input_schema.properties.section.enum | join(\",\");meter,io,sends,clipLauncher,devices,crossFade"
 )
 
 for entry in "${ENUM_CHECKS[@]}"; do
@@ -814,6 +829,15 @@ PROMPT_CHECKS=(
   "system prompt has zoom controls|app_zoomIn"
   "system prompt mentions zoomToFit|app_zoomToFit"
   "system prompt mentions zoomToSelection|app_zoomToSelection"
+
+  # gig phase 31 — mixer visibility & track navigation
+  "system prompt has Mixer Panel Control section|Mixer Panel Control"
+  "system prompt mentions mixer_getState|mixer_getState"
+  "system prompt mentions mixer_setSection|mixer_setSection"
+  "system prompt mentions mixer_zoomInAll|mixer_zoomInAll"
+  "system prompt mentions mixer_zoomOutSelected|mixer_zoomOutSelected"
+  "system prompt mentions track_selectInMixer|track_selectInMixer"
+  "system prompt mentions track_makeVisibleInMixer|track_makeVisibleInMixer"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do

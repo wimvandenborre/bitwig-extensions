@@ -72,6 +72,18 @@ public class TrackHandler {
             return new JsonPrimitive("ok");
         });
 
+        dispatcher.register("track/selectInMixer", params -> {
+            Track track = getTrack(params.get("index").getAsInt());
+            track.selectInMixer();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("track/makeVisibleInMixer", params -> {
+            Track track = getTrack(params.get("index").getAsInt());
+            track.makeVisibleInMixer();
+            return new JsonPrimitive("ok");
+        });
+
         dispatcher.register("track/setArm", params -> {
             Track track = getTrack(params.get("index").getAsInt());
             boolean armed = params.get("armed").getAsBoolean();

@@ -4689,5 +4689,97 @@
       "properties": {},
       "required": []
     }
+  },
+  {
+    "name": "mixer_getState",
+    "description": "Get the visibility state of all mixer panel sections. Returns 6 booleans: meter, io, sends, clipLauncher, devices, crossFade.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "mixer_setSection",
+    "description": "Show or hide a mixer panel section. Valid sections: meter, io, sends, clipLauncher, devices, crossFade.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "section": {
+          "type": "string",
+          "description": "Section name to show/hide.",
+          "enum": ["meter", "io", "sends", "clipLauncher", "devices", "crossFade"]
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "True to show the section, false to hide."
+        }
+      },
+      "required": ["section", "visible"]
+    }
+  },
+  {
+    "name": "mixer_zoomInAll",
+    "description": "Zoom in (widen) all mixer track strips.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "mixer_zoomOutAll",
+    "description": "Zoom out (narrow) all mixer track strips.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "mixer_zoomInSelected",
+    "description": "Zoom in (widen) the selected mixer track strips only.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "mixer_zoomOutSelected",
+    "description": "Zoom out (narrow) the selected mixer track strips only.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_selectInMixer",
+    "description": "Select a track in the Bitwig mixer panel, focusing the mixer on that channel strip.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "track_makeVisibleInMixer",
+    "description": "Scroll the mixer panel so that the specified track becomes visible.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        }
+      },
+      "required": ["index"]
+    }
   }
 ]
