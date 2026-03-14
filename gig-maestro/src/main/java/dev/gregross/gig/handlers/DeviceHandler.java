@@ -173,31 +173,35 @@ public class DeviceHandler {
                 }
             }
 
-            // Apply first page immediately (this flush cycle)
-            JsonObject firstPage = pages.get(0).getAsJsonObject();
-            int firstPageIndex = firstPage.get("pageIndex").getAsInt();
-            JsonArray firstPageParams = firstPage.getAsJsonArray("params");
-            remoteControlsPage.selectedPageIndex().set(firstPageIndex);
-            for (JsonElement paramEl : firstPageParams) {
-                JsonObject p = paramEl.getAsJsonObject();
-                remoteControlsPage.getParameter(p.get("index").getAsInt())
-                    .value().setImmediately(p.get("value").getAsDouble());
-            }
-
-            // Schedule subsequent pages across flush cycles
-            for (int i = 1; i < pages.size(); i++) {
+            // Switch to first page immediately (this flush cycle).
+            // Params are written in the NEXT flush cycle after the page
+            // switch takes effect — Bitwig needs one cycle to update the
+            // RemoteControl objects after a page change.
+            for (int i = 0; i < pages.size(); i++) {
                 JsonObject page = pages.get(i).getAsJsonObject();
                 int pageIndex = page.get("pageIndex").getAsInt();
                 JsonArray pageParams = page.getAsJsonArray("params");
-                long delay = FLUSH_DELAY_MS * i;
-                scheduler.schedule(() -> {
+
+                // Task 1: switch to page
+                long switchDelay = FLUSH_DELAY_MS * (i * 2);
+                if (switchDelay == 0) {
+                    // First page: switch immediately in this flush cycle
                     remoteControlsPage.selectedPageIndex().set(pageIndex);
+                } else {
+                    scheduler.schedule(() -> {
+                        remoteControlsPage.selectedPageIndex().set(pageIndex);
+                    }, switchDelay);
+                }
+
+                // Task 2: write params (one flush cycle after the switch)
+                long writeDelay = FLUSH_DELAY_MS * (i * 2 + 1);
+                scheduler.schedule(() -> {
                     for (JsonElement paramEl : pageParams) {
                         JsonObject p = paramEl.getAsJsonObject();
                         remoteControlsPage.getParameter(p.get("index").getAsInt())
                             .value().setImmediately(p.get("value").getAsDouble());
                     }
-                }, delay);
+                }, writeDelay);
             }
 
             JsonObject result = new JsonObject();

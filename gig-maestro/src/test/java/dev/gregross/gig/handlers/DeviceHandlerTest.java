@@ -580,9 +580,11 @@ class DeviceHandlerTest {
 
         assertContains(response, "\"ok\":true");
         verify(mockPageIndex).set(0);
+        // Param write is scheduled for next flush cycle (1 task)
+        assertEquals(1, scheduledTasks.size(), "Single page schedules 1 write task");
+        scheduledTasks.get(0).run();
         verify(mockVal0).setImmediately(0.25);
         verify(mockVal1).setImmediately(0.75);
-        assertTrue(scheduledTasks.isEmpty(), "Single page should not schedule any tasks");
     }
 
     @Test
@@ -612,15 +614,22 @@ class DeviceHandlerTest {
             + "]}"));
 
         assertContains(response, "\"ok\":true");
-        // First page applied immediately
+        // First page switches immediately (no scheduled task for switch)
         verify(mockPageIndex).set(0);
-        verify(mockVal0).setImmediately(0.5);
-        // Second page was scheduled, not applied yet
-        assertEquals(1, scheduledTasks.size(), "Second page should be scheduled");
+        // 3 scheduled tasks: page0 write, page1 switch, page1 write
+        assertEquals(3, scheduledTasks.size(),
+            "Two pages produce 3 tasks: page0 write, page1 switch, page1 write");
 
-        // Execute the scheduled task and verify second page params
+        // Task 0: write page 0 params (one flush cycle after switch)
         scheduledTasks.get(0).run();
+        verify(mockVal0).setImmediately(0.5);
+
+        // Task 1: switch to page 1
+        scheduledTasks.get(1).run();
         verify(mockPageIndex).set(1);
+
+        // Task 2: write page 1 params
+        scheduledTasks.get(2).run();
         verify(mockVal2).setImmediately(0.9);
     }
 
