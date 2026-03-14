@@ -104,6 +104,32 @@ class MacroHandlerTest {
             callLog.add("device/setParameters:pages=" + pageCount + ",params=" + paramCount);
             return new JsonPrimitive("ok");
         });
+        dispatcher.register("clip/setChance", params -> {
+            int count = params.getAsJsonArray("notes").size();
+            callLog.add("clip/setChance:" + count);
+            return new JsonPrimitive("ok");
+        });
+        dispatcher.register("clip/setNoteExpressions", params -> {
+            JsonArray notes = params.getAsJsonArray("notes");
+            String prop = notes.get(0).getAsJsonObject().get("property").getAsString();
+            callLog.add("clip/setNoteExpressions:" + prop + ":" + notes.size());
+            return new JsonPrimitive("ok");
+        });
+        dispatcher.register("clip/setNoteRepeat", params -> {
+            int count = params.getAsJsonArray("notes").size();
+            callLog.add("clip/setNoteRepeat:" + count);
+            return new JsonPrimitive("ok");
+        });
+        dispatcher.register("clip/setNoteOccurrence", params -> {
+            int count = params.getAsJsonArray("notes").size();
+            callLog.add("clip/setNoteOccurrence:" + count);
+            return new JsonPrimitive("ok");
+        });
+        dispatcher.register("clip/setNoteRecurrence", params -> {
+            int count = params.getAsJsonArray("notes").size();
+            callLog.add("clip/setNoteRecurrence:" + count);
+            return new JsonPrimitive("ok");
+        });
 
         new MacroHandler(dispatcher, new StateCache(), IMMEDIATE_SCHEDULER).register(dispatcher);
     }
@@ -755,6 +781,116 @@ class MacroHandlerTest {
             {"pages":[{"pageIndex":0,"params":[{"index":0,"value":1.5}]}]}""");
         assertTrue(response.contains("error"));
         assertTrue(response.contains("out of range"));
+    }
+
+    // --- Expression support in writeClip ---
+
+    @Test
+    void writeClip_withChance_callsSetChance() {
+        handle("macro/writeClip", """
+            {"trackIndex":0,"sceneIndex":0,"lengthBeats":4,"stepSize":0.25,
+             "notes":[
+                {"x":0,"y":60,"velocity":100,"duration":1,"chance":0.75},
+                {"x":1,"y":62,"velocity":90,"duration":1,"chance":0.5}
+             ]}""");
+        assertTrue(callLog.contains("clip/setChance:2"));
+    }
+
+    @Test
+    void writeClip_withExpressions_callsSetNoteExpressionsPerProperty() {
+        handle("macro/writeClip", """
+            {"trackIndex":0,"sceneIndex":0,"lengthBeats":4,"stepSize":0.25,
+             "notes":[
+                {"x":0,"y":60,"velocity":100,"duration":1,
+                 "expressions":{"pan":0.3,"timbre":0.7}},
+                {"x":1,"y":62,"velocity":90,"duration":1,
+                 "expressions":{"pan":0.6}}
+             ]}""");
+        assertTrue(callLog.contains("clip/setNoteExpressions:pan:2"));
+        assertTrue(callLog.contains("clip/setNoteExpressions:timbre:1"));
+    }
+
+    @Test
+    void writeClip_withRepeat_callsSetNoteRepeat() {
+        handle("macro/writeClip", """
+            {"trackIndex":0,"sceneIndex":0,"lengthBeats":4,"stepSize":0.25,
+             "notes":[
+                {"x":0,"y":60,"velocity":100,"duration":1,
+                 "repeat":{"count":3,"curve":0.0,"velocityEnd":0.5,"velocityCurve":0.0}}
+             ]}""");
+        assertTrue(callLog.contains("clip/setNoteRepeat:1"));
+    }
+
+    @Test
+    void writeClip_withOccurrence_callsSetNoteOccurrence() {
+        handle("macro/writeClip", """
+            {"trackIndex":0,"sceneIndex":0,"lengthBeats":4,"stepSize":0.25,
+             "notes":[
+                {"x":0,"y":60,"velocity":100,"duration":1,"occurrence":"FILL"},
+                {"x":2,"y":64,"velocity":80,"duration":1,"occurrence":"NOT_FILL"}
+             ]}""");
+        assertTrue(callLog.contains("clip/setNoteOccurrence:2"));
+    }
+
+    @Test
+    void writeClip_withRecurrence_callsSetNoteRecurrence() {
+        handle("macro/writeClip", """
+            {"trackIndex":0,"sceneIndex":0,"lengthBeats":4,"stepSize":0.25,
+             "notes":[
+                {"x":0,"y":60,"velocity":100,"duration":1,
+                 "recurrence":{"length":4,"mask":5}}
+             ]}""");
+        assertTrue(callLog.contains("clip/setNoteRecurrence:1"));
+    }
+
+    @Test
+    void writeClip_basicNotesOnly_noExpressionCalls() {
+        handle("macro/writeClip", """
+            {"trackIndex":0,"sceneIndex":0,"lengthBeats":4,"stepSize":0.25,
+             "notes":[
+                {"x":0,"y":60,"velocity":100,"duration":1},
+                {"x":1,"y":62,"velocity":90,"duration":1}
+             ]}""");
+        // Should NOT contain any expression calls
+        for (String call : callLog) {
+            assertFalse(call.startsWith("clip/setChance"), "unexpected setChance call");
+            assertFalse(call.startsWith("clip/setNoteExpressions"), "unexpected setNoteExpressions call");
+            assertFalse(call.startsWith("clip/setNoteRepeat"), "unexpected setNoteRepeat call");
+            assertFalse(call.startsWith("clip/setNoteOccurrence"), "unexpected setNoteOccurrence call");
+            assertFalse(call.startsWith("clip/setNoteRecurrence"), "unexpected setNoteRecurrence call");
+        }
+    }
+
+    @Test
+    void writeClip_mixedExpressions_allTypesApplied() {
+        handle("macro/writeClip", """
+            {"trackIndex":0,"sceneIndex":0,"lengthBeats":8,"stepSize":0.25,
+             "notes":[
+                {"x":0,"y":60,"velocity":100,"duration":1,"chance":0.8,
+                 "expressions":{"pan":0.3},"occurrence":"FILL"},
+                {"x":4,"y":64,"velocity":80,"duration":1,
+                 "repeat":{"count":2,"curve":0.0,"velocityEnd":1.0,"velocityCurve":0.0},
+                 "recurrence":{"length":3,"mask":5}}
+             ]}""");
+        assertTrue(callLog.contains("clip/setChance:1"));
+        assertTrue(callLog.contains("clip/setNoteExpressions:pan:1"));
+        assertTrue(callLog.contains("clip/setNoteOccurrence:1"));
+        assertTrue(callLog.contains("clip/setNoteRepeat:1"));
+        assertTrue(callLog.contains("clip/setNoteRecurrence:1"));
+    }
+
+    @Test
+    void buildSection_withExpressionNotes_expressionsAppliedPerClip() {
+        handle("macro/buildSection", """
+            {"sceneName":"Verse","clips":[
+                {"trackIndex":0,"lengthBeats":8,"stepSize":0.25,
+                 "notes":[
+                    {"x":0,"y":60,"velocity":100,"duration":1,"chance":0.9},
+                    {"x":2,"y":64,"velocity":80,"duration":1,"expressions":{"timbre":0.5}}
+                 ]}
+            ]}""");
+        assertTrue(callLog.contains("clip/setChance:1"));
+        assertTrue(callLog.contains("clip/setNoteExpressions:timbre:1"));
     }
 
     // --- Helpers ---
