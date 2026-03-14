@@ -964,6 +964,22 @@ Same pattern works for master bus: `masterDevice_enterSlot` / `masterDevice_exit
 - `app_zoomToFit` — zoom to fit all content
 - `app_zoomToSelection` — zoom to fit the current selection
 
+### Mixer Panel Control
+
+Granular control over the mixer panel sections and track strip widths:
+
+**Section visibility** (show/hide individual mixer sections):
+- `mixer_getState` — returns visibility of all 6 sections: meter, io, sends, clipLauncher, devices, crossFade
+- `mixer_setSection({ section: "sends", visible: true })` — show/hide a specific section
+
+**Track width zoom:**
+- `mixer_zoomInAll` / `mixer_zoomOutAll` — zoom all track strips in/out
+- `mixer_zoomInSelected` / `mixer_zoomOutSelected` — zoom only selected track strips
+
+**Track mixer navigation:**
+- `track_selectInMixer({ index: 0 })` — select/focus a track in the mixer
+- `track_makeVisibleInMixer({ index: 5 })` — scroll mixer to show a track
+
 **Notifications:** `app_showNotification({ text: "Done!" })` shows a temporary popup in Bitwig's UI — the only way to communicate status to the user inside the DAW.
 
 **Transport navigation:**
