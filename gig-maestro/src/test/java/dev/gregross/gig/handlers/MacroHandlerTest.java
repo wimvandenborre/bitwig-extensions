@@ -131,13 +131,28 @@ class MacroHandlerTest {
             return new JsonPrimitive("ok");
         });
 
+        dispatcher.register("device/writeEnvelope", params -> {
+            int index = params.get("index").getAsInt();
+            int pointCount = params.getAsJsonArray("points").size();
+            callLog.add("device/writeEnvelope:param=" + index + ",points=" + pointCount);
+            return new JsonPrimitive("ok");
+        });
+        dispatcher.register("device/selectPage", params -> {
+            callLog.add("device/selectPage:" + params.get("index").getAsInt());
+            return new JsonPrimitive("ok");
+        });
+        dispatcher.register("transport/setArrangerAutomationWrite", params -> {
+            callLog.add("transport/setArrangerAutomationWrite:" + params.get("enabled").getAsBoolean());
+            return new JsonPrimitive("ok");
+        });
+
         new MacroHandler(dispatcher, new StateCache(), IMMEDIATE_SCHEDULER).register(dispatcher);
     }
 
     // --- Registration ---
 
     @Test
-    void registersSevenMacroMethods() {
+    void registersEightMacroMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("macro/createTrack"));
         assertTrue(methods.contains("macro/createClip"));
@@ -146,6 +161,7 @@ class MacroHandlerTest {
         assertTrue(methods.contains("macro/setupScenes"));
         assertTrue(methods.contains("macro/createSound"));
         assertTrue(methods.contains("macro/buildSong"));
+        assertTrue(methods.contains("macro/writeAutomation"));
     }
 
     // --- macro/createTrack ---
@@ -781,6 +797,110 @@ class MacroHandlerTest {
             {"pages":[{"pageIndex":0,"params":[{"index":0,"value":1.5}]}]}""");
         assertTrue(response.contains("error"));
         assertTrue(response.contains("out of range"));
+    }
+
+    // --- macro/writeAutomation ---
+
+    @Test
+    void writeAutomation_singleEnvelope_callsWriteEnvelope() {
+        handle("macro/writeAutomation", """
+            {"envelopes":[
+                {"paramIndex":0,"points":[{"position":0.0,"value":0.0},{"position":4.0,"value":1.0}]}
+            ]}""");
+        assertTrue(callLog.contains("transport/setArrangerAutomationWrite:true"));
+        assertTrue(callLog.contains("device/writeEnvelope:param=0,points=2"));
+    }
+
+    @Test
+    void writeAutomation_multipleEnvelopes_callsWriteEnvelopeForEach() {
+        handle("macro/writeAutomation", """
+            {"envelopes":[
+                {"paramIndex":0,"points":[{"position":0.0,"value":0.5}]},
+                {"paramIndex":3,"points":[{"position":0.0,"value":0.0},{"position":8.0,"value":1.0}]}
+            ]}""");
+        assertTrue(callLog.contains("device/writeEnvelope:param=0,points=1"));
+        assertTrue(callLog.contains("device/writeEnvelope:param=3,points=2"));
+    }
+
+    @Test
+    void writeAutomation_withPageIndex_switchesPageBeforeGroup() {
+        handle("macro/writeAutomation", """
+            {"envelopes":[
+                {"paramIndex":2,"pageIndex":1,"points":[{"position":0.0,"value":0.7}]}
+            ]}""");
+        assertTrue(callLog.contains("device/selectPage:1"));
+        assertTrue(callLog.contains("device/writeEnvelope:param=2,points=1"));
+        // Page switch must come before the envelope write
+        int pageIdx = callLog.indexOf("device/selectPage:1");
+        int writeIdx = callLog.indexOf("device/writeEnvelope:param=2,points=1");
+        assertTrue(pageIdx < writeIdx, "page switch should precede envelope write");
+    }
+
+    @Test
+    void writeAutomation_withoutPageIndex_noPageSwitch() {
+        handle("macro/writeAutomation", """
+            {"envelopes":[
+                {"paramIndex":0,"points":[{"position":0.0,"value":0.5}]}
+            ]}""");
+        for (String call : callLog) {
+            assertFalse(call.startsWith("device/selectPage"), "unexpected page switch");
+        }
+    }
+
+    @Test
+    void writeAutomation_mixedPageGroups_switchesBetweenGroups() {
+        handle("macro/writeAutomation", """
+            {"envelopes":[
+                {"paramIndex":0,"pageIndex":0,"points":[{"position":0.0,"value":0.5}]},
+                {"paramIndex":1,"pageIndex":2,"points":[{"position":0.0,"value":0.3}]},
+                {"paramIndex":5,"points":[{"position":0.0,"value":0.8}]}
+            ]}""");
+        assertTrue(callLog.contains("device/selectPage:0"));
+        assertTrue(callLog.contains("device/selectPage:2"));
+        assertTrue(callLog.contains("device/writeEnvelope:param=0,points=1"));
+        assertTrue(callLog.contains("device/writeEnvelope:param=1,points=1"));
+        assertTrue(callLog.contains("device/writeEnvelope:param=5,points=1"));
+    }
+
+    @Test
+    void writeAutomation_returnsEnvelopeCountAndTotalPoints() {
+        String response = handle("macro/writeAutomation", """
+            {"envelopes":[
+                {"paramIndex":0,"points":[{"position":0.0,"value":0.0},{"position":4.0,"value":1.0}]},
+                {"paramIndex":1,"points":[{"position":0.0,"value":0.5},{"position":2.0,"value":0.8},{"position":8.0,"value":0.1}]}
+            ]}""");
+        JsonObject result = parseResult(response);
+        assertTrue(result.get("ok").getAsBoolean());
+        assertEquals(2, result.get("envelopeCount").getAsInt());
+        assertEquals(5, result.get("totalPoints").getAsInt());
+    }
+
+    @Test
+    void writeAutomation_emptyEnvelopes_returnsError() {
+        String response = handle("macro/writeAutomation", """
+            {"envelopes":[]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("must not be empty"));
+    }
+
+    @Test
+    void writeAutomation_paramIndexOutOfRange_returnsError() {
+        String response = handle("macro/writeAutomation", """
+            {"envelopes":[
+                {"paramIndex":9,"points":[{"position":0.0,"value":0.5}]}
+            ]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("out of range"));
+    }
+
+    @Test
+    void writeAutomation_emptyPoints_returnsError() {
+        String response = handle("macro/writeAutomation", """
+            {"envelopes":[
+                {"paramIndex":0,"points":[]}
+            ]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("must not be empty"));
     }
 
     // --- Expression support in writeClip ---

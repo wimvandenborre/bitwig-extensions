@@ -3140,6 +3140,52 @@
     }
   },
   {
+    "name": "macro_writeAutomation",
+    "description": "Write arranger automation envelopes for multiple device parameters in one call. Automatically enables arranger automation write, handles page switching for multi-page parameters, and chains envelope writes sequentially. Delegates to device/writeEnvelope internally. Returns { ok, envelopeCount, totalPoints } (optimistic \u2014 envelope writes are deferred).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "envelopes": {
+          "type": "array",
+          "description": "Array of envelope definitions, one per parameter.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "paramIndex": {
+                "type": "integer",
+                "description": "Remote control parameter index (0\u20137) on the target page."
+              },
+              "pageIndex": {
+                "type": "integer",
+                "description": "Optional remote controls page index. If omitted, writes to the current page."
+              },
+              "points": {
+                "type": "array",
+                "description": "Automation points sorted by position.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "position": {
+                      "type": "number",
+                      "description": "Beat position in the arrangement (0.0 = start)."
+                    },
+                    "value": {
+                      "type": "number",
+                      "description": "Parameter value (0.0\u20131.0)."
+                    }
+                  },
+                  "required": ["position", "value"]
+                }
+              }
+            },
+            "required": ["paramIndex", "points"]
+          }
+        }
+      },
+      "required": ["envelopes"]
+    }
+  },
+  {
     "name": "app_activateEngine",
     "description": "Activate the Bitwig audio engine. Use when the engine has been deactivated and needs to be restarted.",
     "input_schema": {

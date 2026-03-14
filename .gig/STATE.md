@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.27.4` |
-| **Phase** | 27 — gig-maestro: Clip Expression Macros |
+| **Version** | `0.28.4` |
+| **Phase** | 28 — gig-maestro: Macro Automation Curves |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 27.4 — Build verification |
+| **Last Batch** | 28.4 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.28.4 | 28 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.28.3 | 28 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.28.2 | 28 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.28.1 | 28 | macro/writeAutomation implementation | PLANNED | done | 2026-03-14 |
 | 0.27.4 | 27 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.27.3 | 27 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.27.2 | 27 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -142,6 +146,7 @@
 D-23.1 (preset format in getDiscoveryResult), D-23.2 (client-side default filtering), D-23.3 (system prompt capture workflow) — all ACTIVE
 
 Phase 27 governed: all tests pass, 562 smoke tests, 0 issues.
+Phase 28 governed: all tests pass, 570 smoke tests, 0 issues.
 
 ---
 
