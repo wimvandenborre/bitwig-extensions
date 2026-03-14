@@ -150,6 +150,7 @@ ALL_TOOLS=(
   macro_createClip
   macro_writeClip
   macro_buildSection
+  macro_buildSong
 
   # phase 13 — mixer & routing
   send_setLevel
@@ -376,6 +377,12 @@ PARAM_CHECKS=(
   "macro_createTrack|.input_schema.properties.pages.type|array"
   "macro_createTrack|.input_schema.properties.pages.items.properties.pageIndex.type|integer"
   "macro_createTrack|.input_schema.properties.pages.items.properties.params.type|array"
+  "macro_createTrack|.input_schema.properties.color.type|object"
+  "macro_createTrack|.input_schema.properties.color.properties.r.type|number"
+  "macro_buildSong|.input_schema.properties.tracks.type|array"
+  "macro_buildSong|.input_schema.properties.sections.type|array"
+  "macro_buildSong|.input_schema.properties.tracks.items.properties.type.type|string"
+  "macro_buildSong|.input_schema.properties.tracks.items.properties.color.type|object"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -744,6 +751,11 @@ PROMPT_CHECKS=(
   # gig phase 24 — macro improvements
   "system prompt documents createTrack with pages|inserts the device, and applies sound parameters"
   "system prompt documents track creation with sound design|Track creation with sound design"
+
+  # gig phase 25 — macro composition chains
+  "system prompt mentions macro_buildSong|macro_buildSong"
+  "system prompt documents one-call alternative|One-call alternative"
+  "system prompt documents sequential track delays|Tracks are created sequentially with proper delays"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do

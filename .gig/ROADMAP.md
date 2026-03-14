@@ -36,6 +36,8 @@
 | 21 | gig-maestro: Toggle Panel Visibility RPC | v0.21.1–v0.21.4 | complete |
 | 22 | gig-maestro: Polymer Sound Design | v0.22.1–v0.22.8 | complete |
 | 23 | gig-maestro: Live Preset Export | v0.23.1–v0.23.5 | complete |
+| 24 | gig-maestro: Macro Improvements | v0.24.1–v0.24.4 | complete |
+| 25 | gig-maestro: Macro Composition Chains | v0.25.1–v0.25.5 | complete |
 
 ## Completed Milestones
 

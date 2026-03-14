@@ -132,6 +132,14 @@ public class TrackHandler {
             return ok();
         });
 
+        dispatcher.register("track/setCursorColor", params -> {
+            float r = params.get("r").getAsFloat();
+            float g = params.get("g").getAsFloat();
+            float b = params.get("b").getAsFloat();
+            cursorTrack.color().set(r, g, b);
+            return ok();
+        });
+
         dispatcher.register("track/setCrossfade", params -> {
             Track track = getTrack(requireInt(params, "index"));
             String mode = requireString(params, "mode").toUpperCase();

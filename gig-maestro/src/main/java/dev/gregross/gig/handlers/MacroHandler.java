@@ -28,6 +28,7 @@ public class MacroHandler {
         dispatcher.register("macro/buildSection", this::handleBuildSection);
         dispatcher.register("macro/setupScenes", this::handleSetupScenes);
         dispatcher.register("macro/createSound", this::handleCreateSound);
+        dispatcher.register("macro/buildSong", this::handleBuildSong);
     }
 
     private JsonElement handleCreateTrack(JsonObject params) throws Exception {
@@ -60,6 +61,15 @@ public class MacroHandler {
             JsonObject renameParams = new JsonObject();
             renameParams.addProperty("name", params.get("name").getAsString());
             dispatcher.handleInternal("track/rename", renameParams);
+        }
+
+        if (params.has("color") && !params.get("color").isJsonNull()) {
+            JsonObject color = params.getAsJsonObject("color");
+            JsonObject colorParams = new JsonObject();
+            colorParams.addProperty("r", color.get("r").getAsFloat());
+            colorParams.addProperty("g", color.get("g").getAsFloat());
+            colorParams.addProperty("b", color.get("b").getAsFloat());
+            dispatcher.handleInternal("track/setCursorColor", colorParams);
         }
 
         boolean hasDevice = params.has("device") && !params.get("device").isJsonNull();
@@ -351,6 +361,100 @@ public class MacroHandler {
         result.addProperty("pageCount", pages.size());
         result.addProperty("paramCount", totalParams);
         result.addProperty("inserted", inserted);
+        return result;
+    }
+
+    private JsonElement handleBuildSong(JsonObject params) throws Exception {
+        JsonArray tracks = requireArray(params, "tracks");
+        if (tracks.isEmpty()) {
+            throw new IllegalArgumentException("'tracks' array must not be empty");
+        }
+
+        // Calculate per-track delay: each track needs time for device init + page writes
+        // Track with pages: FLUSH_DELAY_MS * (1 + 2 * pageCount)
+        // Track with device only: FLUSH_DELAY_MS
+        // Track without device: 0
+        long cumulativeDelay = 0;
+
+        for (int i = 0; i < tracks.size(); i++) {
+            JsonObject track = tracks.get(i).getAsJsonObject();
+            final long trackDelay = cumulativeDelay;
+
+            // Build createTrack params
+            JsonObject createTrackParams = new JsonObject();
+            createTrackParams.addProperty("type", requireString(track, "type"));
+            if (track.has("name") && !track.get("name").isJsonNull()) {
+                createTrackParams.addProperty("name", track.get("name").getAsString());
+            }
+            if (track.has("device") && !track.get("device").isJsonNull()) {
+                createTrackParams.addProperty("device", track.get("device").getAsString());
+            }
+            if (track.has("color") && !track.get("color").isJsonNull()) {
+                createTrackParams.add("color", track.getAsJsonObject("color"));
+            }
+            if (track.has("pages") && !track.get("pages").isJsonNull()) {
+                createTrackParams.add("pages", track.getAsJsonArray("pages"));
+            }
+
+            if (trackDelay == 0) {
+                dispatcher.handleInternal("macro/createTrack", createTrackParams);
+            } else {
+                scheduler.schedule(() -> {
+                    try {
+                        dispatcher.handleInternal("macro/createTrack", createTrackParams);
+                    } catch (Exception e) {
+                        // Deferred track creation failed
+                    }
+                }, trackDelay);
+            }
+
+            // Calculate delay this track needs before next track can start
+            boolean hasDevice = track.has("device") && !track.get("device").isJsonNull();
+            boolean hasPages = track.has("pages") && !track.get("pages").isJsonNull();
+
+            if (hasPages) {
+                int pageCount = track.getAsJsonArray("pages").size();
+                cumulativeDelay += FLUSH_DELAY_MS * (1 + 2 * pageCount);
+            } else if (hasDevice) {
+                cumulativeDelay += FLUSH_DELAY_MS;
+            }
+        }
+
+        // Schedule sections after all tracks are created
+        if (params.has("sections") && !params.get("sections").isJsonNull()) {
+            JsonArray sections = params.getAsJsonArray("sections");
+
+            for (int i = 0; i < sections.size(); i++) {
+                JsonObject section = sections.get(i).getAsJsonObject();
+                final long sectionDelay = cumulativeDelay;
+
+                // Build buildSection params
+                JsonObject sectionParams = new JsonObject();
+                sectionParams.addProperty("sceneName", requireString(section, "sceneName"));
+                sectionParams.add("clips", requireArray(section, "clips"));
+                if (section.has("sceneIndex") && !section.get("sceneIndex").isJsonNull()) {
+                    sectionParams.addProperty("sceneIndex", section.get("sceneIndex").getAsInt());
+                }
+
+                scheduler.schedule(() -> {
+                    try {
+                        dispatcher.handleInternal("macro/buildSection", sectionParams);
+                    } catch (Exception e) {
+                        // Deferred section building failed
+                    }
+                }, sectionDelay);
+
+                // Calculate delay for next section: 1 flush for scene setup + 2 per clip
+                int clipCount = section.getAsJsonArray("clips").size();
+                cumulativeDelay += FLUSH_DELAY_MS * (1 + 2 * clipCount);
+            }
+        }
+
+        JsonObject result = new JsonObject();
+        result.addProperty("trackCount", tracks.size());
+        result.addProperty("sectionCount",
+            params.has("sections") && !params.get("sections").isJsonNull()
+                ? params.getAsJsonArray("sections").size() : 0);
         return result;
     }
 
