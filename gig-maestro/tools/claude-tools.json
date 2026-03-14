@@ -4168,6 +4168,24 @@
     }
   },
   {
+    "name": "device_discoverAll",
+    "description": "Initiate a full parameter discovery scan of the currently selected device. Cycles through every parameter page (100ms per page) and collects all parameter names, values, and displayed values. Returns immediately with { scanning: true, pageCount, estimatedMs }. Call device_getDiscoveryResult after the estimated time to retrieve the complete parameter map. The original page is restored after scanning.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "device_getDiscoveryResult",
+    "description": "Retrieve the result of a device/discoverAll scan. Returns the complete parameter map: { deviceName, pageCount, pages: [{ index, name, parameters: [{ index, name, value, displayedValue }] }] }. If the scan is still in progress, returns { scanning: true }. Throws an error if no discovery has been initiated.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
     "name": "masterDevice_enterLayer",
     "description": "Navigate the master device cursor into a nested layer's device chain. Same as device_enterLayer but for master bus devices.",
     "input_schema": {

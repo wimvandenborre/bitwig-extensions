@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 113 ]; then
-  echo "  PASS  claude-tools.json has >= 113 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 115 ]; then
+  echo "  PASS  claude-tools.json has >= 115 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 113 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 115 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -302,6 +302,10 @@ ALL_TOOLS=(
 
   # gig phase 18 — macro createSound
   macro_createSound
+
+  # gig phase 22 — device discovery
+  device_discoverAll
+  device_getDiscoveryResult
 )
 
 for tool in "${ALL_TOOLS[@]}"; do
@@ -710,7 +714,7 @@ PROMPT_CHECKS=(
   "system prompt mentions track types|trackType"
 
   # gig phase 16 — batch parameter setters
-  "system prompt covers batch parameter changes|batch multiple parameter changes"
+  "system prompt covers batch operations|Batch Operations"
 
   # gig phase 18 — macro createSound
   "system prompt mentions macro_createSound|macro_createSound"
@@ -720,6 +724,13 @@ PROMPT_CHECKS=(
   "system prompt mentions app_toggleDevices|app_toggleDevices"
   "system prompt mentions app_toggleNoteEditor|app_toggleNoteEditor"
   "system prompt mentions app_previousSubPanel|app_previousSubPanel"
+
+  # gig phase 22 — device discovery & presets
+  "system prompt mentions device_discoverAll|device_discoverAll"
+  "system prompt mentions device_getDiscoveryResult|device_getDiscoveryResult"
+  "system prompt has Device Reference Files section|Device Reference Files"
+  "system prompt has Sound Presets section|Sound Presets"
+  "system prompt mentions polymer.json|polymer.json"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do
