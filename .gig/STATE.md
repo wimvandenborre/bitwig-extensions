@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.21.4` |
-| **Phase** | 21 — gig-maestro: Toggle Panel Visibility RPC |
+| **Version** | `0.22.8` |
+| **Phase** | 22 — gig-maestro: Polymer Sound Design |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 21.4 — Update manual/workflow scripts + build verify |
+| **Last Batch** | 22.8 — Preset refinement from live testing |
 | **Last Updated** | 2026-03-13 |
 
 ---
@@ -18,6 +18,14 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.22.8 | 22 | Preset refinement from live testing | UNPLANNED | done | 2026-03-13 |
+| 0.22.7 | 22 | Fix setParameters page-switch timing bug | UNPLANNED | done | 2026-03-13 |
+| 0.22.6 | 22 | Build verification | PLANNED | done | 2026-03-13 |
+| 0.22.5 | 22 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-13 |
+| 0.22.4 | 22 | Polymer parameter map + 5 sound presets | PLANNED | done | 2026-03-13 |
+| 0.22.3 | 22 | Fix discovery getName() → pageNames() | UNPLANNED | done | 2026-03-13 |
+| 0.22.2 | 22 | Unit tests for discoverAll | PLANNED | done | 2026-03-13 |
+| 0.22.1 | 22 | device/discoverAll RPC implementation | PLANNED | done | 2026-03-13 |
 | 0.21.4 | 21 | Update manual/workflow scripts + build verify | PLANNED | done | 2026-03-13 |
 | 0.21.3 | 21 | Tool definitions + system prompt | PLANNED | done | 2026-03-13 |
 | 0.21.2 | 21 | Unit tests | PLANNED | done | 2026-03-13 |
@@ -109,7 +117,7 @@
 
 ## Active Decisions
 
-D-21.1 (9 panel toggle RPCs), D-21.2 (app/toggle naming), D-21.3 (tests + tools + scripts) — all ACTIVE
+D-22.1 (device/discoverAll RPC), D-22.2 (polymer.json reference), D-22.3 (preset JSON files), D-22.4 (100ms page cycling), D-22.5 (system prompt updates) — all ACTIVE
 
 ---
 

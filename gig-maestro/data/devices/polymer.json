@@ -1,0 +1,110 @@
+{
+  "deviceName": "Polymer",
+  "pageCount": 7,
+  "pages": [
+    {
+      "index": 0,
+      "name": "Main",
+      "parameters": [
+        { "index": 0, "name": "Osc/Sub", "defaultValue": 0.385, "defaultDisplayed": "38.5 %" },
+        { "index": 1, "name": "Octave", "defaultValue": 0.5, "defaultDisplayed": "-1" },
+        { "index": 2, "name": "Waveform", "defaultValue": 1.0, "defaultDisplayed": "Sawtooth" },
+        { "index": 3, "name": "Oscs/Noise", "defaultValue": 0.0, "defaultDisplayed": "0.00 %" },
+        { "index": 4, "name": "High-pass", "defaultValue": 0.109, "defaultDisplayed": "43.7 Hz" },
+        { "index": 5, "name": "Glide time", "defaultValue": 0.0, "defaultDisplayed": "0.00 ms" },
+        { "index": 6, "name": "Vel Sens.", "defaultValue": 0.5, "defaultDisplayed": "50.0 %" },
+        { "index": 7, "name": "Output", "defaultValue": 0.794, "defaultDisplayed": "0.0 dB" }
+      ]
+    },
+    {
+      "index": 1,
+      "name": "Envelope",
+      "description": "Amp envelope (indices 0-3) and filter envelope (indices 4-7) — both ADSR",
+      "parameters": [
+        { "index": 0, "name": "Attack", "defaultValue": 0.08, "defaultDisplayed": "4.10 ms" },
+        { "index": 1, "name": "Decay", "defaultValue": 0.482, "defaultDisplayed": "896 ms" },
+        { "index": 2, "name": "Sustain", "defaultValue": 0.34, "defaultDisplayed": "34.0 %" },
+        { "index": 3, "name": "Release", "defaultValue": 0.3, "defaultDisplayed": "215 ms" },
+        { "index": 4, "name": "Attack", "defaultValue": 0.133, "defaultDisplayed": "19.0 ms" },
+        { "index": 5, "name": "Decay", "defaultValue": 0.284, "defaultDisplayed": "184 ms" },
+        { "index": 6, "name": "Sustain", "defaultValue": 0.758, "defaultDisplayed": "75.8 %" },
+        { "index": 7, "name": "Release", "defaultValue": 0.365, "defaultDisplayed": "389 ms" }
+      ]
+    },
+    {
+      "index": 2,
+      "name": "Wavetable",
+      "description": "Oscillator wavetable position, modulation, pitch, unison, and detuning",
+      "parameters": [
+        { "index": 0, "name": "Index", "defaultValue": 0.0, "defaultDisplayed": "0.00 %" },
+        { "index": 1, "name": "IndexMod", "defaultValue": 0.5, "defaultDisplayed": "0.00 %" },
+        { "index": 2, "name": "PitchMod", "defaultValue": 0.5, "defaultDisplayed": "0.00 st" },
+        { "index": 3, "name": "PhaseMod", "defaultValue": 0.0, "defaultDisplayed": "0.00 %" },
+        { "index": 4, "name": "Unison", "defaultValue": 0.0, "defaultDisplayed": "Off" },
+        { "index": 5, "name": "U.Detune", "defaultValue": 0.2, "defaultDisplayed": "20 cents" },
+        { "index": 6, "name": "Pitch", "defaultValue": 0.5, "defaultDisplayed": "0.00 st" },
+        { "index": 7, "name": "Detune", "defaultValue": 0.5, "defaultDisplayed": "0.00 Hz" }
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Sallen-Key",
+      "description": "Low-pass filter: cutoff, resonance, drive, keytracking, envelope modulation, mode",
+      "parameters": [
+        { "index": 0, "name": "Cutoff", "defaultValue": 0.364, "defaultDisplayed": "294 Hz" },
+        { "index": 1, "name": "Reso", "defaultValue": 0.192, "defaultDisplayed": "23.4 %" },
+        { "index": 2, "name": "Drive", "defaultValue": 0.5, "defaultDisplayed": "0.0 dB" },
+        { "index": 3, "name": "Keytrack", "defaultValue": 0.415, "defaultDisplayed": "83.0 %" },
+        { "index": 4, "name": "Ctf Mod", "defaultValue": 0.665, "defaultDisplayed": "39.60 st" },
+        { "index": 5, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" },
+        { "index": 6, "name": "Mode", "defaultValue": 0.2, "defaultDisplayed": "LP 4P" },
+        { "index": 7, "name": "Nonlin", "defaultValue": 0.0, "defaultDisplayed": "Symmetric" }
+      ]
+    },
+    {
+      "index": 4,
+      "name": "ADSR",
+      "description": "Amp envelope ADSR (duplicate of Envelope page indices 4-7)",
+      "parameters": [
+        { "index": 0, "name": "Attack", "defaultValue": 0.133, "defaultDisplayed": "19.0 ms" },
+        { "index": 1, "name": "Decay", "defaultValue": 0.284, "defaultDisplayed": "184 ms" },
+        { "index": 2, "name": "Sustain", "defaultValue": 0.758, "defaultDisplayed": "75.8 %" },
+        { "index": 3, "name": "Release", "defaultValue": 0.365, "defaultDisplayed": "389 ms" },
+        { "index": 4, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" },
+        { "index": 5, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" },
+        { "index": 6, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" },
+        { "index": 7, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" }
+      ]
+    },
+    {
+      "index": 5,
+      "name": "Filter EG",
+      "description": "Filter envelope ADSR (duplicate of Envelope page indices 0-3)",
+      "parameters": [
+        { "index": 0, "name": "Attack", "defaultValue": 0.08, "defaultDisplayed": "4.10 ms" },
+        { "index": 1, "name": "Decay", "defaultValue": 0.482, "defaultDisplayed": "896 ms" },
+        { "index": 2, "name": "Sustain", "defaultValue": 0.34, "defaultDisplayed": "34.0 %" },
+        { "index": 3, "name": "Release", "defaultValue": 0.3, "defaultDisplayed": "215 ms" },
+        { "index": 4, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" },
+        { "index": 5, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" },
+        { "index": 6, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" },
+        { "index": 7, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" }
+      ]
+    },
+    {
+      "index": 6,
+      "name": "Vibrato",
+      "description": "Vibrato LFO: rate, waveshape, delay, fade-in, retrigger, mode, amount",
+      "parameters": [
+        { "index": 0, "name": "Rate", "defaultValue": 0.399, "defaultDisplayed": "4.80 Hz" },
+        { "index": 1, "name": "Waveshape", "defaultValue": 0.8, "defaultDisplayed": "80.0 %" },
+        { "index": 2, "name": "Delay", "defaultValue": 0.308, "defaultDisplayed": "233 ms" },
+        { "index": 3, "name": "Fade-in", "defaultValue": 0.39, "defaultDisplayed": "475 ms" },
+        { "index": 4, "name": "Retrig", "defaultValue": 1.0, "defaultDisplayed": "On" },
+        { "index": 5, "name": "", "defaultValue": 0.0, "defaultDisplayed": "" },
+        { "index": 6, "name": "Mode", "defaultValue": 0.0, "defaultDisplayed": "Modwheel" },
+        { "index": 7, "name": "Amount", "defaultValue": 1.0, "defaultDisplayed": "100 %" }
+      ]
+    }
+  ]
+}

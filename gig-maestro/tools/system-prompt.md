@@ -176,31 +176,41 @@ Navigate inside complex devices to access nested layers, drum pads, and specific
 
 All 3 methods are also available on `masterDevice_*` for master bus devices.
 
+**Device Parameter Discovery** — map all pages/parameters in one shot:
+```
+1. device_discoverAll()                              // starts async scan (~100ms per page)
+2. // wait for estimatedMs from response
+3. device_getDiscoveryResult()                       // returns full parameter map
+```
+Returns: `{ deviceName, pageCount, pages: [{ index, name, parameters: [{ index, name, value, displayedValue }] }] }`
+
+**Device Reference Files** — pre-mapped parameter layouts in `data/devices/`:
+- `data/devices/polymer.json` — Polymer synth (7 pages, 56 parameters)
+- Read these files to know a device's layout without running discovery
+
+**Sound Presets** — ready-to-use parameter recipes in `data/presets/{device}/`:
+- `data/presets/polymer/pluck.json` — short percussive pluck
+- `data/presets/polymer/bass.json` — deep sub bass
+- `data/presets/polymer/lead.json` — bright saw lead with unison
+- `data/presets/polymer/pad.json` — warm evolving pad
+- `data/presets/polymer/keys.json` — electric piano-style keys
+- Each preset's `pages` array is directly compatible with `macro_createSound`
+
 **From-scratch sound design workflow:**
 ```
-1. device_insertBitwigDevice(name: "Polymer")        // insert synth
-2. device_selectPage(index: 0)                       // go to first page
-3. session_snapshot()                                 // read page name + params
-4. device_selectPage(index: 1)                       // next page
-5. session_snapshot()                                 // read — repeat to map all pages
-6. // Now you know the device layout. Apply synthesis knowledge:
-7. device_selectPageByTag(tag: "osc")                // jump to oscillator page
-8. device_setParameterValue(index: 0, value: 0.7)    // set waveform/shape
-9. device_selectPageByTag(tag: "filter")             // jump to filter page
-10. device_setParameterValue(index: 0, value: 0.3)   // set filter cutoff
-11. device_selectPageByTag(tag: "env")               // jump to envelope
-12. device_setParameterValue(index: 2, value: 0.5)   // adjust decay
-```
-Or batch multiple parameter changes across pages using `session_transaction`:
-```
-session_transaction(operations: [
-  {method: "device/selectPageByTag", params: {tag: "osc"}},
-  {method: "device/setParameterValue", params: {index: 0, value: 0.7}},
-  {method: "device/selectPageByTag", params: {tag: "filter"}},
-  {method: "device/setParameterValue", params: {index: 0, value: 0.3}},
-  {method: "device/selectPageByTag", params: {tag: "env"}},
-  {method: "device/setParameterValue", params: {index: 2, value: 0.5}}
-], postSnapshot: true)
+// Option A: Use a preset as a starting point
+1. Read data/presets/polymer/lead.json
+2. macro_createSound(device: "Polymer", pages: <from preset file>)
+
+// Option B: Discover and design from scratch
+1. device_insertBitwigDevice(name: "Polymer")
+2. device_discoverAll() → wait → device_getDiscoveryResult()
+3. // Now you have the full parameter map. Apply synthesis knowledge:
+4. macro_createSound(pages: [{pageIndex: 0, params: [...]}, ...])
+
+// Option C: Tweak by tag (quick adjustments)
+1. device_selectPageByTag(tag: "filter")
+2. device_setParameterValue(index: 0, value: 0.3)   // adjust cutoff
 ```
 
 **Layer editing workflow (Instrument Layer):**

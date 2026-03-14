@@ -40,6 +40,10 @@ public class DeviceHandler {
     private final ControllerHost host;
     private final TaskScheduler scheduler;
 
+    // Discovery state
+    private volatile JsonObject discoveryResult = null;
+    private volatile boolean discoveryInProgress = false;
+
     public DeviceHandler(CursorTrack cursorTrack, CursorDevice cursorDevice,
                          CursorRemoteControlsPage remoteControlsPage,
                          DrumPadBank drumPadBank,
@@ -169,31 +173,35 @@ public class DeviceHandler {
                 }
             }
 
-            // Apply first page immediately (this flush cycle)
-            JsonObject firstPage = pages.get(0).getAsJsonObject();
-            int firstPageIndex = firstPage.get("pageIndex").getAsInt();
-            JsonArray firstPageParams = firstPage.getAsJsonArray("params");
-            remoteControlsPage.selectedPageIndex().set(firstPageIndex);
-            for (JsonElement paramEl : firstPageParams) {
-                JsonObject p = paramEl.getAsJsonObject();
-                remoteControlsPage.getParameter(p.get("index").getAsInt())
-                    .value().setImmediately(p.get("value").getAsDouble());
-            }
-
-            // Schedule subsequent pages across flush cycles
-            for (int i = 1; i < pages.size(); i++) {
+            // Switch to first page immediately (this flush cycle).
+            // Params are written in the NEXT flush cycle after the page
+            // switch takes effect — Bitwig needs one cycle to update the
+            // RemoteControl objects after a page change.
+            for (int i = 0; i < pages.size(); i++) {
                 JsonObject page = pages.get(i).getAsJsonObject();
                 int pageIndex = page.get("pageIndex").getAsInt();
                 JsonArray pageParams = page.getAsJsonArray("params");
-                long delay = FLUSH_DELAY_MS * i;
-                scheduler.schedule(() -> {
+
+                // Task 1: switch to page
+                long switchDelay = FLUSH_DELAY_MS * (i * 2);
+                if (switchDelay == 0) {
+                    // First page: switch immediately in this flush cycle
                     remoteControlsPage.selectedPageIndex().set(pageIndex);
+                } else {
+                    scheduler.schedule(() -> {
+                        remoteControlsPage.selectedPageIndex().set(pageIndex);
+                    }, switchDelay);
+                }
+
+                // Task 2: write params (one flush cycle after the switch)
+                long writeDelay = FLUSH_DELAY_MS * (i * 2 + 1);
+                scheduler.schedule(() -> {
                     for (JsonElement paramEl : pageParams) {
                         JsonObject p = paramEl.getAsJsonObject();
                         remoteControlsPage.getParameter(p.get("index").getAsInt())
                             .value().setImmediately(p.get("value").getAsDouble());
                     }
-                }, delay);
+                }, writeDelay);
             }
 
             JsonObject result = new JsonObject();
@@ -464,6 +472,93 @@ public class DeviceHandler {
                 throw new IllegalArgumentException("direction must be 'next' or 'previous', got: " + direction);
             }
             return new JsonPrimitive("ok");
+        });
+
+        // Device parameter discovery
+        dispatcher.register("device/discoverAll", params -> {
+            if (discoveryInProgress) {
+                throw new IllegalStateException("Discovery already in progress");
+            }
+            int totalPages = remoteControlsPage.pageCount().get();
+            if (totalPages <= 0) {
+                JsonObject result = new JsonObject();
+                result.addProperty("deviceName", cursorDevice.name().get());
+                result.addProperty("pageCount", 0);
+                result.add("pages", new JsonArray());
+                return result;
+            }
+
+            int originalPage = remoteControlsPage.selectedPageIndex().get();
+            discoveryInProgress = true;
+            discoveryResult = null;
+
+            String deviceName = cursorDevice.name().get();
+            String[] allPageNames = remoteControlsPage.pageNames().get();
+            JsonArray pages = new JsonArray();
+
+            // Set to page 0 — first read happens in task at FLUSH_DELAY_MS
+            remoteControlsPage.selectedPageIndex().set(0);
+
+            for (int i = 0; i < totalPages; i++) {
+                final int pageIndex = i;
+                long delay = FLUSH_DELAY_MS * (i + 1);
+                scheduler.schedule(() -> {
+                    // Read current page's parameters
+                    JsonObject page = new JsonObject();
+                    page.addProperty("index", pageIndex);
+                    String pageName = (pageIndex < allPageNames.length)
+                        ? allPageNames[pageIndex] : "";
+                    page.addProperty("name", pageName);
+                    JsonArray parameters = new JsonArray();
+                    for (int j = 0; j < PARAM_COUNT; j++) {
+                        RemoteControl param = remoteControlsPage.getParameter(j);
+                        JsonObject paramObj = new JsonObject();
+                        paramObj.addProperty("index", j);
+                        paramObj.addProperty("name", param.name().get());
+                        paramObj.addProperty("value", param.value().get());
+                        paramObj.addProperty("displayedValue",
+                            param.value().displayedValue().get());
+                        parameters.add(paramObj);
+                    }
+                    page.add("parameters", parameters);
+                    pages.add(page);
+
+                    // Advance to next page, or finalize
+                    if (pageIndex < totalPages - 1) {
+                        remoteControlsPage.selectedPageIndex().set(pageIndex + 1);
+                    } else {
+                        // Restore original page and publish result
+                        remoteControlsPage.selectedPageIndex().set(originalPage);
+                        JsonObject result = new JsonObject();
+                        result.addProperty("deviceName", deviceName);
+                        result.addProperty("pageCount", totalPages);
+                        result.add("pages", pages);
+                        discoveryResult = result;
+                        discoveryInProgress = false;
+                    }
+                }, delay);
+            }
+
+            JsonObject response = new JsonObject();
+            response.addProperty("scanning", true);
+            response.addProperty("pageCount", totalPages);
+            response.addProperty("estimatedMs", totalPages * FLUSH_DELAY_MS);
+            return response;
+        });
+
+        dispatcher.register("device/getDiscoveryResult", params -> {
+            if (discoveryResult != null) {
+                JsonObject result = discoveryResult;
+                discoveryResult = null;
+                return result;
+            }
+            if (discoveryInProgress) {
+                JsonObject result = new JsonObject();
+                result.addProperty("scanning", true);
+                return result;
+            }
+            throw new IllegalStateException(
+                "No discovery in progress. Call device/discoverAll first.");
         });
 
         // Cursor track navigation

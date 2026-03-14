@@ -10,6 +10,10 @@ import com.bitwig.extension.controller.api.RemoteControl;
 import com.bitwig.extension.controller.api.SettableBooleanValue;
 import com.bitwig.extension.controller.api.SettableIntegerValue;
 import com.bitwig.extension.controller.api.SettableRangedValue;
+import com.bitwig.extension.controller.api.SettableStringValue;
+import com.bitwig.extension.controller.api.StringArrayValue;
+import com.bitwig.extension.controller.api.StringValue;
+import com.bitwig.extension.controller.api.IntegerValue;
 import com.bitwig.extension.controller.api.Transport;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -110,8 +114,15 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlyTwentyNineMethods() {
-        assertEquals(30, dispatcher.getRegisteredMethods().size());
+    void registersDiscoveryMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("device/discoverAll"));
+        assertTrue(methods.contains("device/getDiscoveryResult"));
+    }
+
+    @Test
+    void registersExactlyThirtyTwoMethods() {
+        assertEquals(32, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---
@@ -569,9 +580,11 @@ class DeviceHandlerTest {
 
         assertContains(response, "\"ok\":true");
         verify(mockPageIndex).set(0);
+        // Param write is scheduled for next flush cycle (1 task)
+        assertEquals(1, scheduledTasks.size(), "Single page schedules 1 write task");
+        scheduledTasks.get(0).run();
         verify(mockVal0).setImmediately(0.25);
         verify(mockVal1).setImmediately(0.75);
-        assertTrue(scheduledTasks.isEmpty(), "Single page should not schedule any tasks");
     }
 
     @Test
@@ -601,16 +614,154 @@ class DeviceHandlerTest {
             + "]}"));
 
         assertContains(response, "\"ok\":true");
-        // First page applied immediately
+        // First page switches immediately (no scheduled task for switch)
         verify(mockPageIndex).set(0);
-        verify(mockVal0).setImmediately(0.5);
-        // Second page was scheduled, not applied yet
-        assertEquals(1, scheduledTasks.size(), "Second page should be scheduled");
+        // 3 scheduled tasks: page0 write, page1 switch, page1 write
+        assertEquals(3, scheduledTasks.size(),
+            "Two pages produce 3 tasks: page0 write, page1 switch, page1 write");
 
-        // Execute the scheduled task and verify second page params
+        // Task 0: write page 0 params (one flush cycle after switch)
         scheduledTasks.get(0).run();
+        verify(mockVal0).setImmediately(0.5);
+
+        // Task 1: switch to page 1
+        scheduledTasks.get(1).run();
         verify(mockPageIndex).set(1);
+
+        // Task 2: write page 1 params
+        scheduledTasks.get(2).run();
         verify(mockVal2).setImmediately(0.9);
+    }
+
+    // --- device/discoverAll behavioral ---
+
+    @Test
+    void discoverAll_zeroPages_returnsEmptyResult() {
+        IntegerValue mockPageCount = mock(IntegerValue.class);
+        when(mockRemoteControlsPage.pageCount()).thenReturn(mockPageCount);
+        when(mockPageCount.get()).thenReturn(0);
+        StringValue mockDeviceName = mock(StringValue.class);
+        when(mockCursorDevice.name()).thenReturn(mockDeviceName);
+        when(mockDeviceName.get()).thenReturn("Empty Device");
+
+        String response = dispatcher.handle(rpc("device/discoverAll", "{}"));
+        assertContains(response, "\"pageCount\":0");
+        assertContains(response, "\"deviceName\":\"Empty Device\"");
+        assertContains(response, "\"pages\":[]");
+    }
+
+    @Test
+    void discoverAll_multiPage_returnsScanningResponse() {
+        // Set up a non-immediate scheduler to verify the immediate response
+        JsonRpcDispatcher localDispatcher = new JsonRpcDispatcher();
+        List<Runnable> scheduledTasks = new ArrayList<>();
+        new DeviceHandler(mockCursorTrack, mockCursorDevice, mockRemoteControlsPage,
+            mockDrumPadBank, mockDeviceLibrary, mockTransport, mockHost,
+            (task, delay) -> scheduledTasks.add(task)).register(localDispatcher);
+
+        IntegerValue mockPageCount = mock(IntegerValue.class);
+        when(mockRemoteControlsPage.pageCount()).thenReturn(mockPageCount);
+        when(mockPageCount.get()).thenReturn(3);
+        when(mockRemoteControlsPage.selectedPageIndex()).thenReturn(mockPageIndex);
+        when(mockPageIndex.get()).thenReturn(0);
+        StringValue mockDeviceName = mock(StringValue.class);
+        when(mockCursorDevice.name()).thenReturn(mockDeviceName);
+        when(mockDeviceName.get()).thenReturn("Polymer");
+        StringArrayValue mockPageNames = mock(StringArrayValue.class);
+        when(mockRemoteControlsPage.pageNames()).thenReturn(mockPageNames);
+        when(mockPageNames.get()).thenReturn(new String[]{"A", "B", "C"});
+
+        String response = localDispatcher.handle(rpc("device/discoverAll", "{}"));
+        assertContains(response, "\"scanning\":true");
+        assertContains(response, "\"pageCount\":3");
+        assertEquals(3, scheduledTasks.size());
+    }
+
+    @Test
+    void discoverAll_completeScan_returnsFullParameterMap() {
+        // With immediate scheduler, scan completes synchronously
+        IntegerValue mockPageCount = mock(IntegerValue.class);
+        when(mockRemoteControlsPage.pageCount()).thenReturn(mockPageCount);
+        when(mockPageCount.get()).thenReturn(2);
+        when(mockRemoteControlsPage.selectedPageIndex()).thenReturn(mockPageIndex);
+        when(mockPageIndex.get()).thenReturn(0);
+        StringValue mockDeviceName = mock(StringValue.class);
+        when(mockCursorDevice.name()).thenReturn(mockDeviceName);
+        when(mockDeviceName.get()).thenReturn("Polymer");
+
+        // Mock page names array
+        StringArrayValue mockPageNames = mock(StringArrayValue.class);
+        when(mockRemoteControlsPage.pageNames()).thenReturn(mockPageNames);
+        when(mockPageNames.get()).thenReturn(new String[]{"Oscillator", "Filter"});
+
+        // Mock all 8 parameters
+        for (int i = 0; i < 8; i++) {
+            RemoteControl param = mock(RemoteControl.class);
+            SettableStringValue paramName = mock(SettableStringValue.class);
+            SettableRangedValue paramValue = mock(SettableRangedValue.class);
+            StringValue displayedValue = mock(StringValue.class);
+            when(mockRemoteControlsPage.getParameter(i)).thenReturn(param);
+            when(param.name()).thenReturn(paramName);
+            when(paramName.get()).thenReturn("Param " + i);
+            when(param.value()).thenReturn(paramValue);
+            when(paramValue.get()).thenReturn(0.5);
+            when(paramValue.displayedValue()).thenReturn(displayedValue);
+            when(displayedValue.get()).thenReturn("50%");
+        }
+
+        // Run discoverAll — tasks execute immediately
+        dispatcher.handle(rpc("device/discoverAll", "{}"));
+
+        // Fetch result
+        String result = dispatcher.handle(rpc("device/getDiscoveryResult", "{}"));
+        assertContains(result, "\"deviceName\":\"Polymer\"");
+        assertContains(result, "\"pageCount\":2");
+        assertContains(result, "\"Oscillator\"");
+        assertContains(result, "\"Param 0\"");
+        assertContains(result, "\"50%\"");
+    }
+
+    @Test
+    void discoverAll_restoresOriginalPage() {
+        IntegerValue mockPageCount = mock(IntegerValue.class);
+        when(mockRemoteControlsPage.pageCount()).thenReturn(mockPageCount);
+        when(mockPageCount.get()).thenReturn(2);
+        when(mockRemoteControlsPage.selectedPageIndex()).thenReturn(mockPageIndex);
+        when(mockPageIndex.get()).thenReturn(5); // Original page was 5
+
+        StringValue mockDeviceName = mock(StringValue.class);
+        when(mockCursorDevice.name()).thenReturn(mockDeviceName);
+        when(mockDeviceName.get()).thenReturn("Test");
+        StringArrayValue mockPageNamesArr = mock(StringArrayValue.class);
+        when(mockRemoteControlsPage.pageNames()).thenReturn(mockPageNamesArr);
+        when(mockPageNamesArr.get()).thenReturn(new String[]{"Page A", "Page B"});
+        for (int i = 0; i < 8; i++) {
+            RemoteControl param = mock(RemoteControl.class);
+            SettableStringValue pn = mock(SettableStringValue.class);
+            SettableRangedValue pv = mock(SettableRangedValue.class);
+            StringValue dv = mock(StringValue.class);
+            when(mockRemoteControlsPage.getParameter(i)).thenReturn(param);
+            when(param.name()).thenReturn(pn);
+            when(pn.get()).thenReturn("P");
+            when(param.value()).thenReturn(pv);
+            when(pv.get()).thenReturn(0.0);
+            when(pv.displayedValue()).thenReturn(dv);
+            when(dv.get()).thenReturn("0");
+        }
+
+        dispatcher.handle(rpc("device/discoverAll", "{}"));
+
+        // Verify: page 0 set initially, then page 1, then restored to 5
+        var inOrder = inOrder(mockPageIndex);
+        inOrder.verify(mockPageIndex).set(0);   // Start scan
+        inOrder.verify(mockPageIndex).set(1);   // Advance to page 1
+        inOrder.verify(mockPageIndex).set(5);   // Restore original
+    }
+
+    @Test
+    void getDiscoveryResult_noDiscovery_returnsError() {
+        String response = dispatcher.handle(rpc("device/getDiscoveryResult", "{}"));
+        assertContains(response, "No discovery in progress");
     }
 
     // --- Helpers ---

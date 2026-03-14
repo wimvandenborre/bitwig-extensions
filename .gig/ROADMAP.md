@@ -34,6 +34,7 @@
 | 19 | gig-maestro: Smoke Test Overhaul | v0.19.1–v0.19.8 | complete |
 | 20 | gig-maestro: Device Cursor Fix | v0.20.1–v0.20.3 | complete |
 | 21 | gig-maestro: Toggle Panel Visibility RPC | v0.21.1–v0.21.4 | complete |
+| 22 | gig-maestro: Polymer Sound Design | v0.22.1–v0.22.8 | complete |
 
 ## Completed Milestones
 
