@@ -114,8 +114,14 @@ class TrackHandlerTest {
     }
 
     @Test
-    void registersExactlyTwentyFiveMethods() {
-        assertEquals(25, dispatcher.getRegisteredMethods().size());
+    void registersToggleSoloMethod() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("track/toggleSolo"));
+    }
+
+    @Test
+    void registersExactlyTwentySixMethods() {
+        assertEquals(26, dispatcher.getRegisteredMethods().size());
     }
 
     // --- trackBank/scrollTo validation ---
@@ -347,6 +353,35 @@ class TrackHandlerTest {
         dispatcher.handle(rpc("track/setMonitor", "{\"index\":0,\"mode\":\"AUTO\"}"));
 
         verify(mockMonitorMode).set("AUTO");
+    }
+
+    // --- Behavioral tests — toggleSolo ---
+
+    @Test
+    void toggleSolo_defaultNonExclusive() {
+        when(mockTrack.solo()).thenReturn(mockSoloValue);
+
+        dispatcher.handle(rpc("track/toggleSolo", "{\"index\":0}"));
+
+        verify(mockSoloValue).toggle(false);
+    }
+
+    @Test
+    void toggleSolo_exclusiveTrue() {
+        when(mockTrack.solo()).thenReturn(mockSoloValue);
+
+        dispatcher.handle(rpc("track/toggleSolo", "{\"index\":0,\"exclusive\":true}"));
+
+        verify(mockSoloValue).toggle(true);
+    }
+
+    @Test
+    void toggleSolo_exclusiveFalse() {
+        when(mockTrack.solo()).thenReturn(mockSoloValue);
+
+        dispatcher.handle(rpc("track/toggleSolo", "{\"index\":0,\"exclusive\":false}"));
+
+        verify(mockSoloValue).toggle(false);
     }
 
     // --- Helpers ---

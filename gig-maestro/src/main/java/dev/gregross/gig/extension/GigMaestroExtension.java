@@ -11,6 +11,7 @@ import dev.gregross.gig.handlers.BrowserHandler;
 import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
+import dev.gregross.gig.handlers.GrooveHandler;
 import dev.gregross.gig.handlers.MacroHandler;
 import dev.gregross.gig.handlers.MasterDeviceHandler;
 import dev.gregross.gig.handlers.MasterHandler;
@@ -98,6 +99,9 @@ public class GigMaestroExtension extends ControllerExtension {
         // Create popup browser for preset/device/sample browsing
         PopupBrowser popupBrowser = host.createPopupBrowser();
 
+        // Create groove
+        Groove groove = host.createGroove();
+
         // Create arranger and cue marker bank
         Arranger arranger = host.createArranger();
         CueMarkerBank cueMarkerBank = arranger.createCueMarkerBank(16);
@@ -122,6 +126,7 @@ public class GigMaestroExtension extends ControllerExtension {
         stateCache.registerBrowserObservers(popupBrowser);
         stateCache.registerFilterObservers(popupBrowser);
         stateCache.registerNoteInputObservers(arpeggiator, noteLatch);
+        stateCache.registerGrooveObservers(groove);
 
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
@@ -164,6 +169,7 @@ public class GigMaestroExtension extends ControllerExtension {
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
         new BrowserHandler(popupBrowser, cursorDevice, stateCache).register(dispatcher);
         new NoteInputHandler(noteInput, arpeggiator, noteLatch, stateCache).register(dispatcher);
+        new GrooveHandler(groove).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, host::scheduleTask).register(dispatcher);
 
         // Start servers

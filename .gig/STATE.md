@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.29.3` |
-| **Phase** | 29 — gig-maestro: Song Dump Fidelity |
+| **Version** | `0.30.5` |
+| **Phase** | 30 — gig-maestro: Global Groove & High-Value API Gaps |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 29.3 — Build verification |
+| **Last Batch** | 30.5 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.30.5 | 30 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.30.4 | 30 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.30.3 | 30 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.30.2 | 30 | Exclusive solo + zoom methods | PLANNED | done | 2026-03-14 |
+| 0.30.1 | 30 | GrooveHandler + StateCache + extension wiring | PLANNED | done | 2026-03-14 |
 | 0.29.3 | 29 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.29.1-2 | 29 | Dump + rebuild: device params + clip settings | PLANNED | done | 2026-03-14 |
 | 0.28.4 | 28 | Build verification | PLANNED | done | 2026-03-14 |
@@ -145,11 +150,7 @@
 
 ## Active Decisions
 
-D-23.1 (preset format in getDiscoveryResult), D-23.2 (client-side default filtering), D-23.3 (system prompt capture workflow) — all ACTIVE
-
-Phase 27 governed: all tests pass, 562 smoke tests, 0 issues.
-Phase 28 governed: all tests pass, 570 smoke tests, 0 issues.
-Phase 29 governed: all tests pass, 570 smoke tests, 0 issues. CLI-only changes.
+_None — phase 30 archived._
 
 ---
 

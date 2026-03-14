@@ -270,7 +270,16 @@ public class StateCache {
     private volatile int noteLatchVelocityThreshold;
     private volatile int noteLatchActiveNotes;
 
+    // Groove state
+    private volatile boolean grooveEnabled;
+    private volatile double grooveShuffleAmount;
+    private volatile double grooveShuffleRate;
+    private volatile double grooveAccentAmount;
+    private volatile double grooveAccentRate;
+    private volatile double grooveAccentPhase;
+
     // Delta detection — previous section hashes
+    private int prevGrooveHash;
     private int prevTransportHash;
     private int prevTracksHash;
     private int prevScenesHash;
@@ -1023,6 +1032,26 @@ public class StateCache {
         noteLatch.activeNotes().addValueObserver((IntegerValueChangedCallback) v -> noteLatchActiveNotes = v);
     }
 
+    public void registerGrooveObservers(Groove groove) {
+        groove.getEnabled().markInterested();
+        groove.getEnabled().addValueObserver((DoubleValueChangedCallback) v -> grooveEnabled = v > 0.5);
+
+        groove.getShuffleAmount().markInterested();
+        groove.getShuffleAmount().addValueObserver((DoubleValueChangedCallback) v -> grooveShuffleAmount = v);
+
+        groove.getShuffleRate().markInterested();
+        groove.getShuffleRate().addValueObserver((DoubleValueChangedCallback) v -> grooveShuffleRate = v);
+
+        groove.getAccentAmount().markInterested();
+        groove.getAccentAmount().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentAmount = v);
+
+        groove.getAccentRate().markInterested();
+        groove.getAccentRate().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentRate = v);
+
+        groove.getAccentPhase().markInterested();
+        groove.getAccentPhase().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentPhase = v);
+    }
+
     public CursorBrowserFilterItem[] getFilterCursors() {
         return filterCursors;
     }
@@ -1110,6 +1139,7 @@ public class StateCache {
         snapshot.add("browser", getBrowserState());
         snapshot.add("arpeggiator", getArpeggiatorState());
         snapshot.add("noteLatch", getNoteLatchState());
+        snapshot.add("groove", getGrooveState());
         return snapshot;
     }
 
@@ -1153,6 +1183,7 @@ public class StateCache {
         checkSection("browser", getBrowserState(), changed, data);
         checkSection("arpeggiator", getArpeggiatorState(), changed, data);
         checkSection("noteLatch", getNoteLatchState(), changed, data);
+        checkSection("groove", getGrooveState(), changed, data);
 
         if (changed.isEmpty()) {
             return null;
@@ -1189,6 +1220,7 @@ public class StateCache {
             case "browser" -> prevBrowserHash;
             case "arpeggiator" -> prevArpeggiatorHash;
             case "noteLatch" -> prevNoteLatchHash;
+            case "groove" -> prevGrooveHash;
             default -> 0;
         };
     }
@@ -1208,6 +1240,7 @@ public class StateCache {
             case "browser" -> prevBrowserHash = hash;
             case "arpeggiator" -> prevArpeggiatorHash = hash;
             case "noteLatch" -> prevNoteLatchHash = hash;
+            case "groove" -> prevGrooveHash = hash;
         }
     }
 
@@ -1660,6 +1693,17 @@ public class StateCache {
         obj.addProperty("mono", noteLatchMono);
         obj.addProperty("velocityThreshold", noteLatchVelocityThreshold);
         obj.addProperty("activeNotes", noteLatchActiveNotes);
+        return obj;
+    }
+
+    public JsonObject getGrooveState() {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("enabled", grooveEnabled);
+        obj.addProperty("shuffleAmount", grooveShuffleAmount);
+        obj.addProperty("shuffleRate", grooveShuffleRate);
+        obj.addProperty("accentAmount", grooveAccentAmount);
+        obj.addProperty("accentRate", grooveAccentRate);
+        obj.addProperty("accentPhase", grooveAccentPhase);
         return obj;
     }
 }

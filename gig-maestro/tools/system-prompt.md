@@ -959,6 +959,11 @@ Same pattern works for master bus: `masterDevice_enterSlot` / `masterDevice_exit
 - `app_toggleFullScreen` — toggle full screen mode
 - `app_previousSubPanel` / `app_nextSubPanel` — cycle between detail sub-panels (note editor, device, automation)
 
+**Zoom controls:**
+- `app_zoomIn` / `app_zoomOut` — zoom in/out on the arranger/editor timeline
+- `app_zoomToFit` — zoom to fit all content
+- `app_zoomToSelection` — zoom to fit the current selection
+
 **Notifications:** `app_showNotification({ text: "Done!" })` shows a temporary popup in Bitwig's UI — the only way to communicate status to the user inside the DAW.
 
 **Transport navigation:**
@@ -1362,3 +1367,19 @@ Sustains notes after key release. 3 modes:
 
 - **arpeggiator:** `isEnabled`, `mode`, `octaves`, `rate`, `gateLength`, `shuffle`, `humanize`, `isFreeRunning`, `enableOverlappingNotes`, `usePressureToVelocity`, `terminateNotesImmediately`
 - **noteLatch:** `isEnabled`, `mode`, `mono`, `velocityThreshold`, `activeNotes`
+- **groove:** `enabled`, `shuffleAmount`, `shuffleRate`, `accentAmount`, `accentRate`, `accentPhase`
+
+### Global Groove
+
+The groove engine applies swing/shuffle and accent globally to all clip playback:
+
+- `groove_getState` — returns all 6 groove parameters
+- `groove_setEnabled({ enabled: true })` — enable/disable the groove engine
+- `groove_setParameter({ name: "shuffleAmount", value: 0.7 })` — set any groove parameter (0.0–1.0)
+
+Valid parameter names: `shuffleAmount`, `shuffleRate`, `accentAmount`, `accentRate`, `accentPhase`.
+
+### Exclusive Solo
+
+- `track_toggleSolo({ index: 0, exclusive: true })` — toggle solo with exclusive mode (unsolos all other tracks first)
+- `track_toggleSolo({ index: 0 })` — toggle solo without exclusive (default)

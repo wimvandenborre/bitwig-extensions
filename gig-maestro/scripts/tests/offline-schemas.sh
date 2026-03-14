@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 115 ]; then
-  echo "  PASS  claude-tools.json has >= 115 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 123 ]; then
+  echo "  PASS  claude-tools.json has >= 123 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 115 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 123 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -308,6 +308,16 @@ ALL_TOOLS=(
   # gig phase 22 — device discovery
   device_discoverAll
   device_getDiscoveryResult
+
+  # gig phase 30 — groove, exclusive solo, zoom
+  groove_getState
+  groove_setEnabled
+  groove_setParameter
+  track_toggleSolo
+  app_zoomIn
+  app_zoomOut
+  app_zoomToFit
+  app_zoomToSelection
 )
 
 for tool in "${ALL_TOOLS[@]}"; do
@@ -401,6 +411,11 @@ PARAM_CHECKS=(
   "macro_writeAutomation|.input_schema.properties.envelopes.items.properties.pageIndex.type|integer"
   "macro_writeAutomation|.input_schema.properties.envelopes.items.properties.points.type|array"
   "macro_writeAutomation|.input_schema.properties.envelopes.items.properties.points.items.properties.position.type|number"
+  "groove_setEnabled|.input_schema.properties.enabled.type|boolean"
+  "groove_setParameter|.input_schema.properties.name.type|string"
+  "groove_setParameter|.input_schema.properties.value.type|number"
+  "track_toggleSolo|.input_schema.properties.index.type|integer"
+  "track_toggleSolo|.input_schema.properties.exclusive.type|boolean"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -419,6 +434,7 @@ ENUM_CHECKS=(
   "track_setCrossfade;.input_schema.properties.mode.enum | join(\",\");A,B,AB"
   "track_setMonitor;.input_schema.properties.mode.enum | join(\",\");ON,OFF,AUTO"
   "masterDevice_insertBitwigDevice;.input_schema.properties.position.enum | join(\",\");end,before,after"
+  "groove_setParameter;.input_schema.properties.name.enum | join(\",\");accentAmount,accentPhase,accentRate,shuffleAmount,shuffleRate"
 )
 
 for entry in "${ENUM_CHECKS[@]}"; do
@@ -490,6 +506,7 @@ assert_contains "session_snapshot mentions isGroup" "$SNAP_DESC" "isGroup"
 assert_contains "session_snapshot mentions isGroupExpanded" "$SNAP_DESC" "isGroupExpanded"
 assert_contains "snapshot mentions arpeggiator" "$SNAP_DESC" "arpeggiator"
 assert_contains "snapshot mentions noteLatch" "$SNAP_DESC" "noteLatch"
+assert_contains "snapshot mentions groove" "$SNAP_DESC" "groove state"
 
 GETNOTES_DESC=$(jq -r '.[] | select(.name=="clip_getNotes") | .description' "$TOOLS_FILE")
 assert_contains "clip_getNotes describes pan" "$GETNOTES_DESC" "pan"
@@ -786,6 +803,17 @@ PROMPT_CHECKS=(
   # gig phase 28 — macro automation curves
   "system prompt mentions macro_writeAutomation|macro_writeAutomation"
   "system prompt documents arranger automation macro|Arranger automation"
+
+  # gig phase 30 — groove, exclusive solo, zoom
+  "system prompt has Global Groove section|Global Groove"
+  "system prompt mentions groove_getState|groove_getState"
+  "system prompt mentions groove_setEnabled|groove_setEnabled"
+  "system prompt mentions groove_setParameter|groove_setParameter"
+  "system prompt has Exclusive Solo section|Exclusive Solo"
+  "system prompt mentions track_toggleSolo|track_toggleSolo"
+  "system prompt has zoom controls|app_zoomIn"
+  "system prompt mentions zoomToFit|app_zoomToFit"
+  "system prompt mentions zoomToSelection|app_zoomToSelection"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do

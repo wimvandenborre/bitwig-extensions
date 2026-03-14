@@ -32,7 +32,7 @@ class ApplicationHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersSixteenMethods() {
+    void registersTwentyMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("app/undo"));
         assertTrue(methods.contains("app/redo"));
@@ -50,7 +50,11 @@ class ApplicationHandlerTest {
         assertTrue(methods.contains("app/toggleFullScreen"));
         assertTrue(methods.contains("app/previousSubPanel"));
         assertTrue(methods.contains("app/nextSubPanel"));
-        assertEquals(16, methods.size());
+        assertTrue(methods.contains("app/zoomIn"));
+        assertTrue(methods.contains("app/zoomOut"));
+        assertTrue(methods.contains("app/zoomToFit"));
+        assertTrue(methods.contains("app/zoomToSelection"));
+        assertEquals(20, methods.size());
     }
 
     // --- showNotification validation ---
@@ -177,6 +181,32 @@ class ApplicationHandlerTest {
     void nextSubPanel_callsApplicationNextSubPanel() {
         dispatcher.handle(rpc("app/nextSubPanel", "{}"));
         verify(mockApplication).nextSubPanel();
+    }
+
+    // --- Zoom behavioral tests ---
+
+    @Test
+    void zoomIn_callsApplicationZoomIn() {
+        dispatcher.handle(rpc("app/zoomIn", "{}"));
+        verify(mockApplication).zoomIn();
+    }
+
+    @Test
+    void zoomOut_callsApplicationZoomOut() {
+        dispatcher.handle(rpc("app/zoomOut", "{}"));
+        verify(mockApplication).zoomOut();
+    }
+
+    @Test
+    void zoomToFit_callsApplicationZoomToFit() {
+        dispatcher.handle(rpc("app/zoomToFit", "{}"));
+        verify(mockApplication).zoomToFit();
+    }
+
+    @Test
+    void zoomToSelection_callsApplicationZoomToSelection() {
+        dispatcher.handle(rpc("app/zoomToSelection", "{}"));
+        verify(mockApplication).zoomToSelection();
     }
 
     // --- Helpers ---
