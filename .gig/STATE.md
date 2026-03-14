@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.24.4` |
-| **Phase** | 24 — gig-maestro: Macro Improvements |
+| **Version** | `0.25.5` |
+| **Phase** | 25 — gig-maestro: Macro Composition Chains |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 24.4 — Build verification |
+| **Last Batch** | 25.5 — Build verification |
 | **Last Updated** | 2026-03-13 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.25.5 | 25 | Build verification | PLANNED | done | 2026-03-13 |
+| 0.25.4 | 25 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-13 |
+| 0.25.3 | 25 | Unit tests | PLANNED | done | 2026-03-13 |
+| 0.25.2 | 25 | macro/buildSong implementation | PLANNED | done | 2026-03-13 |
+| 0.25.1 | 25 | Add color to macro/createTrack | PLANNED | done | 2026-03-13 |
 | 0.24.4 | 24 | Build verification | PLANNED | done | 2026-03-13 |
 | 0.24.3 | 24 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-13 |
 | 0.24.2 | 24 | Unit tests | PLANNED | done | 2026-03-13 |
