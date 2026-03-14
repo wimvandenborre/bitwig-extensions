@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.32.5` |
-| **Phase** | 32 — gig-maestro: Track Queries & Cursor Navigation |
+| **Version** | `0.33.5` |
+| **Phase** | 33 — gig-maestro: VU Metering & Activity Feedback |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 32.5 — Build verification |
+| **Last Batch** | 33.5 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.33.5 | 33 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.33.4 | 33 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.33.3 | 33 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.33.1-2 | 33 | StateCache + TrackHandler RPCs | PLANNED | done | 2026-03-14 |
 | 0.32.5 | 32 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.32.4 | 32 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.32.3 | 32 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -160,7 +164,7 @@
 
 ## Active Decisions
 
-_None — phase 32 archived._
+_None — phase 33 archived._
 
 ---
 

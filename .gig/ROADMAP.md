@@ -45,7 +45,7 @@
 | 30 | gig-maestro: Global Groove & High-Value API Gaps | v0.30.1–v0.30.5 | complete |
 | 31 | gig-maestro: Mixer Visibility & Track Navigation | v0.31.1–v0.31.5 | complete |
 | 32 | gig-maestro: Track Queries & Cursor Navigation | v0.32.1–v0.32.5 | complete |
-| 33 | gig-maestro: VU Metering & Activity Feedback | v0.33.x | upcoming |
+| 33 | gig-maestro: VU Metering & Activity Feedback | v0.33.1–v0.33.5 | complete |
 | 34 | gig-maestro: Project Cue Mix & Structure | v0.34.x | upcoming |
 | 35 | gig-maestro: Arranger Scroll & View Control | v0.35.x | upcoming |
 
