@@ -29,6 +29,7 @@ public class MacroHandler {
         dispatcher.register("macro/setupScenes", this::handleSetupScenes);
         dispatcher.register("macro/createSound", this::handleCreateSound);
         dispatcher.register("macro/buildSong", this::handleBuildSong);
+        dispatcher.register("macro/writeAutomation", this::handleWriteAutomation);
     }
 
     private JsonElement handleCreateTrack(JsonObject params) throws Exception {
@@ -478,6 +479,121 @@ public class MacroHandler {
         result.addProperty("sectionCount",
             params.has("sections") && !params.get("sections").isJsonNull()
                 ? params.getAsJsonArray("sections").size() : 0);
+        return result;
+    }
+
+    private JsonElement handleWriteAutomation(JsonObject params) throws Exception {
+        JsonArray envelopes = requireArray(params, "envelopes");
+        if (envelopes.isEmpty()) {
+            throw new IllegalArgumentException("'envelopes' array must not be empty");
+        }
+
+        // Validate all envelopes up front and group by pageIndex
+        // null page = current page, grouped separately at the end
+        java.util.Map<Integer, java.util.List<JsonObject>> byPage = new java.util.LinkedHashMap<>();
+        java.util.List<JsonObject> currentPageEnvelopes = new java.util.ArrayList<>();
+        int totalPoints = 0;
+
+        for (JsonElement el : envelopes) {
+            JsonObject env = el.getAsJsonObject();
+            int paramIndex = requireInt(env, "paramIndex");
+            if (paramIndex < 0 || paramIndex >= 8) {
+                throw new IllegalArgumentException("paramIndex out of range: 0-7, got " + paramIndex);
+            }
+            JsonArray points = requireArray(env, "points");
+            if (points.isEmpty()) {
+                throw new IllegalArgumentException("points array must not be empty for paramIndex " + paramIndex);
+            }
+            for (JsonElement ptEl : points) {
+                JsonObject pt = ptEl.getAsJsonObject();
+                if (!pt.has("position") || !pt.has("value")) {
+                    throw new IllegalArgumentException("each point must have 'position' and 'value'");
+                }
+                double position = pt.get("position").getAsDouble();
+                if (position < 0) {
+                    throw new IllegalArgumentException("position must be >= 0, got: " + position);
+                }
+                double value = pt.get("value").getAsDouble();
+                if (value < 0.0 || value > 1.0) {
+                    throw new IllegalArgumentException("value out of range: 0.0-1.0, got " + value);
+                }
+            }
+            totalPoints += points.size();
+
+            if (env.has("pageIndex") && !env.get("pageIndex").isJsonNull()) {
+                int pageIndex = env.get("pageIndex").getAsInt();
+                byPage.computeIfAbsent(pageIndex, k -> new java.util.ArrayList<>()).add(env);
+            } else {
+                currentPageEnvelopes.add(env);
+            }
+        }
+
+        int envelopeCount = envelopes.size();
+
+        // Enable arranger automation write
+        JsonObject enableParams = new JsonObject();
+        enableParams.addProperty("enabled", true);
+        dispatcher.handleInternal("transport/setArrangerAutomationWrite", enableParams);
+
+        // Schedule envelope writes: page groups first, then current-page envelopes
+        long cumulativeDelay = FLUSH_DELAY_MS; // initial delay for automation write to take effect
+
+        for (var entry : byPage.entrySet()) {
+            int pageIndex = entry.getKey();
+            java.util.List<JsonObject> pageEnvelopes = entry.getValue();
+
+            // Switch page
+            final long pageDelay = cumulativeDelay;
+            scheduler.schedule(() -> {
+                try {
+                    JsonObject pageParams = new JsonObject();
+                    pageParams.addProperty("index", pageIndex);
+                    dispatcher.handleInternal("device/selectPage", pageParams);
+                } catch (Exception e) {
+                    // Deferred page switch failed
+                }
+            }, pageDelay);
+            cumulativeDelay += FLUSH_DELAY_MS;
+
+            // Write each envelope in this page group
+            for (JsonObject env : pageEnvelopes) {
+                final long envDelay = cumulativeDelay;
+                int pointCount = env.getAsJsonArray("points").size();
+                scheduler.schedule(() -> {
+                    try {
+                        JsonObject writeParams = new JsonObject();
+                        writeParams.addProperty("index", env.get("paramIndex").getAsInt());
+                        writeParams.add("points", env.getAsJsonArray("points"));
+                        dispatcher.handleInternal("device/writeEnvelope", writeParams);
+                    } catch (Exception e) {
+                        // Deferred envelope write failed
+                    }
+                }, envDelay);
+                cumulativeDelay += 100L * (pointCount + 2);
+            }
+        }
+
+        // Current-page envelopes (no page switch needed)
+        for (JsonObject env : currentPageEnvelopes) {
+            final long envDelay = cumulativeDelay;
+            int pointCount = env.getAsJsonArray("points").size();
+            scheduler.schedule(() -> {
+                try {
+                    JsonObject writeParams = new JsonObject();
+                    writeParams.addProperty("index", env.get("paramIndex").getAsInt());
+                    writeParams.add("points", env.getAsJsonArray("points"));
+                    dispatcher.handleInternal("device/writeEnvelope", writeParams);
+                } catch (Exception e) {
+                    // Deferred envelope write failed
+                }
+            }, envDelay);
+            cumulativeDelay += 100L * (pointCount + 2);
+        }
+
+        JsonObject result = new JsonObject();
+        result.addProperty("ok", true);
+        result.addProperty("envelopeCount", envelopeCount);
+        result.addProperty("totalPoints", totalPoints);
         return result;
     }
 
