@@ -548,7 +548,13 @@ public class DeviceHandler {
 
         dispatcher.register("device/getDiscoveryResult", params -> {
             if (discoveryResult != null) {
-                JsonObject result = discoveryResult;
+                String format = optionalString(params, "format", "full");
+                JsonObject result;
+                if ("preset".equals(format)) {
+                    result = toPresetFormat(discoveryResult);
+                } else {
+                    result = discoveryResult;
+                }
                 discoveryResult = null;
                 return result;
             }
@@ -576,6 +582,32 @@ public class DeviceHandler {
             }
             return new JsonPrimitive("ok");
         });
+    }
+
+    static JsonObject toPresetFormat(JsonObject discoveryResult) {
+        JsonObject preset = new JsonObject();
+        preset.addProperty("deviceName", discoveryResult.get("deviceName").getAsString());
+        preset.addProperty("pageCount", discoveryResult.get("pageCount").getAsInt());
+
+        JsonArray presetPages = new JsonArray();
+        for (JsonElement pageEl : discoveryResult.getAsJsonArray("pages")) {
+            JsonObject page = pageEl.getAsJsonObject();
+            JsonObject presetPage = new JsonObject();
+            presetPage.addProperty("pageIndex", page.get("index").getAsInt());
+
+            JsonArray presetParams = new JsonArray();
+            for (JsonElement paramEl : page.getAsJsonArray("parameters")) {
+                JsonObject param = paramEl.getAsJsonObject();
+                JsonObject presetParam = new JsonObject();
+                presetParam.addProperty("index", param.get("index").getAsInt());
+                presetParam.addProperty("value", param.get("value").getAsDouble());
+                presetParams.add(presetParam);
+            }
+            presetPage.add("params", presetParams);
+            presetPages.add(presetPage);
+        }
+        preset.add("pages", presetPages);
+        return preset;
     }
 
     static void validatePageTag(String tag) {
