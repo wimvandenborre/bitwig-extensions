@@ -143,8 +143,15 @@ class TrackHandlerTest {
     }
 
     @Test
-    void registersExactlyThirtyTwoMethods() {
-        assertEquals(32, dispatcher.getRegisteredMethods().size());
+    void registersActivityFeedbackMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("track/getVuMeters"));
+        assertTrue(methods.contains("track/getPlayingNotes"));
+    }
+
+    @Test
+    void registersExactlyThirtyFourMethods() {
+        assertEquals(34, dispatcher.getRegisteredMethods().size());
     }
 
     // --- trackBank/scrollTo validation ---
@@ -376,6 +383,20 @@ class TrackHandlerTest {
         dispatcher.handle(rpc("track/setMonitor", "{\"index\":0,\"mode\":\"AUTO\"}"));
 
         verify(mockMonitorMode).set("AUTO");
+    }
+
+    // --- Behavioral tests — activity feedback ---
+
+    @Test
+    void getVuMeters_returnsArray() {
+        String response = dispatcher.handle(rpc("track/getVuMeters", "{}"));
+        assertContains(response, "[");
+    }
+
+    @Test
+    void getPlayingNotes_returnsArray() {
+        String response = dispatcher.handle(rpc("track/getPlayingNotes", "{\"index\":0}"));
+        assertContains(response, "[");
     }
 
     // --- Behavioral tests — cursor navigation ---
