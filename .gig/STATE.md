@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.26.4` |
-| **Phase** | 26 — gig-maestro: Plugin Device Support |
+| **Version** | `0.27.4` |
+| **Phase** | 27 — gig-maestro: Clip Expression Macros |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 26.4 — Build verification |
-| **Last Updated** | 2026-03-13 |
+| **Last Batch** | 27.4 — Build verification |
+| **Last Updated** | 2026-03-14 |
 
 ---
 
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.27.4 | 27 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.27.3 | 27 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.27.2 | 27 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.27.1 | 27 | Expression support in writeNotesToCursor | PLANNED | done | 2026-03-14 |
 | 0.26.4 | 26 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.26.3 | 26 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.26.2 | 26 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -136,6 +140,8 @@
 ## Active Decisions
 
 D-23.1 (preset format in getDiscoveryResult), D-23.2 (client-side default filtering), D-23.3 (system prompt capture workflow) — all ACTIVE
+
+Phase 27 governed: all tests pass, 562 smoke tests, 0 issues.
 
 ---
 

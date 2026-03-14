@@ -2712,6 +2712,49 @@
               "duration": {
                 "type": "number",
                 "description": "Duration in beats (default 1.0)"
+              },
+              "chance": {
+                "type": "number",
+                "description": "Probability 0.0\u20131.0 that this note plays (default 1.0)."
+              },
+              "expressions": {
+                "type": "object",
+                "description": "Per-note expression values. Each key is a property name, value is 0.0\u20131.0.",
+                "properties": {
+                  "pan": { "type": "number" },
+                  "timbre": { "type": "number" },
+                  "pressure": { "type": "number" },
+                  "gain": { "type": "number" },
+                  "transpose": { "type": "number" },
+                  "releaseVelocity": { "type": "number" },
+                  "velocitySpread": { "type": "number" },
+                  "mute": { "type": "number" }
+                }
+              },
+              "repeat": {
+                "type": "object",
+                "description": "Note repeat/ratchet settings.",
+                "properties": {
+                  "count": { "type": "integer", "description": "Number of repeats (1\u201316)." },
+                  "curve": { "type": "number", "description": "Timing curve (-1.0 to 1.0, 0.0 = even)." },
+                  "velocityEnd": { "type": "number", "description": "End velocity 0.0\u20131.0." },
+                  "velocityCurve": { "type": "number", "description": "Velocity curve (-1.0 to 1.0)." }
+                },
+                "required": ["count", "curve", "velocityEnd", "velocityCurve"]
+              },
+              "occurrence": {
+                "type": "string",
+                "description": "Condition for note to play.",
+                "enum": ["ALWAYS", "FIRST", "NOT_FIRST", "PREV_NOTE_ONSET", "NOT_PREV_NOTE_ONSET", "PREV_NOTE_RELEASE", "NOT_PREV_NOTE_RELEASE", "FILL", "NOT_FILL", "CHANCE", "NOT_CHANCE"]
+              },
+              "recurrence": {
+                "type": "object",
+                "description": "Recurrence cycle settings.",
+                "properties": {
+                  "length": { "type": "integer", "description": "Cycle length (1\u20138)." },
+                  "mask": { "type": "integer", "description": "Bitmask for active steps in cycle." }
+                },
+                "required": ["length", "mask"]
               }
             },
             "required": [
@@ -2768,21 +2811,50 @@
               },
               "notes": {
                 "type": "array",
-                "description": "Array of note objects {x, y, velocity?, duration?}.",
+                "description": "Array of note objects. Supports optional expression properties.",
                 "items": {
                   "type": "object",
                   "properties": {
-                    "x": {
-                      "type": "integer"
+                    "x": { "type": "integer" },
+                    "y": { "type": "integer" },
+                    "velocity": { "type": "number" },
+                    "duration": { "type": "number" },
+                    "chance": { "type": "number", "description": "Probability 0.0\u20131.0." },
+                    "expressions": {
+                      "type": "object",
+                      "description": "Per-note expressions {pan, timbre, pressure, gain, transpose, releaseVelocity, velocitySpread, mute}.",
+                      "properties": {
+                        "pan": { "type": "number" },
+                        "timbre": { "type": "number" },
+                        "pressure": { "type": "number" },
+                        "gain": { "type": "number" },
+                        "transpose": { "type": "number" },
+                        "releaseVelocity": { "type": "number" },
+                        "velocitySpread": { "type": "number" },
+                        "mute": { "type": "number" }
+                      }
                     },
-                    "y": {
-                      "type": "integer"
+                    "repeat": {
+                      "type": "object",
+                      "properties": {
+                        "count": { "type": "integer" },
+                        "curve": { "type": "number" },
+                        "velocityEnd": { "type": "number" },
+                        "velocityCurve": { "type": "number" }
+                      },
+                      "required": ["count", "curve", "velocityEnd", "velocityCurve"]
                     },
-                    "velocity": {
-                      "type": "number"
+                    "occurrence": {
+                      "type": "string",
+                      "enum": ["ALWAYS", "FIRST", "NOT_FIRST", "PREV_NOTE_ONSET", "NOT_PREV_NOTE_ONSET", "PREV_NOTE_RELEASE", "NOT_PREV_NOTE_RELEASE", "FILL", "NOT_FILL", "CHANCE", "NOT_CHANCE"]
                     },
-                    "duration": {
-                      "type": "number"
+                    "recurrence": {
+                      "type": "object",
+                      "properties": {
+                        "length": { "type": "integer" },
+                        "mask": { "type": "integer" }
+                      },
+                      "required": ["length", "mask"]
                     }
                   },
                   "required": [
@@ -3006,14 +3078,50 @@
                     "stepSize": { "type": "number", "description": "Step size for note grid." },
                     "notes": {
                       "type": "array",
-                      "description": "Notes to write.",
+                      "description": "Notes to write. Supports optional expression properties.",
                       "items": {
                         "type": "object",
                         "properties": {
                           "x": { "type": "integer", "description": "Step index." },
                           "y": { "type": "integer", "description": "MIDI note (0-127)." },
                           "velocity": { "type": "integer" },
-                          "duration": { "type": "number" }
+                          "duration": { "type": "number" },
+                          "chance": { "type": "number" },
+                          "expressions": {
+                            "type": "object",
+                            "properties": {
+                              "pan": { "type": "number" },
+                              "timbre": { "type": "number" },
+                              "pressure": { "type": "number" },
+                              "gain": { "type": "number" },
+                              "transpose": { "type": "number" },
+                              "releaseVelocity": { "type": "number" },
+                              "velocitySpread": { "type": "number" },
+                              "mute": { "type": "number" }
+                            }
+                          },
+                          "repeat": {
+                            "type": "object",
+                            "properties": {
+                              "count": { "type": "integer" },
+                              "curve": { "type": "number" },
+                              "velocityEnd": { "type": "number" },
+                              "velocityCurve": { "type": "number" }
+                            },
+                            "required": ["count", "curve", "velocityEnd", "velocityCurve"]
+                          },
+                          "occurrence": {
+                            "type": "string",
+                            "enum": ["ALWAYS", "FIRST", "NOT_FIRST", "PREV_NOTE_ONSET", "NOT_PREV_NOTE_ONSET", "PREV_NOTE_RELEASE", "NOT_PREV_NOTE_RELEASE", "FILL", "NOT_FILL", "CHANCE", "NOT_CHANCE"]
+                          },
+                          "recurrence": {
+                            "type": "object",
+                            "properties": {
+                              "length": { "type": "integer" },
+                              "mask": { "type": "integer" }
+                            },
+                            "required": ["length", "mask"]
+                          }
                         },
                         "required": ["x", "y"]
                       }
