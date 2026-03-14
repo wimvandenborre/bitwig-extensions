@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode, trackType, isGroup, isGroupExpanded), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), and noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode, trackType, isGroup, isGroupExpanded), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes), and groove state (enabled, shuffleAmount, shuffleRate, accentAmount, accentRate, accentPhase). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -4592,6 +4592,102 @@
         }
       },
       "required": ["tag"]
+    }
+  },
+  {
+    "name": "groove_getState",
+    "description": "Get the current state of the global groove engine. Returns enabled (boolean), shuffleAmount, shuffleRate, accentAmount, accentRate, accentPhase (all 0.0–1.0). Groove applies swing/shuffle to all clips globally.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "groove_setEnabled",
+    "description": "Enable or disable the global groove engine. When enabled, shuffle and accent settings affect all clip playback.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "True to enable groove, false to disable."
+        }
+      },
+      "required": ["enabled"]
+    }
+  },
+  {
+    "name": "groove_setParameter",
+    "description": "Set a groove parameter by name. Valid names: shuffleAmount, shuffleRate, accentAmount, accentRate, accentPhase. All values are 0.0–1.0.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Parameter name.",
+          "enum": ["accentAmount", "accentPhase", "accentRate", "shuffleAmount", "shuffleRate"]
+        },
+        "value": {
+          "type": "number",
+          "description": "Parameter value (0.0–1.0)."
+        }
+      },
+      "required": ["name", "value"]
+    }
+  },
+  {
+    "name": "track_toggleSolo",
+    "description": "Toggle solo state on a track. When exclusive is true, all other tracks are unsoloed first (exclusive solo). When exclusive is false or omitted, only this track's solo is toggled.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 63."
+        },
+        "exclusive": {
+          "type": "boolean",
+          "description": "If true, unsolo all other tracks (exclusive solo). Default: false."
+        }
+      },
+      "required": ["index"]
+    }
+  },
+  {
+    "name": "app_zoomIn",
+    "description": "Zoom in on the arranger/editor timeline.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_zoomOut",
+    "description": "Zoom out on the arranger/editor timeline.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_zoomToFit",
+    "description": "Zoom the arranger/editor to fit all content in the visible area.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "app_zoomToSelection",
+    "description": "Zoom the arranger/editor to fit the current selection in the visible area.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
     }
   }
 ]
