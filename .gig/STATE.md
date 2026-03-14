@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.23.4` |
+| **Version** | `0.23.5` |
 | **Phase** | 23 — gig-maestro: Live Preset Export |
-| **Status** | `IMPLEMENTED` |
-| **Last Batch** | 23.4 — Build verification |
+| **Status** | `GOVERNED` |
+| **Last Batch** | 23.5 — Online smoke tests for discovery + preset export |
 | **Last Updated** | 2026-03-13 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.23.5 | 23 | Online smoke tests for discovery + preset export | UNPLANNED | done | 2026-03-13 |
 | 0.23.4 | 23 | Build verification | PLANNED | done | 2026-03-13 |
 | 0.23.3 | 23 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-13 |
 | 0.23.2 | 23 | Unit tests for preset format | PLANNED | done | 2026-03-13 |
