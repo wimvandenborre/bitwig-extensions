@@ -43,6 +43,7 @@
 | 28 | gig-maestro: Macro Automation Curves | v0.28.1–v0.28.4 | complete |
 | 29 | gig-maestro: Song Dump Fidelity | v0.29.1–v0.29.3 | complete |
 | 30 | gig-maestro: Global Groove & High-Value API Gaps | v0.30.1–v0.30.5 | complete |
+| 31 | gig-maestro: Mixer Visibility & Track Navigation | v0.31.1–v0.31.5 | complete |
 
 ## Completed Milestones
 

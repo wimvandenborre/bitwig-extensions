@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.30.5` |
-| **Phase** | 30 — gig-maestro: Global Groove & High-Value API Gaps |
+| **Version** | `0.31.5` |
+| **Phase** | 31 — gig-maestro: Mixer Visibility & Track Navigation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 30.5 — Build verification |
+| **Last Batch** | 31.5 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.31.5 | 31 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.31.4 | 31 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.31.3 | 31 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.31.2 | 31 | Track mixer navigation methods | PLANNED | done | 2026-03-14 |
+| 0.31.1 | 31 | MixerHandler + extension wiring | PLANNED | done | 2026-03-14 |
 | 0.30.5 | 30 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.30.4 | 30 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.30.3 | 30 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -150,7 +155,7 @@
 
 ## Active Decisions
 
-_None — phase 30 archived._
+_None — phase 31 archived._
 
 ---
 
