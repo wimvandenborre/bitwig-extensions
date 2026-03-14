@@ -73,16 +73,22 @@ public class MacroHandler {
         }
 
         boolean hasDevice = params.has("device") && !params.get("device").isJsonNull();
+        boolean hasPlugin = params.has("plugin") && !params.get("plugin").isJsonNull();
         boolean hasPages = params.has("pages") && !params.get("pages").isJsonNull();
 
-        if (hasPages && !hasDevice) {
-            throw new IllegalArgumentException("'pages' requires 'device' — cannot set parameters without a device");
+        if (hasDevice && hasPlugin) {
+            throw new IllegalArgumentException("cannot specify both 'device' and 'plugin'");
+        }
+        if (hasPages && !hasDevice && !hasPlugin) {
+            throw new IllegalArgumentException("'pages' requires 'device' or 'plugin' — cannot set parameters without a device");
         }
 
         if (hasDevice) {
             JsonObject deviceParams = new JsonObject();
             deviceParams.addProperty("name", params.get("device").getAsString());
             dispatcher.handleInternal("device/insertBitwigDevice", deviceParams);
+        } else if (hasPlugin) {
+            insertPlugin(params.getAsJsonObject("plugin"));
         }
 
         JsonObject result = new JsonObject();
@@ -325,19 +331,31 @@ public class MacroHandler {
 
         boolean inserted = false;
         String deviceName = "current";
+        boolean hasDevice = params.has("device") && !params.get("device").isJsonNull();
+        boolean hasPlugin = params.has("plugin") && !params.get("plugin").isJsonNull();
 
-        if (params.has("device") && !params.get("device").isJsonNull()) {
+        if (hasDevice && hasPlugin) {
+            throw new IllegalArgumentException("cannot specify both 'device' and 'plugin'");
+        }
+
+        if (hasDevice) {
             deviceName = params.get("device").getAsString();
             String position = params.has("position") && !params.get("position").isJsonNull()
                 ? params.get("position").getAsString() : "end";
 
-            // Phase 1: insert device immediately
             JsonObject deviceParams = new JsonObject();
             deviceParams.addProperty("name", deviceName);
             deviceParams.addProperty("position", position);
             dispatcher.handleInternal("device/insertBitwigDevice", deviceParams);
             inserted = true;
+        } else if (hasPlugin) {
+            JsonObject plugin = params.getAsJsonObject("plugin");
+            deviceName = plugin.get("type").getAsString() + ":" + plugin.get("id").getAsString();
+            insertPlugin(plugin);
+            inserted = true;
+        }
 
+        if (inserted) {
             // Phase 2: set parameters after flush (device needs to initialize)
             JsonObject setParamsPayload = new JsonObject();
             setParamsPayload.add("pages", pages);
@@ -389,6 +407,9 @@ public class MacroHandler {
             if (track.has("device") && !track.get("device").isJsonNull()) {
                 createTrackParams.addProperty("device", track.get("device").getAsString());
             }
+            if (track.has("plugin") && !track.get("plugin").isJsonNull()) {
+                createTrackParams.add("plugin", track.getAsJsonObject("plugin"));
+            }
             if (track.has("color") && !track.get("color").isJsonNull()) {
                 createTrackParams.add("color", track.getAsJsonObject("color"));
             }
@@ -410,12 +431,14 @@ public class MacroHandler {
 
             // Calculate delay this track needs before next track can start
             boolean hasDevice = track.has("device") && !track.get("device").isJsonNull();
+            boolean hasPlugin = track.has("plugin") && !track.get("plugin").isJsonNull();
             boolean hasPages = track.has("pages") && !track.get("pages").isJsonNull();
+            boolean hasAnyDevice = hasDevice || hasPlugin;
 
             if (hasPages) {
                 int pageCount = track.getAsJsonArray("pages").size();
                 cumulativeDelay += FLUSH_DELAY_MS * (1 + 2 * pageCount);
-            } else if (hasDevice) {
+            } else if (hasAnyDevice) {
                 cumulativeDelay += FLUSH_DELAY_MS;
             }
         }
@@ -459,6 +482,13 @@ public class MacroHandler {
     }
 
     // --- Internal helpers ---
+
+    private void insertPlugin(JsonObject plugin) throws Exception {
+        JsonObject pluginParams = new JsonObject();
+        pluginParams.addProperty("type", plugin.get("type").getAsString());
+        pluginParams.addProperty("id", plugin.get("id").getAsString());
+        dispatcher.handleInternal("device/insertPluginDevice", pluginParams);
+    }
 
     private void writeNotesToCursor(double stepSize, JsonArray notes, String name) throws Exception {
         JsonObject stepSizeParams = new JsonObject();

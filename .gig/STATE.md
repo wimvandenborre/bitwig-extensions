@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.25.5` |
-| **Phase** | 25 — gig-maestro: Macro Composition Chains |
+| **Version** | `0.26.4` |
+| **Phase** | 26 — gig-maestro: Plugin Device Support |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 25.5 — Build verification |
+| **Last Batch** | 26.4 — Build verification |
 | **Last Updated** | 2026-03-13 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.26.4 | 26 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.26.3 | 26 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.26.2 | 26 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.26.1 | 26 | Plugin support in MacroHandler | PLANNED | done | 2026-03-14 |
 | 0.25.5 | 25 | Build verification | PLANNED | done | 2026-03-13 |
 | 0.25.4 | 25 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-13 |
 | 0.25.3 | 25 | Unit tests | PLANNED | done | 2026-03-13 |

@@ -138,7 +138,7 @@ After writing base notes, you can add per-note expression to create more dynamic
 You can add and remove devices on the cursor track:
 
 - **Built-in devices:** Use `device_listBitwigDevices` to discover available devices (151 total), then `device_insertBitwigDevice` with the device name. Names are case-insensitive. If you misspell a name, the error will suggest close matches.
-- **Third-party plugins:** Use `device_insertPluginDevice` with the plugin `type` ("vst2", "vst3", "clap") and `id`.
+- **Third-party plugins:** Use `device_insertPluginDevice` with the plugin `type` ("vst2", "vst3", "clap") and `id`. Plugin IDs: VST2 uses numeric IDs, VST3 uses GUID strings, CLAP uses reverse-domain strings (e.g., "com.vendor.synth"). Macros also support plugins via the `plugin` parameter (alternative to `device`).
 - **Positioning:** By default, devices are inserted at the **end** of the chain. Use `position: "before"` or `"after"` to insert relative to the currently selected device.
 - **Removal:** Navigate to the target device with `device_selectNext` / `device_selectPrevious`, then call `device_remove`.
 
@@ -742,6 +742,12 @@ macro_createTrack({ type: "instrument", name: "Bass", device: "Polymer", pages: 
 ]})
 ```
 This creates a track, names it, inserts the device, and applies sound parameters — all in one call. The `pages` format is identical to `macro_createSound`. Use this instead of calling `track_createInstrument` → `track_rename` → `macro_createSound` separately.
+
+**Track creation with plugin — use `plugin` instead of `device`:**
+```
+macro_createTrack({ type: "instrument", name: "VST Synth", plugin: { type: "vst3", id: "ABCD-1234" } })
+```
+The `plugin` parameter works anywhere `device` does — in `macro_createTrack`, `macro_createSound`, and `macro_buildSong`. It accepts `{type, id}` where type is "vst2", "vst3", or "clap". Cannot be combined with `device`.
 
 Manual fallback: `track_createInstrument → track_rename → device_insertBitwigDevice → session_snapshot`
 
