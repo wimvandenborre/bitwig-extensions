@@ -4,4 +4,4 @@
 > Active decisions for the current phase live here.
 > When a phase completes, its decisions are archived to `phases/`.
 
-_No active decisions. Next phase decisions will appear here._
+_No active decisions._

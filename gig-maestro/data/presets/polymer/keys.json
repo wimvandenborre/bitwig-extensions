@@ -1,47 +1,47 @@
 {
   "name": "Keys",
-  "description": "Electric piano-style keys with medium attack, moderate decay, and clean filter. Responsive to velocity.",
+  "description": "Expressive electric piano keys with velocity sensitivity, medium decay, and clean filtered tone.",
   "device": "Polymer",
   "pages": [
     {
       "pageIndex": 0,
       "params": [
-        { "index": 0, "value": 0.2 },
+        { "index": 0, "value": 0.15 },
         { "index": 1, "value": 0.5 },
         { "index": 2, "value": 1.0 },
         { "index": 3, "value": 0.0 },
-        { "index": 4, "value": 0.05 },
-        { "index": 6, "value": 0.7 },
+        { "index": 4, "value": 0.08 },
+        { "index": 6, "value": 0.75 },
         { "index": 7, "value": 0.794 }
-      ]
-    },
-    {
-      "pageIndex": 4,
-      "params": [
-        { "index": 0, "value": 0.04 },
-        { "index": 1, "value": 0.45 },
-        { "index": 2, "value": 0.25 },
-        { "index": 3, "value": 0.3 }
       ]
     },
     {
       "pageIndex": 3,
       "params": [
-        { "index": 0, "value": 0.45 },
+        { "index": 0, "value": 0.55 },
         { "index": 1, "value": 0.12 },
         { "index": 2, "value": 0.5 },
-        { "index": 3, "value": 0.5 },
-        { "index": 4, "value": 0.6 },
+        { "index": 3, "value": 0.55 },
+        { "index": 4, "value": 0.5 },
         { "index": 6, "value": 0.2 }
       ]
     },
     {
       "pageIndex": 5,
       "params": [
-        { "index": 0, "value": 0.02 },
-        { "index": 1, "value": 0.35 },
-        { "index": 2, "value": 0.1 },
+        { "index": 0, "value": 0.01 },
+        { "index": 1, "value": 0.3 },
+        { "index": 2, "value": 0.2 },
         { "index": 3, "value": 0.2 }
+      ]
+    },
+    {
+      "pageIndex": 4,
+      "params": [
+        { "index": 0, "value": 0.01 },
+        { "index": 1, "value": 0.42 },
+        { "index": 2, "value": 0.35 },
+        { "index": 3, "value": 0.3 }
       ]
     }
   ]

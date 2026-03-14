@@ -5,6 +5,4 @@
 
 ---
 
-## Active Phase
-
 _No active phase. Run `/gig:gather` to start the next phase._
