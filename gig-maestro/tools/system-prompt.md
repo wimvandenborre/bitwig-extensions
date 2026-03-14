@@ -1415,3 +1415,16 @@ Navigate group hierarchies and control cursor pinning:
 - `cursor_selectFirstChild` — move cursor into first child of current group
 - `cursor_setPinned({ pinned: true })` — pin cursor to prevent it from following UI selection (useful during batch operations)
 - `cursor_getInfo` — returns `{name, trackType, isPinned}` for the current cursor track
+
+### Activity Feedback
+
+Live activity data for mixing analysis and monitoring. These are poll-only (not in session_snapshot) to avoid noise:
+
+**VU Meters:**
+- `track_getVuMeters` — returns array of 8 integers (0-127 RMS sum per track). Poll during playback to analyze relative levels. Value 0 = silence, 127 = maximum.
+
+**Playing Notes:**
+- `track_getPlayingNotes({ index: 0 })` — returns array of `{pitch, velocity}` for currently playing MIDI notes on a track. Empty when no notes playing.
+
+**Muted by Solo** (in snapshot):
+- Each track in `session_snapshot` includes `isMutedBySolo` (boolean) — true when another track's solo is silencing this track. Use alongside `solo` to understand the full solo/mute picture.

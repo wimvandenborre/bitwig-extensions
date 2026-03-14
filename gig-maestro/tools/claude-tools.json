@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode, trackType, isGroup, isGroupExpanded, canHoldNoteData, canHoldAudioData), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes), and groove state (enabled, shuffleAmount, shuffleRate, accentAmount, accentRate, accentPhase). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, isMutedBySolo, sends, crossfadeMode, monitorMode, trackType, isGroup, isGroupExpanded, canHoldNoteData, canHoldAudioData), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes), and groove state (enabled, shuffleAmount, shuffleRate, accentAmount, accentRate, accentPhase). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -4821,6 +4821,29 @@
       "type": "object",
       "properties": {},
       "required": []
+    }
+  },
+  {
+    "name": "track_getVuMeters",
+    "description": "Poll the current VU meter levels (RMS sum) for all 8 tracks in the track bank. Returns an array of 8 integers (0-127). Call on demand for mixing analysis — not included in session_snapshot to avoid noise.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_getPlayingNotes",
+    "description": "Poll the currently playing MIDI notes on a specific track. Returns an array of {pitch, velocity} objects. Empty array when no notes are playing. Call on demand — not included in session_snapshot.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Track index (0-based). Valid range: 0 to 7."
+        }
+      },
+      "required": ["index"]
     }
   }
 ]
