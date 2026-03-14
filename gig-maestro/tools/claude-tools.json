@@ -4178,10 +4178,16 @@
   },
   {
     "name": "device_getDiscoveryResult",
-    "description": "Retrieve the result of a device/discoverAll scan. Returns the complete parameter map: { deviceName, pageCount, pages: [{ index, name, parameters: [{ index, name, value, displayedValue }] }] }. If the scan is still in progress, returns { scanning: true }. Throws an error if no discovery has been initiated.",
+    "description": "Retrieve the result of a device/discoverAll scan. By default returns the full parameter map: { deviceName, pageCount, pages: [{ index, name, parameters: [{ index, name, value, displayedValue }] }] }. With format='preset', returns macro/createSound-compatible JSON: { deviceName, pageCount, pages: [{ pageIndex, params: [{ index, value }] }] }. If the scan is still in progress, returns { scanning: true }. Throws an error if no discovery has been initiated.",
     "input_schema": {
       "type": "object",
-      "properties": {},
+      "properties": {
+        "format": {
+          "type": "string",
+          "description": "Output format: 'full' (default) for complete parameter map with names and displayed values, or 'preset' for macro/createSound-compatible JSON with just pageIndex/params.",
+          "enum": ["full", "preset"]
+        }
+      },
       "required": []
     }
   },

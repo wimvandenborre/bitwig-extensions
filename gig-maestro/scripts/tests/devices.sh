@@ -167,3 +167,55 @@ assert_contains "device/enterSlot missing name returns -32602" "$ERR" '-32602'
 
 ERR=$(rpc '{"jsonrpc":"2.0","method":"masterDevice/enterSlot","params":{},"id":508}')
 assert_contains "masterDevice/enterSlot missing name returns -32602" "$ERR" '-32602'
+
+echo "--- Device Discovery + Preset Export ---"
+
+# Insert Polymer for discovery testing
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/insertBitwigDevice","params":{"name":"Polymer"},"id":600}')
+assert_contains "insert Polymer for discovery returns ok" "$RESP" '"ok"'
+sleep 0.5
+
+# Start discovery scan
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/discoverAll","params":{},"id":601}')
+assert_contains "discoverAll returns scanning" "$RESP" '"scanning":true'
+assert_contains "discoverAll returns pageCount" "$RESP" '"pageCount"'
+
+# Wait for scan to complete (7 pages × 100ms + buffer)
+sleep 1.5
+
+# Get result in full format (default)
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/getDiscoveryResult","params":{},"id":602}')
+assert_contains "getDiscoveryResult full has deviceName" "$RESP" '"deviceName"'
+assert_contains "getDiscoveryResult full has parameters" "$RESP" '"parameters"'
+assert_contains "getDiscoveryResult full has displayedValue" "$RESP" '"displayedValue"'
+assert_contains "getDiscoveryResult full has Polymer" "$RESP" '"Polymer"'
+
+# Run discovery again for preset format test
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/discoverAll","params":{},"id":603}')
+assert_contains "discoverAll second scan returns scanning" "$RESP" '"scanning":true'
+sleep 1.5
+
+# Get result in preset format
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/getDiscoveryResult","params":{"format":"preset"},"id":604}')
+assert_contains "getDiscoveryResult preset has deviceName" "$RESP" '"deviceName"'
+assert_contains "getDiscoveryResult preset has pageIndex" "$RESP" '"pageIndex"'
+assert_contains "getDiscoveryResult preset has params" "$RESP" '"params"'
+
+# Preset format should NOT contain full format fields
+TOTAL=$((TOTAL + 1))
+if echo "$RESP" | grep -q '"displayedValue"'; then
+  echo "  FAIL  getDiscoveryResult preset should not contain displayedValue"
+  FAIL=$((FAIL + 1))
+else
+  echo "  PASS  getDiscoveryResult preset omits displayedValue"
+  PASS=$((PASS + 1))
+fi
+
+# Verify no discovery returns error
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/getDiscoveryResult","params":{},"id":605}')
+assert_contains "getDiscoveryResult with no scan returns error" "$RESP" 'No discovery in progress'
+
+# Clean up — remove the Polymer we inserted
+RESP=$(rpc '{"jsonrpc":"2.0","method":"device/remove","id":606}')
+assert_contains "remove Polymer after discovery returns ok" "$RESP" '"ok"'
+sleep 0.5

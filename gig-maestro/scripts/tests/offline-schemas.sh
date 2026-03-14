@@ -372,6 +372,7 @@ PARAM_CHECKS=(
   "device_setParameters|.input_schema.properties.pages.type|array"
   "device_setParameters|.input_schema.properties.pages.items.properties.params.type|array"
   "macro_createSound|.input_schema.properties.device.type|string"
+  "device_getDiscoveryResult|.input_schema.properties.format.type|string"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -731,6 +732,11 @@ PROMPT_CHECKS=(
   "system prompt has Device Reference Files section|Device Reference Files"
   "system prompt has Sound Presets section|Sound Presets"
   "system prompt mentions polymer.json|polymer.json"
+
+  # gig phase 23 — live preset export
+  "system prompt has Capturing Presets section|Capturing Presets"
+  "system prompt mentions format preset|format: \"preset\""
+  "system prompt mentions preset-compatible|preset-compatible"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do
