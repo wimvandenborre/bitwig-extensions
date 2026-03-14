@@ -2554,7 +2554,7 @@
   },
   {
     "name": "macro_createTrack",
-    "description": "Create a new track with optional rename and device insertion in a single call. Composes track/create + track/rename + device/insertBitwigDevice. Use instead of calling these 3 methods separately.",
+    "description": "Create a new track with optional rename, color, device insertion, and sound design in a single call. Composes track/create + track/rename + track/setColor + device/insertBitwigDevice + macro/createSound. Use instead of calling these methods separately.",
     "input_schema": {
       "type": "object",
       "properties": {
@@ -2578,6 +2578,16 @@
         "device": {
           "type": "string",
           "description": "Name of a Bitwig built-in device to insert on the new track (e.g., 'Polymer', 'Drum Machine'). Case-insensitive."
+        },
+        "color": {
+          "type": "object",
+          "description": "Track color as RGB floats (0.0 to 1.0). Applied after rename, before device insertion.",
+          "properties": {
+            "r": { "type": "number", "description": "Red component (0.0-1.0)." },
+            "g": { "type": "number", "description": "Green component (0.0-1.0)." },
+            "b": { "type": "number", "description": "Blue component (0.0-1.0)." }
+          },
+          "required": ["r", "g", "b"]
         },
         "pages": {
           "type": "array",
@@ -2867,6 +2877,117 @@
         }
       },
       "required": ["pages"]
+    }
+  },
+  {
+    "name": "macro_buildSong",
+    "description": "Build an entire song structure in one call: create multiple tracks with devices and sound parameters, then build sections with clips. Chains macro/createTrack and macro/buildSection internally with proper flush delays between each track to prevent cursor race conditions. Tracks are created sequentially; sections are built after all tracks complete. Returns { trackCount, sectionCount }.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "tracks": {
+          "type": "array",
+          "description": "Array of track definitions. Each track is created sequentially with proper timing.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["audio", "instrument", "effect"],
+                "description": "Type of track to create."
+              },
+              "name": {
+                "type": "string",
+                "description": "Name for the track."
+              },
+              "device": {
+                "type": "string",
+                "description": "Bitwig device to insert (e.g., 'Polymer', 'Drum Machine')."
+              },
+              "color": {
+                "type": "object",
+                "description": "Track color as RGB floats (0.0-1.0).",
+                "properties": {
+                  "r": { "type": "number" },
+                  "g": { "type": "number" },
+                  "b": { "type": "number" }
+                },
+                "required": ["r", "g", "b"]
+              },
+              "pages": {
+                "type": "array",
+                "description": "Sound parameter pages (same format as macro/createSound).",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "pageIndex": { "type": "integer" },
+                    "params": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": { "type": "integer" },
+                          "value": { "type": "number" }
+                        },
+                        "required": ["index", "value"]
+                      }
+                    }
+                  },
+                  "required": ["pageIndex", "params"]
+                }
+              }
+            },
+            "required": ["type"]
+          }
+        },
+        "sections": {
+          "type": "array",
+          "description": "Array of section definitions. Each section is built after all tracks complete. Uses macro/buildSection format.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sceneName": {
+                "type": "string",
+                "description": "Name for the scene/section."
+              },
+              "sceneIndex": {
+                "type": "integer",
+                "description": "Optional explicit scene index. If omitted, a new scene is created."
+              },
+              "clips": {
+                "type": "array",
+                "description": "Clips to write in this section.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "trackIndex": { "type": "integer", "description": "Track index for this clip." },
+                    "lengthBeats": { "type": "integer", "description": "Clip length in beats." },
+                    "stepSize": { "type": "number", "description": "Step size for note grid." },
+                    "notes": {
+                      "type": "array",
+                      "description": "Notes to write.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "x": { "type": "integer", "description": "Step index." },
+                          "y": { "type": "integer", "description": "MIDI note (0-127)." },
+                          "velocity": { "type": "integer" },
+                          "duration": { "type": "number" }
+                        },
+                        "required": ["x", "y"]
+                      }
+                    },
+                    "name": { "type": "string", "description": "Optional clip name." }
+                  },
+                  "required": ["trackIndex", "lengthBeats", "stepSize", "notes"]
+                }
+              }
+            },
+            "required": ["sceneName", "clips"]
+          }
+        }
+      },
+      "required": ["tracks"]
     }
   },
   {

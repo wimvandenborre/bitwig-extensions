@@ -692,8 +692,9 @@ Macros are predefined compound operations that collapse common multi-call workfl
 | `macro_createClip` | clip/create + clip/select | 2 → 1 |
 | `macro_writeClip` | clip/create + clip/select + clip/setStepSize + clip/setNotes + clip/rename | 4–5 → 1 |
 | `macro_buildSection` | scene/create + scene/rename + N×(clip/create + clip/select + clip/setStepSize + clip/setNotes + clip/rename) | 10+ → 1 |
+| `macro_buildSong` | N×macro_createTrack + M×macro_buildSection | N+M → 1 |
 
-**`macro_buildSection`** is the highest-impact macro. A 4-track song section that previously required 12+ individual calls now takes 1. It creates a new scene, scrolls the scene bank to make it visible, renames it, then writes all clips with notes.
+**`macro_buildSong`** is the highest-impact macro. An entire multi-track song with sections and clips that previously required N+M calls now takes 1. It creates tracks sequentially (with proper flush delays for sound parameters), then builds all sections after tracks complete. Use this for full song scaffolding.
 
 
 
@@ -779,6 +780,22 @@ Complete sequence for creating a multi-track song using macros:
 5. **Launch:** `clip_launch` or `scene_launch` to play back.
 
 This workflow takes ~5 calls for a 3-track, 2-section song. The manual equivalent would take 20+ calls.
+
+**One-call alternative — use `macro_buildSong`:**
+```
+macro_buildSong({
+  tracks: [
+    { type: "instrument", name: "Drums", device: "Drum Machine", color: { r: 1, g: 0, b: 0 } },
+    { type: "instrument", name: "Bass", device: "Polymer", color: { r: 0, g: 0.5, b: 1 }, pages: [...] },
+    { type: "instrument", name: "Lead", device: "Polysynth", pages: [...] }
+  ],
+  sections: [
+    { sceneName: "Verse 1", clips: [{ trackIndex: 0, ... }, { trackIndex: 1, ... }, { trackIndex: 2, ... }] },
+    { sceneName: "Chorus", clips: [...] }
+  ]
+})
+```
+This collapses the entire workflow (steps 2-3) into a single call. Tracks are created sequentially with proper delays for sound parameter initialization. Sections are built after all tracks exist.
 
 ### Song Persistence (CLI)
 
