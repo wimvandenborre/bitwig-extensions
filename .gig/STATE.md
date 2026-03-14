@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.22.8` |
-| **Phase** | 22 — gig-maestro: Polymer Sound Design |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 22.8 — Preset refinement from live testing |
+| **Version** | `0.23.4` |
+| **Phase** | 23 — gig-maestro: Live Preset Export |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | 23.4 — Build verification |
 | **Last Updated** | 2026-03-13 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.23.4 | 23 | Build verification | PLANNED | done | 2026-03-13 |
+| 0.23.3 | 23 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-13 |
+| 0.23.2 | 23 | Unit tests for preset format | PLANNED | done | 2026-03-13 |
+| 0.23.1 | 23 | Preset format in getDiscoveryResult | PLANNED | done | 2026-03-13 |
 | 0.22.8 | 22 | Preset refinement from live testing | UNPLANNED | done | 2026-03-13 |
 | 0.22.7 | 22 | Fix setParameters page-switch timing bug | UNPLANNED | done | 2026-03-13 |
 | 0.22.6 | 22 | Build verification | PLANNED | done | 2026-03-13 |
@@ -117,7 +121,7 @@
 
 ## Active Decisions
 
-D-22.1 (device/discoverAll RPC), D-22.2 (polymer.json reference), D-22.3 (preset JSON files), D-22.4 (100ms page cycling), D-22.5 (system prompt updates) — all ACTIVE
+D-23.1 (preset format in getDiscoveryResult), D-23.2 (client-side default filtering), D-23.3 (system prompt capture workflow) — all ACTIVE
 
 ---
 
