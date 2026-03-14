@@ -1041,22 +1041,22 @@ public class StateCache {
 
     public void registerGrooveObservers(Groove groove) {
         groove.getEnabled().markInterested();
-        groove.getEnabled().addValueObserver((DoubleValueChangedCallback) v -> grooveEnabled = v > 0.5);
+        groove.getEnabled().value().addValueObserver((DoubleValueChangedCallback) v -> grooveEnabled = v > 0.5);
 
         groove.getShuffleAmount().markInterested();
-        groove.getShuffleAmount().addValueObserver((DoubleValueChangedCallback) v -> grooveShuffleAmount = v);
+        groove.getShuffleAmount().value().addValueObserver((DoubleValueChangedCallback) v -> grooveShuffleAmount = v);
 
         groove.getShuffleRate().markInterested();
-        groove.getShuffleRate().addValueObserver((DoubleValueChangedCallback) v -> grooveShuffleRate = v);
+        groove.getShuffleRate().value().addValueObserver((DoubleValueChangedCallback) v -> grooveShuffleRate = v);
 
         groove.getAccentAmount().markInterested();
-        groove.getAccentAmount().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentAmount = v);
+        groove.getAccentAmount().value().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentAmount = v);
 
         groove.getAccentRate().markInterested();
-        groove.getAccentRate().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentRate = v);
+        groove.getAccentRate().value().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentRate = v);
 
         groove.getAccentPhase().markInterested();
-        groove.getAccentPhase().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentPhase = v);
+        groove.getAccentPhase().value().addValueObserver((DoubleValueChangedCallback) v -> grooveAccentPhase = v);
     }
 
     public CursorBrowserFilterItem[] getFilterCursors() {
