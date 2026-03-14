@@ -10,6 +10,7 @@ import com.bitwig.extension.controller.api.SettableEnumValue;
 import com.bitwig.extension.controller.api.SettableRangedValue;
 import com.bitwig.extension.controller.api.SettableStringValue;
 import com.bitwig.extension.controller.api.SoloValue;
+import com.bitwig.extension.controller.api.StringValue;
 import com.bitwig.extension.controller.api.Track;
 import com.bitwig.extension.controller.api.TrackBank;
 import dev.gregross.gig.extension.StateCache;
@@ -49,11 +50,17 @@ class TrackHandlerTest {
     @Mock private SettableEnumValue mockMonitorMode;
     @Mock private SettableStringValue mockNameValue;
     @Mock private SettableBooleanValue mockGroupExpanded;
+    @Mock private SettableBooleanValue mockIsPinned;
+    @Mock private StringValue mockTrackType;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
+        // Stub cursor properties needed by constructor markInterested() calls
+        when(mockCursorTrack.isPinned()).thenReturn(mockIsPinned);
+        when(mockCursorTrack.trackType()).thenReturn(mockTrackType);
+
         dispatcher = new JsonRpcDispatcher();
         new TrackHandler(mockTrackBank, mockApplication, mockCursorTrack,
             mockTrackBankManager, new StateCache(), mockNoteInput).register(dispatcher);
@@ -127,8 +134,8 @@ class TrackHandlerTest {
     }
 
     @Test
-    void registersExactlyTwentyEightMethods() {
-        assertEquals(28, dispatcher.getRegisteredMethods().size());
+    void registersExactlyThirtyTwoMethods() {
+        assertEquals(32, dispatcher.getRegisteredMethods().size());
     }
 
     // --- trackBank/scrollTo validation ---

@@ -34,6 +34,10 @@ public class TrackHandler {
         this.trackBankManager = trackBankManager;
         this.stateCache = stateCache;
         this.noteInput = noteInput;
+
+        // Mark cursor properties interested for cursor/getInfo
+        cursorTrack.isPinned().markInterested();
+        cursorTrack.trackType().markInterested();
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -221,6 +225,34 @@ public class TrackHandler {
         dispatcher.register("track/removeNoteSource", params -> {
             cursorTrack.removeNoteSource(noteInput);
             return ok();
+        });
+
+        // --- Cursor navigation methods ---
+
+        dispatcher.register("cursor/selectParent", params -> {
+            cursorTrack.selectParent();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("cursor/selectFirstChild", params -> {
+            cursorTrack.selectFirstChild();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("cursor/setPinned", params -> {
+            if (!params.has("pinned")) {
+                throw new IllegalArgumentException("missing 'pinned' parameter");
+            }
+            cursorTrack.isPinned().set(params.get("pinned").getAsBoolean());
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("cursor/getInfo", params -> {
+            JsonObject info = new JsonObject();
+            info.addProperty("name", cursorTrack.name().get());
+            info.addProperty("trackType", cursorTrack.trackType().get());
+            info.addProperty("isPinned", cursorTrack.isPinned().get());
+            return info;
         });
 
         // --- Track bank scroll methods ---

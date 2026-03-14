@@ -47,6 +47,8 @@ public class StateCache {
     private final String[] trackTypes = new String[TRACK_COUNT];
     private final boolean[] trackIsGroup = new boolean[TRACK_COUNT];
     private final boolean[] trackIsGroupExpanded = new boolean[TRACK_COUNT];
+    private volatile boolean[] trackCanHoldNoteData = new boolean[TRACK_COUNT];
+    private volatile boolean[] trackCanHoldAudioData = new boolean[TRACK_COUNT];
 
     // Send state — [trackIndex][sendIndex]
     private volatile int sendCount = DEFAULT_SEND_COUNT;
@@ -815,6 +817,11 @@ public class StateCache {
 
             track.isGroupExpanded().markInterested();
             track.isGroupExpanded().addValueObserver((BooleanValueChangedCallback) v -> trackIsGroupExpanded[idx] = v);
+
+            track.canHoldNoteData().markInterested();
+            track.canHoldNoteData().addValueObserver(v -> trackCanHoldNoteData[idx] = v);
+            track.canHoldAudioData().markInterested();
+            track.canHoldAudioData().addValueObserver(v -> trackCanHoldAudioData[idx] = v);
         }
     }
 
@@ -1294,6 +1301,8 @@ public class StateCache {
             track.addProperty("trackType", trackTypes[i] != null ? trackTypes[i] : "");
             track.addProperty("isGroup", trackIsGroup[i]);
             track.addProperty("isGroupExpanded", trackIsGroupExpanded[i]);
+            track.addProperty("canHoldNoteData", trackCanHoldNoteData[i]);
+            track.addProperty("canHoldAudioData", trackCanHoldAudioData[i]);
 
             JsonArray sends = new JsonArray();
             for (int s = 0; s < sendCount; s++) {
