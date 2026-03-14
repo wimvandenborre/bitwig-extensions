@@ -388,6 +388,13 @@ PARAM_CHECKS=(
   "macro_createTrack|.input_schema.properties.plugin.properties.id.type|string"
   "macro_createSound|.input_schema.properties.plugin.type|object"
   "macro_buildSong|.input_schema.properties.tracks.items.properties.plugin.type|object"
+  "macro_writeClip|.input_schema.properties.notes.items.properties.chance.type|number"
+  "macro_writeClip|.input_schema.properties.notes.items.properties.expressions.type|object"
+  "macro_writeClip|.input_schema.properties.notes.items.properties.repeat.type|object"
+  "macro_writeClip|.input_schema.properties.notes.items.properties.occurrence.type|string"
+  "macro_writeClip|.input_schema.properties.notes.items.properties.recurrence.type|object"
+  "macro_buildSection|.input_schema.properties.clips.items.properties.notes.items.properties.chance.type|number"
+  "macro_buildSection|.input_schema.properties.clips.items.properties.notes.items.properties.expressions.type|object"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -765,6 +772,10 @@ PROMPT_CHECKS=(
   # gig phase 26 — plugin device support
   "system prompt documents plugin in macros|Macros also support plugins via"
   "system prompt documents plugin track creation|Track creation with plugin"
+
+  # gig phase 27 — clip expression macros
+  "system prompt documents inline expressions|inline expression properties"
+  "system prompt documents expression grouping|grouped by type and applied in deferred flush"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do

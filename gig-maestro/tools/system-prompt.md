@@ -757,6 +757,25 @@ macro_writeClip({ trackIndex: 0, sceneIndex: 0, lengthBeats: 16, stepSize: 0.25,
 ```
 Manual fallback: `clip_create → clip_select → clip_setStepSize → clip_setNotes → clip_rename`
 
+Notes support optional inline expression properties that are applied after the base notes are written:
+- `chance` (number 0.0–1.0): probability the note plays
+- `expressions` (object): per-note values — `{pan, timbre, pressure, gain, transpose, releaseVelocity, velocitySpread, mute}`, each 0.0–1.0
+- `repeat` (object): ratchet — `{count, curve, velocityEnd, velocityCurve}`
+- `occurrence` (string): condition — ALWAYS, FIRST, NOT_FIRST, FILL, NOT_FILL, etc.
+- `recurrence` (object): cycle — `{length, mask}` where mask is a bitmask
+
+Example with expressions:
+```
+macro_writeClip({ trackIndex: 0, sceneIndex: 0, lengthBeats: 8, stepSize: 0.25,
+  notes: [
+    { x: 0, y: 60, velocity: 100, duration: 1, chance: 0.8, expressions: { pan: 0.3 } },
+    { x: 4, y: 64, velocity: 80, duration: 1, repeat: { count: 3, curve: 0, velocityEnd: 0.5, velocityCurve: 0 } }
+  ]
+})
+```
+
+Expressions are grouped by type and applied in deferred flush cycles after the notes exist. Basic notes without expression properties work unchanged.
+
 **Full section (multi-track) — use `macro_buildSection`:**
 ```
 macro_buildSection({ sceneName: "Verse 1", clips: [
