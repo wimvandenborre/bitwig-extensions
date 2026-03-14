@@ -114,8 +114,8 @@ class TrackHandlerTest {
     }
 
     @Test
-    void registersExactlyTwentyFourMethods() {
-        assertEquals(24, dispatcher.getRegisteredMethods().size());
+    void registersExactlyTwentyFiveMethods() {
+        assertEquals(25, dispatcher.getRegisteredMethods().size());
     }
 
     // --- trackBank/scrollTo validation ---

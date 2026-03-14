@@ -83,6 +83,13 @@ class MacroHandlerTest {
             callLog.add("sceneBank/scrollBy:" + params.get("amount").getAsInt());
             return new JsonPrimitive("ok");
         });
+        dispatcher.register("track/setCursorColor", params -> {
+            callLog.add("track/setCursorColor:"
+                + params.get("r").getAsFloat() + ","
+                + params.get("g").getAsFloat() + ","
+                + params.get("b").getAsFloat());
+            return new JsonPrimitive("ok");
+        });
         dispatcher.register("device/setParameters", params -> {
             int pageCount = params.getAsJsonArray("pages").size();
             int paramCount = 0;
@@ -99,7 +106,7 @@ class MacroHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersSixMacroMethods() {
+    void registersSevenMacroMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("macro/createTrack"));
         assertTrue(methods.contains("macro/createClip"));
@@ -107,6 +114,7 @@ class MacroHandlerTest {
         assertTrue(methods.contains("macro/buildSection"));
         assertTrue(methods.contains("macro/setupScenes"));
         assertTrue(methods.contains("macro/createSound"));
+        assertTrue(methods.contains("macro/buildSong"));
     }
 
     // --- macro/createTrack ---
@@ -204,6 +212,118 @@ class MacroHandlerTest {
         assertTrue(result.get("ok").getAsBoolean());
         assertEquals(2, result.get("pageCount").getAsInt());
         assertEquals(3, result.get("paramCount").getAsInt());
+    }
+
+    @Test
+    void createTrack_withColor_setsColorAfterRename() {
+        handle("macro/createTrack", """
+            {"type":"instrument","name":"Bass","color":{"r":0.5,"g":0.2,"b":0.8}}""");
+        assertEquals(List.of(
+            "track/createInstrument",
+            "track/rename:Bass",
+            "track/setCursorColor:0.5,0.2,0.8"
+        ), callLog);
+    }
+
+    @Test
+    void createTrack_withColorAndDevice_colorBeforeDevice() {
+        handle("macro/createTrack", """
+            {"type":"instrument","name":"Synth","color":{"r":1.0,"g":0.0,"b":0.0},"device":"Polymer"}""");
+        assertEquals(List.of(
+            "track/createInstrument",
+            "track/rename:Synth",
+            "track/setCursorColor:1.0,0.0,0.0",
+            "device/insertBitwigDevice:Polymer"
+        ), callLog);
+    }
+
+    // --- macro/buildSong ---
+
+    @Test
+    void buildSong_twoTracksOneSection() {
+        handle("macro/buildSong", """
+            {"tracks":[
+                {"type":"instrument","name":"Bass","device":"Polymer"},
+                {"type":"instrument","name":"Lead","device":"Polysynth"}
+            ],"sections":[
+                {"sceneName":"Verse","clips":[
+                    {"trackIndex":0,"lengthBeats":16,"stepSize":0.25,
+                     "notes":[{"x":0,"y":48,"velocity":100,"duration":1}],"name":"Bass Line"},
+                    {"trackIndex":1,"lengthBeats":16,"stepSize":0.25,
+                     "notes":[{"x":0,"y":60,"velocity":80,"duration":1}],"name":"Lead Line"}
+                ]}
+            ]}""");
+        // Track 0: immediate createTrack
+        // Track 1: deferred (device needs flush)
+        // Section: deferred after tracks
+        assertTrue(callLog.contains("track/createInstrument"));
+        assertTrue(callLog.contains("track/rename:Bass"));
+        assertTrue(callLog.contains("device/insertBitwigDevice:Polymer"));
+        assertTrue(callLog.contains("track/rename:Lead"));
+        assertTrue(callLog.contains("device/insertBitwigDevice:Polysynth"));
+        assertTrue(callLog.contains("scene/create"));
+        assertTrue(callLog.contains("scene/rename:Verse"));
+    }
+
+    @Test
+    void buildSong_tracksOnly_noSections() {
+        String response = handle("macro/buildSong", """
+            {"tracks":[
+                {"type":"audio","name":"Vocal"},
+                {"type":"instrument","name":"Keys"}
+            ]}""");
+        JsonObject result = parseResult(response);
+        assertEquals(2, result.get("trackCount").getAsInt());
+        assertEquals(0, result.get("sectionCount").getAsInt());
+        assertTrue(callLog.contains("track/createAudio"));
+        assertTrue(callLog.contains("track/rename:Vocal"));
+        assertTrue(callLog.contains("track/rename:Keys"));
+    }
+
+    @Test
+    void buildSong_emptyTracks_returnsError() {
+        String response = handle("macro/buildSong", """
+            {"tracks":[]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("must not be empty"));
+    }
+
+    @Test
+    void buildSong_returnsTrackAndSectionCounts() {
+        String response = handle("macro/buildSong", """
+            {"tracks":[
+                {"type":"instrument","name":"Drums","device":"Drum Machine"},
+                {"type":"instrument","name":"Bass","device":"Polymer"},
+                {"type":"instrument","name":"Lead","device":"Polysynth"}
+            ],"sections":[
+                {"sceneName":"Verse","clips":[
+                    {"trackIndex":0,"lengthBeats":16,"stepSize":0.25,
+                     "notes":[{"x":0,"y":36,"velocity":100,"duration":1}]}
+                ]},
+                {"sceneName":"Chorus","clips":[
+                    {"trackIndex":0,"lengthBeats":16,"stepSize":0.25,
+                     "notes":[{"x":0,"y":36,"velocity":100,"duration":1}]}
+                ]}
+            ]}""");
+        JsonObject result = parseResult(response);
+        assertEquals(3, result.get("trackCount").getAsInt());
+        assertEquals(2, result.get("sectionCount").getAsInt());
+    }
+
+    @Test
+    void buildSong_withColorAndPages() {
+        handle("macro/buildSong", """
+            {"tracks":[
+                {"type":"instrument","name":"Bass","device":"Polymer",
+                 "color":{"r":0.0,"g":0.5,"b":1.0},
+                 "pages":[{"pageIndex":0,"params":[{"index":0,"value":0.75}]}]}
+            ]}""");
+        assertTrue(callLog.contains("track/createInstrument"));
+        assertTrue(callLog.contains("track/rename:Bass"));
+        assertTrue(callLog.contains("track/setCursorColor:0.0,0.5,1.0"));
+        assertTrue(callLog.contains("device/insertBitwigDevice:Polymer"));
+        // createSound delegation happens via deferred scheduler
+        assertTrue(callLog.contains("device/setParameters:pages=1,params=1"));
     }
 
     // --- macro/createClip ---
