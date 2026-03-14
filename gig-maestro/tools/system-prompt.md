@@ -213,6 +213,21 @@ Returns: `{ deviceName, pageCount, pages: [{ index, name, parameters: [{ index, 
 2. device_setParameterValue(index: 0, value: 0.3)   // adjust cutoff
 ```
 
+**Capturing Presets** — save the current device state as a reusable preset:
+```
+// After tweaking a sound (via UI or RPC), capture it:
+1. device_discoverAll()                              // scan all pages
+2. // wait for estimatedMs
+3. device_getDiscoveryResult(format: "preset")       // get preset-compatible JSON
+
+// To create a minimal preset (non-default values only):
+4. Read data/devices/{device}.json                   // load reference defaults
+5. Compare preset output against reference defaults
+6. Strip parameters that match their default values
+7. Save to data/presets/{device}/{name}.json
+```
+The `format: "preset"` option returns `{ deviceName, pageCount, pages: [{ pageIndex, params: [{ index, value }] }] }` — directly passable to `macro_createSound`. Comparing against the device reference file (`data/devices/`) produces minimal presets that only include changed values.
+
 **Layer editing workflow (Instrument Layer):**
 ```
 1. device_insertBitwigDevice(name: "Instrument Layer")
