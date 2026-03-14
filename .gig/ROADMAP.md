@@ -41,6 +41,7 @@
 | 26 | gig-maestro: Plugin Device Support | v0.26.1–v0.26.4 | complete |
 | 27 | gig-maestro: Clip Expression Macros | v0.27.1–v0.27.4 | complete |
 | 28 | gig-maestro: Macro Automation Curves | v0.28.1–v0.28.4 | complete |
+| 29 | gig-maestro: Song Dump Fidelity | v0.29.1–v0.29.3 | complete |
 
 ## Completed Milestones
 

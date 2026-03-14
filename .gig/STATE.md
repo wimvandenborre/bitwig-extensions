@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.28.4` |
-| **Phase** | 28 — gig-maestro: Macro Automation Curves |
+| **Version** | `0.29.3` |
+| **Phase** | 29 — gig-maestro: Song Dump Fidelity |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 28.4 — Build verification |
+| **Last Batch** | 29.3 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,8 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.29.3 | 29 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.29.1-2 | 29 | Dump + rebuild: device params + clip settings | PLANNED | done | 2026-03-14 |
 | 0.28.4 | 28 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.28.3 | 28 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.28.2 | 28 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -147,6 +149,7 @@ D-23.1 (preset format in getDiscoveryResult), D-23.2 (client-side default filter
 
 Phase 27 governed: all tests pass, 562 smoke tests, 0 issues.
 Phase 28 governed: all tests pass, 570 smoke tests, 0 issues.
+Phase 29 governed: all tests pass, 570 smoke tests, 0 issues. CLI-only changes.
 
 ---
 
