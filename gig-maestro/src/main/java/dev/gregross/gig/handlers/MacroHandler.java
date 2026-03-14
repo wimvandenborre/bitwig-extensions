@@ -504,6 +504,117 @@ public class MacroHandler {
             renameP.addProperty("name", name);
             dispatcher.handleInternal("clip/rename", renameP);
         }
+
+        // Apply expression properties (deferred — notes must exist first)
+        applyNoteExpressions(notes);
+    }
+
+    private void applyNoteExpressions(JsonArray notes) {
+        // Collect expression data from notes
+        JsonArray chanceNotes = new JsonArray();
+        JsonArray repeatNotes = new JsonArray();
+        JsonArray occurrenceNotes = new JsonArray();
+        JsonArray recurrenceNotes = new JsonArray();
+        // Map: property name → array of {x, y, property, value}
+        java.util.Map<String, JsonArray> expressionsByProperty = new java.util.LinkedHashMap<>();
+
+        for (JsonElement el : notes) {
+            JsonObject note = el.getAsJsonObject();
+            int x = note.get("x").getAsInt();
+            int y = note.get("y").getAsInt();
+
+            if (note.has("chance") && !note.get("chance").isJsonNull()) {
+                JsonObject entry = new JsonObject();
+                entry.addProperty("x", x);
+                entry.addProperty("y", y);
+                entry.addProperty("chance", note.get("chance").getAsDouble());
+                chanceNotes.add(entry);
+            }
+
+            if (note.has("expressions") && !note.get("expressions").isJsonNull()) {
+                JsonObject expr = note.getAsJsonObject("expressions");
+                for (String prop : expr.keySet()) {
+                    expressionsByProperty.computeIfAbsent(prop, k -> new JsonArray());
+                    JsonObject entry = new JsonObject();
+                    entry.addProperty("x", x);
+                    entry.addProperty("y", y);
+                    entry.addProperty("property", prop);
+                    entry.addProperty("value", expr.get(prop).getAsDouble());
+                    expressionsByProperty.get(prop).add(entry);
+                }
+            }
+
+            if (note.has("repeat") && !note.get("repeat").isJsonNull()) {
+                JsonObject repeat = note.getAsJsonObject("repeat");
+                JsonObject entry = new JsonObject();
+                entry.addProperty("x", x);
+                entry.addProperty("y", y);
+                entry.addProperty("count", repeat.get("count").getAsInt());
+                entry.addProperty("curve", repeat.get("curve").getAsDouble());
+                entry.addProperty("velocityEnd", repeat.get("velocityEnd").getAsDouble());
+                entry.addProperty("velocityCurve", repeat.get("velocityCurve").getAsDouble());
+                repeatNotes.add(entry);
+            }
+
+            if (note.has("occurrence") && !note.get("occurrence").isJsonNull()) {
+                JsonObject entry = new JsonObject();
+                entry.addProperty("x", x);
+                entry.addProperty("y", y);
+                entry.addProperty("condition", note.get("occurrence").getAsString());
+                occurrenceNotes.add(entry);
+            }
+
+            if (note.has("recurrence") && !note.get("recurrence").isJsonNull()) {
+                JsonObject recurrence = note.getAsJsonObject("recurrence");
+                JsonObject entry = new JsonObject();
+                entry.addProperty("x", x);
+                entry.addProperty("y", y);
+                entry.addProperty("length", recurrence.get("length").getAsInt());
+                entry.addProperty("mask", recurrence.get("mask").getAsInt());
+                recurrenceNotes.add(entry);
+            }
+        }
+
+        // Schedule expression calls if any were collected
+        boolean hasExpressions = chanceNotes.size() > 0
+            || !expressionsByProperty.isEmpty()
+            || repeatNotes.size() > 0
+            || occurrenceNotes.size() > 0
+            || recurrenceNotes.size() > 0;
+
+        if (!hasExpressions) return;
+
+        scheduler.schedule(() -> {
+            try {
+                if (chanceNotes.size() > 0) {
+                    JsonObject p = new JsonObject();
+                    p.add("notes", chanceNotes);
+                    dispatcher.handleInternal("clip/setChance", p);
+                }
+                for (JsonArray exprNotes : expressionsByProperty.values()) {
+                    JsonObject p = new JsonObject();
+                    p.add("notes", exprNotes);
+                    dispatcher.handleInternal("clip/setNoteExpressions", p);
+                }
+                if (repeatNotes.size() > 0) {
+                    JsonObject p = new JsonObject();
+                    p.add("notes", repeatNotes);
+                    dispatcher.handleInternal("clip/setNoteRepeat", p);
+                }
+                if (occurrenceNotes.size() > 0) {
+                    JsonObject p = new JsonObject();
+                    p.add("notes", occurrenceNotes);
+                    dispatcher.handleInternal("clip/setNoteOccurrence", p);
+                }
+                if (recurrenceNotes.size() > 0) {
+                    JsonObject p = new JsonObject();
+                    p.add("notes", recurrenceNotes);
+                    dispatcher.handleInternal("clip/setNoteRecurrence", p);
+                }
+            } catch (Exception e) {
+                // Deferred expression application failed
+            }
+        }, FLUSH_DELAY_MS);
     }
 
     private void createClip(int trackIndex, int slotIndex, int lengthBeats) throws Exception {
