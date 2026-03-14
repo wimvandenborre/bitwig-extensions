@@ -40,6 +40,7 @@
 | 25 | gig-maestro: Macro Composition Chains | v0.25.1–v0.25.5 | complete |
 | 26 | gig-maestro: Plugin Device Support | v0.26.1–v0.26.4 | complete |
 | 27 | gig-maestro: Clip Expression Macros | v0.27.1–v0.27.4 | complete |
+| 28 | gig-maestro: Macro Automation Curves | v0.28.1–v0.28.4 | complete |
 
 ## Completed Milestones
 
