@@ -1,7 +1,7 @@
 [
   {
     "name": "session_snapshot",
-    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode, trackType, isGroup, isGroupExpanded), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes), and groove state (enabled, shuffleAmount, shuffleRate, accentAmount, accentRate, accentPhase). Always call this before taking actions to understand the current state, and after actions to verify results.",
+    "description": "Retrieve the full current state of the Bitwig Studio session. Returns transport state (playing, tempo, position, metronomeVolume, preRoll), all tracks (name, volume, pan, mute, solo, arm, sends, crossfadeMode, monitorMode, trackType, isGroup, isGroupExpanded, canHoldNoteData, canHoldAudioData), master track (volume, pan, mute, solo, color), project state (hasSoloedTracks, hasMutedTracks, hasArmedTracks, isModified, panelLayout), clip grid (64 tracks x 8 slots with content, playback, and recording states), scenes, device state (cursor track, cursor device, remote control parameters with hasAutomation flag, nesting info: isNested, hasSlots, slotNames, hasLayers, hasDrumPads), masterDevice state (master bus device chain, parameters, nesting info), application state (project name, undo/redo), arranger state (7 visibility toggles), arrangement state (loop range, punch in/out, automation mode, cue markers), browser state (exists, title, selectedContentType, contentTypeNames, canAudition, shouldAudition, resultName, resultIsSelected, resultsEntryCount, filters with 8 columns: category/tag/creator/device/deviceType/fileType/location/smartCollection each with exists/name/hitCount/entryCount), arpeggiator state (isEnabled, mode, octaves, rate, gateLength, shuffle, humanize, isFreeRunning, enableOverlappingNotes, usePressureToVelocity, terminateNotesImmediately), noteLatch state (isEnabled, mode, mono, velocityThreshold, activeNotes), and groove state (enabled, shuffleAmount, shuffleRate, accentAmount, accentRate, accentPhase). Always call this before taking actions to understand the current state, and after actions to verify results.",
     "input_schema": {
       "type": "object",
       "properties": {},
@@ -4780,6 +4780,47 @@
         }
       },
       "required": ["index"]
+    }
+  },
+  {
+    "name": "cursor_selectParent",
+    "description": "Move the cursor track selection to the parent group track. If already at root level, has no effect.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "cursor_selectFirstChild",
+    "description": "Move the cursor track selection to the first child track within the current group. Only works when cursor is on a group track.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "cursor_setPinned",
+    "description": "Pin or unpin the cursor track. When pinned, the cursor stays on the current track even if the user selects a different track in the Bitwig UI. Useful for batch operations.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pinned": {
+          "type": "boolean",
+          "description": "True to pin the cursor, false to unpin."
+        }
+      },
+      "required": ["pinned"]
+    }
+  },
+  {
+    "name": "cursor_getInfo",
+    "description": "Get information about the current cursor track: name, trackType, and isPinned state.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
     }
   }
 ]

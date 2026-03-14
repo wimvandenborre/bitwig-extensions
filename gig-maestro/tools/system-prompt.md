@@ -1399,3 +1399,19 @@ Valid parameter names: `shuffleAmount`, `shuffleRate`, `accentAmount`, `accentRa
 
 - `track_toggleSolo({ index: 0, exclusive: true })` — toggle solo with exclusive mode (unsolos all other tracks first)
 - `track_toggleSolo({ index: 0 })` — toggle solo without exclusive (default)
+
+### Track Capabilities
+
+Each track in the snapshot includes `canHoldNoteData` and `canHoldAudioData` booleans. Use these to check track capabilities before writing clips or recording:
+- Instrument tracks: `canHoldNoteData: true`
+- Audio tracks: `canHoldAudioData: true`
+- Hybrid tracks: both true
+- Group/Effect tracks: typically both false
+
+### Cursor Track Navigation
+
+Navigate group hierarchies and control cursor pinning:
+- `cursor_selectParent` — move cursor to parent group track
+- `cursor_selectFirstChild` — move cursor into first child of current group
+- `cursor_setPinned({ pinned: true })` — pin cursor to prevent it from following UI selection (useful during batch operations)
+- `cursor_getInfo` — returns `{name, trackType, isPinned}` for the current cursor track

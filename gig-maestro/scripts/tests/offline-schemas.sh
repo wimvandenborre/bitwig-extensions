@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 131 ]; then
-  echo "  PASS  claude-tools.json has >= 131 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 135 ]; then
+  echo "  PASS  claude-tools.json has >= 135 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 131 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 135 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -328,6 +328,12 @@ ALL_TOOLS=(
   mixer_zoomOutSelected
   track_selectInMixer
   track_makeVisibleInMixer
+
+  # gig phase 32 — track queries & cursor navigation
+  cursor_selectParent
+  cursor_selectFirstChild
+  cursor_setPinned
+  cursor_getInfo
 )
 
 for tool in "${ALL_TOOLS[@]}"; do
@@ -430,6 +436,7 @@ PARAM_CHECKS=(
   "mixer_setSection|.input_schema.properties.visible.type|boolean"
   "track_selectInMixer|.input_schema.properties.index.type|integer"
   "track_makeVisibleInMixer|.input_schema.properties.index.type|integer"
+  "cursor_setPinned|.input_schema.properties.pinned.type|boolean"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -522,6 +529,7 @@ assert_contains "session_snapshot mentions isGroupExpanded" "$SNAP_DESC" "isGrou
 assert_contains "snapshot mentions arpeggiator" "$SNAP_DESC" "arpeggiator"
 assert_contains "snapshot mentions noteLatch" "$SNAP_DESC" "noteLatch"
 assert_contains "snapshot mentions groove" "$SNAP_DESC" "groove state"
+assert_contains "snapshot mentions canHoldNoteData" "$SNAP_DESC" "canHoldNoteData"
 
 GETNOTES_DESC=$(jq -r '.[] | select(.name=="clip_getNotes") | .description' "$TOOLS_FILE")
 assert_contains "clip_getNotes describes pan" "$GETNOTES_DESC" "pan"
@@ -838,6 +846,15 @@ PROMPT_CHECKS=(
   "system prompt mentions mixer_zoomOutSelected|mixer_zoomOutSelected"
   "system prompt mentions track_selectInMixer|track_selectInMixer"
   "system prompt mentions track_makeVisibleInMixer|track_makeVisibleInMixer"
+
+  # gig phase 32 — track queries & cursor navigation
+  "system prompt has Track Capabilities section|Track Capabilities"
+  "system prompt mentions canHoldNoteData|canHoldNoteData"
+  "system prompt has Cursor Track Navigation section|Cursor Track Navigation"
+  "system prompt mentions cursor_selectParent|cursor_selectParent"
+  "system prompt mentions cursor_selectFirstChild|cursor_selectFirstChild"
+  "system prompt mentions cursor_setPinned|cursor_setPinned"
+  "system prompt mentions cursor_getInfo|cursor_getInfo"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do
