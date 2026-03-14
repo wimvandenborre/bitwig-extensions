@@ -120,8 +120,15 @@ class TrackHandlerTest {
     }
 
     @Test
-    void registersExactlyTwentySixMethods() {
-        assertEquals(26, dispatcher.getRegisteredMethods().size());
+    void registersMixerNavigationMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("track/selectInMixer"));
+        assertTrue(methods.contains("track/makeVisibleInMixer"));
+    }
+
+    @Test
+    void registersExactlyTwentyEightMethods() {
+        assertEquals(28, dispatcher.getRegisteredMethods().size());
     }
 
     // --- trackBank/scrollTo validation ---
@@ -353,6 +360,22 @@ class TrackHandlerTest {
         dispatcher.handle(rpc("track/setMonitor", "{\"index\":0,\"mode\":\"AUTO\"}"));
 
         verify(mockMonitorMode).set("AUTO");
+    }
+
+    // --- Behavioral tests — mixer navigation ---
+
+    @Test
+    void selectInMixer_callsTrackSelectInMixer() {
+        dispatcher.handle(rpc("track/selectInMixer", "{\"index\":0}"));
+
+        verify(mockTrack).selectInMixer();
+    }
+
+    @Test
+    void makeVisibleInMixer_callsTrackMakeVisibleInMixer() {
+        dispatcher.handle(rpc("track/makeVisibleInMixer", "{\"index\":0}"));
+
+        verify(mockTrack).makeVisibleInMixer();
     }
 
     // --- Behavioral tests — toggleSolo ---
