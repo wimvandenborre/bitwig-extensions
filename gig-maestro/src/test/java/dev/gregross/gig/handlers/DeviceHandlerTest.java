@@ -764,6 +764,77 @@ class DeviceHandlerTest {
         assertContains(response, "No discovery in progress");
     }
 
+    @Test
+    void getDiscoveryResult_presetFormat_returnsPresetCompatibleJson() {
+        // Set up a 2-page device with immediate scheduler
+        setupDiscoveryMocks(2);
+
+        dispatcher.handle(rpc("device/discoverAll", "{}"));
+        String result = dispatcher.handle(rpc("device/getDiscoveryResult",
+            "{\"format\":\"preset\"}"));
+
+        // Preset format uses pageIndex/params instead of index/parameters
+        assertContains(result, "\"deviceName\":\"Polymer\"");
+        assertContains(result, "\"pageCount\":2");
+        assertContains(result, "\"pageIndex\":0");
+        assertContains(result, "\"pageIndex\":1");
+        assertContains(result, "\"params\":");
+        // Should NOT contain full format fields
+        assertFalse(result.contains("\"displayedValue\""),
+            "Preset format should not include displayedValue");
+        assertFalse(result.contains("\"name\":\"Param"),
+            "Preset format should not include parameter names");
+    }
+
+    @Test
+    void getDiscoveryResult_defaultFormat_returnsFullJson() {
+        setupDiscoveryMocks(2);
+
+        dispatcher.handle(rpc("device/discoverAll", "{}"));
+        String result = dispatcher.handle(rpc("device/getDiscoveryResult", "{}"));
+
+        // Full format has index/parameters/name/displayedValue
+        assertContains(result, "\"parameters\":");
+        assertContains(result, "\"displayedValue\":");
+        assertContains(result, "\"Param 0\"");
+    }
+
+    @Test
+    void getDiscoveryResult_presetFormat_noDiscovery_returnsError() {
+        String response = dispatcher.handle(rpc("device/getDiscoveryResult",
+            "{\"format\":\"preset\"}"));
+        assertContains(response, "No discovery in progress");
+    }
+
+    private void setupDiscoveryMocks(int pageCount) {
+        IntegerValue mockPageCount = mock(IntegerValue.class);
+        when(mockRemoteControlsPage.pageCount()).thenReturn(mockPageCount);
+        when(mockPageCount.get()).thenReturn(pageCount);
+        when(mockRemoteControlsPage.selectedPageIndex()).thenReturn(mockPageIndex);
+        when(mockPageIndex.get()).thenReturn(0);
+        StringValue mockDeviceName = mock(StringValue.class);
+        when(mockCursorDevice.name()).thenReturn(mockDeviceName);
+        when(mockDeviceName.get()).thenReturn("Polymer");
+        StringArrayValue mockPageNames = mock(StringArrayValue.class);
+        when(mockRemoteControlsPage.pageNames()).thenReturn(mockPageNames);
+        String[] names = new String[pageCount];
+        for (int i = 0; i < pageCount; i++) names[i] = "Page " + i;
+        when(mockPageNames.get()).thenReturn(names);
+        for (int i = 0; i < 8; i++) {
+            RemoteControl param = mock(RemoteControl.class);
+            SettableStringValue paramName = mock(SettableStringValue.class);
+            SettableRangedValue paramValue = mock(SettableRangedValue.class);
+            StringValue displayedValue = mock(StringValue.class);
+            when(mockRemoteControlsPage.getParameter(i)).thenReturn(param);
+            when(param.name()).thenReturn(paramName);
+            when(paramName.get()).thenReturn("Param " + i);
+            when(param.value()).thenReturn(paramValue);
+            when(paramValue.get()).thenReturn(0.5);
+            when(paramValue.displayedValue()).thenReturn(displayedValue);
+            when(displayedValue.get()).thenReturn("50%");
+        }
+    }
+
     // --- Helpers ---
 
     private String rpc(String method, String params) {
