@@ -373,6 +373,9 @@ PARAM_CHECKS=(
   "device_setParameters|.input_schema.properties.pages.items.properties.params.type|array"
   "macro_createSound|.input_schema.properties.device.type|string"
   "device_getDiscoveryResult|.input_schema.properties.format.type|string"
+  "macro_createTrack|.input_schema.properties.pages.type|array"
+  "macro_createTrack|.input_schema.properties.pages.items.properties.pageIndex.type|integer"
+  "macro_createTrack|.input_schema.properties.pages.items.properties.params.type|array"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -737,6 +740,10 @@ PROMPT_CHECKS=(
   "system prompt has Capturing Presets section|Capturing Presets"
   "system prompt mentions format preset|format: \"preset\""
   "system prompt mentions preset-compatible|preset-compatible"
+
+  # gig phase 24 — macro improvements
+  "system prompt documents createTrack with pages|inserts the device, and applies sound parameters"
+  "system prompt documents track creation with sound design|Track creation with sound design"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do
