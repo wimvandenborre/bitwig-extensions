@@ -134,6 +134,15 @@ class TrackHandlerTest {
     }
 
     @Test
+    void registersCursorNavigationMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("cursor/selectParent"));
+        assertTrue(methods.contains("cursor/selectFirstChild"));
+        assertTrue(methods.contains("cursor/setPinned"));
+        assertTrue(methods.contains("cursor/getInfo"));
+    }
+
+    @Test
     void registersExactlyThirtyTwoMethods() {
         assertEquals(32, dispatcher.getRegisteredMethods().size());
     }
@@ -367,6 +376,54 @@ class TrackHandlerTest {
         dispatcher.handle(rpc("track/setMonitor", "{\"index\":0,\"mode\":\"AUTO\"}"));
 
         verify(mockMonitorMode).set("AUTO");
+    }
+
+    // --- Behavioral tests — cursor navigation ---
+
+    @Test
+    void selectParent_callsCursorTrackSelectParent() {
+        dispatcher.handle(rpc("cursor/selectParent", "{}"));
+
+        verify(mockCursorTrack).selectParent();
+    }
+
+    @Test
+    void selectFirstChild_callsCursorTrackSelectFirstChild() {
+        dispatcher.handle(rpc("cursor/selectFirstChild", "{}"));
+
+        verify(mockCursorTrack).selectFirstChild();
+    }
+
+    @Test
+    void setPinned_true_callsCursorTrackIsPinnedSet() {
+        dispatcher.handle(rpc("cursor/setPinned", "{\"pinned\":true}"));
+
+        verify(mockIsPinned).set(true);
+    }
+
+    @Test
+    void setPinned_false_callsCursorTrackIsPinnedSet() {
+        dispatcher.handle(rpc("cursor/setPinned", "{\"pinned\":false}"));
+
+        verify(mockIsPinned).set(false);
+    }
+
+    @Test
+    void setPinned_missingParam_returnsError() {
+        String response = dispatcher.handle(rpc("cursor/setPinned", "{}"));
+        assertContains(response, "pinned");
+    }
+
+    @Test
+    void getInfo_returnsExpectedFields() {
+        when(mockNameValue.get()).thenReturn("Lead Synth");
+        when(mockTrackType.get()).thenReturn("Instrument");
+        when(mockIsPinned.get()).thenReturn(false);
+
+        String response = dispatcher.handle(rpc("cursor/getInfo", "{}"));
+        assertContains(response, "\"name\":\"Lead Synth\"");
+        assertContains(response, "\"trackType\":\"Instrument\"");
+        assertContains(response, "\"isPinned\":false");
     }
 
     // --- Behavioral tests — mixer navigation ---
