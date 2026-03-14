@@ -1,0 +1,46 @@
+{
+  "name": "Pluck",
+  "description": "Short, percussive pluck with bright attack and fast decay. Good for arpeggios and melodic sequences.",
+  "device": "Polymer",
+  "pages": [
+    {
+      "pageIndex": 0,
+      "params": [
+        { "index": 0, "value": 0.0 },
+        { "index": 1, "value": 0.5 },
+        { "index": 2, "value": 1.0 },
+        { "index": 3, "value": 0.0 },
+        { "index": 4, "value": 0.0 },
+        { "index": 7, "value": 0.794 }
+      ]
+    },
+    {
+      "pageIndex": 4,
+      "params": [
+        { "index": 0, "value": 0.0 },
+        { "index": 1, "value": 0.22 },
+        { "index": 2, "value": 0.0 },
+        { "index": 3, "value": 0.15 }
+      ]
+    },
+    {
+      "pageIndex": 3,
+      "params": [
+        { "index": 0, "value": 0.55 },
+        { "index": 1, "value": 0.15 },
+        { "index": 2, "value": 0.5 },
+        { "index": 4, "value": 0.75 },
+        { "index": 6, "value": 0.2 }
+      ]
+    },
+    {
+      "pageIndex": 5,
+      "params": [
+        { "index": 0, "value": 0.0 },
+        { "index": 1, "value": 0.18 },
+        { "index": 2, "value": 0.0 },
+        { "index": 3, "value": 0.12 }
+      ]
+    }
+  ]
+}
