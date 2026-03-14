@@ -383,6 +383,11 @@ PARAM_CHECKS=(
   "macro_buildSong|.input_schema.properties.sections.type|array"
   "macro_buildSong|.input_schema.properties.tracks.items.properties.type.type|string"
   "macro_buildSong|.input_schema.properties.tracks.items.properties.color.type|object"
+  "macro_createTrack|.input_schema.properties.plugin.type|object"
+  "macro_createTrack|.input_schema.properties.plugin.properties.type.type|string"
+  "macro_createTrack|.input_schema.properties.plugin.properties.id.type|string"
+  "macro_createSound|.input_schema.properties.plugin.type|object"
+  "macro_buildSong|.input_schema.properties.tracks.items.properties.plugin.type|object"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -756,6 +761,10 @@ PROMPT_CHECKS=(
   "system prompt mentions macro_buildSong|macro_buildSong"
   "system prompt documents one-call alternative|One-call alternative"
   "system prompt documents sequential track delays|Tracks are created sequentially with proper delays"
+
+  # gig phase 26 — plugin device support
+  "system prompt documents plugin in macros|Macros also support plugins via"
+  "system prompt documents plugin track creation|Track creation with plugin"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do
