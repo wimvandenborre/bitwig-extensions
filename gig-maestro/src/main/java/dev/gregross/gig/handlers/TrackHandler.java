@@ -65,6 +65,13 @@ public class TrackHandler {
             return new JsonPrimitive("ok");
         });
 
+        dispatcher.register("track/toggleSolo", params -> {
+            Track track = getTrack(params.get("index").getAsInt());
+            boolean exclusive = params.has("exclusive") && params.get("exclusive").getAsBoolean();
+            track.solo().toggle(exclusive);
+            return new JsonPrimitive("ok");
+        });
+
         dispatcher.register("track/setArm", params -> {
             Track track = getTrack(params.get("index").getAsInt());
             boolean armed = params.get("armed").getAsBoolean();

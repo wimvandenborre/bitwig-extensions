@@ -115,6 +115,27 @@ public class ApplicationHandler {
             application.nextSubPanel();
             return new JsonPrimitive("ok");
         });
+
+        // Zoom controls
+        dispatcher.register("app/zoomIn", params -> {
+            application.zoomIn();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/zoomOut", params -> {
+            application.zoomOut();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/zoomToFit", params -> {
+            application.zoomToFit();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/zoomToSelection", params -> {
+            application.zoomToSelection();
+            return new JsonPrimitive("ok");
+        });
     }
 
     private static final Set<String> PANEL_LAYOUTS = Set.of("ARRANGE", "MIX", "EDIT");
