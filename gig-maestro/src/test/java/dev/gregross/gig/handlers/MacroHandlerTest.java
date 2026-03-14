@@ -158,6 +158,54 @@ class MacroHandlerTest {
         assertEquals(List.of("track/createAudio:pos=3"), callLog);
     }
 
+    @Test
+    void createTrack_withDeviceAndPages_delegatesToCreateSound() {
+        handle("macro/createTrack", """
+            {"type":"instrument","name":"Lead Synth","device":"Polymer","pages":[
+                {"pageIndex":0,"params":[{"index":0,"value":0.75},{"index":1,"value":0.5}]},
+                {"pageIndex":1,"params":[{"index":2,"value":0.3}]}
+            ]}""");
+        assertEquals(List.of(
+            "track/createInstrument",
+            "track/rename:Lead Synth",
+            "device/insertBitwigDevice:Polymer",
+            "device/setParameters:pages=2,params=3"
+        ), callLog);
+    }
+
+    @Test
+    void createTrack_withPagesButNoDevice_returnsError() {
+        String response = handle("macro/createTrack", """
+            {"type":"instrument","pages":[
+                {"pageIndex":0,"params":[{"index":0,"value":0.5}]}
+            ]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("pages") && response.contains("device"));
+    }
+
+    @Test
+    void createTrack_withDeviceNoPages_worksAsBeforeNoSoundCall() {
+        handle("macro/createTrack", """
+            {"type":"instrument","device":"Polymer"}""");
+        assertEquals(List.of(
+            "track/createInstrument",
+            "device/insertBitwigDevice:Polymer"
+        ), callLog);
+    }
+
+    @Test
+    void createTrack_withPages_returnsPageAndParamCounts() {
+        String response = handle("macro/createTrack", """
+            {"type":"instrument","device":"Polymer","pages":[
+                {"pageIndex":0,"params":[{"index":0,"value":0.75},{"index":1,"value":0.5}]},
+                {"pageIndex":1,"params":[{"index":2,"value":0.3}]}
+            ]}""");
+        JsonObject result = parseResult(response);
+        assertTrue(result.get("ok").getAsBoolean());
+        assertEquals(2, result.get("pageCount").getAsInt());
+        assertEquals(3, result.get("paramCount").getAsInt());
+    }
+
     // --- macro/createClip ---
 
     @Test

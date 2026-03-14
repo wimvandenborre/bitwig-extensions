@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.23.5` |
-| **Phase** | 23 — gig-maestro: Live Preset Export |
+| **Version** | `0.24.4` |
+| **Phase** | 24 — gig-maestro: Macro Improvements |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 23.5 — Online smoke tests for discovery + preset export |
+| **Last Batch** | 24.4 — Build verification |
 | **Last Updated** | 2026-03-13 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.24.4 | 24 | Build verification | PLANNED | done | 2026-03-13 |
+| 0.24.3 | 24 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-13 |
+| 0.24.2 | 24 | Unit tests | PLANNED | done | 2026-03-13 |
+| 0.24.1 | 24 | Extend macro/createTrack with pages support | PLANNED | done | 2026-03-13 |
 | 0.23.5 | 23 | Online smoke tests for discovery + preset export | UNPLANNED | done | 2026-03-13 |
 | 0.23.4 | 23 | Build verification | PLANNED | done | 2026-03-13 |
 | 0.23.3 | 23 | Tool definition + system prompt + smoke tests | PLANNED | done | 2026-03-13 |

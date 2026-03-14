@@ -62,7 +62,14 @@ public class MacroHandler {
             dispatcher.handleInternal("track/rename", renameParams);
         }
 
-        if (params.has("device") && !params.get("device").isJsonNull()) {
+        boolean hasDevice = params.has("device") && !params.get("device").isJsonNull();
+        boolean hasPages = params.has("pages") && !params.get("pages").isJsonNull();
+
+        if (hasPages && !hasDevice) {
+            throw new IllegalArgumentException("'pages' requires 'device' — cannot set parameters without a device");
+        }
+
+        if (hasDevice) {
             JsonObject deviceParams = new JsonObject();
             deviceParams.addProperty("name", params.get("device").getAsString());
             dispatcher.handleInternal("device/insertBitwigDevice", deviceParams);
@@ -70,6 +77,31 @@ public class MacroHandler {
 
         JsonObject result = new JsonObject();
         result.addProperty("ok", true);
+
+        if (hasPages) {
+            JsonArray pages = params.getAsJsonArray("pages");
+            JsonObject soundParams = new JsonObject();
+            soundParams.add("pages", pages);
+
+            // Count params for response
+            int paramCount = 0;
+            for (JsonElement pageEl : pages) {
+                paramCount += pageEl.getAsJsonObject().getAsJsonArray("params").size();
+            }
+
+            // Schedule after flush so the inserted device has initialized
+            scheduler.schedule(() -> {
+                try {
+                    dispatcher.handleInternal("macro/createSound", soundParams);
+                } catch (Exception e) {
+                    // Deferred sound creation failed
+                }
+            }, FLUSH_DELAY_MS);
+
+            result.addProperty("pageCount", pages.size());
+            result.addProperty("paramCount", paramCount);
+        }
+
         return result;
     }
 

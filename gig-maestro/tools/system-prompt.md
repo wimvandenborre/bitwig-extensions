@@ -688,7 +688,7 @@ Macros are predefined compound operations that collapse common multi-call workfl
 
 | Macro | Replaces | Calls Saved |
 |-------|----------|-------------|
-| `macro_createTrack` | track/create + track/rename + device/insert | 2–3 → 1 |
+| `macro_createTrack` | track/create + track/rename + device/insert + sound design | 2–4 → 1 |
 | `macro_createClip` | clip/create + clip/select | 2 → 1 |
 | `macro_writeClip` | clip/create + clip/select + clip/setStepSize + clip/setNotes + clip/rename | 4–5 → 1 |
 | `macro_buildSection` | scene/create + scene/rename + N×(clip/create + clip/select + clip/setStepSize + clip/setNotes + clip/rename) | 10+ → 1 |
@@ -732,6 +732,16 @@ Create tracks in this order for a clean mix layout:
 ```
 macro_createTrack({ type: "instrument", name: "Bass", device: "Polymer" })
 ```
+
+**Track creation with sound design — use `macro_createTrack` with `pages`:**
+```
+macro_createTrack({ type: "instrument", name: "Bass", device: "Polymer", pages: [
+  { pageIndex: 0, params: [{ index: 0, value: 0.75 }, { index: 1, value: 0.5 }] },
+  { pageIndex: 1, params: [{ index: 2, value: 0.3 }] }
+]})
+```
+This creates a track, names it, inserts the device, and applies sound parameters — all in one call. The `pages` format is identical to `macro_createSound`. Use this instead of calling `track_createInstrument` → `track_rename` → `macro_createSound` separately.
+
 Manual fallback: `track_createInstrument → track_rename → device_insertBitwigDevice → session_snapshot`
 
 **Note writing (per clip) — use `macro_writeClip`:**
@@ -758,10 +768,10 @@ session_snapshot → device_listBitwigDevices → device_insertBitwigDevice → 
 Complete sequence for creating a multi-track song using macros:
 
 1. **Set tempo:** `transport_setTempo` with desired BPM.
-2. **Create tracks:** Use `macro_createTrack` for each:
+2. **Create tracks:** Use `macro_createTrack` for each (add `pages` for sound design):
    - `macro_createTrack({ type: "instrument", name: "Drums", device: "Drum Machine" })`
-   - `macro_createTrack({ type: "instrument", name: "Bass", device: "Polymer" })`
-   - `macro_createTrack({ type: "instrument", name: "Lead", device: "Polysynth" })`
+   - `macro_createTrack({ type: "instrument", name: "Bass", device: "Polymer", pages: [...] })`
+   - `macro_createTrack({ type: "instrument", name: "Lead", device: "Polysynth", pages: [...] })`
 3. **Build sections:** Use `macro_buildSection` for each song section:
    - `macro_buildSection({ sceneName: "Verse 1", clips: [{ trackIndex: 0, ... }, { trackIndex: 1, ... }, { trackIndex: 2, ... }] })`
    - `macro_buildSection({ sceneName: "Chorus", clips: [...] })`
