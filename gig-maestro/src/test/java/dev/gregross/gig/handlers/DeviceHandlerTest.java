@@ -11,6 +11,7 @@ import com.bitwig.extension.controller.api.SettableBooleanValue;
 import com.bitwig.extension.controller.api.SettableIntegerValue;
 import com.bitwig.extension.controller.api.SettableRangedValue;
 import com.bitwig.extension.controller.api.SettableStringValue;
+import com.bitwig.extension.controller.api.StringArrayValue;
 import com.bitwig.extension.controller.api.StringValue;
 import com.bitwig.extension.controller.api.IntegerValue;
 import com.bitwig.extension.controller.api.Transport;
@@ -657,6 +658,9 @@ class DeviceHandlerTest {
         StringValue mockDeviceName = mock(StringValue.class);
         when(mockCursorDevice.name()).thenReturn(mockDeviceName);
         when(mockDeviceName.get()).thenReturn("Polymer");
+        StringArrayValue mockPageNames = mock(StringArrayValue.class);
+        when(mockRemoteControlsPage.pageNames()).thenReturn(mockPageNames);
+        when(mockPageNames.get()).thenReturn(new String[]{"A", "B", "C"});
 
         String response = localDispatcher.handle(rpc("device/discoverAll", "{}"));
         assertContains(response, "\"scanning\":true");
@@ -676,10 +680,10 @@ class DeviceHandlerTest {
         when(mockCursorDevice.name()).thenReturn(mockDeviceName);
         when(mockDeviceName.get()).thenReturn("Polymer");
 
-        // Mock page name
-        StringValue mockPageName = mock(StringValue.class);
-        when(mockRemoteControlsPage.getName()).thenReturn(mockPageName);
-        when(mockPageName.get()).thenReturn("Oscillator");
+        // Mock page names array
+        StringArrayValue mockPageNames = mock(StringArrayValue.class);
+        when(mockRemoteControlsPage.pageNames()).thenReturn(mockPageNames);
+        when(mockPageNames.get()).thenReturn(new String[]{"Oscillator", "Filter"});
 
         // Mock all 8 parameters
         for (int i = 0; i < 8; i++) {
@@ -719,9 +723,9 @@ class DeviceHandlerTest {
         StringValue mockDeviceName = mock(StringValue.class);
         when(mockCursorDevice.name()).thenReturn(mockDeviceName);
         when(mockDeviceName.get()).thenReturn("Test");
-        StringValue mockPageName = mock(StringValue.class);
-        when(mockRemoteControlsPage.getName()).thenReturn(mockPageName);
-        when(mockPageName.get()).thenReturn("Page");
+        StringArrayValue mockPageNamesArr = mock(StringArrayValue.class);
+        when(mockRemoteControlsPage.pageNames()).thenReturn(mockPageNamesArr);
+        when(mockPageNamesArr.get()).thenReturn(new String[]{"Page A", "Page B"});
         for (int i = 0; i < 8; i++) {
             RemoteControl param = mock(RemoteControl.class);
             SettableStringValue pn = mock(SettableStringValue.class);

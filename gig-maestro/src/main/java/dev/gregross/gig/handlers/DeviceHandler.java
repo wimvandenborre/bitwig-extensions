@@ -489,6 +489,7 @@ public class DeviceHandler {
             discoveryResult = null;
 
             String deviceName = cursorDevice.name().get();
+            String[] allPageNames = remoteControlsPage.pageNames().get();
             JsonArray pages = new JsonArray();
 
             // Set to page 0 — first read happens in task at FLUSH_DELAY_MS
@@ -501,7 +502,9 @@ public class DeviceHandler {
                     // Read current page's parameters
                     JsonObject page = new JsonObject();
                     page.addProperty("index", pageIndex);
-                    page.addProperty("name", remoteControlsPage.getName().get());
+                    String pageName = (pageIndex < allPageNames.length)
+                        ? allPageNames[pageIndex] : "";
+                    page.addProperty("name", pageName);
                     JsonArray parameters = new JsonArray();
                     for (int j = 0; j < PARAM_COUNT; j++) {
                         RemoteControl param = remoteControlsPage.getParameter(j);
