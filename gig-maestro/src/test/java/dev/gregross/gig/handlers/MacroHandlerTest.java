@@ -90,6 +90,11 @@ class MacroHandlerTest {
                 + params.get("b").getAsFloat());
             return new JsonPrimitive("ok");
         });
+        dispatcher.register("device/insertPluginDevice", params -> {
+            callLog.add("device/insertPluginDevice:" + params.get("type").getAsString()
+                + ":" + params.get("id").getAsString());
+            return new JsonPrimitive("ok");
+        });
         dispatcher.register("device/setParameters", params -> {
             int pageCount = params.getAsJsonArray("pages").size();
             int paramCount = 0;
@@ -237,6 +242,55 @@ class MacroHandlerTest {
         ), callLog);
     }
 
+    @Test
+    void createTrack_withPlugin_insertsPluginDevice() {
+        handle("macro/createTrack", """
+            {"type":"instrument","name":"Synth","plugin":{"type":"vst3","id":"ABCD-1234"}}""");
+        assertEquals(List.of(
+            "track/createInstrument",
+            "track/rename:Synth",
+            "device/insertPluginDevice:vst3:ABCD-1234"
+        ), callLog);
+    }
+
+    @Test
+    void createTrack_withPluginAndPages_insertsPluginAndSetsParams() {
+        handle("macro/createTrack", """
+            {"type":"instrument","name":"Synth","plugin":{"type":"clap","id":"com.vendor.synth"},
+             "pages":[{"pageIndex":0,"params":[{"index":0,"value":0.5}]}]}""");
+        assertTrue(callLog.contains("device/insertPluginDevice:clap:com.vendor.synth"));
+        assertTrue(callLog.contains("device/setParameters:pages=1,params=1"));
+    }
+
+    @Test
+    void createTrack_withDeviceAndPlugin_returnsError() {
+        String response = handle("macro/createTrack", """
+            {"type":"instrument","device":"Polymer","plugin":{"type":"vst3","id":"123"}}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("cannot specify both"));
+    }
+
+    @Test
+    void createSound_withPlugin_insertsPluginAndSetsParams() {
+        String response = handle("macro/createSound", """
+            {"plugin":{"type":"vst2","id":"12345"},
+             "pages":[{"pageIndex":0,"params":[{"index":0,"value":0.75}]}]}""");
+        assertTrue(callLog.contains("device/insertPluginDevice:vst2:12345"));
+        assertTrue(callLog.contains("device/setParameters:pages=1,params=1"));
+        JsonObject result = parseResult(response);
+        assertTrue(result.get("inserted").getAsBoolean());
+        assertEquals("vst2:12345", result.get("device").getAsString());
+    }
+
+    @Test
+    void createSound_withDeviceAndPlugin_returnsError() {
+        String response = handle("macro/createSound", """
+            {"device":"Polymer","plugin":{"type":"vst3","id":"123"},
+             "pages":[{"pageIndex":0,"params":[{"index":0,"value":0.5}]}]}""");
+        assertTrue(response.contains("error"));
+        assertTrue(response.contains("cannot specify both"));
+    }
+
     // --- macro/buildSong ---
 
     @Test
@@ -324,6 +378,18 @@ class MacroHandlerTest {
         assertTrue(callLog.contains("device/insertBitwigDevice:Polymer"));
         // createSound delegation happens via deferred scheduler
         assertTrue(callLog.contains("device/setParameters:pages=1,params=1"));
+    }
+
+    @Test
+    void buildSong_withPluginTrack() {
+        handle("macro/buildSong", """
+            {"tracks":[
+                {"type":"instrument","name":"VST Synth",
+                 "plugin":{"type":"vst3","id":"GUID-123"}}
+            ]}""");
+        assertTrue(callLog.contains("track/createInstrument"));
+        assertTrue(callLog.contains("track/rename:VST Synth"));
+        assertTrue(callLog.contains("device/insertPluginDevice:vst3:GUID-123"));
     }
 
     // --- macro/createClip ---
