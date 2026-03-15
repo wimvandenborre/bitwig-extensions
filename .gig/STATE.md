@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.41.6` |
-| **Phase** | 41 — Documentation |
+| **Version** | `0.42.6` |
+| **Phase** | 42 — Interactive Documentation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 41.6 — Mermaid flow charts & user stories |
+| **Last Batch** | 42.6 — Catch-all POST route for Scalar Try It |
 | **Last Updated** | 2026-03-15 |
 
 ---
@@ -18,6 +18,12 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.42.6 | 42 | Catch-all POST route for Scalar Try It | UNPLANNED | done | 2026-03-15 |
+| 0.42.5 | 42 | Context-aware example values | UNPLANNED | done | 2026-03-15 |
+| 0.42.4 | 42 | Build verification + docs update | PLANNED | done | 2026-03-15 |
+| 0.42.3 | 42 | Serve /docs from extension HTTP server | PLANNED | done | 2026-03-15 |
+| 0.42.2 | 42 | Scalar HTML page | PLANNED | done | 2026-03-15 |
+| 0.42.1 | 42 | OpenAPI spec generator script | PLANNED | done | 2026-03-15 |
 | 0.41.6 | 41 | Mermaid flow charts & user stories | UNPLANNED | done | 2026-03-15 |
 | 0.41.5 | 41 | Cross-link review & build verification | PLANNED | done | 2026-03-15 |
 | 0.41.4 | 41 | RPC API reference | PLANNED | done | 2026-03-15 |
@@ -200,7 +206,7 @@
 
 ## Active Decisions
 
-_None — phase 41 archived._
+_None — phase 42 archived._
 
 ---
 

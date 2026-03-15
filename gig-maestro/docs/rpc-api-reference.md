@@ -2,6 +2,8 @@
 
 Complete reference for all JSON-RPC methods exposed by the Gig Maestro Bitwig Studio controller extension.
 
+> **Prefer interactive docs?** Open [http://localhost:8787/docs](http://localhost:8787/docs) when Bitwig is running for a searchable, interactive API browser with a "Try It" playground. Or open [api.html](api.html) locally.
+
 ---
 
 ## Introduction

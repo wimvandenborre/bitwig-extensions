@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,11 @@ public class HttpRpcServer {
 
         server.createContext("/rpc", exchange -> handleRpc(exchange, requestHandler));
         server.createContext("/health", this::handleHealth);
+        server.createContext("/docs", this::handleDocs);
+        server.createContext("/openapi.json", this::handleOpenApiSpec);
+        // Catch-all: route any POST to the RPC handler (enables Scalar "Try It"
+        // which sends to paths like /transport/play instead of /rpc)
+        server.createContext("/", exchange -> handleRpc(exchange, requestHandler));
     }
 
     public void start() {
@@ -71,6 +77,31 @@ public class HttpRpcServer {
     private void handleHealth(HttpExchange exchange) throws IOException {
         addCorsHeaders(exchange);
         sendResponse(exchange, 200, "{\"status\":\"ok\",\"version\":\"0.1.0\"}");
+    }
+
+    private void handleDocs(HttpExchange exchange) throws IOException {
+        addCorsHeaders(exchange);
+        serveClasspathResource(exchange, "/docs/api.html", "text/html");
+    }
+
+    private void handleOpenApiSpec(HttpExchange exchange) throws IOException {
+        addCorsHeaders(exchange);
+        serveClasspathResource(exchange, "/docs/openapi.json", "application/json");
+    }
+
+    private void serveClasspathResource(HttpExchange exchange, String path, String contentType) throws IOException {
+        try (InputStream is = getClass().getResourceAsStream(path)) {
+            if (is == null) {
+                sendResponse(exchange, 404, "{\"error\":\"Resource not found\"}");
+                return;
+            }
+            byte[] bytes = is.readAllBytes();
+            exchange.getResponseHeaders().set("Content-Type", contentType + "; charset=utf-8");
+            exchange.sendResponseHeaders(200, bytes.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(bytes);
+            }
+        }
     }
 
     private void sendResponse(HttpExchange exchange, int status, String body) throws IOException {

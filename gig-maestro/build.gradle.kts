@@ -24,9 +24,20 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
+val copyDocsToResources by tasks.registering(Copy::class) {
+    from("docs/api.html", "docs/openapi.json")
+    into(layout.buildDirectory.dir("resources/main/docs"))
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    dependsOn(copyDocsToResources)
+}
+
 tasks.shadowJar {
     archiveFileName.set("GigMaestro.bwextension")
     destinationDirectory.set(file(bitwigExtensionsDir))
+    dependsOn(copyDocsToResources)
+    from(layout.buildDirectory.dir("resources/main"))
 }
 
 tasks.named("build") {

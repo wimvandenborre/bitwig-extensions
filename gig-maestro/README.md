@@ -215,8 +215,12 @@ gig rpc '{"jsonrpc":"2.0","method":"browser/commit","params":{},"id":1}'
 
 ## Documentation
 
+- **[Interactive API Docs](http://localhost:8787/docs)** -- browse all 306 methods with live "Try It" playground (requires Bitwig running)
 - [CLI Reference](docs/cli-reference.md) -- all CLI commands, flags, and usage examples
 - [RPC API Reference](docs/rpc-api-reference.md) -- every RPC method with parameters and responses
+- [OpenAPI Spec](docs/openapi.json) -- machine-readable API definition (OpenAPI 3.1)
+
+The interactive docs are also available as a [static HTML page](docs/api.html) that can be opened locally.
 
 ## Testing
 
