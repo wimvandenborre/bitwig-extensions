@@ -57,14 +57,14 @@ public class GigCli {
     }
 
     /**
-     * Reads defaults from ~/.gig/config.json when present.
+     * Reads defaults from ~/.gig-maestro/config.json when present.
      * Config format: {"host":"...", "port":...}
      * CLI flags always override config values.
      */
     static class ConfigFileDefaultProvider implements IDefaultValueProvider {
 
         private static final Path CONFIG_PATH =
-            Paths.get(System.getProperty("user.home"), ".gig", "config.json");
+            Paths.get(System.getProperty("user.home"), ".gig-maestro", "config.json");
 
         private JsonObject config;
         private boolean loaded = false;

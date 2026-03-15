@@ -25,8 +25,16 @@
 **Decision:** Support a `~/.gig/config.json` file with `host` and `port` defaults. CLI flags override config file. Config file is optional — missing file means defaults (localhost:8787).
 **Rationale:** Eliminates `--host` and `--port` flags for non-default setups. Simple JSON format matches the rest of the tool. `~/.gig/` is a reasonable config location.
 **Alternatives considered:** Environment variables — rejected as less discoverable. YAML — rejected as an extra dependency.
-**Status:** ACTIVE
+**Status:** AMENDED
 **ID:** D-1.3
+
+## 2026-03-15 — CLI: Config path changed to ~/.gig-maestro/
+
+**Decision:** Config file path is `~/.gig-maestro/config.json` (not `~/.gig/`).
+**Rationale:** User override — `~/.gig` is too generic and conflicts with the project's `.gig/` workflow directory. `~/.gig-maestro/` is specific to this tool.
+**Alternatives considered:** Original `~/.gig/` — rejected by user as too generic.
+**Status:** ACTIVE
+**ID:** D-1.3a
 
 ## 2026-03-15 — CLI: Scene command details
 
