@@ -4751,6 +4751,87 @@
     }
   },
   {
+    "name": "detailEditor_zoomIn",
+    "description": "Zoom in on the detail editor (note editor) timeline horizontally.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "detailEditor_zoomOut",
+    "description": "Zoom out on the detail editor (note editor) timeline horizontally.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "detailEditor_zoomToFit",
+    "description": "Zoom the detail editor to fit all content in the visible area.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "detailEditor_zoomToSelection",
+    "description": "Zoom the detail editor to fit the current selection in the visible area.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "detailEditor_zoomToFitSelectionOrAll",
+    "description": "Toggle the detail editor zoom between fitting the selection and fitting all content.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "detailEditor_zoomInLanes",
+    "description": "Zoom in on the detail editor lane heights (vertical zoom — makes note lanes taller).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "detailEditor_zoomOutLanes",
+    "description": "Zoom out on the detail editor lane heights (vertical zoom — makes note lanes shorter).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "detailEditor_zoomToRegion",
+    "description": "Zoom the detail editor to show a specific time region. Useful for framing a particular section of a clip.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "number",
+          "description": "Start position of the region (in beats)."
+        },
+        "to": {
+          "type": "number",
+          "description": "End position of the region (in beats)."
+        }
+      },
+      "required": ["from", "to"]
+    }
+  },
+  {
     "name": "mixer_getState",
     "description": "Get the visibility state of all mixer panel sections. Returns 6 booleans: meter, io, sends, clipLauncher, devices, crossFade.",
     "input_schema": {

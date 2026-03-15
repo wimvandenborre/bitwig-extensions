@@ -983,6 +983,22 @@ A generic escape hatch for triggering any Bitwig Studio menu command or keyboard
 
 This covers any Bitwig command not exposed as a dedicated RPC method — useful for less common operations like bouncing, consolidating, or accessing menu items.
 
+### DetailEditor Panel Control
+
+Control the detail editor (note editor) zoom and navigation independently from the arranger:
+
+**Timeline zoom (horizontal):**
+- `detailEditor_zoomIn` / `detailEditor_zoomOut` — zoom in/out on the note editor timeline
+- `detailEditor_zoomToFit` — zoom to fit all clip content
+- `detailEditor_zoomToSelection` — zoom to fit selected notes
+- `detailEditor_zoomToFitSelectionOrAll` — toggle between fitting selection and all content
+- `detailEditor_zoomToRegion` — zoom to a specific beat range (`from`, `to`)
+
+**Lane zoom (vertical):**
+- `detailEditor_zoomInLanes` / `detailEditor_zoomOutLanes` — zoom note lane heights up/down
+
+Use these when editing notes in the detail editor to frame the view on relevant sections without affecting the arranger view.
+
 ### Mixer Panel Control
 
 Granular control over the mixer panel sections and track strip widths:

@@ -49,12 +49,11 @@
 | 34 | gig-maestro: Cue Mix & Scene Creation | v0.34.1–v0.34.5 | complete |
 | 35 | gig-maestro: Arranger Lane Zoom & Timeline Navigation | v0.35.1–v0.35.4 | complete |
 | 36 | gig-maestro: Action Discovery & Invoke | v0.36.1–v0.36.4 | complete |
-| 37 | gig-maestro: DetailEditor Panel Control | v0.37.x | planned |
+| 37 | gig-maestro: DetailEditor Panel Control | v0.37.1–v0.37.4 | complete |
 
 ## Upcoming Phase Details
 
-### Phase 37 — DetailEditor Panel Control
-Expose DetailEditor (note editor/detail panel) zoom and navigation via RPC. DetailEditor extends TimelineEditor — has horizontal zoom, lane height zoom, and its own ScrollbarModel. Simpler than Arranger (no visibility toggles, single lane zoom method). Enables Claude to control the note editor view independently from the arranger.
+_No upcoming phases planned. Run `/gig:gather` to start the next phase._
 
 ## Completed Milestones
 
