@@ -55,6 +55,7 @@
 | 40 | gig-maestro: CLI Enhancements | v0.40.1–v0.40.6 | complete |
 | 41 | Documentation | v0.41.1–v0.41.6 | complete |
 | 42 | Interactive Documentation | v0.42.1–v0.42.6 | complete |
+| 43 | OpenAPI Auto-Regeneration | v0.43.1–v0.43.2 | complete |
 
 ## Upcoming Phase Details
 

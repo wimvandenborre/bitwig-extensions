@@ -24,7 +24,16 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
+val generateOpenApi by tasks.registering(Exec::class) {
+    description = "Generate OpenAPI spec from claude-tools.json"
+    commandLine("node", "scripts/generate-openapi.mjs")
+    inputs.file("tools/claude-tools.json")
+    inputs.file("scripts/generate-openapi.mjs")
+    outputs.file("docs/openapi.json")
+}
+
 val copyDocsToResources by tasks.registering(Copy::class) {
+    dependsOn(generateOpenApi)
     from("docs/api.html", "docs/openapi.json")
     into(layout.buildDirectory.dir("resources/main/docs"))
 }
