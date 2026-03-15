@@ -15,10 +15,10 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 37.1 | `0.37.1` | DetailEditorHandler + extension wiring | in-session | pending |
-| 37.2 | `0.37.2` | Unit tests | in-session | pending |
-| 37.3 | `0.37.3` | Tool definitions + system prompt + smoke tests | in-session | pending |
-| 37.4 | `0.37.4` | Build verification | in-session | pending |
+| 37.1 | `0.37.1` | DetailEditorHandler + extension wiring | in-session | done |
+| 37.2 | `0.37.2` | Unit tests | in-session | done |
+| 37.3 | `0.37.3` | Tool definitions + system prompt + smoke tests | in-session | done |
+| 37.4 | `0.37.4` | Build verification | in-session | done |
 
 ### Batch 37.1 — DetailEditorHandler + extension wiring
 

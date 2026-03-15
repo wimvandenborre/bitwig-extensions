@@ -4,11 +4,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.36.4` |
+| **Version** | `0.37.4` |
 | **Phase** | 37 — gig-maestro: DetailEditor Panel Control |
-| **Status** | `GATHERED` |
-| **Last Batch** | 36.4 — Build verification |
-| **Last Updated** | 2026-03-14 |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | 37.4 — Build verification |
+| **Last Updated** | 2026-03-15 |
 
 ---
 
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.37.4 | 37 | Build verification | PLANNED | done | 2026-03-15 |
+| 0.37.3 | 37 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-15 |
+| 0.37.2 | 37 | Unit tests | PLANNED | done | 2026-03-15 |
+| 0.37.1 | 37 | DetailEditorHandler + extension wiring | PLANNED | done | 2026-03-15 |
 | 0.36.4 | 36 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.36.3 | 36 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.36.2 | 36 | Unit tests | PLANNED | done | 2026-03-14 |
