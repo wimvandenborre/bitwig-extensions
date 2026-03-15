@@ -1019,6 +1019,19 @@ Vertical navigation in the note editor:
 
 Use these with the DetailEditor zoom tools to precisely frame the note editor view.
 
+### WebSocket Subscriptions
+
+Control which state change topics are sent to your WebSocket connection. By default, all 14 topics are sent. Subscribe to specific topics to reduce bandwidth:
+
+- `state_subscribe` — set your subscription to specific topics (e.g., `["transport", "device"]`). Only matching sections appear in `state/changed` notifications.
+- `state_unsubscribe` — remove topics from your current subscription.
+- `state_subscribeAll` — reset to receive all topics (default).
+- `state_getTopics` — list all 14 valid topic names.
+
+**Valid topics:** transport, tracks, scenes, device, clip, master, application, arranger, arrangement, masterDevice, browser, arpeggiator, noteLatch, groove.
+
+**Note:** Subscription RPCs (`state/subscribe`, `state/unsubscribe`, `state/subscribeAll`) only work over WebSocket, not HTTP. `state/getTopics` works over both.
+
 ### Mixer Panel Control
 
 Granular control over the mixer panel sections and track strip widths:

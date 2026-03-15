@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 167 ]; then
-  echo "  PASS  claude-tools.json has >= 167 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 171 ]; then
+  echo "  PASS  claude-tools.json has >= 171 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 167 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 171 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -318,6 +318,12 @@ ALL_TOOLS=(
   app_zoomOut
   app_zoomToFit
   app_zoomToSelection
+
+  # gig phase 39 — websocket subscriptions
+  state_subscribe
+  state_unsubscribe
+  state_subscribeAll
+  state_getTopics
 
   # gig phase 38 — modulation mapping & clip key scrolling
   device_setParameterMapping
@@ -894,6 +900,12 @@ PROMPT_CHECKS=(
   "system prompt has zoom controls|app_zoomIn"
   "system prompt mentions zoomToFit|app_zoomToFit"
   "system prompt mentions zoomToSelection|app_zoomToSelection"
+
+  # gig phase 39 — websocket subscriptions
+  "system prompt has WebSocket Subscriptions section|WebSocket Subscriptions"
+  "system prompt mentions state_subscribe|state_subscribe"
+  "system prompt mentions state_getTopics|state_getTopics"
+  "system prompt lists valid topics|transport, tracks, scenes"
 
   # gig phase 38 — modulation mapping & clip key scrolling
   "system prompt has Remote Control Mapping section|Remote Control Mapping"
