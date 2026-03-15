@@ -1436,3 +1436,13 @@ Headphone monitoring control via the project's cue mix system:
 - `project_setCueMix({ value: 0.5 })` — set cue mix balance (0.0 = main mix, 1.0 = cue only)
 - `project/getState` also returns `cueVolume` and `cueMix` values alongside solo/mute/arm flags
 - Both values are included in the session snapshot under the application/project section
+
+### Arranger Lane Zoom & Timeline Navigation
+
+**Lane height zoom** (resize track lanes in the arranger):
+- `arranger_zoomInLanes` / `arranger_zoomOutLanes` — zoom all track lanes in/out
+- `arranger_zoomInSelectedLanes` / `arranger_zoomOutSelectedLanes` — zoom only selected track lanes
+
+**Timeline navigation** (frame specific sections):
+- `arranger_zoomToRegion({ from: 64.0, to: 128.0 })` — zoom to a specific beat range (e.g., bars 17-32)
+- `arranger_zoomToFitSelectionOrAll` — toggle between fitting the selection and fitting all content

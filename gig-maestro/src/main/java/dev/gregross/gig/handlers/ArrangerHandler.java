@@ -3,6 +3,7 @@ package dev.gregross.gig.handlers;
 import com.bitwig.extension.controller.api.Arranger;
 import com.bitwig.extension.controller.api.CueMarker;
 import com.bitwig.extension.controller.api.CueMarkerBank;
+import com.bitwig.extension.controller.api.ScrollbarModel;
 import com.bitwig.extension.controller.api.Transport;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -17,13 +18,15 @@ public class ArrangerHandler {
     private final Arranger arranger;
     private final Transport transport;
     private final CueMarkerBank cueMarkerBank;
+    private final ScrollbarModel scrollbar;
     private final StateCache stateCache;
 
     public ArrangerHandler(Arranger arranger, Transport transport, CueMarkerBank cueMarkerBank,
-                           StateCache stateCache) {
+                           ScrollbarModel scrollbar, StateCache stateCache) {
         this.arranger = arranger;
         this.transport = transport;
         this.cueMarkerBank = cueMarkerBank;
+        this.scrollbar = scrollbar;
         this.stateCache = stateCache;
     }
 
@@ -83,6 +86,48 @@ public class ArrangerHandler {
                 throw new IllegalArgumentException("missing 'enabled' parameter");
             }
             arranger.hasDoubleRowTrackHeight().set(params.get("enabled").getAsBoolean());
+            return ok();
+        });
+
+        // --- Lane height zoom ---
+
+        dispatcher.register("arranger/zoomInLanes", params -> {
+            arranger.zoomInLaneHeightsAll();
+            return ok();
+        });
+
+        dispatcher.register("arranger/zoomOutLanes", params -> {
+            arranger.zoomOutLaneHeightsAll();
+            return ok();
+        });
+
+        dispatcher.register("arranger/zoomInSelectedLanes", params -> {
+            arranger.zoomInLaneHeightsSelected();
+            return ok();
+        });
+
+        dispatcher.register("arranger/zoomOutSelectedLanes", params -> {
+            arranger.zoomOutLaneHeightsSelected();
+            return ok();
+        });
+
+        // --- Timeline navigation ---
+
+        dispatcher.register("arranger/zoomToRegion", params -> {
+            if (!params.has("from")) {
+                throw new IllegalArgumentException("missing 'from' parameter");
+            }
+            if (!params.has("to")) {
+                throw new IllegalArgumentException("missing 'to' parameter");
+            }
+            double from = params.get("from").getAsDouble();
+            double to = params.get("to").getAsDouble();
+            scrollbar.zoomToContentRegion(from, to);
+            return ok();
+        });
+
+        dispatcher.register("arranger/zoomToFitSelectionOrAll", params -> {
+            scrollbar.zoomToFitSelectionOrAll();
             return ok();
         });
 

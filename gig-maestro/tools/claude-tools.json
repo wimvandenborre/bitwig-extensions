@@ -4873,5 +4873,68 @@
       },
       "required": ["value"]
     }
+  },
+  {
+    "name": "arranger_zoomInLanes",
+    "description": "Zoom in (enlarge) all track lane heights in the arranger.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "arranger_zoomOutLanes",
+    "description": "Zoom out (shrink) all track lane heights in the arranger.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "arranger_zoomInSelectedLanes",
+    "description": "Zoom in (enlarge) only the selected track lane heights in the arranger.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "arranger_zoomOutSelectedLanes",
+    "description": "Zoom out (shrink) only the selected track lane heights in the arranger.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "arranger_zoomToRegion",
+    "description": "Zoom the arranger timeline to show a specific beat range. Use this to frame a particular section (e.g., bars 17-24 for a chorus).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "number",
+          "description": "Start position in beats."
+        },
+        "to": {
+          "type": "number",
+          "description": "End position in beats."
+        }
+      },
+      "required": ["from", "to"]
+    }
+  },
+  {
+    "name": "arranger_zoomToFitSelectionOrAll",
+    "description": "Toggle the arranger zoom between fitting the current selection and fitting all content.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
   }
 ]

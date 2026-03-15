@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.34.5` |
-| **Phase** | 34 — gig-maestro: Cue Mix & Scene Creation |
+| **Version** | `0.35.4` |
+| **Phase** | 35 — gig-maestro: Arranger Lane Zoom & Timeline Navigation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 34.5 — Build verification |
+| **Last Batch** | 35.4 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.35.4 | 35 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.35.3 | 35 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.35.2 | 35 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.35.1 | 35 | ArrangerHandler lane zoom + timeline navigation | PLANNED | done | 2026-03-14 |
 | 0.34.5 | 34 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.34.4 | 34 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.34.3 | 34 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -168,7 +172,7 @@
 
 ## Active Decisions
 
-_None — phase 34 archived._
+_None — phase 35 archived._
 
 ---
 

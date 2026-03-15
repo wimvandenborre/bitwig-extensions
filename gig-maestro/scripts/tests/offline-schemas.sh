@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 139 ]; then
-  echo "  PASS  claude-tools.json has >= 139 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 145 ]; then
+  echo "  PASS  claude-tools.json has >= 145 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 139 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 145 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -342,6 +342,14 @@ ALL_TOOLS=(
   # gig phase 34 — cue mix
   project_setCueVolume
   project_setCueMix
+
+  # gig phase 35 — arranger lane zoom & timeline navigation
+  arranger_zoomInLanes
+  arranger_zoomOutLanes
+  arranger_zoomInSelectedLanes
+  arranger_zoomOutSelectedLanes
+  arranger_zoomToRegion
+  arranger_zoomToFitSelectionOrAll
 )
 
 for tool in "${ALL_TOOLS[@]}"; do
@@ -448,6 +456,8 @@ PARAM_CHECKS=(
   "track_getPlayingNotes|.input_schema.properties.index.type|integer"
   "project_setCueVolume|.input_schema.properties.value.type|number"
   "project_setCueMix|.input_schema.properties.value.type|number"
+  "arranger_zoomToRegion|.input_schema.properties.from.type|number"
+  "arranger_zoomToRegion|.input_schema.properties.to.type|number"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -878,6 +888,12 @@ PROMPT_CHECKS=(
   "system prompt has Cue Mix Control section|Cue Mix Control"
   "system prompt mentions project_setCueVolume|project_setCueVolume"
   "system prompt mentions project_setCueMix|project_setCueMix"
+
+  # gig phase 35 — arranger lane zoom & timeline navigation
+  "system prompt has Arranger Lane Zoom section|Arranger Lane Zoom"
+  "system prompt mentions arranger_zoomInLanes|arranger_zoomInLanes"
+  "system prompt mentions arranger_zoomToRegion|arranger_zoomToRegion"
+  "system prompt mentions arranger_zoomToFitSelectionOrAll|arranger_zoomToFitSelectionOrAll"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do
