@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.38.4` |
+| **Version** | `0.39.5` |
 | **Phase** | 39 — gig-maestro: WebSocket Subscriptions |
-| **Status** | `GATHERED` |
-| **Last Batch** | 38.4 — Build verification |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | 39.5 — Build verification |
 | **Last Updated** | 2026-03-15 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.39.5 | 39 | Build verification | PLANNED | done | 2026-03-15 |
+| 0.39.4 | 39 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-15 |
+| 0.39.3 | 39 | Unit tests | PLANNED | done | 2026-03-15 |
+| 0.39.2 | 39 | state/getTopics RPC | PLANNED | done | 2026-03-15 |
+| 0.39.1 | 39 | WsRpcServer per-client subscriptions + filtered broadcast | PLANNED | done | 2026-03-15 |
 | 0.38.4 | 38 | Build verification | PLANNED | done | 2026-03-15 |
 | 0.38.3 | 38 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-15 |
 | 0.38.2 | 38 | Unit tests | PLANNED | done | 2026-03-15 |

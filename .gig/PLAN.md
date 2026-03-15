@@ -15,11 +15,11 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 39.1 | `0.39.1` | WsRpcServer per-client subscriptions + filtered broadcast | in-session | pending |
-| 39.2 | `0.39.2` | RPC methods: subscribe, unsubscribe, subscribeAll, getTopics | in-session | pending |
-| 39.3 | `0.39.3` | Unit tests | in-session | pending |
-| 39.4 | `0.39.4` | Tool definitions + system prompt + smoke tests | in-session | pending |
-| 39.5 | `0.39.5` | Build verification | in-session | pending |
+| 39.1 | `0.39.1` | WsRpcServer per-client subscriptions + filtered broadcast | in-session | done |
+| 39.2 | `0.39.2` | RPC methods: subscribe, unsubscribe, subscribeAll, getTopics | in-session | done |
+| 39.3 | `0.39.3` | Unit tests | in-session | done |
+| 39.4 | `0.39.4` | Tool definitions + system prompt + smoke tests | in-session | done |
+| 39.5 | `0.39.5` | Build verification | in-session | done |
 
 ### Batch 39.1 — WsRpcServer per-client subscriptions + filtered broadcast
 
