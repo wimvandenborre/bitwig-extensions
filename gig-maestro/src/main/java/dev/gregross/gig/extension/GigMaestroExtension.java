@@ -139,6 +139,15 @@ public class GigMaestroExtension extends ControllerExtension {
         // Register session/snapshot handler
         dispatcher.register("session/snapshot", params -> stateCache.getSnapshot());
 
+        // Register state/getTopics handler
+        dispatcher.register("state/getTopics", params -> {
+            JsonArray topics = new JsonArray();
+            for (String topic : dev.gregross.gig.server.WsRpcServer.VALID_TOPICS) {
+                topics.add(new JsonPrimitive(topic));
+            }
+            return topics;
+        });
+
         // Register api/list handler
         dispatcher.register("api/list", params -> {
             JsonArray methods = new JsonArray();
