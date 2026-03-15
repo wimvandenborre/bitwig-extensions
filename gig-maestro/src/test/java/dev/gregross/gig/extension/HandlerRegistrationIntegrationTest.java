@@ -49,6 +49,7 @@ class HandlerRegistrationIntegrationTest {
     @Mock private PopupBrowser mockPopupBrowser;
     @Mock private Arranger mockArranger;
     @Mock private CueMarkerBank mockCueMarkerBank;
+    @Mock private ScrollbarModel mockScrollbar;
     @Mock private SettableBooleanValue mockIsPinned;
     @Mock private StringValue mockCursorTrackType;
 
@@ -92,7 +93,7 @@ class HandlerRegistrationIntegrationTest {
         new DeviceHandler(mockCursorTrack, mockCursorDevice, mockRemoteControlsPage, mockDrumPadBank, deviceLibrary, mockTransport, mockHost, (task, delay) -> task.run()).register(dispatcher);
         new NoteHandler(mockCursorClip, stateCache).register(dispatcher);
         new SceneHandler(mockSceneBank, mockProject, stateCache).register(dispatcher);
-        new ArrangerHandler(mockArranger, mockTransport, mockCueMarkerBank, stateCache).register(dispatcher);
+        new ArrangerHandler(mockArranger, mockTransport, mockCueMarkerBank, mockScrollbar, stateCache).register(dispatcher);
         new MasterDeviceHandler(mockMasterTrack, mockMasterCursorDevice, mockMasterRemoteControlsPage, deviceLibrary, (task, delay) -> task.run()).register(dispatcher);
         new SendHandler(mockTrackBank, 4).register(dispatcher);
         new ProjectHandler(mockProject, stateCache).register(dispatcher);

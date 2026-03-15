@@ -3,6 +3,7 @@ package dev.gregross.gig.handlers;
 import com.bitwig.extension.controller.api.Arranger;
 import com.bitwig.extension.controller.api.CueMarker;
 import com.bitwig.extension.controller.api.CueMarkerBank;
+import com.bitwig.extension.controller.api.ScrollbarModel;
 import com.bitwig.extension.controller.api.SettableBeatTimeValue;
 import com.bitwig.extension.controller.api.SettableBooleanValue;
 import com.bitwig.extension.controller.api.SettableIntegerValue;
@@ -28,6 +29,7 @@ class ArrangerHandlerTest {
     @Mock private Arranger mockArranger;
     @Mock private Transport mockTransport;
     @Mock private CueMarkerBank mockCueMarkerBank;
+    @Mock private ScrollbarModel mockScrollbar;
     @Mock private CueMarker mockCueMarker;
 
     // Arranger 2-level chain mocks
@@ -51,7 +53,7 @@ class ArrangerHandlerTest {
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new ArrangerHandler(mockArranger, mockTransport, mockCueMarkerBank, new StateCache()).register(dispatcher);
+        new ArrangerHandler(mockArranger, mockTransport, mockCueMarkerBank, mockScrollbar, new StateCache()).register(dispatcher);
 
         // Common stub: cueMarkerBank returns cueMarker at index 0
         when(mockCueMarkerBank.getItemAt(0)).thenReturn(mockCueMarker);
@@ -84,8 +86,19 @@ class ArrangerHandlerTest {
     }
 
     @Test
-    void registersExactlySeventeenMethods() {
-        assertEquals(17, dispatcher.getRegisteredMethods().size());
+    void registersLaneZoomAndTimelineNavMethods() {
+        var methods = dispatcher.getRegisteredMethods();
+        assertTrue(methods.contains("arranger/zoomInLanes"));
+        assertTrue(methods.contains("arranger/zoomOutLanes"));
+        assertTrue(methods.contains("arranger/zoomInSelectedLanes"));
+        assertTrue(methods.contains("arranger/zoomOutSelectedLanes"));
+        assertTrue(methods.contains("arranger/zoomToRegion"));
+        assertTrue(methods.contains("arranger/zoomToFitSelectionOrAll"));
+    }
+
+    @Test
+    void registersExactlyTwentyThreeMethods() {
+        assertEquals(23, dispatcher.getRegisteredMethods().size());
     }
 
     // --- Visibility toggle validation ---
@@ -402,6 +415,58 @@ class ArrangerHandlerTest {
     void cueMarkerBankScrollBy_callsCueMarkerBankScrollBy() {
         dispatcher.handle(rpc("cueMarkerBank/scrollBy", "{\"amount\":4}"));
         verify(mockCueMarkerBank).scrollBy(4);
+    }
+
+    // --- Lane zoom behavioral tests ---
+
+    @Test
+    void zoomInLanes_callsArrangerZoomInLaneHeightsAll() {
+        dispatcher.handle(rpc("arranger/zoomInLanes", "{}"));
+        verify(mockArranger).zoomInLaneHeightsAll();
+    }
+
+    @Test
+    void zoomOutLanes_callsArrangerZoomOutLaneHeightsAll() {
+        dispatcher.handle(rpc("arranger/zoomOutLanes", "{}"));
+        verify(mockArranger).zoomOutLaneHeightsAll();
+    }
+
+    @Test
+    void zoomInSelectedLanes_callsArrangerZoomInLaneHeightsSelected() {
+        dispatcher.handle(rpc("arranger/zoomInSelectedLanes", "{}"));
+        verify(mockArranger).zoomInLaneHeightsSelected();
+    }
+
+    @Test
+    void zoomOutSelectedLanes_callsArrangerZoomOutLaneHeightsSelected() {
+        dispatcher.handle(rpc("arranger/zoomOutSelectedLanes", "{}"));
+        verify(mockArranger).zoomOutLaneHeightsSelected();
+    }
+
+    // --- Timeline navigation behavioral tests ---
+
+    @Test
+    void zoomToRegion_callsScrollbarZoomToContentRegion() {
+        dispatcher.handle(rpc("arranger/zoomToRegion", "{\"from\":16.0,\"to\":32.0}"));
+        verify(mockScrollbar).zoomToContentRegion(16.0, 32.0);
+    }
+
+    @Test
+    void zoomToRegion_missingFrom_returnsError() {
+        String response = dispatcher.handle(rpc("arranger/zoomToRegion", "{\"to\":32.0}"));
+        assertContains(response, "from");
+    }
+
+    @Test
+    void zoomToRegion_missingTo_returnsError() {
+        String response = dispatcher.handle(rpc("arranger/zoomToRegion", "{\"from\":16.0}"));
+        assertContains(response, "to");
+    }
+
+    @Test
+    void zoomToFitSelectionOrAll_callsScrollbar() {
+        dispatcher.handle(rpc("arranger/zoomToFitSelectionOrAll", "{}"));
+        verify(mockScrollbar).zoomToFitSelectionOrAll();
     }
 
     // --- Helpers ---
