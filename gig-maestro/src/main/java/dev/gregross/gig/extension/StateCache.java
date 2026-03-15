@@ -177,6 +177,8 @@ public class StateCache {
     private volatile boolean hasMutedTracks;
     private volatile boolean hasArmedTracks;
     private volatile boolean isModified;
+    private volatile double cueVolume;
+    private volatile double cueMix;
 
     // Transport — metronome & pre-roll
     private volatile double metronomeVolume;
@@ -438,6 +440,12 @@ public class StateCache {
 
         project.isModified().markInterested();
         project.isModified().addValueObserver((BooleanValueChangedCallback) v -> isModified = v);
+
+        project.cueVolume().markInterested();
+        project.cueVolume().value().addValueObserver((DoubleValueChangedCallback) v -> cueVolume = v);
+
+        project.cueMix().markInterested();
+        project.cueMix().value().addValueObserver((DoubleValueChangedCallback) v -> cueMix = v);
 
         // Transport — metronome volume & pre-roll
         transport.metronomeVolume().markInterested();
@@ -1558,6 +1566,8 @@ public class StateCache {
         obj.addProperty("hasMutedTracks", hasMutedTracks);
         obj.addProperty("hasArmedTracks", hasArmedTracks);
         obj.addProperty("isModified", isModified);
+        obj.addProperty("cueVolume", cueVolume);
+        obj.addProperty("cueMix", cueMix);
         return obj;
     }
 
@@ -1708,6 +1718,8 @@ public class StateCache {
     public boolean hasMutedTracks() { return hasMutedTracks; }
     public boolean hasArmedTracks() { return hasArmedTracks; }
     public boolean isModified() { return isModified; }
+    public double getCueVolume() { return cueVolume; }
+    public double getCueMix() { return cueMix; }
 
     public JsonObject getArpeggiatorState() {
         JsonObject obj = new JsonObject();
