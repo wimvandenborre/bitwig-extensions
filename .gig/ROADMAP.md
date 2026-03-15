@@ -49,6 +49,7 @@
 | 34 | gig-maestro: Cue Mix & Scene Creation | v0.34.1–v0.34.5 | complete |
 | 35 | gig-maestro: Arranger Lane Zoom & Timeline Navigation | v0.35.1–v0.35.4 | complete |
 | 36 | gig-maestro: Action Discovery & Invoke | v0.36.1–v0.36.4 | complete |
+| 37 | gig-maestro: DetailEditor Panel Control | v0.37.x | planned |
 
 ## Upcoming Phase Details
 

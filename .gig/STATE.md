@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.36.4` |
-| **Phase** | 36 — gig-maestro: Action Discovery & Invoke |
-| **Status** | `GOVERNED` |
+| **Phase** | 37 — gig-maestro: DetailEditor Panel Control |
+| **Status** | `GATHERED` |
 | **Last Batch** | 36.4 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
