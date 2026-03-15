@@ -197,6 +197,8 @@ class StateCacheSnapshotTest {
         assertFalse(app.get("hasMutedTracks").getAsBoolean());
         assertTrue(app.get("hasArmedTracks").getAsBoolean());
         assertTrue(app.get("isModified").getAsBoolean());
+        assertTrue(app.has("cueVolume"));
+        assertTrue(app.has("cueMix"));
     }
 
     @Test
