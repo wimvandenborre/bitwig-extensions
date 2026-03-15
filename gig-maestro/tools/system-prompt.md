@@ -964,6 +964,25 @@ Same pattern works for master bus: `masterDevice_enterSlot` / `masterDevice_exit
 - `app_zoomToFit` — zoom to fit all content
 - `app_zoomToSelection` — zoom to fit the current selection
 
+**Track group navigation:**
+- `app_navigateIntoTrackGroup` — enter a group track to see only its children
+- `app_navigateToParentTrackGroup` — exit back to the parent group level
+
+### Action Discovery & Invoke
+
+A generic escape hatch for triggering any Bitwig Studio menu command or keyboard shortcut by ID:
+
+- `action_list` — discover all available actions, optionally filtered by category. Returns `{id, name, category, menuItemText}` for each action.
+- `action_listCategories` — list all action categories (`{id, name}`).
+- `action_invoke` — trigger any action by its unique ID.
+
+**Workflow:**
+1. Call `action_listCategories` to see available categories.
+2. Call `action_list` with a `category` filter to find relevant actions.
+3. Call `action_invoke` with the action `id` to execute it.
+
+This covers any Bitwig command not exposed as a dedicated RPC method — useful for less common operations like bouncing, consolidating, or accessing menu items.
+
 ### Mixer Panel Control
 
 Granular control over the mixer panel sections and track strip widths:

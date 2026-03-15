@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.36.0` |
+| **Version** | `0.36.4` |
 | **Phase** | 36 — gig-maestro: Action Discovery & Invoke |
-| **Status** | `GATHERED` |
-| **Last Batch** | — (not started) |
+| **Status** | `GOVERNED` |
+| **Last Batch** | 36.4 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.36.4 | 36 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.36.3 | 36 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.36.2 | 36 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.36.1 | 36 | ApplicationHandler: action RPCs + track group nav | PLANNED | done | 2026-03-14 |
 | 0.35.4 | 35 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.35.3 | 35 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.35.2 | 35 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -172,7 +176,7 @@
 
 ## Active Decisions
 
-_None — phase 35 archived._
+_None — phase 36 archived._
 
 ---
 

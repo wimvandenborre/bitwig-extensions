@@ -4691,6 +4691,66 @@
     }
   },
   {
+    "name": "app_navigateIntoTrackGroup",
+    "description": "Navigate Bitwig Studio into a track group (folder). This changes the visible scope to show only the tracks inside the group.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "trackIndex": {
+          "type": "integer",
+          "description": "The index of the group track to navigate into (0-based within the current track bank)."
+        }
+      },
+      "required": ["trackIndex"]
+    }
+  },
+  {
+    "name": "app_navigateToParentTrackGroup",
+    "description": "Navigate Bitwig Studio out of the current track group back to the parent level.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "action_list",
+    "description": "List all available Bitwig Studio actions (menu commands, keyboard shortcuts). Returns an array of {id, name, category, menuItemText} objects. Use the optional category filter to narrow results. Action IDs can be passed to action_invoke to trigger any Bitwig command programmatically.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Optional category name to filter actions (e.g. 'Edit', 'View'). Omit to list all actions."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "action_listCategories",
+    "description": "List all action categories in Bitwig Studio. Returns an array of {id, name} objects. Use category names with action_list to filter actions by category.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "action_invoke",
+    "description": "Invoke a Bitwig Studio action by its unique ID. This is a generic escape hatch that can trigger any menu command or keyboard shortcut. Use action_list to discover available action IDs first.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique action identifier (e.g. 'select_all', 'duplicate'). Get IDs from action_list."
+        }
+      },
+      "required": ["id"]
+    }
+  },
+  {
     "name": "mixer_getState",
     "description": "Get the visibility state of all mixer panel sections. Returns 6 booleans: meter, io, sends, clipLauncher, devices, crossFade.",
     "input_schema": {

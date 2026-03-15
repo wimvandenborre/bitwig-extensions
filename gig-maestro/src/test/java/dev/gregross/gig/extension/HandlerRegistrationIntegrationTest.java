@@ -84,7 +84,7 @@ class HandlerRegistrationIntegrationTest {
         // Register all 16 handlers in the same order as GigMaestroExtension.init()
         DeviceLibrary deviceLibrary = new DeviceLibrary(tempDir);
 
-        new ApplicationHandler(mockApplication, mockHost).register(dispatcher);
+        new ApplicationHandler(mockApplication, mockHost, mockTrackBank).register(dispatcher);
         new TransportHandler(mockTransport, stateCache).register(dispatcher);
         TrackBankManager trackBankManager = new TrackBankManager(mockTrackBank, 8);
         new TrackHandler(mockTrackBank, mockApplication, mockCursorTrack, trackBankManager, stateCache, mockNoteInput).register(dispatcher);
