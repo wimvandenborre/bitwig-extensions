@@ -30,7 +30,8 @@ import java.nio.file.Paths;
         SceneCommand.class,
         ActionCommand.class,
         MixerCommand.class,
-        ProjectCommand.class
+        ProjectCommand.class,
+        WatchCommand.class
     }
 )
 public class GigCli {

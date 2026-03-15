@@ -47,6 +47,7 @@ val cliRuntimeOnly by configurations.getting
 dependencies {
     cliImplementation(libs.picocli)
     cliImplementation(libs.gson)
+    cliImplementation(libs.java.websocket)
 
     // CLI classes available in tests
     testImplementation(sourceSets["cli"].output)
