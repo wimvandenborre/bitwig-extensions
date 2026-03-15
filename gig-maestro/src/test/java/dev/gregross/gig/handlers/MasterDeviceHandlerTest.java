@@ -73,7 +73,9 @@ class MasterDeviceHandlerTest {
         assertTrue(methods.contains("masterDevice/enterLayer"));
         assertTrue(methods.contains("masterDevice/enterKeyPad"));
         assertTrue(methods.contains("masterDevice/selectPageByTag"));
-        assertEquals(22, methods.size());
+        assertTrue(methods.contains("masterDevice/setParameterMapping"));
+        assertTrue(methods.contains("masterDevice/getParameterMapping"));
+        assertEquals(24, methods.size());
     }
 
     // --- setEnabled validation ---
