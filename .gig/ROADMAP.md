@@ -47,7 +47,7 @@
 | 32 | gig-maestro: Track Queries & Cursor Navigation | v0.32.1–v0.32.5 | complete |
 | 33 | gig-maestro: VU Metering & Activity Feedback | v0.33.1–v0.33.5 | complete |
 | 34 | gig-maestro: Cue Mix & Scene Creation | v0.34.1–v0.34.5 | complete |
-| 35 | gig-maestro: Arranger Scroll & View Control | v0.35.x | upcoming |
+| 35 | gig-maestro: Arranger Lane Zoom & Timeline Navigation | v0.35.1–v0.35.4 | complete |
 
 ## Upcoming Phase Details
 
