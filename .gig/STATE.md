@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.42.5` |
+| **Version** | `0.42.6` |
 | **Phase** | 42 — Interactive Documentation |
 | **Status** | `IMPLEMENTED` |
-| **Last Batch** | 42.5 — Context-aware example values |
+| **Last Batch** | 42.6 — Catch-all POST route for Scalar Try It |
 | **Last Updated** | 2026-03-15 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.42.6 | 42 | Catch-all POST route for Scalar Try It | UNPLANNED | done | 2026-03-15 |
 | 0.42.5 | 42 | Context-aware example values | UNPLANNED | done | 2026-03-15 |
 | 0.42.4 | 42 | Build verification + docs update | PLANNED | done | 2026-03-15 |
 | 0.42.3 | 42 | Serve /docs from extension HTTP server | PLANNED | done | 2026-03-15 |
