@@ -19,6 +19,9 @@ target/
 .DS_Store
 Thumbs.db
 
+# Generated
+gig-maestro/docs/openapi.json
+
 # Environment
 .env
 .env.local
