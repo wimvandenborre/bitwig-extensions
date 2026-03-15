@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.37.4` |
 | **Phase** | 37 — gig-maestro: DetailEditor Panel Control |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 37.4 — Build verification |
 | **Last Updated** | 2026-03-15 |
 
@@ -180,7 +180,7 @@
 
 ## Active Decisions
 
-_None — phase 36 archived._
+_None — phase 37 archived._
 
 ---
 
