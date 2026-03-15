@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.36.4` |
 | **Phase** | 36 — gig-maestro: Action Discovery & Invoke |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 36.4 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
@@ -176,7 +176,7 @@
 
 ## Active Decisions
 
-_None — phase 35 archived._
+_None — phase 36 archived._
 
 ---
 
