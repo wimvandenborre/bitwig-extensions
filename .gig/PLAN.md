@@ -20,6 +20,7 @@
 | 41.3 | `0.41.3` | CLI reference | team | done |
 | 41.4 | `0.41.4` | RPC API reference | team | done |
 | 41.5 | `0.41.5` | Cross-link review & build verification | in-session | done |
+| 41.6 | `0.41.6` | Mermaid flow charts & user stories [UNPLANNED] | in-session | done |
 
 ### Batch 41.1 — Root README
 

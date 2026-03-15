@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.41.5` |
+| **Version** | `0.41.6` |
 | **Phase** | 41 — Documentation |
 | **Status** | `IMPLEMENTED` |
-| **Last Batch** | 41.5 — Cross-link review & build verification |
+| **Last Batch** | 41.6 — Mermaid flow charts & user stories |
 | **Last Updated** | 2026-03-15 |
 
 ---
@@ -18,6 +18,7 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.41.6 | 41 | Mermaid flow charts & user stories | UNPLANNED | done | 2026-03-15 |
 | 0.41.5 | 41 | Cross-link review & build verification | PLANNED | done | 2026-03-15 |
 | 0.41.4 | 41 | RPC API reference | PLANNED | done | 2026-03-15 |
 | 0.41.3 | 41 | CLI reference | PLANNED | done | 2026-03-15 |
