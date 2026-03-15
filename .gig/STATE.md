@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.43.2` |
 | **Phase** | 43 — OpenAPI Auto-Regeneration |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 43.2 — Offline smoke test + build verification |
 | **Last Updated** | 2026-03-15 |
 
@@ -208,9 +208,7 @@
 
 ## Active Decisions
 
-- **D-1.1:** Gradle Exec task runs Node.js script, dependency of copyDocsToResources
-- **D-1.2:** Up-to-date checking with inputs/outputs declared
-- **D-1.3:** Offline smoke test validates spec structure and method count
+_None — phase 43 archived._
 
 ---
 
