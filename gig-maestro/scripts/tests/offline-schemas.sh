@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 137 ]; then
-  echo "  PASS  claude-tools.json has >= 137 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 139 ]; then
+  echo "  PASS  claude-tools.json has >= 139 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 137 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 139 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -338,6 +338,10 @@ ALL_TOOLS=(
   # gig phase 33 — VU metering & activity feedback
   track_getVuMeters
   track_getPlayingNotes
+
+  # gig phase 34 — cue mix
+  project_setCueVolume
+  project_setCueMix
 )
 
 for tool in "${ALL_TOOLS[@]}"; do
@@ -442,6 +446,8 @@ PARAM_CHECKS=(
   "track_makeVisibleInMixer|.input_schema.properties.index.type|integer"
   "cursor_setPinned|.input_schema.properties.pinned.type|boolean"
   "track_getPlayingNotes|.input_schema.properties.index.type|integer"
+  "project_setCueVolume|.input_schema.properties.value.type|number"
+  "project_setCueMix|.input_schema.properties.value.type|number"
 )
 
 for entry in "${PARAM_CHECKS[@]}"; do
@@ -867,6 +873,11 @@ PROMPT_CHECKS=(
   "system prompt mentions track_getVuMeters|track_getVuMeters"
   "system prompt mentions track_getPlayingNotes|track_getPlayingNotes"
   "system prompt mentions isMutedBySolo|isMutedBySolo"
+
+  # gig phase 34 — cue mix
+  "system prompt has Cue Mix Control section|Cue Mix Control"
+  "system prompt mentions project_setCueVolume|project_setCueVolume"
+  "system prompt mentions project_setCueMix|project_setCueMix"
 )
 
 for entry in "${PROMPT_CHECKS[@]}"; do

@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.33.5` |
-| **Phase** | 33 — gig-maestro: VU Metering & Activity Feedback |
+| **Version** | `0.34.5` |
+| **Phase** | 34 — gig-maestro: Cue Mix & Scene Creation |
 | **Status** | `GOVERNED` |
-| **Last Batch** | 33.5 — Build verification |
+| **Last Batch** | 34.5 — Build verification |
 | **Last Updated** | 2026-03-14 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.34.5 | 34 | Build verification | PLANNED | done | 2026-03-14 |
+| 0.34.4 | 34 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
+| 0.34.3 | 34 | Unit tests | PLANNED | done | 2026-03-14 |
+| 0.34.1 | 34 | StateCache cue mix + ProjectHandler set RPCs | PLANNED | done | 2026-03-14 |
 | 0.33.5 | 33 | Build verification | PLANNED | done | 2026-03-14 |
 | 0.33.4 | 33 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-14 |
 | 0.33.3 | 33 | Unit tests | PLANNED | done | 2026-03-14 |
@@ -164,7 +168,7 @@
 
 ## Active Decisions
 
-_None — phase 33 archived._
+_None — phase 34 archived._
 
 ---
 

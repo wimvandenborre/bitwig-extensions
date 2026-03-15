@@ -1,6 +1,8 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.Parameter;
 import com.bitwig.extension.controller.api.Project;
+import com.bitwig.extension.controller.api.SettableRangedValue;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.gregross.gig.extension.StateCache;
@@ -10,19 +12,31 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ProjectHandlerTest {
 
     @Mock private Project mockProject;
+    @Mock private Parameter mockCueVolumeParam;
+    @Mock private Parameter mockCueMixParam;
+    @Mock private SettableRangedValue mockCueVolumeValue;
+    @Mock private SettableRangedValue mockCueMixValue;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
+        when(mockProject.cueVolume()).thenReturn(mockCueVolumeParam);
+        when(mockProject.cueMix()).thenReturn(mockCueMixParam);
+        when(mockCueVolumeParam.value()).thenReturn(mockCueVolumeValue);
+        when(mockCueMixParam.value()).thenReturn(mockCueMixValue);
+
         dispatcher = new JsonRpcDispatcher();
         new ProjectHandler(mockProject, new StateCache()).register(dispatcher);
     }
@@ -30,13 +44,15 @@ class ProjectHandlerTest {
     // --- Registration ---
 
     @Test
-    void registersFourMethods() {
+    void registersSixMethods() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("project/unsoloAll"));
         assertTrue(methods.contains("project/unmuteAll"));
         assertTrue(methods.contains("project/unarmAll"));
         assertTrue(methods.contains("project/getState"));
-        assertEquals(4, methods.size());
+        assertTrue(methods.contains("project/setCueVolume"));
+        assertTrue(methods.contains("project/setCueMix"));
+        assertEquals(6, methods.size());
     }
 
     // --- project/getState ---
@@ -52,6 +68,8 @@ class ProjectHandlerTest {
         assertTrue(result.has("hasMutedTracks"));
         assertTrue(result.has("hasArmedTracks"));
         assertTrue(result.has("isModified"));
+        assertTrue(result.has("cueVolume"));
+        assertTrue(result.has("cueMix"));
     }
 
     // --- Behavioral tests (Mockito) ---
@@ -72,6 +90,32 @@ class ProjectHandlerTest {
     void unarmAll_callsProjectUnarm() {
         dispatcher.handle(rpc("project/unarmAll", "{}"));
         verify(mockProject).unarmAll();
+    }
+
+    // --- Cue mix behavioral tests ---
+
+    @Test
+    void setCueVolume_callsProjectCueVolumeSet() {
+        dispatcher.handle(rpc("project/setCueVolume", "{\"value\":0.75}"));
+        verify(mockCueVolumeValue).set(0.75);
+    }
+
+    @Test
+    void setCueMix_callsProjectCueMixSet() {
+        dispatcher.handle(rpc("project/setCueMix", "{\"value\":0.5}"));
+        verify(mockCueMixValue).set(0.5);
+    }
+
+    @Test
+    void setCueVolume_missingValue_returnsError() {
+        String response = dispatcher.handle(rpc("project/setCueVolume", "{}"));
+        assertTrue(response.contains("value"));
+    }
+
+    @Test
+    void setCueMix_missingValue_returnsError() {
+        String response = dispatcher.handle(rpc("project/setCueMix", "{}"));
+        assertTrue(response.contains("value"));
     }
 
     // --- Helpers ---
