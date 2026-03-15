@@ -19,6 +19,7 @@
 | 42.2 | `0.42.2` | Scalar HTML page | in-session | done |
 | 42.3 | `0.42.3` | Serve /docs from extension HTTP server | in-session | done |
 | 42.4 | `0.42.4` | Build verification + docs update | in-session | done |
+| 42.5 | `0.42.5` | Context-aware example values [UNPLANNED] | in-session | done |
 
 ### Batch 42.1 — OpenAPI spec generator script
 
