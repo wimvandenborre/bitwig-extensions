@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.35.4` |
-| **Phase** | 35 — gig-maestro: Arranger Lane Zoom & Timeline Navigation |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 35.4 — Build verification |
+| **Version** | `0.36.0` |
+| **Phase** | 36 — gig-maestro: Action Discovery & Invoke |
+| **Status** | `GATHERED` |
+| **Last Batch** | — (not started) |
 | **Last Updated** | 2026-03-14 |
 
 ---

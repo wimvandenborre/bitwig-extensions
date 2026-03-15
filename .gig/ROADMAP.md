@@ -48,20 +48,12 @@
 | 33 | gig-maestro: VU Metering & Activity Feedback | v0.33.1–v0.33.5 | complete |
 | 34 | gig-maestro: Cue Mix & Scene Creation | v0.34.1–v0.34.5 | complete |
 | 35 | gig-maestro: Arranger Lane Zoom & Timeline Navigation | v0.35.1–v0.35.4 | complete |
+| 36 | gig-maestro: Action Discovery & Invoke | v0.36.x | planned |
 
 ## Upcoming Phase Details
 
-### Phase 32 — Track Queries & Cursor Navigation
-Expose cached track type/isGroup/canHoldNoteData/canHoldAudioData as RPC queries. Add CursorTrack navigation: selectParent, selectFirstChild, isPinned/setPinned. Low effort, high value — enables Claude to make conditional decisions based on track capabilities.
-
-### Phase 33 — VU Metering & Activity Feedback
-Add VU meter observation (addVuMeterObserver), playingNotes query, isMutedBySolo detection. Enables live mixing feedback — dynamic volume balancing, detecting silent/clipping tracks. Requires observer wiring + delta integration.
-
-### Phase 34 — Project Cue Mix & Structure
-Expose cueVolume, cueMix on Project for headphone monitoring control. Add getRootTrackGroup for project structure queries. Small, focused additions.
-
-### Phase 35 — Arranger Scroll & View Control
-Arranger scroll position control, lane visibility toggles, track height beyond double-row. Enables Claude to frame the view on relevant sections during arrangement work.
+### Phase 37 — DetailEditor Panel Control
+Expose DetailEditor (note editor/detail panel) zoom and navigation via RPC. DetailEditor extends TimelineEditor — has horizontal zoom, lane height zoom, and its own ScrollbarModel. Simpler than Arranger (no visibility toggles, single lane zoom method). Enables Claude to control the note editor view independently from the arranger.
 
 ## Completed Milestones
 
