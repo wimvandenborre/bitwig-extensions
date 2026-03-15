@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.41.6` |
 | **Phase** | 41 — Documentation |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 41.6 — Mermaid flow charts & user stories |
 | **Last Updated** | 2026-03-15 |
 
@@ -200,13 +200,7 @@
 
 ## Active Decisions
 
-- **D-1.1:** Create four docs: root README, gig-maestro README, CLI reference, RPC API reference
-- **D-1.2:** Standard locations — READMEs at roots, references in docs/
-- **D-1.3:** RPC API grouped by domain with params + examples
-- **D-1.4:** CLI reference as command tree with synopsis + examples
-- **D-1.5:** WebSocket streaming documented as section in RPC API reference
-- **D-1.6:** Sound design recipes stay in system-prompt.md only
-- **D-1.7:** No Javadoc — out of scope
+_None — phase 41 archived._
 
 ---
 
