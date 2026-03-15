@@ -74,11 +74,11 @@ class CliCommandStructureTest {
     }
 
     @Test
-    void cliHasSevenSubcommands() {
+    void cliHasTwelveSubcommands() {
         CommandLine cli = new CommandLine(new GigCli());
-        // transport, track, device, note, snapshot, rpc, song
-        assertEquals(7, cli.getSubcommands().size(),
-            "GigCli should have 7 subcommands");
+        // transport, track, device, note, snapshot, rpc, song, scene, action, mixer, project, watch
+        assertEquals(12, cli.getSubcommands().size(),
+            "GigCli should have 12 subcommands");
     }
 
     // --- Subcommand counts for each top-level command ---
@@ -153,6 +153,80 @@ class CliCommandStructureTest {
         assertNotNull(tempoCmd);
         assertFalse(tempoCmd.getCommandSpec().positionalParameters().isEmpty(),
             "tempo should have a positional parameter for BPM");
+    }
+
+    // --- New commands (phase 40) ---
+
+    @Test
+    void sceneHas7Subcommands() {
+        CommandLine cli = new CommandLine(new GigCli());
+        CommandLine scene = cli.getSubcommands().get("scene");
+        assertNotNull(scene, "GigCli should have 'scene' subcommand");
+        assertEquals(7, scene.getSubcommands().size(),
+            "scene should have 7 subcommands");
+    }
+
+    @Test
+    void actionHas3Subcommands() {
+        CommandLine cli = new CommandLine(new GigCli());
+        CommandLine action = cli.getSubcommands().get("action");
+        assertNotNull(action, "GigCli should have 'action' subcommand");
+        assertEquals(3, action.getSubcommands().size(),
+            "action should have 3 subcommands");
+    }
+
+    @Test
+    void mixerHas4Subcommands() {
+        CommandLine cli = new CommandLine(new GigCli());
+        CommandLine mixer = cli.getSubcommands().get("mixer");
+        assertNotNull(mixer, "GigCli should have 'mixer' subcommand");
+        assertEquals(4, mixer.getSubcommands().size(),
+            "mixer should have 4 subcommands");
+    }
+
+    @Test
+    void projectHas6Subcommands() {
+        CommandLine cli = new CommandLine(new GigCli());
+        CommandLine project = cli.getSubcommands().get("project");
+        assertNotNull(project, "GigCli should have 'project' subcommand");
+        assertEquals(6, project.getSubcommands().size(),
+            "project should have 6 subcommands");
+    }
+
+    @Test
+    void watchIsRegistered() {
+        CommandLine cli = new CommandLine(new GigCli());
+        assertNotNull(cli.getSubcommands().get("watch"),
+            "GigCli should have 'watch' subcommand");
+    }
+
+    @Test
+    void watchHasTopicsOption() {
+        CommandLine cli = new CommandLine(new GigCli());
+        CommandLine watch = cli.getSubcommands().get("watch");
+        assertNotNull(watch);
+        assertNotNull(watch.getCommandSpec().optionsMap().get("--topics"),
+            "watch should have --topics option");
+    }
+
+    @Test
+    void actionListHasCategoryOption() {
+        CommandLine cli = new CommandLine(new GigCli());
+        CommandLine listCmd = cli.getSubcommands().get("action")
+            .getSubcommands().get("list");
+        assertNotNull(listCmd);
+        assertNotNull(listCmd.getCommandSpec().optionsMap().get("--category"),
+            "action list should have --category option");
+    }
+
+    @Test
+    void sceneLaunchHasIndexParam() {
+        CommandLine cli = new CommandLine(new GigCli());
+        CommandLine launchCmd = cli.getSubcommands().get("scene")
+            .getSubcommands().get("launch");
+        assertNotNull(launchCmd);
+        assertFalse(launchCmd.getCommandSpec().positionalParameters().isEmpty(),
+            "scene launch should have positional index parameter");
     }
 
     @Test
