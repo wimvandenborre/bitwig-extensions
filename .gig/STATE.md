@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.37.4` |
-| **Phase** | 37 — gig-maestro: DetailEditor Panel Control |
-| **Status** | `GOVERNED` |
+| **Phase** | 38 — gig-maestro: Modulation Mapping & Clip Key Scrolling |
+| **Status** | `GATHERED` |
 | **Last Batch** | 37.4 — Build verification |
 | **Last Updated** | 2026-03-15 |
 

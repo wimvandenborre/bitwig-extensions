@@ -50,6 +50,7 @@
 | 35 | gig-maestro: Arranger Lane Zoom & Timeline Navigation | v0.35.1–v0.35.4 | complete |
 | 36 | gig-maestro: Action Discovery & Invoke | v0.36.1–v0.36.4 | complete |
 | 37 | gig-maestro: DetailEditor Panel Control | v0.37.1–v0.37.4 | complete |
+| 38 | gig-maestro: Modulation Mapping & Clip Key Scrolling | v0.38.x | planned |
 
 ## Upcoming Phase Details
 
