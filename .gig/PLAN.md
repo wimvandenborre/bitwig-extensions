@@ -15,11 +15,11 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 40.1 | `0.40.1` | Config file support + SceneCommand + ActionCommand | team | pending |
-| 40.2 | `0.40.2` | MixerCommand + ProjectCommand | team | pending |
-| 40.3 | `0.40.3` | WatchCommand (WebSocket streaming) | in-session | pending |
-| 40.4 | `0.40.4` | CLI unit tests | in-session | pending |
-| 40.5 | `0.40.5` | Build verification | in-session | pending |
+| 40.1 | `0.40.1` | Config file support + SceneCommand + ActionCommand | team | done |
+| 40.2 | `0.40.2` | MixerCommand + ProjectCommand | team | done |
+| 40.3 | `0.40.3` | WatchCommand (WebSocket streaming) | in-session | done |
+| 40.4 | `0.40.4` | CLI unit tests | in-session | done |
+| 40.5 | `0.40.5` | Build verification | in-session | done |
 
 ### Batch 40.1 — Config file support + SceneCommand + ActionCommand
 
