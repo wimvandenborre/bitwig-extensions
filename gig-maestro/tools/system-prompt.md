@@ -999,6 +999,26 @@ Control the detail editor (note editor) zoom and navigation independently from t
 
 Use these when editing notes in the detail editor to frame the view on relevant sections without affecting the arranger view.
 
+### Remote Control Mapping
+
+Control which remote control parameter slots are in mapping mode:
+
+- `device_setParameterMapping` — enter/exit mapping mode for a parameter index (0-7). When enabled, the next parameter clicked in Bitwig's UI will be assigned to that remote control slot.
+- `device_getParameterMapping` — read mapping mode state for all 8 parameters.
+- `masterDevice_setParameterMapping` / `masterDevice_getParameterMapping` — same for master device.
+
+The `isBeingMapped` state is also included in the session snapshot under each parameter object.
+
+### Clip Key Scrolling
+
+Vertical navigation in the note editor:
+
+- `note_scrollToKey` — scroll to center on a specific MIDI key (0-127, middle C = 60)
+- `note_scrollKeysPageUp` / `note_scrollKeysPageDown` — scroll one page up/down
+- `note_scrollKeysStepUp` / `note_scrollKeysStepDown` — scroll one semitone up/down
+
+Use these with the DetailEditor zoom tools to precisely frame the note editor view.
+
 ### Mixer Panel Control
 
 Granular control over the mixer panel sections and track strip widths:

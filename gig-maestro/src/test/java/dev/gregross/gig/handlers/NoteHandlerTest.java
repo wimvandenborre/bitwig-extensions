@@ -69,8 +69,8 @@ class NoteHandlerTest {
     }
 
     @Test
-    void registersExactlyElevenMethods() {
-        assertEquals(11, dispatcher.getRegisteredMethods().size());
+    void registersExactlySixteenMethods() {
+        assertEquals(16, dispatcher.getRegisteredMethods().size());
     }
 
     // --- clip/setNotes validation ---
@@ -250,6 +250,44 @@ class NoteHandlerTest {
             "{\"notes\":[{\"x\":0,\"y\":60,\"length\":4,\"mask\":5}]}"));
         verify(mockNoteStep).setRecurrence(4, 5);
         verify(mockNoteStep).setIsRecurrenceEnabled(true);
+    }
+
+    // --- Clip key scrolling ---
+
+    @Test
+    void scrollToKey_callsCursorClipScrollToKey() {
+        dispatcher.handle(rpc("note/scrollToKey", "{\"key\":60}"));
+        verify(mockCursorClip).scrollToKey(60);
+    }
+
+    @Test
+    void scrollToKey_invalidKey_returnsError() {
+        String response = dispatcher.handle(rpc("note/scrollToKey", "{\"key\":128}"));
+        assertContains(response, "-32602");
+    }
+
+    @Test
+    void scrollKeysPageUp_callsCursorClip() {
+        dispatcher.handle(rpc("note/scrollKeysPageUp", "{}"));
+        verify(mockCursorClip).scrollKeysPageUp();
+    }
+
+    @Test
+    void scrollKeysPageDown_callsCursorClip() {
+        dispatcher.handle(rpc("note/scrollKeysPageDown", "{}"));
+        verify(mockCursorClip).scrollKeysPageDown();
+    }
+
+    @Test
+    void scrollKeysStepUp_callsCursorClip() {
+        dispatcher.handle(rpc("note/scrollKeysStepUp", "{}"));
+        verify(mockCursorClip).scrollKeysStepUp();
+    }
+
+    @Test
+    void scrollKeysStepDown_callsCursorClip() {
+        dispatcher.handle(rpc("note/scrollKeysStepDown", "{}"));
+        verify(mockCursorClip).scrollKeysStepDown();
     }
 
     // --- Helpers ---

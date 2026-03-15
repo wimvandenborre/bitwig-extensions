@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 158 ]; then
-  echo "  PASS  claude-tools.json has >= 158 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 167 ]; then
+  echo "  PASS  claude-tools.json has >= 167 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 158 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 167 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -319,6 +319,17 @@ ALL_TOOLS=(
   app_zoomToFit
   app_zoomToSelection
 
+  # gig phase 38 — modulation mapping & clip key scrolling
+  device_setParameterMapping
+  device_getParameterMapping
+  masterDevice_setParameterMapping
+  masterDevice_getParameterMapping
+  note_scrollToKey
+  note_scrollKeysPageUp
+  note_scrollKeysPageDown
+  note_scrollKeysStepUp
+  note_scrollKeysStepDown
+
   # gig phase 37 — detail editor panel control
   detailEditor_zoomIn
   detailEditor_zoomOut
@@ -465,6 +476,9 @@ PARAM_CHECKS=(
   "groove_setParameter|.input_schema.properties.value.type|number"
   "track_toggleSolo|.input_schema.properties.index.type|integer"
   "track_toggleSolo|.input_schema.properties.exclusive.type|boolean"
+  "device_setParameterMapping|.input_schema.properties.index.type|integer"
+  "device_setParameterMapping|.input_schema.properties.enabled.type|boolean"
+  "note_scrollToKey|.input_schema.properties.key.type|integer"
   "detailEditor_zoomToRegion|.input_schema.properties.from.type|number"
   "detailEditor_zoomToRegion|.input_schema.properties.to.type|number"
   "app_navigateIntoTrackGroup|.input_schema.properties.trackIndex.type|integer"
@@ -880,6 +894,14 @@ PROMPT_CHECKS=(
   "system prompt has zoom controls|app_zoomIn"
   "system prompt mentions zoomToFit|app_zoomToFit"
   "system prompt mentions zoomToSelection|app_zoomToSelection"
+
+  # gig phase 38 — modulation mapping & clip key scrolling
+  "system prompt has Remote Control Mapping section|Remote Control Mapping"
+  "system prompt mentions device_setParameterMapping|device_setParameterMapping"
+  "system prompt mentions isBeingMapped|isBeingMapped"
+  "system prompt has Clip Key Scrolling section|Clip Key Scrolling"
+  "system prompt mentions note_scrollToKey|note_scrollToKey"
+  "system prompt mentions note_scrollKeysPageUp|note_scrollKeysPageUp"
 
   # gig phase 37 — detail editor panel control
   "system prompt has DetailEditor section|DetailEditor Panel Control"

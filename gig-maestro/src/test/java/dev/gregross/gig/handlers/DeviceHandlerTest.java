@@ -121,8 +121,8 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlyThirtyTwoMethods() {
-        assertEquals(32, dispatcher.getRegisteredMethods().size());
+    void registersExactlyThirtyFourMethods() {
+        assertEquals(34, dispatcher.getRegisteredMethods().size());
     }
 
     // --- device/hasAutomation validation ---
@@ -893,5 +893,45 @@ class DeviceHandlerTest {
     void previousPresetCreator_callsSwitchToPreviousPresetCreator() {
         dispatcher.handle(rpc("device/previousPresetCreator", "{}"));
         verify(mockCursorDevice).switchToPreviousPresetCreator();
+    }
+
+    // --- Remote control mapping ---
+
+    @Test
+    void setParameterMapping_callsIsBeingMappedSet() {
+        com.bitwig.extension.controller.api.SettableBooleanValue mockMappingValue =
+            org.mockito.Mockito.mock(com.bitwig.extension.controller.api.SettableBooleanValue.class);
+        when(mockRemoteControlsPage.getParameter(0)).thenReturn(mockRemoteControl);
+        when(mockRemoteControl.isBeingMapped()).thenReturn(mockMappingValue);
+
+        dispatcher.handle(rpc("device/setParameterMapping", "{\"index\":0,\"enabled\":true}"));
+        verify(mockMappingValue).set(true);
+    }
+
+    @Test
+    void setParameterMapping_missingIndex_returnsError() {
+        String response = dispatcher.handle(rpc("device/setParameterMapping", "{\"enabled\":true}"));
+        assertContains(response, "-32602");
+    }
+
+    @Test
+    void setParameterMapping_missingEnabled_returnsError() {
+        String response = dispatcher.handle(rpc("device/setParameterMapping", "{\"index\":0}"));
+        assertContains(response, "-32602");
+    }
+
+    @Test
+    void getParameterMapping_returnsArrayOfBooleans() {
+        com.bitwig.extension.controller.api.SettableBooleanValue mockMappingValue =
+            org.mockito.Mockito.mock(com.bitwig.extension.controller.api.SettableBooleanValue.class);
+        when(mockMappingValue.get()).thenReturn(false);
+        for (int i = 0; i < 8; i++) {
+            RemoteControl rc = org.mockito.Mockito.mock(RemoteControl.class);
+            when(rc.isBeingMapped()).thenReturn(mockMappingValue);
+            when(mockRemoteControlsPage.getParameter(i)).thenReturn(rc);
+        }
+
+        String response = dispatcher.handle(rpc("device/getParameterMapping", "{}"));
+        assertContains(response, "\"result\"");
     }
 }

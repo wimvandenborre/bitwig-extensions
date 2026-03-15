@@ -139,6 +139,7 @@ class StateCacheSnapshotTest {
         assertEquals(0.62, p0.get("modulatedValue").getAsDouble(), 0.001);
         assertEquals("75%", p0.get("displayedValue").getAsString());
         assertTrue(p0.get("hasAutomation").getAsBoolean());
+        assertFalse(p0.get("isBeingMapped").getAsBoolean());
     }
 
     @Test

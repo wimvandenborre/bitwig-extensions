@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.37.4` |
+| **Version** | `0.38.4` |
 | **Phase** | 38 — gig-maestro: Modulation Mapping & Clip Key Scrolling |
-| **Status** | `GATHERED` |
-| **Last Batch** | 37.4 — Build verification |
+| **Status** | `GOVERNED` |
+| **Last Batch** | 38.4 — Build verification |
 | **Last Updated** | 2026-03-15 |
 
 ---
@@ -18,6 +18,10 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.38.4 | 38 | Build verification | PLANNED | done | 2026-03-15 |
+| 0.38.3 | 38 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-15 |
+| 0.38.2 | 38 | Unit tests | PLANNED | done | 2026-03-15 |
+| 0.38.1 | 38 | StateCache + device/master mapping RPCs + clip key scroll | PLANNED | done | 2026-03-15 |
 | 0.37.4 | 37 | Build verification | PLANNED | done | 2026-03-15 |
 | 0.37.3 | 37 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-15 |
 | 0.37.2 | 37 | Unit tests | PLANNED | done | 2026-03-15 |
@@ -180,7 +184,7 @@
 
 ## Active Decisions
 
-_None — phase 37 archived._
+_None — phase 38 archived._
 
 ---
 
