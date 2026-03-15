@@ -93,6 +93,126 @@ function toRpcMethod(name) {
   return toPath(name).slice(1); // strip leading /
 }
 
+// Context-aware example values keyed by parameter name
+const examplesByName = {
+  // Indices and positions
+  index: 0, trackIndex: 0, slotIndex: 0, slot: 0, sceneIndex: 0,
+  position: 0, insertPosition: "end", page: 0,
+  // Values
+  value: 0.8, volume: 0.8, level: 0.8, pan: 0.5, amount: 0.5,
+  mix: 0.5, gain: 0.5, threshold: 64,
+  // Transport
+  bpm: 120.0, tempo: 120.0, beats: 4.0,
+  start: 0.0, length: 4.0, duration: 1.0,
+  // Notes
+  x: 0, y: 60, velocity: 100, channel: 0,
+  key: 60, octaves: 2, steps: 4,
+  stepSize: 0.25, chance: 1.0,
+  // Text
+  name: "My Track", color: "BLUE", id: "select_all",
+  notification: "Hello from Gig Maestro",
+  category: "Transport",
+  // Devices
+  deviceName: "Polymer", pluginId: "com.example.synth",
+  pluginType: "vst3",
+  // Modes and enums
+  mode: "latch", rate: "1/16", layout: "ARRANGE",
+  section: "sends", type: "instrument",
+  action: "forward",
+  // Booleans
+  enabled: true, mute: false, solo: false, arm: false,
+  loop: true, expanded: true, pinned: false,
+  audition: true, mono: false,
+  // Complex
+  operations: [{ method: "transport/play", params: {} }],
+  notes: [{ x: 0, y: 60, velocity: 100, duration: 1.0 }],
+  parameters: [{ page: 0, index: 0, value: 0.5 }],
+  // Clip expressions
+  timbre: 0.5, pressure: 0.5, transpose: 0, releaseVelocity: 64,
+  velocitySpread: 0.0,
+  // Automation
+  points: [{ position: 0.0, value: 0.5 }, { position: 4.0, value: 1.0 }],
+  // Subscriptions
+  topics: ["transport", "tracks"],
+  // Misc
+  offset: 0, count: 8, semitones: 0, gridSize: 0.25,
+  crossfadeMode: "AB", monitorMode: "AUTO",
+  preSnapshot: false, postSnapshot: false,
+  rollback: "undoAll",
+};
+
+// Build example params from schema with context-aware values
+function buildExample(schema) {
+  const example = {};
+  if (!schema.properties) return example;
+  for (const [key, prop] of Object.entries(schema.properties)) {
+    // Infer from description hints before falling back to name-based defaults
+    const desc = (prop.description || "").toLowerCase();
+    if (key === "name" && (desc.includes("device") || desc.includes("polymer"))) {
+      example[key] = "Polymer";
+      continue;
+    }
+    if (key === "name" && (desc.includes("scene") || desc.includes("clip"))) {
+      example[key] = "Verse A";
+      continue;
+    }
+    // Use known example if available
+    if (key in examplesByName) {
+      example[key] = examplesByName[key];
+      continue;
+    }
+    // Use enum first value
+    if (prop.enum) {
+      example[key] = prop.enum[0];
+      continue;
+    }
+    // Infer from name patterns
+    if (prop.type === "string") {
+      if (key.toLowerCase().includes("name")) example[key] = "My Item";
+      else if (key.toLowerCase().includes("color")) example[key] = "RED";
+      else if (key.toLowerCase().includes("id")) example[key] = "example_id";
+      else if (key.toLowerCase().includes("method")) example[key] = "transport/play";
+      else example[key] = "value";
+    } else if (prop.type === "number") {
+      if (key.toLowerCase().includes("volume") || key.toLowerCase().includes("pan")
+          || key.toLowerCase().includes("value") || key.toLowerCase().includes("level"))
+        example[key] = 0.8;
+      else if (key.toLowerCase().includes("tempo") || key.toLowerCase().includes("bpm"))
+        example[key] = 120.0;
+      else example[key] = 1.0;
+    } else if (prop.type === "integer") {
+      if (key.toLowerCase().includes("index")) example[key] = 0;
+      else if (key.toLowerCase().includes("velocity")) example[key] = 100;
+      else if (key.toLowerCase().includes("key") || key.toLowerCase().includes("note"))
+        example[key] = 60;
+      else example[key] = 1;
+    } else if (prop.type === "boolean") {
+      example[key] = true;
+    } else if (prop.type === "array") {
+      example[key] = [];
+    } else if (prop.type === "object") {
+      example[key] = {};
+    }
+  }
+  return example;
+}
+
+// Add example values to individual properties in the schema (for inline display)
+function enrichSchemaWithExamples(schema) {
+  if (!schema.properties) return schema;
+  const enriched = { ...schema, properties: { ...schema.properties } };
+  for (const [key, prop] of Object.entries(enriched.properties)) {
+    if (prop.example !== undefined) continue; // already has one
+    const val = key in examplesByName ? examplesByName[key] : undefined;
+    if (val !== undefined && typeof val !== "object") {
+      enriched.properties[key] = { ...prop, example: val };
+    } else if (prop.enum) {
+      enriched.properties[key] = { ...prop, example: prop.enum[0] };
+    }
+  }
+  return enriched;
+}
+
 // Build paths
 const paths = {};
 const tagSet = new Set();
@@ -119,7 +239,7 @@ for (const tool of tools) {
             method: { type: "string", enum: [rpcMethod], description: "RPC method name" },
             id: { type: "integer", description: "Request identifier", example: 1 },
             params: hasParams
-              ? { ...tool.input_schema, description: "Method parameters" }
+              ? { ...enrichSchemaWithExamples(tool.input_schema), description: "Method parameters" }
               : { type: "object", properties: {}, description: "No parameters required" },
           },
         },
@@ -152,20 +272,6 @@ for (const tool of tools) {
       },
     },
   };
-}
-
-// Build example params from schema
-function buildExample(schema) {
-  const example = {};
-  if (!schema.properties) return example;
-  for (const [key, prop] of Object.entries(schema.properties)) {
-    if (prop.type === "string") example[key] = prop.enum?.[0] || "string";
-    else if (prop.type === "number" || prop.type === "integer") example[key] = 0;
-    else if (prop.type === "boolean") example[key] = true;
-    else if (prop.type === "array") example[key] = [];
-    else if (prop.type === "object") example[key] = {};
-  }
-  return example;
 }
 
 function firstSentence(text) {
