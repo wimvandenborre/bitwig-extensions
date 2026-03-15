@@ -122,6 +122,7 @@ public class StateCache {
     private final String[] paramDisplayedValues = new String[PARAM_COUNT];
     private final boolean[] paramHasAutomation = new boolean[PARAM_COUNT];
     private final double[] paramModulatedValues = new double[PARAM_COUNT];
+    private final boolean[] paramIsBeingMapped = new boolean[PARAM_COUNT];
 
     // Master device state (master cursor device)
     private volatile String masterDeviceName = "";
@@ -147,6 +148,7 @@ public class StateCache {
     private final double[] masterParamValues = new double[PARAM_COUNT];
     private final String[] masterParamDisplayedValues = new String[PARAM_COUNT];
     private final double[] masterParamModulatedValues = new double[PARAM_COUNT];
+    private final boolean[] masterParamIsBeingMapped = new boolean[PARAM_COUNT];
 
     // Cursor clip state
     private volatile int clipPlayingStep = -1;
@@ -624,6 +626,9 @@ public class StateCache {
 
             param.modulatedValue().markInterested();
             param.modulatedValue().addValueObserver((DoubleValueChangedCallback) v -> paramModulatedValues[idx] = v);
+
+            param.isBeingMapped().markInterested();
+            param.isBeingMapped().addValueObserver((BooleanValueChangedCallback) v -> paramIsBeingMapped[idx] = v);
         }
     }
 
@@ -923,6 +928,9 @@ public class StateCache {
 
             param.modulatedValue().markInterested();
             param.modulatedValue().addValueObserver((DoubleValueChangedCallback) v -> masterParamModulatedValues[idx] = v);
+
+            param.isBeingMapped().markInterested();
+            param.isBeingMapped().addValueObserver((BooleanValueChangedCallback) v -> masterParamIsBeingMapped[idx] = v);
         }
     }
 
@@ -1166,6 +1174,14 @@ public class StateCache {
             return new int[0];
         }
         return trackPlayingNotes[trackIndex].clone();
+    }
+
+    public boolean[] getParamIsBeingMapped() {
+        return paramIsBeingMapped.clone();
+    }
+
+    public boolean[] getMasterParamIsBeingMapped() {
+        return masterParamIsBeingMapped.clone();
     }
 
     public JsonObject getSnapshot() {
@@ -1458,6 +1474,7 @@ public class StateCache {
             param.addProperty("modulatedValue", paramModulatedValues[i]);
             param.addProperty("displayedValue", paramDisplayedValues[i] != null ? paramDisplayedValues[i] : "");
             param.addProperty("hasAutomation", paramHasAutomation[i]);
+            param.addProperty("isBeingMapped", paramIsBeingMapped[i]);
             params.add(param);
         }
         remoteControls.add("parameters", params);
@@ -1509,6 +1526,7 @@ public class StateCache {
             param.addProperty("value", masterParamValues[i]);
             param.addProperty("modulatedValue", masterParamModulatedValues[i]);
             param.addProperty("displayedValue", masterParamDisplayedValues[i] != null ? masterParamDisplayedValues[i] : "");
+            param.addProperty("isBeingMapped", masterParamIsBeingMapped[i]);
             params.add(param);
         }
         remoteControls.add("parameters", params);

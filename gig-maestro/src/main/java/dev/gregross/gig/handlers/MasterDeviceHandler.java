@@ -276,6 +276,26 @@ public class MasterDeviceHandler {
             result.addProperty("paramCount", totalParams);
             return result;
         });
+
+        // --- Remote control mapping ---
+
+        dispatcher.register("masterDevice/setParameterMapping", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("index must be 0-" + (PARAM_COUNT - 1));
+            }
+            boolean enabled = requireBoolean(params, "enabled");
+            remoteControlsPage.getParameter(index).isBeingMapped().set(enabled);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("masterDevice/getParameterMapping", params -> {
+            JsonArray result = new JsonArray();
+            for (int i = 0; i < PARAM_COUNT; i++) {
+                result.add(remoteControlsPage.getParameter(i).isBeingMapped().get());
+            }
+            return result;
+        });
     }
 
     private InsertionPoint getInsertionPoint(String position) {

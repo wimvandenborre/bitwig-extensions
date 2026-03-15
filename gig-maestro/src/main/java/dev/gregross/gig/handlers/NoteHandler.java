@@ -305,6 +305,37 @@ public class NoteHandler {
             cursorClip.scrollToStep(offset);
             return new JsonPrimitive("ok");
         });
+
+        // --- Clip key scrolling (vertical navigation) ---
+
+        dispatcher.register("note/scrollToKey", params -> {
+            int key = requireInt(params, "key");
+            if (key < 0 || key > 127) {
+                throw new IllegalArgumentException("key must be 0-127");
+            }
+            cursorClip.scrollToKey(key);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("note/scrollKeysPageUp", params -> {
+            cursorClip.scrollKeysPageUp();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("note/scrollKeysPageDown", params -> {
+            cursorClip.scrollKeysPageDown();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("note/scrollKeysStepUp", params -> {
+            cursorClip.scrollKeysStepUp();
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("note/scrollKeysStepDown", params -> {
+            cursorClip.scrollKeysStepDown();
+            return new JsonPrimitive("ok");
+        });
     }
 
 }

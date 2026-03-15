@@ -582,6 +582,26 @@ public class DeviceHandler {
             }
             return new JsonPrimitive("ok");
         });
+
+        // --- Remote control mapping ---
+
+        dispatcher.register("device/setParameterMapping", params -> {
+            int index = requireInt(params, "index");
+            if (index < 0 || index >= PARAM_COUNT) {
+                throw new IllegalArgumentException("index must be 0-" + (PARAM_COUNT - 1));
+            }
+            boolean enabled = requireBoolean(params, "enabled");
+            remoteControlsPage.getParameter(index).isBeingMapped().set(enabled);
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("device/getParameterMapping", params -> {
+            JsonArray result = new JsonArray();
+            for (int i = 0; i < PARAM_COUNT; i++) {
+                result.add(remoteControlsPage.getParameter(i).isBeingMapped().get());
+            }
+            return result;
+        });
     }
 
     static JsonObject toPresetFormat(JsonObject discoveryResult) {
