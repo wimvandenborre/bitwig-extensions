@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.40.6` |
-| **Phase** | 40 — gig-maestro: CLI Enhancements |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 40.6 — Rename config path to ~/.gig-maestro |
+| **Version** | `0.41.5` |
+| **Phase** | 41 — Documentation |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | 41.5 — Cross-link review & build verification |
 | **Last Updated** | 2026-03-15 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.41.5 | 41 | Cross-link review & build verification | PLANNED | done | 2026-03-15 |
+| 0.41.4 | 41 | RPC API reference | PLANNED | done | 2026-03-15 |
+| 0.41.3 | 41 | CLI reference | PLANNED | done | 2026-03-15 |
+| 0.41.2 | 41 | gig-maestro README | PLANNED | done | 2026-03-15 |
+| 0.41.1 | 41 | Root README | PLANNED | done | 2026-03-15 |
 | 0.40.6 | 40 | Rename config path to ~/.gig-maestro | UNPLANNED | done | 2026-03-15 |
 | 0.40.5 | 40 | Build verification | PLANNED | done | 2026-03-15 |
 | 0.40.4 | 40 | CLI unit tests | PLANNED | done | 2026-03-15 |
@@ -194,7 +199,13 @@
 
 ## Active Decisions
 
-_None — phase 40 archived._
+- **D-1.1:** Create four docs: root README, gig-maestro README, CLI reference, RPC API reference
+- **D-1.2:** Standard locations — READMEs at roots, references in docs/
+- **D-1.3:** RPC API grouped by domain with params + examples
+- **D-1.4:** CLI reference as command tree with synopsis + examples
+- **D-1.5:** WebSocket streaming documented as section in RPC API reference
+- **D-1.6:** Sound design recipes stay in system-prompt.md only
+- **D-1.7:** No Javadoc — out of scope
 
 ---
 
@@ -216,6 +227,9 @@ _None._
 - **Module history:** `.gig/modules/gig-maestro/` (25 phases), `.gig/modules/launchpad-mk2/` (5 phases)
 - **Claude context:** `.claude/CLAUDE.md` at root covers both modules
 - **Build commands:** `./gradlew :gig-maestro:shadowJar`, `./gradlew :launchpad-mk2:build`, etc.
+- **Doc sources:** `tools/claude-tools.json` (306 tool schemas), `tools/system-prompt.md` (84KB), CLI source in `src/cli/java/`
+- **CLI commands:** 12 top-level (transport, track, device, note, snapshot, rpc, song, scene, action, mixer, project, watch)
+- **RPC domains:** transport, track, master, cursor, device, masterDevice, clip, note, scene, browser, arranger, mixer, project, groove, send, arpeggiator, noteLatch, noteInput, detailEditor, macro, state, action, cueMarker, session, api
 
 ---
 

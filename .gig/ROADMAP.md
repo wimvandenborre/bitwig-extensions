@@ -53,6 +53,7 @@
 | 38 | gig-maestro: Modulation Mapping & Clip Key Scrolling | v0.38.1–v0.38.4 | complete |
 | 39 | gig-maestro: WebSocket Subscriptions | v0.39.1–v0.39.5 | complete |
 | 40 | gig-maestro: CLI Enhancements | v0.40.1–v0.40.6 | complete |
+| 41 | Documentation | v0.41.x | planned |
 
 ## Upcoming Phase Details
 
