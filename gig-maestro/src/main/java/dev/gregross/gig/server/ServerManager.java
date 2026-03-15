@@ -1,5 +1,7 @@
 package dev.gregross.gig.server;
 
+import com.google.gson.JsonObject;
+
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -33,9 +35,9 @@ public class ServerManager {
         }
     }
 
-    public void broadcast(String json) {
+    public void broadcastDelta(JsonObject delta) {
         if (wsServer != null) {
-            wsServer.broadcast(json);
+            wsServer.broadcastDelta(delta);
         }
     }
 

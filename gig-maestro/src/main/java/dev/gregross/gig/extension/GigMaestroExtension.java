@@ -200,11 +200,7 @@ public class GigMaestroExtension extends ControllerExtension {
         if (serverManager.getWsClientCount() > 0) {
             JsonObject delta = stateCache.getDelta();
             if (delta != null) {
-                JsonObject notification = new JsonObject();
-                notification.addProperty("jsonrpc", "2.0");
-                notification.addProperty("method", "state/changed");
-                notification.add("params", delta);
-                serverManager.broadcast(notification.toString());
+                serverManager.broadcastDelta(delta);
             }
         }
     }
