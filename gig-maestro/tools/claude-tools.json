@@ -4832,6 +4832,110 @@
     }
   },
   {
+    "name": "device_setParameterMapping",
+    "description": "Toggle mapping mode for a remote control parameter slot. When enabled, the user can click a device parameter in Bitwig to assign it to this remote control slot.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Remote control parameter index (0-7)."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "true to enter mapping mode, false to exit."
+        }
+      },
+      "required": ["index", "enabled"]
+    }
+  },
+  {
+    "name": "device_getParameterMapping",
+    "description": "Get the mapping mode state of all 8 remote control parameters. Returns an array of 8 booleans indicating which parameters are currently in mapping mode.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "masterDevice_setParameterMapping",
+    "description": "Toggle mapping mode for a master device remote control parameter slot.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Remote control parameter index (0-7)."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "true to enter mapping mode, false to exit."
+        }
+      },
+      "required": ["index", "enabled"]
+    }
+  },
+  {
+    "name": "masterDevice_getParameterMapping",
+    "description": "Get the mapping mode state of all 8 master device remote control parameters.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "note_scrollToKey",
+    "description": "Scroll the note editor vertically to center on a specific MIDI key/note.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "integer",
+          "description": "MIDI key number (0-127). Middle C is 60."
+        }
+      },
+      "required": ["key"]
+    }
+  },
+  {
+    "name": "note_scrollKeysPageUp",
+    "description": "Scroll the note editor one page up (higher pitch).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "note_scrollKeysPageDown",
+    "description": "Scroll the note editor one page down (lower pitch).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "note_scrollKeysStepUp",
+    "description": "Scroll the note editor one step up (one semitone higher).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "note_scrollKeysStepDown",
+    "description": "Scroll the note editor one step down (one semitone lower).",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
     "name": "mixer_getState",
     "description": "Get the visibility state of all mixer panel sections. Returns 6 booleans: meter, io, sends, clipLauncher, devices, crossFade.",
     "input_schema": {
