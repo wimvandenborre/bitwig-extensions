@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 145 ]; then
-  echo "  PASS  claude-tools.json has >= 145 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 150 ]; then
+  echo "  PASS  claude-tools.json has >= 150 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 145 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 150 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -319,6 +319,13 @@ ALL_TOOLS=(
   app_zoomToFit
   app_zoomToSelection
 
+  # gig phase 36 — action discovery & invoke
+  app_navigateIntoTrackGroup
+  app_navigateToParentTrackGroup
+  action_list
+  action_listCategories
+  action_invoke
+
   # gig phase 31 — mixer visibility & track navigation
   mixer_getState
   mixer_setSection
@@ -448,6 +455,8 @@ PARAM_CHECKS=(
   "groove_setParameter|.input_schema.properties.value.type|number"
   "track_toggleSolo|.input_schema.properties.index.type|integer"
   "track_toggleSolo|.input_schema.properties.exclusive.type|boolean"
+  "app_navigateIntoTrackGroup|.input_schema.properties.trackIndex.type|integer"
+  "action_invoke|.input_schema.properties.id.type|string"
   "mixer_setSection|.input_schema.properties.section.type|string"
   "mixer_setSection|.input_schema.properties.visible.type|boolean"
   "track_selectInMixer|.input_schema.properties.index.type|integer"
@@ -859,6 +868,14 @@ PROMPT_CHECKS=(
   "system prompt has zoom controls|app_zoomIn"
   "system prompt mentions zoomToFit|app_zoomToFit"
   "system prompt mentions zoomToSelection|app_zoomToSelection"
+
+  # gig phase 36 — action discovery & invoke
+  "system prompt has Action Discovery section|Action Discovery & Invoke"
+  "system prompt mentions action_list|action_list"
+  "system prompt mentions action_listCategories|action_listCategories"
+  "system prompt mentions action_invoke|action_invoke"
+  "system prompt mentions navigateIntoTrackGroup|app_navigateIntoTrackGroup"
+  "system prompt mentions navigateToParentTrackGroup|app_navigateToParentTrackGroup"
 
   # gig phase 31 — mixer visibility & track navigation
   "system prompt has Mixer Panel Control section|Mixer Panel Control"
