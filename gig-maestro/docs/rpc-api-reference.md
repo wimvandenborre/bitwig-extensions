@@ -61,6 +61,41 @@ Standard JSON-RPC error codes apply. Application-specific errors use codes in th
 
 Tool names in this document use underscores (e.g., `transport_play`) which map to RPC method names with slashes (e.g., `transport/play`). When making HTTP requests, always use the slash form.
 
+### Request / Response Flow
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as HTTP :8787
+    participant D as Dispatcher
+    participant H as Handler
+    participant B as Bitwig API
+
+    C->>S: POST /rpc {"method":"transport/play"}
+    S->>D: Parse & route
+    D->>H: TransportHandler.play()
+    H->>B: transport.play()
+    B-->>H: void
+    H-->>D: {"status":"ok"}
+    D-->>S: JSON-RPC response
+    S-->>C: 200 OK
+```
+
+### Error Flow
+
+```mermaid
+flowchart TD
+    REQ[Client sends request] --> PARSE{Valid JSON-RPC?}
+    PARSE -->|No| E1["Error -32600: Invalid request"]
+    PARSE -->|Yes| ROUTE{Method exists?}
+    ROUTE -->|No| E2["Error -32601: Method not found"]
+    ROUTE -->|Yes| VALIDATE{Params valid?}
+    VALIDATE -->|No| E3["Error -32602: Invalid params"]
+    VALIDATE -->|Yes| EXEC[Execute handler]
+    EXEC --> SUCCESS["result: {...}"]
+    EXEC -->|Exception| E4["Error -32603: Internal error"]
+```
+
 ---
 
 ## WebSocket Streaming
@@ -114,6 +149,56 @@ Each WebSocket connection maintains its own subscription set. Subscriptions are 
 ### RPC over WebSocket
 
 Standard RPC methods can also be sent over the WebSocket connection. The server processes them identically to HTTP requests and returns the response on the same WebSocket. Subscription management methods (`state/subscribe`, `state/unsubscribe`, `state/subscribeAll`) must be called over WebSocket since they are per-connection.
+
+### WebSocket Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant W as WebSocket :8788
+    participant B as Bitwig
+
+    C->>W: Connect
+    Note over C,W: Default: all topics
+
+    C->>W: state/subscribe {topics:["transport"]}
+    W-->>C: {result: {subscribed:["transport"]}}
+    Note over C,W: Now receiving transport only
+
+    loop Bitwig flush cycle
+        B->>W: State changed
+        W-->>C: state/delta {changed:["transport"], data:{...}}
+    end
+
+    C->>W: state/subscribeAll {}
+    W-->>C: {result: {subscribed:"all"}}
+    Note over C,W: Back to all topics
+
+    C->>W: Disconnect
+```
+
+### Transaction Flow
+
+```mermaid
+flowchart TD
+    TX["session/transaction"] --> PRE{preSnapshot?}
+    PRE -->|Yes| SNAP1[Capture state]
+    PRE -->|No| EXEC
+    SNAP1 --> EXEC
+
+    EXEC[Execute operations sequentially] --> CHECK{Error?}
+    CHECK -->|No| NEXT{More ops?}
+    NEXT -->|Yes| EXEC
+    NEXT -->|No| POST{postSnapshot?}
+    CHECK -->|Yes| RB{rollback = undoAll?}
+    RB -->|Yes| UNDO[Undo completed steps]
+    RB -->|No| PARTIAL[Return partial results]
+    UNDO --> PARTIAL
+
+    POST -->|Yes| SNAP2[Capture state]
+    POST -->|No| DONE[Return all results]
+    SNAP2 --> DONE
+```
 
 ---
 

@@ -4,6 +4,55 @@ The `gig` command-line tool controls Bitwig Studio remotely via JSON-RPC. It com
 
 **Version:** gig-cli 0.3.0
 
+### How the CLI Works
+
+```mermaid
+flowchart LR
+    U[User] -->|"gig transport play"| CLI[gig CLI]
+    CLI -->|Build JSON-RPC request| HTTP["POST /rpc"]
+    HTTP -->|"transport/play"| EXT[Gig Maestro Extension]
+    EXT -->|Execute| BW[Bitwig Studio]
+    BW -->|Result| EXT
+    EXT -->|JSON response| HTTP
+    HTTP -->|Print to stdout| CLI
+    CLI -->|JSON output| U
+```
+
+### User Stories
+
+**Quick session control from the terminal:**
+
+> *I want to control playback, adjust levels, and manage tracks without
+> leaving my terminal or IDE.*
+
+```bash
+gig transport play                     # start playback
+gig transport tempo 128.0              # set BPM
+gig track set-volume -i 0 -v 0.7      # lower track 0
+gig track set-mute -i 3 on            # mute track 3
+gig --pretty snapshot                  # inspect full state
+```
+
+**Export and restore a session:**
+
+> *I want to save my entire Bitwig session as JSON so I can version it
+> or rebuild it later.*
+
+```bash
+gig song dump -o my-session.json       # export
+# ... make changes ...
+gig song rebuild                       # restore
+```
+
+**Live monitoring during a performance:**
+
+> *I want to see real-time transport and device changes streamed to my
+> terminal during a live set.*
+
+```bash
+gig --pretty watch --topics transport,device
+```
+
 ## Building and Installing
 
 ```bash

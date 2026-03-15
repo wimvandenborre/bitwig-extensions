@@ -8,19 +8,44 @@ transport, tracks, devices, clips, notes, mixing, browsing, and more.
 
 ## Architecture
 
-```
-Bitwig Studio
-  └── Gig Maestro Extension
-        ├── HTTP Server (port 8787) ← JSON-RPC 2.0
-        └── WebSocket Server (port 8788) ← State streaming
-              ↑
-        CLI / curl / Claude / any client
+```mermaid
+graph TB
+    subgraph Bitwig Studio
+        EXT[Gig Maestro Extension]
+        API[Bitwig Controller API v25]
+        EXT <--> API
+    end
+
+    EXT -->|port 8787| HTTP[HTTP Server]
+    EXT -->|port 8788| WS[WebSocket Server]
+
+    HTTP <-->|JSON-RPC 2.0| CLI[gig CLI]
+    HTTP <-->|JSON-RPC 2.0| CURL[curl / scripts]
+    HTTP <-->|JSON-RPC 2.0| CLAUDE[Claude / AI agents]
+    WS -->|State deltas| STREAM[Streaming clients]
 ```
 
 The extension runs inside Bitwig as a controller script. It starts an HTTP
 server accepting JSON-RPC 2.0 requests and a WebSocket server for real-time
 state subscriptions. External clients connect over the network to read and
 manipulate the Bitwig session.
+
+### Request Flow
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant H as HTTP Server
+    participant D as RPC Dispatcher
+    participant B as Bitwig API
+
+    C->>H: POST /rpc (JSON-RPC request)
+    H->>D: Route to handler
+    D->>B: Execute Bitwig operation
+    B-->>D: Result
+    D-->>H: JSON-RPC response
+    H-->>C: HTTP 200 + JSON body
+```
 
 ## Features
 
@@ -90,6 +115,102 @@ gig transport stop
 gig --pretty snapshot
 gig track set-volume -i 0 -v 0.8
 gig watch --topics transport
+```
+
+## User Stories
+
+### Automate a recording session
+
+> *As a producer, I want to set up my session from the terminal so I can start
+> recording without touching the mouse.*
+
+```sh
+# Create tracks
+gig track create-instrument -p 0
+gig track rename "Drums"
+gig track create-instrument -p 1
+gig track rename "Bass"
+gig track create-audio -p 2
+gig track rename "Vocals"
+
+# Set tempo and arm the vocal track
+gig transport tempo 95.0
+gig track set-arm -i 2 on
+
+# Set loop range and start recording
+gig rpc '{"jsonrpc":"2.0","method":"transport/setLoopRange","params":{"start":0,"length":16,"enabled":true},"id":1}'
+gig transport record
+```
+
+### Monitor live state from a dashboard
+
+> *As a developer, I want to stream real-time state changes so I can build
+> a custom dashboard showing transport position and track levels.*
+
+```sh
+# Watch only transport and track updates
+gig --pretty watch --topics transport,tracks
+```
+
+```mermaid
+sequenceDiagram
+    participant D as Dashboard
+    participant W as WebSocket :8788
+    participant B as Bitwig
+
+    D->>W: Connect
+    D->>W: state/subscribe {topics: ["transport","tracks"]}
+    W-->>D: Subscribed
+
+    loop Every flush cycle
+        B->>W: State changed
+        W-->>D: state/delta {transport: {position: 4.5}}
+    end
+```
+
+### Build a song programmatically
+
+> *As an AI agent (Claude), I want to compose a multi-track arrangement by
+> calling macro operations so I can generate music from a text description.*
+
+```sh
+# Use the macro/buildSong RPC to create an entire arrangement
+curl -s http://localhost:8787/rpc -d '{
+  "jsonrpc":"2.0",
+  "method":"macro/buildSong",
+  "params":{
+    "tracks":[
+      {"name":"Kick","type":"instrument","device":"Drum Machine",
+       "clips":[{"slot":0,"notes":[{"x":0,"y":36,"velocity":100,"duration":0.5}]}]},
+      {"name":"Bass","type":"instrument","device":"Polymer",
+       "clips":[{"slot":0,"notes":[{"x":0,"y":36,"velocity":90,"duration":1.0}]}]}
+    ]
+  },
+  "id":1
+}'
+```
+
+### Browse and load presets
+
+> *As a sound designer, I want to search for presets by category and audition
+> them before committing.*
+
+```mermaid
+flowchart LR
+    A[Open browser] --> B[Set filters]
+    B --> C[Browse results]
+    C --> D{Audition?}
+    D -->|Yes| E[Preview sound]
+    E --> C
+    D -->|No| F[Commit selection]
+    F --> G[Device loaded]
+```
+
+```sh
+gig rpc '{"jsonrpc":"2.0","method":"browser/browsePresets","params":{},"id":1}'
+gig rpc '{"jsonrpc":"2.0","method":"browser/setShouldAudition","params":{"enabled":true},"id":1}'
+gig rpc '{"jsonrpc":"2.0","method":"browser/selectNextFile","params":{},"id":1}'
+gig rpc '{"jsonrpc":"2.0","method":"browser/commit","params":{},"id":1}'
 ```
 
 ## Documentation

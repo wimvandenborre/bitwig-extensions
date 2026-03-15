@@ -9,6 +9,24 @@ Multi-module Gradle project containing Bitwig Studio controller extensions.
 | [gig-maestro](gig-maestro/) | RPC-based Bitwig controller extension with a companion CLI tool | [README](gig-maestro/README.md) |
 | [launchpad-mk2](launchpad-mk2/) | Novation Launchpad MK2 controller extension | [README](launchpad-mk2/README.md) |
 
+```mermaid
+graph LR
+    BW[Bitwig Studio]
+    GM[gig-maestro Extension]
+    LP[launchpad-mk2 Extension]
+    CLI[gig CLI]
+    WS[WebSocket Clients]
+    HTTP[HTTP Clients]
+    PAD[Launchpad MK2 Hardware]
+
+    BW --- GM
+    BW --- LP
+    GM -->|port 8787| HTTP
+    GM -->|port 8788| WS
+    GM -->|port 8787| CLI
+    LP <-->|MIDI| PAD
+```
+
 ## Prerequisites
 
 - **Java 21+**
