@@ -26,6 +26,9 @@ public class HttpRpcServer {
         server.createContext("/health", this::handleHealth);
         server.createContext("/docs", this::handleDocs);
         server.createContext("/openapi.json", this::handleOpenApiSpec);
+        // Catch-all: route any POST to the RPC handler (enables Scalar "Try It"
+        // which sends to paths like /transport/play instead of /rpc)
+        server.createContext("/", exchange -> handleRpc(exchange, requestHandler));
     }
 
     public void start() {
