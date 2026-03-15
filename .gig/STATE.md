@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.38.4` |
 | **Phase** | 38 — gig-maestro: Modulation Mapping & Clip Key Scrolling |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 38.4 — Build verification |
 | **Last Updated** | 2026-03-15 |
 
@@ -184,7 +184,7 @@
 
 ## Active Decisions
 
-_None — phase 37 archived._
+_None — phase 38 archived._
 
 ---
 
