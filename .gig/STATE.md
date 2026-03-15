@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.39.5` |
+| **Version** | `0.40.6` |
 | **Phase** | 40 — gig-maestro: CLI Enhancements |
-| **Status** | `GATHERED` |
-| **Last Batch** | 39.5 — Build verification |
+| **Status** | `GOVERNED` |
+| **Last Batch** | 40.6 — Rename config path to ~/.gig-maestro |
 | **Last Updated** | 2026-03-15 |
 
 ---
@@ -18,6 +18,11 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.40.6 | 40 | Rename config path to ~/.gig-maestro | UNPLANNED | done | 2026-03-15 |
+| 0.40.5 | 40 | Build verification | PLANNED | done | 2026-03-15 |
+| 0.40.4 | 40 | CLI unit tests | PLANNED | done | 2026-03-15 |
+| 0.40.3 | 40 | WatchCommand (WebSocket streaming) | PLANNED | done | 2026-03-15 |
+| 0.40.1-2 | 40 | Config file + scene/action/mixer/project commands | PLANNED | done | 2026-03-15 |
 | 0.39.5 | 39 | Build verification | PLANNED | done | 2026-03-15 |
 | 0.39.4 | 39 | Tool definitions + system prompt + smoke tests | PLANNED | done | 2026-03-15 |
 | 0.39.3 | 39 | Unit tests | PLANNED | done | 2026-03-15 |
@@ -189,7 +194,7 @@
 
 ## Active Decisions
 
-_None — phase 39 archived._
+_None — phase 40 archived._
 
 ---
 

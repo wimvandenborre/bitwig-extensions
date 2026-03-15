@@ -52,7 +52,7 @@
 | 37 | gig-maestro: DetailEditor Panel Control | v0.37.1–v0.37.4 | complete |
 | 38 | gig-maestro: Modulation Mapping & Clip Key Scrolling | v0.38.1–v0.38.4 | complete |
 | 39 | gig-maestro: WebSocket Subscriptions | v0.39.1–v0.39.5 | complete |
-| 40 | gig-maestro: CLI Enhancements | v0.40.x | planned |
+| 40 | gig-maestro: CLI Enhancements | v0.40.1–v0.40.6 | complete |
 
 ## Upcoming Phase Details
 

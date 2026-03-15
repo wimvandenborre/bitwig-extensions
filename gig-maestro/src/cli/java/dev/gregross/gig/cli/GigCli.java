@@ -1,8 +1,18 @@
 package dev.gregross.gig.cli;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.IDefaultValueProvider;
+import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Option;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Command(
     name = "gig",
@@ -16,7 +26,12 @@ import picocli.CommandLine.Option;
         NoteCommand.class,
         SnapshotCommand.class,
         RpcCommand.class,
-        SongCommand.class
+        SongCommand.class,
+        SceneCommand.class,
+        ActionCommand.class,
+        MixerCommand.class,
+        ProjectCommand.class,
+        WatchCommand.class
     }
 )
 public class GigCli {
@@ -35,7 +50,57 @@ public class GigCli {
     }
 
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new GigCli()).execute(args);
+        CommandLine cmd = new CommandLine(new GigCli());
+        cmd.setDefaultValueProvider(new ConfigFileDefaultProvider());
+        int exitCode = cmd.execute(args);
         System.exit(exitCode);
+    }
+
+    /**
+     * Reads defaults from ~/.gig-maestro/config.json when present.
+     * Config format: {"host":"...", "port":...}
+     * CLI flags always override config values.
+     */
+    static class ConfigFileDefaultProvider implements IDefaultValueProvider {
+
+        private static final Path CONFIG_PATH =
+            Paths.get(System.getProperty("user.home"), ".gig-maestro", "config.json");
+
+        private JsonObject config;
+        private boolean loaded = false;
+
+        @Override
+        public String defaultValue(ArgSpec argSpec) {
+            if (!loaded) {
+                config = loadConfig();
+                loaded = true;
+            }
+            if (config == null || !(argSpec instanceof OptionSpec)) {
+                return null;
+            }
+            OptionSpec option = (OptionSpec) argSpec;
+            String longestName = option.longestName();
+            switch (longestName) {
+                case "--host":
+                    return config.has("host") ? config.get("host").getAsString() : null;
+                case "--port":
+                    return config.has("port") ? String.valueOf(config.get("port").getAsInt()) : null;
+                default:
+                    return null;
+            }
+        }
+
+        private static JsonObject loadConfig() {
+            if (!Files.exists(CONFIG_PATH)) {
+                return null;
+            }
+            try {
+                String content = Files.readString(CONFIG_PATH);
+                return JsonParser.parseString(content).getAsJsonObject();
+            } catch (IOException | IllegalStateException e) {
+                // Malformed or unreadable config — silently fall back to defaults
+                return null;
+            }
+        }
     }
 }
