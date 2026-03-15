@@ -4845,5 +4845,33 @@
       },
       "required": ["index"]
     }
+  },
+  {
+    "name": "project_setCueVolume",
+    "description": "Set the cue/headphone monitoring volume (0.0–1.0). Controls the level of the cue mix output for headphone monitoring.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Cue volume level (0.0–1.0)."
+        }
+      },
+      "required": ["value"]
+    }
+  },
+  {
+    "name": "project_setCueMix",
+    "description": "Set the cue mix balance (0.0–1.0). Controls the blend between the main mix and the cue/solo signal in headphone monitoring. 0.0 = all main mix, 1.0 = all cue.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Cue mix balance (0.0–1.0)."
+        }
+      },
+      "required": ["value"]
+    }
   }
 ]

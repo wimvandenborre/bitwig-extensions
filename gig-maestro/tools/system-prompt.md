@@ -1428,3 +1428,11 @@ Live activity data for mixing analysis and monitoring. These are poll-only (not 
 
 **Muted by Solo** (in snapshot):
 - Each track in `session_snapshot` includes `isMutedBySolo` (boolean) — true when another track's solo is silencing this track. Use alongside `solo` to understand the full solo/mute picture.
+
+### Cue Mix Control
+
+Headphone monitoring control via the project's cue mix system:
+- `project_setCueVolume({ value: 0.8 })` — set cue/headphone volume (0.0–1.0)
+- `project_setCueMix({ value: 0.5 })` — set cue mix balance (0.0 = main mix, 1.0 = cue only)
+- `project/getState` also returns `cueVolume` and `cueMix` values alongside solo/mute/arm flags
+- Both values are included in the session snapshot under the application/project section
