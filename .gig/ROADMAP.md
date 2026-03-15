@@ -54,7 +54,7 @@
 | 39 | gig-maestro: WebSocket Subscriptions | v0.39.1–v0.39.5 | complete |
 | 40 | gig-maestro: CLI Enhancements | v0.40.1–v0.40.6 | complete |
 | 41 | Documentation | v0.41.1–v0.41.6 | complete |
-| 42 | Interactive Documentation | v0.42.x | planned |
+| 42 | Interactive Documentation | v0.42.1–v0.42.6 | complete |
 
 ## Upcoming Phase Details
 

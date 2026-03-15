@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.42.6` |
 | **Phase** | 42 — Interactive Documentation |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 42.6 — Catch-all POST route for Scalar Try It |
 | **Last Updated** | 2026-03-15 |
 
@@ -206,11 +206,7 @@
 
 ## Active Decisions
 
-- **D-1.1:** Use Scalar for interactive API documentation UI
-- **D-1.2:** OpenAPI 3.1 spec, each RPC method as a POST path
-- **D-1.3:** Node.js script generates spec from claude-tools.json
-- **D-1.4:** Static HTML + serve from extension at GET /docs
-- **D-1.5:** claude-tools.json is the single source of truth
+_None — phase 42 archived._
 
 ---
 
