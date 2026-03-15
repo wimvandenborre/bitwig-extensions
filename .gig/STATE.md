@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Version** | `0.38.4` |
-| **Phase** | 38 — gig-maestro: Modulation Mapping & Clip Key Scrolling |
-| **Status** | `GOVERNED` |
+| **Phase** | 39 — gig-maestro: WebSocket Subscriptions |
+| **Status** | `GATHERED` |
 | **Last Batch** | 38.4 — Build verification |
 | **Last Updated** | 2026-03-15 |
 
