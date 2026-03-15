@@ -50,6 +50,8 @@ class HandlerRegistrationIntegrationTest {
     @Mock private Arranger mockArranger;
     @Mock private CueMarkerBank mockCueMarkerBank;
     @Mock private ScrollbarModel mockScrollbar;
+    @Mock private DetailEditor mockDetailEditor;
+    @Mock private ScrollbarModel mockDetailScrollbar;
     @Mock private SettableBooleanValue mockIsPinned;
     @Mock private StringValue mockCursorTrackType;
 
@@ -67,6 +69,9 @@ class HandlerRegistrationIntegrationTest {
         // CursorTrack properties needed by TrackHandler constructor markInterested() calls
         when(mockCursorTrack.isPinned()).thenReturn(mockIsPinned);
         when(mockCursorTrack.trackType()).thenReturn(mockCursorTrackType);
+
+        // DetailEditor scrollbar
+        when(mockDetailEditor.getHorizontalScrollbarModel()).thenReturn(mockDetailScrollbar);
 
         dispatcher = new JsonRpcDispatcher();
 
@@ -100,6 +105,7 @@ class HandlerRegistrationIntegrationTest {
         new TransactionHandler(dispatcher, stateCache).register(dispatcher);
         new BrowserHandler(mockPopupBrowser, mockCursorDevice, stateCache).register(dispatcher);
         new NoteInputHandler(mockNoteInput, mockArpeggiator, mockNoteLatch, stateCache).register(dispatcher);
+        new DetailEditorHandler(mockDetailEditor).register(dispatcher);
         new MacroHandler(dispatcher, stateCache, IMMEDIATE_SCHEDULER).register(dispatcher);
     }
 
