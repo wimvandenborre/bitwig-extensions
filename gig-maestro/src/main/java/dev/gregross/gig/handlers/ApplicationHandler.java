@@ -1,10 +1,15 @@
 package dev.gregross.gig.handlers;
 
+import com.bitwig.extension.controller.api.Action;
+import com.bitwig.extension.controller.api.ActionCategory;
 import com.bitwig.extension.controller.api.Application;
 import com.bitwig.extension.controller.api.ControllerHost;
+import com.bitwig.extension.controller.api.TrackBank;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
+import dev.gregross.gig.rpc.RpcException;
 
 import java.util.Set;
 
@@ -12,10 +17,12 @@ public class ApplicationHandler {
 
     private final Application application;
     private final ControllerHost host;
+    private final TrackBank trackBank;
 
-    public ApplicationHandler(Application application, ControllerHost host) {
+    public ApplicationHandler(Application application, ControllerHost host, TrackBank trackBank) {
         this.application = application;
         this.host = host;
+        this.trackBank = trackBank;
     }
 
     public void register(JsonRpcDispatcher dispatcher) {
@@ -134,6 +141,71 @@ public class ApplicationHandler {
 
         dispatcher.register("app/zoomToSelection", params -> {
             application.zoomToSelection();
+            return new JsonPrimitive("ok");
+        });
+
+        // Track group navigation
+        dispatcher.register("app/navigateIntoTrackGroup", params -> {
+            if (!params.has("trackIndex")) {
+                throw new IllegalArgumentException("missing 'trackIndex' parameter");
+            }
+            int trackIndex = params.get("trackIndex").getAsInt();
+            application.navigateIntoTrackGroup(trackBank.getItemAt(trackIndex));
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("app/navigateToParentTrackGroup", params -> {
+            application.navigateToParentTrackGroup();
+            return new JsonPrimitive("ok");
+        });
+
+        // Action discovery & invoke
+        dispatcher.register("action/list", params -> {
+            Action[] actions = application.getActions();
+            String categoryFilter = params.has("category") ? params.get("category").getAsString() : null;
+            JsonArray result = new JsonArray();
+            for (Action action : actions) {
+                if (categoryFilter != null) {
+                    ActionCategory cat = action.getCategory();
+                    if (cat == null || !categoryFilter.equals(cat.getName())) {
+                        continue;
+                    }
+                }
+                JsonObject obj = new JsonObject();
+                obj.addProperty("id", action.getId());
+                obj.addProperty("name", action.getName());
+                ActionCategory cat = action.getCategory();
+                obj.addProperty("category", cat != null ? cat.getName() : null);
+                obj.addProperty("menuItemText", action.getMenuItemText());
+                result.add(obj);
+            }
+            return result;
+        });
+
+        dispatcher.register("action/listCategories", params -> {
+            ActionCategory[] categories = application.getActionCategories();
+            JsonArray result = new JsonArray();
+            for (ActionCategory cat : categories) {
+                JsonObject obj = new JsonObject();
+                obj.addProperty("id", cat.getId());
+                obj.addProperty("name", cat.getName());
+                result.add(obj);
+            }
+            return result;
+        });
+
+        dispatcher.register("action/invoke", params -> {
+            if (!params.has("id")) {
+                throw new IllegalArgumentException("missing 'id' parameter");
+            }
+            String id = params.get("id").getAsString();
+            Action action = application.getAction(id);
+            if (action == null) {
+                JsonObject data = new JsonObject();
+                data.addProperty("actionId", id);
+                throw new RpcException(-32001, "ACTION_NOT_FOUND", data);
+            }
+            action.invoke();
             return new JsonPrimitive("ok");
         });
     }
