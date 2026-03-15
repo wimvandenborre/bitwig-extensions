@@ -15,11 +15,11 @@ echo "--- O1. Tool Schema Validation ---"
 
 TOOL_COUNT=$(jq length "$TOOLS_FILE")
 TOTAL=$((TOTAL + 1))
-if [ "$TOOL_COUNT" -ge 150 ]; then
-  echo "  PASS  claude-tools.json has >= 150 tools (found $TOOL_COUNT)"
+if [ "$TOOL_COUNT" -ge 158 ]; then
+  echo "  PASS  claude-tools.json has >= 158 tools (found $TOOL_COUNT)"
   PASS=$((PASS + 1))
 else
-  echo "  FAIL  claude-tools.json has >= 150 tools — found $TOOL_COUNT"
+  echo "  FAIL  claude-tools.json has >= 158 tools — found $TOOL_COUNT"
   FAIL=$((FAIL + 1))
 fi
 
@@ -319,6 +319,16 @@ ALL_TOOLS=(
   app_zoomToFit
   app_zoomToSelection
 
+  # gig phase 37 — detail editor panel control
+  detailEditor_zoomIn
+  detailEditor_zoomOut
+  detailEditor_zoomToFit
+  detailEditor_zoomToSelection
+  detailEditor_zoomToFitSelectionOrAll
+  detailEditor_zoomInLanes
+  detailEditor_zoomOutLanes
+  detailEditor_zoomToRegion
+
   # gig phase 36 — action discovery & invoke
   app_navigateIntoTrackGroup
   app_navigateToParentTrackGroup
@@ -455,6 +465,8 @@ PARAM_CHECKS=(
   "groove_setParameter|.input_schema.properties.value.type|number"
   "track_toggleSolo|.input_schema.properties.index.type|integer"
   "track_toggleSolo|.input_schema.properties.exclusive.type|boolean"
+  "detailEditor_zoomToRegion|.input_schema.properties.from.type|number"
+  "detailEditor_zoomToRegion|.input_schema.properties.to.type|number"
   "app_navigateIntoTrackGroup|.input_schema.properties.trackIndex.type|integer"
   "action_invoke|.input_schema.properties.id.type|string"
   "mixer_setSection|.input_schema.properties.section.type|string"
@@ -868,6 +880,12 @@ PROMPT_CHECKS=(
   "system prompt has zoom controls|app_zoomIn"
   "system prompt mentions zoomToFit|app_zoomToFit"
   "system prompt mentions zoomToSelection|app_zoomToSelection"
+
+  # gig phase 37 — detail editor panel control
+  "system prompt has DetailEditor section|DetailEditor Panel Control"
+  "system prompt mentions detailEditor_zoomIn|detailEditor_zoomIn"
+  "system prompt mentions detailEditor_zoomToRegion|detailEditor_zoomToRegion"
+  "system prompt mentions detailEditor_zoomInLanes|detailEditor_zoomInLanes"
 
   # gig phase 36 — action discovery & invoke
   "system prompt has Action Discovery section|Action Discovery & Invoke"
