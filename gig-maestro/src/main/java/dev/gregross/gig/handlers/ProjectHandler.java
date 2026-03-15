@@ -32,12 +32,30 @@ public class ProjectHandler {
             return new JsonPrimitive("ok");
         });
 
+        dispatcher.register("project/setCueVolume", params -> {
+            if (!params.has("value")) {
+                throw new IllegalArgumentException("missing 'value' parameter");
+            }
+            project.cueVolume().value().set(params.get("value").getAsDouble());
+            return new JsonPrimitive("ok");
+        });
+
+        dispatcher.register("project/setCueMix", params -> {
+            if (!params.has("value")) {
+                throw new IllegalArgumentException("missing 'value' parameter");
+            }
+            project.cueMix().value().set(params.get("value").getAsDouble());
+            return new JsonPrimitive("ok");
+        });
+
         dispatcher.register("project/getState", params -> {
             JsonObject state = new JsonObject();
             state.addProperty("hasSoloedTracks", stateCache.hasSoloedTracks());
             state.addProperty("hasMutedTracks", stateCache.hasMutedTracks());
             state.addProperty("hasArmedTracks", stateCache.hasArmedTracks());
             state.addProperty("isModified", stateCache.isModified());
+            state.addProperty("cueVolume", stateCache.getCueVolume());
+            state.addProperty("cueMix", stateCache.getCueMix());
             return state;
         });
     }
