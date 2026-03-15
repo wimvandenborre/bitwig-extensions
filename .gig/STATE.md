@@ -6,7 +6,7 @@
 |-------|-------|
 | **Version** | `0.39.5` |
 | **Phase** | 39 — gig-maestro: WebSocket Subscriptions |
-| **Status** | `IMPLEMENTED` |
+| **Status** | `GOVERNED` |
 | **Last Batch** | 39.5 — Build verification |
 | **Last Updated** | 2026-03-15 |
 
@@ -189,7 +189,7 @@
 
 ## Active Decisions
 
-_None — phase 38 archived._
+_None — phase 39 archived._
 
 ---
 
