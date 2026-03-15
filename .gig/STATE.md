@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | `0.42.6` |
-| **Phase** | 42 — Interactive Documentation |
-| **Status** | `GOVERNED` |
-| **Last Batch** | 42.6 — Catch-all POST route for Scalar Try It |
+| **Version** | `0.43.2` |
+| **Phase** | 43 — OpenAPI Auto-Regeneration |
+| **Status** | `IMPLEMENTED` |
+| **Last Batch** | 43.2 — Offline smoke test + build verification |
 | **Last Updated** | 2026-03-15 |
 
 ---
@@ -18,6 +18,8 @@
 
 | Version | Phase | Batch Title | Type | Status | Timestamp |
 |---------|-------|-------------|------|--------|-----------|
+| 0.43.2 | 43 | Offline smoke test + build verification | PLANNED | done | 2026-03-15 |
+| 0.43.1 | 43 | Gradle task + up-to-date wiring | PLANNED | done | 2026-03-15 |
 | 0.42.6 | 42 | Catch-all POST route for Scalar Try It | UNPLANNED | done | 2026-03-15 |
 | 0.42.5 | 42 | Context-aware example values | UNPLANNED | done | 2026-03-15 |
 | 0.42.4 | 42 | Build verification + docs update | PLANNED | done | 2026-03-15 |
@@ -206,7 +208,9 @@
 
 ## Active Decisions
 
-_None — phase 42 archived._
+- **D-1.1:** Gradle Exec task runs Node.js script, dependency of copyDocsToResources
+- **D-1.2:** Up-to-date checking with inputs/outputs declared
+- **D-1.3:** Offline smoke test validates spec structure and method count
 
 ---
 
