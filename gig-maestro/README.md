@@ -88,8 +88,8 @@ curl -s http://localhost:8787/rpc \
 gig transport play
 gig transport stop
 gig --pretty snapshot
-gig track list
-gig device params
+gig track set-volume -i 0 -v 0.8
+gig watch --topics transport
 ```
 
 ## Documentation
