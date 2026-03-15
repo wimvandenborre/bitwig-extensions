@@ -87,10 +87,20 @@ class WsRpcServerTest {
         client.connectBlocking(2, TimeUnit.SECONDS);
         Thread.sleep(100);
 
-        server.broadcast("{\"jsonrpc\":\"2.0\",\"method\":\"state/changed\"}");
+        com.google.gson.JsonObject delta = new com.google.gson.JsonObject();
+        com.google.gson.JsonArray changed = new com.google.gson.JsonArray();
+        changed.add("transport");
+        delta.add("changed", changed);
+        com.google.gson.JsonObject data = new com.google.gson.JsonObject();
+        com.google.gson.JsonObject transportData = new com.google.gson.JsonObject();
+        transportData.addProperty("isPlaying", true);
+        data.add("transport", transportData);
+        delta.add("data", data);
+        server.broadcastDelta(delta);
 
         String received = broadcastFuture.get(2, TimeUnit.SECONDS);
         assertTrue(received.contains("state/changed"));
+        assertTrue(received.contains("transport"));
         client.closeBlocking();
     }
 
@@ -112,5 +122,91 @@ class WsRpcServerTest {
         client.closeBlocking();
         Thread.sleep(200);
         assertEquals(0, server.getClientCount());
+    }
+
+    // --- Subscription management (unit tests) ---
+
+    @Test
+    void subscription_defaultIsNull() {
+        org.java_websocket.WebSocket mockConn = org.mockito.Mockito.mock(org.java_websocket.WebSocket.class);
+        assertNull(server.getSubscription(mockConn));
+    }
+
+    @Test
+    void subscription_setAndGet() {
+        org.java_websocket.WebSocket mockConn = org.mockito.Mockito.mock(org.java_websocket.WebSocket.class);
+        server.setSubscription(mockConn, java.util.Set.of("transport", "tracks"));
+        java.util.Set<String> topics = server.getSubscription(mockConn);
+        assertNotNull(topics);
+        assertEquals(2, topics.size());
+        assertTrue(topics.contains("transport"));
+        assertTrue(topics.contains("tracks"));
+    }
+
+    @Test
+    void subscription_clearRemovesEntry() {
+        org.java_websocket.WebSocket mockConn = org.mockito.Mockito.mock(org.java_websocket.WebSocket.class);
+        server.setSubscription(mockConn, java.util.Set.of("transport"));
+        server.clearSubscription(mockConn);
+        assertNull(server.getSubscription(mockConn));
+    }
+
+    @Test
+    void handleSubscribe_validTopics_setsSubscription() {
+        org.java_websocket.WebSocket mockConn = org.mockito.Mockito.mock(org.java_websocket.WebSocket.class);
+        String request = "{\"jsonrpc\":\"2.0\",\"method\":\"state/subscribe\",\"params\":{\"topics\":[\"transport\",\"device\"]},\"id\":1}";
+        String response = server.handleSubscriptionRpc(mockConn, request);
+        assertNotNull(response);
+        assertTrue(response.contains("\"ok\":true"));
+        assertEquals(java.util.Set.of("transport", "device"), server.getSubscription(mockConn));
+    }
+
+    @Test
+    void handleSubscribe_invalidTopic_returnsError() {
+        org.java_websocket.WebSocket mockConn = org.mockito.Mockito.mock(org.java_websocket.WebSocket.class);
+        String request = "{\"jsonrpc\":\"2.0\",\"method\":\"state/subscribe\",\"params\":{\"topics\":[\"bogus\"]},\"id\":1}";
+        String response = server.handleSubscriptionRpc(mockConn, request);
+        assertNotNull(response);
+        assertTrue(response.contains("-32602"));
+    }
+
+    @Test
+    void handleUnsubscribe_removesTopics() {
+        org.java_websocket.WebSocket mockConn = org.mockito.Mockito.mock(org.java_websocket.WebSocket.class);
+        server.setSubscription(mockConn, new java.util.HashSet<>(java.util.Set.of("transport", "tracks", "device")));
+        String request = "{\"jsonrpc\":\"2.0\",\"method\":\"state/unsubscribe\",\"params\":{\"topics\":[\"tracks\"]},\"id\":1}";
+        String response = server.handleSubscriptionRpc(mockConn, request);
+        assertNotNull(response);
+        assertTrue(response.contains("\"ok\":true"));
+        java.util.Set<String> remaining = server.getSubscription(mockConn);
+        assertEquals(2, remaining.size());
+        assertFalse(remaining.contains("tracks"));
+    }
+
+    @Test
+    void handleSubscribeAll_clearsSubscription() {
+        org.java_websocket.WebSocket mockConn = org.mockito.Mockito.mock(org.java_websocket.WebSocket.class);
+        server.setSubscription(mockConn, java.util.Set.of("transport"));
+        String request = "{\"jsonrpc\":\"2.0\",\"method\":\"state/subscribeAll\",\"params\":{},\"id\":1}";
+        String response = server.handleSubscriptionRpc(mockConn, request);
+        assertNotNull(response);
+        assertTrue(response.contains("\"ok\":true"));
+        assertNull(server.getSubscription(mockConn));
+    }
+
+    @Test
+    void handleNonSubscriptionRpc_returnsNull() {
+        org.java_websocket.WebSocket mockConn = org.mockito.Mockito.mock(org.java_websocket.WebSocket.class);
+        String request = "{\"jsonrpc\":\"2.0\",\"method\":\"transport/play\",\"params\":{},\"id\":1}";
+        String response = server.handleSubscriptionRpc(mockConn, request);
+        assertNull(response);
+    }
+
+    @Test
+    void validTopics_containsAll14Sections() {
+        assertEquals(14, WsRpcServer.VALID_TOPICS.size());
+        assertTrue(WsRpcServer.VALID_TOPICS.contains("transport"));
+        assertTrue(WsRpcServer.VALID_TOPICS.contains("groove"));
+        assertTrue(WsRpcServer.VALID_TOPICS.contains("masterDevice"));
     }
 }
