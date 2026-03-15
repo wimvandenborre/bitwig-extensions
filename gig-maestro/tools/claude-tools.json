@@ -4936,6 +4936,54 @@
     }
   },
   {
+    "name": "state_subscribe",
+    "description": "Subscribe to specific state change topics on the WebSocket connection. Only deltas for subscribed topics will be sent. Must be called over WebSocket (not HTTP). Default is all topics.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of topic names to subscribe to. Valid topics: transport, tracks, scenes, device, clip, master, application, arranger, arrangement, masterDevice, browser, arpeggiator, noteLatch, groove."
+        }
+      },
+      "required": ["topics"]
+    }
+  },
+  {
+    "name": "state_unsubscribe",
+    "description": "Remove topics from the current WebSocket subscription. Must be called over WebSocket.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of topic names to unsubscribe from."
+        }
+      },
+      "required": ["topics"]
+    }
+  },
+  {
+    "name": "state_subscribeAll",
+    "description": "Reset WebSocket subscription to receive all state change topics (default behavior). Must be called over WebSocket.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "state_getTopics",
+    "description": "List all valid subscription topic names. Can be called over HTTP or WebSocket.",
+    "input_schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
     "name": "mixer_getState",
     "description": "Get the visibility state of all mixer panel sections. Returns 6 booleans: meter, io, sends, clipLauncher, devices, crossFade.",
     "input_schema": {
