@@ -15,10 +15,10 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 38.1 | `0.38.1` | StateCache isBeingMapped + device/master mapping RPCs + clip key scroll | in-session | pending |
-| 38.2 | `0.38.2` | Unit tests | in-session | pending |
-| 38.3 | `0.38.3` | Tool definitions + system prompt + smoke tests | in-session | pending |
-| 38.4 | `0.38.4` | Build verification | in-session | pending |
+| 38.1 | `0.38.1` | StateCache isBeingMapped + device/master mapping RPCs + clip key scroll | in-session | done |
+| 38.2 | `0.38.2` | Unit tests | in-session | done |
+| 38.3 | `0.38.3` | Tool definitions + system prompt + smoke tests | in-session | done |
+| 38.4 | `0.38.4` | Build verification | in-session | done |
 
 ### Batch 38.1 — StateCache isBeingMapped + device/master mapping RPCs + clip key scroll
 
