@@ -15,10 +15,10 @@
 
 | Batch | Version | Title | Delegation | Status |
 |-------|---------|-------|------------|--------|
-| 36.1 | `0.36.1` | ApplicationHandler: action RPCs + track group nav | in-session | pending |
-| 36.2 | `0.36.2` | Unit tests | in-session | pending |
-| 36.3 | `0.36.3` | Tool definitions + system prompt + smoke tests | in-session | pending |
-| 36.4 | `0.36.4` | Build verification | in-session | pending |
+| 36.1 | `0.36.1` | ApplicationHandler: action RPCs + track group nav | in-session | done |
+| 36.2 | `0.36.2` | Unit tests | in-session | done |
+| 36.3 | `0.36.3` | Tool definitions + system prompt + smoke tests | in-session | done |
+| 36.4 | `0.36.4` | Build verification | in-session | done |
 
 ### Batch 36.1 — ApplicationHandler: action RPCs + track group nav
 
