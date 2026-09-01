@@ -37,13 +37,14 @@ class EffectTrackHandlerTest {
     @Mock private Device sourceDevice;
     @Mock private Device destinationPlaceholder;
     @Mock private InsertionPoint destinationInsertionPoint;
+    @Mock private DeviceLibrary deviceLibrary;
 
     private JsonRpcDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
         dispatcher = new JsonRpcDispatcher();
-        new EffectTrackHandler(effectTrackBank, List.of(sourceDeviceBank, destinationDeviceBank))
+        new EffectTrackHandler(effectTrackBank, List.of(sourceDeviceBank, destinationDeviceBank), deviceLibrary)
             .register(dispatcher);
 
         when(effectTrackBank.getSizeOfBank()).thenReturn(2);
@@ -69,6 +70,7 @@ class EffectTrackHandlerTest {
     void registersEffectTrackMethods() {
         assertTrue(dispatcher.getRegisteredMethods().contains("effect/getTracks"));
         assertTrue(dispatcher.getRegisteredMethods().contains("effect/copyDeviceToTracks"));
+        assertTrue(dispatcher.getRegisteredMethods().contains("effect/insertDeviceOnTracks"));
     }
 
     @Test
@@ -82,6 +84,19 @@ class EffectTrackHandlerTest {
         assertContains(response, "\"ok\":true");
         assertContains(response, "\"copiedCount\":1");
         verify(destinationInsertionPoint).copyDevices(sourceDevice);
+    }
+
+    @Test
+    void insertsPluginOnceOnValidatedDestinations() {
+        String response = dispatcher.handle(rpc("effect/insertDeviceOnTracks",
+            "{\"device\":{\"kind\":\"plugin\",\"type\":\"vst3\","
+                + "\"id\":\"com.example.room\",\"expectedName\":\"RoomOrbit\"},"
+                + "\"position\":\"end\",\"destinationTracks\":[{"
+                + "\"channelId\":\"destination-id\",\"expectedName\":\"Clap\"}]}"));
+
+        assertContains(response, "\"ok\":true");
+        assertContains(response, "\"insertedCount\":1");
+        verify(destinationInsertionPoint).insertVST3Device("com.example.room");
     }
 
     private void stubTrack(Track track, String id, String name) {

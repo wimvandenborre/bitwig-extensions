@@ -217,7 +217,7 @@ public class GigMaestroExtension extends ControllerExtension {
             }
         }
         new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, drumPadBank, deviceLibrary, transport, host, host::scheduleTask).register(dispatcher);
-        new EffectTrackHandler(effectTrackBank, effectDeviceBanks).register(dispatcher);
+        new EffectTrackHandler(effectTrackBank, effectDeviceBanks, deviceLibrary).register(dispatcher);
         new NoteHandler(cursorClip, stateCache).register(dispatcher);
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, arranger.getHorizontalScrollbarModel(), stateCache).register(dispatcher);
