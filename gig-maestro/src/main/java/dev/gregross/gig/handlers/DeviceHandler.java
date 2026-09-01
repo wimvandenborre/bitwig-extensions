@@ -23,6 +23,7 @@ import static dev.gregross.gig.rpc.JsonParamValidator.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -437,48 +438,77 @@ public class DeviceHandler {
         });
 
         dispatcher.register("device/setDrumPadSend", params -> {
-            DrumPad pad = getExactDrumPad(params);
-            String destinationName = requireString(params, "destinationName");
             double level = requireDouble(params, "level");
-            if (level < 0.0 || level > 1.0) {
-                throw new IllegalArgumentException("level must be 0.0-1.0, got " + level);
-            }
-            String mode = requireString(params, "mode").toUpperCase();
-            if (!mode.equals("AUTO") && !mode.equals("PRE") && !mode.equals("POST")) {
-                throw new IllegalArgumentException("invalid send mode: " + mode + " (expected AUTO, PRE, or POST)");
-            }
+            validateSendLevel(level);
+            String mode = validatedSendMode(requireString(params, "mode"));
             boolean enabled = requireBoolean(params, "enabled");
-
-            SendBank sendBank = pad.sendBank();
-            Send matched = null;
-            int matchedIndex = -1;
-            for (int i = 0; i < sendBank.getSizeOfBank(); i++) {
-                Send candidate = (Send) sendBank.getItemAt(i);
-                if (destinationName.equals(candidate.name().get())) {
-                    if (matched != null) {
-                        throw new IllegalStateException("ambiguous drum pad send destination: " + destinationName);
-                    }
-                    matched = candidate;
-                    matchedIndex = i;
-                }
-            }
-            if (matched == null) {
-                throw new IllegalArgumentException("drum pad send destination not found: " + destinationName);
-            }
-
-            matched.sendMode().set(mode);
-            matched.isEnabled().set(enabled);
-            matched.value().setImmediately(level);
+            ResolvedPadSend resolved = resolvePadSend(params);
+            applyPadSend(resolved.send(), level, mode, enabled);
 
             JsonObject result = new JsonObject();
             result.addProperty("ok", true);
-            result.addProperty("padKey", requireInt(params, "key"));
-            result.addProperty("padName", requireString(params, "expectedPadName"));
-            result.addProperty("destinationName", destinationName);
-            result.addProperty("sendIndex", matchedIndex);
+            result.addProperty("padKey", resolved.key());
+            result.addProperty("padName", resolved.padName());
+            result.addProperty("destinationName", resolved.destinationName());
+            result.addProperty("sendIndex", resolved.sendIndex());
             result.addProperty("requestedLevel", level);
             result.addProperty("requestedMode", mode);
             result.addProperty("requestedEnabled", enabled);
+            return result;
+        });
+
+        dispatcher.register("device/getDrumPadSendRoutes", params -> {
+            requireExactDevice(params);
+            JsonArray routes = requireNonEmptyRoutes(params);
+            JsonArray observed = new JsonArray();
+            Set<String> identities = new HashSet<>();
+            for (JsonElement element : routes) {
+                JsonObject route = requireRouteObject(element);
+                ResolvedPadSend resolved = resolveUniquePadSend(route, identities);
+                observed.add(padSendRouteState(resolved));
+            }
+
+            JsonObject result = new JsonObject();
+            result.addProperty("deviceName", cursorDevice.name().get());
+            result.addProperty("routeCount", observed.size());
+            result.add("routes", observed);
+            return result;
+        });
+
+        dispatcher.register("device/setDrumPadSends", params -> {
+            requireExactDevice(params);
+            JsonArray routes = requireNonEmptyRoutes(params);
+            double level = requireDouble(params, "level");
+            validateSendLevel(level);
+            String mode = validatedSendMode(requireString(params, "mode"));
+            boolean enabled = requireBoolean(params, "enabled");
+
+            // Resolve and validate the full routing table before changing any send.
+            List<ResolvedPadSend> resolvedRoutes = new ArrayList<>();
+            Set<String> identities = new HashSet<>();
+            JsonArray before = new JsonArray();
+            for (JsonElement element : routes) {
+                JsonObject route = requireRouteObject(element);
+                ResolvedPadSend resolved = resolveUniquePadSend(route, identities);
+                resolvedRoutes.add(resolved);
+                before.add(padSendRouteState(resolved));
+            }
+
+            for (ResolvedPadSend resolved : resolvedRoutes) {
+                applyPadSend(resolved.send(), level, mode, enabled);
+            }
+
+            JsonObject requested = new JsonObject();
+            requested.addProperty("level", level);
+            requested.addProperty("mode", mode);
+            requested.addProperty("enabled", enabled);
+
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            result.addProperty("deviceName", cursorDevice.name().get());
+            result.addProperty("routeCount", resolvedRoutes.size());
+            result.add("requested", requested);
+            result.add("before", before);
             return result;
         });
 
@@ -687,6 +717,105 @@ public class DeviceHandler {
         }
         return pad;
     }
+
+    private void requireExactDevice(JsonObject params) {
+        String expectedName = requireString(params, "expectedDeviceName");
+        String actualName = cursorDevice.name().get();
+        if (!expectedName.equals(actualName)) {
+            throw new IllegalStateException("device identity mismatch: expected '" + expectedName
+                + "', found '" + actualName + "'");
+        }
+    }
+
+    private JsonArray requireNonEmptyRoutes(JsonObject params) {
+        JsonArray routes = requireArray(params, "routes");
+        if (routes.isEmpty()) {
+            throw new IllegalArgumentException("routes array must not be empty");
+        }
+        if (routes.size() > 128) {
+            throw new IllegalArgumentException("routes array must contain at most 128 entries");
+        }
+        return routes;
+    }
+
+    private JsonObject requireRouteObject(JsonElement element) {
+        if (!element.isJsonObject()) {
+            throw new IllegalArgumentException("each route must be an object");
+        }
+        return element.getAsJsonObject();
+    }
+
+    private ResolvedPadSend resolveUniquePadSend(JsonObject route, Set<String> identities) {
+        ResolvedPadSend resolved = resolvePadSend(route);
+        String identity = resolved.key() + "\u0000" + resolved.destinationName();
+        if (!identities.add(identity)) {
+            throw new IllegalArgumentException("duplicate drum pad route for key " + resolved.key()
+                + " and destination " + resolved.destinationName());
+        }
+        return resolved;
+    }
+
+    private ResolvedPadSend resolvePadSend(JsonObject params) {
+        DrumPad pad = getExactDrumPad(params);
+        int key = requireInt(params, "key");
+        String padName = requireString(params, "expectedPadName");
+        String destinationName = requireString(params, "destinationName");
+        SendBank sendBank = pad.sendBank();
+        Send matched = null;
+        int matchedIndex = -1;
+        for (int i = 0; i < sendBank.getSizeOfBank(); i++) {
+            Send candidate = (Send) sendBank.getItemAt(i);
+            if (destinationName.equals(candidate.name().get())) {
+                if (matched != null) {
+                    throw new IllegalStateException("ambiguous drum pad send destination: " + destinationName);
+                }
+                matched = candidate;
+                matchedIndex = i;
+            }
+        }
+        if (matched == null) {
+            throw new IllegalArgumentException("drum pad send destination not found: " + destinationName);
+        }
+        return new ResolvedPadSend(key, padName, destinationName, matchedIndex, matched);
+    }
+
+    private void validateSendLevel(double level) {
+        if (level < 0.0 || level > 1.0) {
+            throw new IllegalArgumentException("level must be 0.0-1.0, got " + level);
+        }
+    }
+
+    private String validatedSendMode(String mode) {
+        String normalized = mode.toUpperCase();
+        if (!normalized.equals("AUTO") && !normalized.equals("PRE") && !normalized.equals("POST")) {
+            throw new IllegalArgumentException("invalid send mode: " + normalized
+                + " (expected AUTO, PRE, or POST)");
+        }
+        return normalized;
+    }
+
+    private void applyPadSend(Send send, double level, String mode, boolean enabled) {
+        send.sendMode().set(mode);
+        send.isEnabled().set(enabled);
+        send.value().setImmediately(level);
+    }
+
+    private JsonObject padSendRouteState(ResolvedPadSend resolved) {
+        JsonObject state = sendState(resolved.sendIndex(), resolved.destinationName(), resolved.send());
+        state.addProperty("key", resolved.key());
+        state.addProperty("padName", resolved.padName());
+        state.addProperty("destinationName", resolved.destinationName());
+        state.remove("name");
+        return state;
+    }
+
+    private record ResolvedPadSend(
+        int key,
+        String padName,
+        String destinationName,
+        int sendIndex,
+        Send send
+    ) {}
 
     private JsonObject sendState(int index, String name, Send send) {
         JsonObject state = new JsonObject();

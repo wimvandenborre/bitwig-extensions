@@ -110,6 +110,8 @@ class DeviceHandlerTest {
         assertTrue(methods.contains("device/getDrumPads"));
         assertTrue(methods.contains("device/getDrumPadSends"));
         assertTrue(methods.contains("device/setDrumPadSend"));
+        assertTrue(methods.contains("device/getDrumPadSendRoutes"));
+        assertTrue(methods.contains("device/setDrumPadSends"));
     }
 
     @Test
@@ -128,8 +130,8 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlyThirtySixMethods() {
-        assertEquals(36, dispatcher.getRegisteredMethods().size());
+    void registersExactlyThirtyEightMethods() {
+        assertEquals(38, dispatcher.getRegisteredMethods().size());
     }
 
     @Test
@@ -191,6 +193,58 @@ class DeviceHandlerTest {
 
         assertContains(response, "identity mismatch");
         assertContains(response, "-32603");
+    }
+
+    @Test
+    void setDrumPadSends_validatesAllRoutesBeforeApplying() {
+        SettableStringValue deviceName = mock(SettableStringValue.class);
+        BooleanValue hasDrumPads = mock(BooleanValue.class);
+        DrumPad kickPad = mock(DrumPad.class);
+        DrumPad clapPad = mock(DrumPad.class);
+        BooleanValue kickExists = mock(BooleanValue.class);
+        BooleanValue clapExists = mock(BooleanValue.class);
+        SettableStringValue kickName = mock(SettableStringValue.class);
+        SettableStringValue clapName = mock(SettableStringValue.class);
+        SendBank kickSendBank = mock(SendBank.class);
+        Send kickSend = mock(Send.class);
+        StringValue kickSendName = mock(StringValue.class);
+        SettableRangedValue kickValue = mock(SettableRangedValue.class);
+        SettableEnumValue kickMode = mock(SettableEnumValue.class);
+        SettableBooleanValue kickEnabled = mock(SettableBooleanValue.class);
+
+        when(mockCursorDevice.name()).thenReturn(deviceName);
+        when(deviceName.get()).thenReturn("Drum Machine");
+        when(mockCursorDevice.hasDrumPads()).thenReturn(hasDrumPads);
+        when(hasDrumPads.get()).thenReturn(true);
+        when(mockDrumPadBank.getItemAt(36)).thenReturn(kickPad);
+        when(mockDrumPadBank.getItemAt(37)).thenReturn(clapPad);
+        when(kickPad.exists()).thenReturn(kickExists);
+        when(clapPad.exists()).thenReturn(clapExists);
+        when(kickExists.get()).thenReturn(true);
+        when(clapExists.get()).thenReturn(true);
+        when(kickPad.name()).thenReturn(kickName);
+        when(clapPad.name()).thenReturn(clapName);
+        when(kickName.get()).thenReturn("Kick");
+        when(clapName.get()).thenReturn("Wrong Clap");
+        when(kickPad.sendBank()).thenReturn(kickSendBank);
+        when(kickSendBank.getSizeOfBank()).thenReturn(1);
+        when(kickSendBank.getItemAt(0)).thenReturn(kickSend);
+        when(kickSend.name()).thenReturn(kickSendName);
+        when(kickSendName.get()).thenReturn("Kick FX");
+        when(kickSend.value()).thenReturn(kickValue);
+        when(kickSend.sendMode()).thenReturn(kickMode);
+        when(kickSend.isEnabled()).thenReturn(kickEnabled);
+
+        String response = dispatcher.handle(rpc("device/setDrumPadSends",
+            "{\"expectedDeviceName\":\"Drum Machine\",\"level\":1.0,"
+                + "\"mode\":\"POST\",\"enabled\":true,\"routes\":["
+                + "{\"key\":36,\"expectedPadName\":\"Kick\",\"destinationName\":\"Kick FX\"},"
+                + "{\"key\":37,\"expectedPadName\":\"Clap\",\"destinationName\":\"Clap FX\"}]}"));
+
+        assertContains(response, "identity mismatch");
+        verify(kickMode, never()).set(anyString());
+        verify(kickEnabled, never()).set(anyBoolean());
+        verify(kickValue, never()).setImmediately(anyDouble());
     }
 
     // --- device/hasAutomation validation ---
