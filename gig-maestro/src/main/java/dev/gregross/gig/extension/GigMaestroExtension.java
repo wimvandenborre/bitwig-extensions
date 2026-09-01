@@ -86,6 +86,14 @@ public class GigMaestroExtension extends ControllerExtension {
                 (com.bitwig.extension.controller.api.DrumPad) drumPadBank.getItemAt(i);
             pad.name().markInterested();
             pad.exists().markInterested();
+            SendBank padSendBank = pad.sendBank();
+            for (int sendIndex = 0; sendIndex < SEND_COUNT; sendIndex++) {
+                Send send = (Send) padSendBank.getItemAt(sendIndex);
+                send.name().markInterested();
+                send.value().markInterested();
+                send.sendMode().markInterested();
+                send.isEnabled().markInterested();
+            }
         }
 
         // Create master cursor device for master bus FX
