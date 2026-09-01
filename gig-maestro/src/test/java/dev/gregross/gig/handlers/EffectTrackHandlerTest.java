@@ -71,6 +71,7 @@ class EffectTrackHandlerTest {
         assertTrue(dispatcher.getRegisteredMethods().contains("effect/getTracks"));
         assertTrue(dispatcher.getRegisteredMethods().contains("effect/copyDeviceToTracks"));
         assertTrue(dispatcher.getRegisteredMethods().contains("effect/insertDeviceOnTracks"));
+        assertTrue(dispatcher.getRegisteredMethods().contains("effect/renameTracks"));
     }
 
     @Test
@@ -97,6 +98,19 @@ class EffectTrackHandlerTest {
         assertContains(response, "\"ok\":true");
         assertContains(response, "\"insertedCount\":1");
         verify(destinationInsertionPoint).insertVST3Device("com.example.room");
+    }
+
+    @Test
+    void renamesValidatedTracksInOneRequest() {
+        String response = dispatcher.handle(rpc("effect/renameTracks",
+            "{\"renames\":[{\"channelId\":\"source-id\",\"expectedName\":\"Kick\","
+                + "\"newName\":\"Kick_FX\"},{\"channelId\":\"destination-id\","
+                + "\"expectedName\":\"Clap\",\"newName\":\"Clap_FX\"}]}"));
+
+        assertContains(response, "\"ok\":true");
+        assertContains(response, "\"renameCount\":2");
+        verify(sourceTrack.name()).set("Kick_FX");
+        verify(destinationTrack.name()).set("Clap_FX");
     }
 
     private void stubTrack(Track track, String id, String name) {

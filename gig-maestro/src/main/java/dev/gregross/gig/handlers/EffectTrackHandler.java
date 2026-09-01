@@ -174,6 +174,73 @@ public class EffectTrackHandler {
             result.add("alreadyPresent", alreadyPresent);
             return result;
         });
+
+        dispatcher.register("effect/renameTracks", params -> {
+            JsonArray renameRequests = requireArray(params, "renames");
+            if (renameRequests.isEmpty()) {
+                throw new IllegalArgumentException("renames array must not be empty");
+            }
+            if (renameRequests.size() > effectTrackBank.getSizeOfBank()) {
+                throw new IllegalArgumentException("too many rename requests");
+            }
+
+            List<TrackRename> renames = new ArrayList<>();
+            Set<String> targetIds = new HashSet<>();
+            Set<String> newNames = new HashSet<>();
+            for (JsonElement element : renameRequests) {
+                if (!element.isJsonObject()) {
+                    throw new IllegalArgumentException("each rename request must be an object");
+                }
+                JsonObject request = element.getAsJsonObject();
+                EffectTrack track = resolveTrack(request);
+                String newName = requireString(request, "newName");
+                if (newName.isBlank()) {
+                    throw new IllegalArgumentException("newName must not be blank");
+                }
+                if (!targetIds.add(track.channelId())) {
+                    throw new IllegalArgumentException("duplicate rename target: " + track.name());
+                }
+                if (!newNames.add(newName)) {
+                    throw new IllegalArgumentException("duplicate new effect track name: " + newName);
+                }
+                renames.add(new TrackRename(track, newName));
+            }
+
+            // Reject collisions with tracks outside the validated rename set.
+            for (int i = 0; i < effectTrackBank.getSizeOfBank(); i++) {
+                Track existing = (Track) effectTrackBank.getItemAt(i);
+                if (!existing.exists().get() || targetIds.contains(existing.channelId().get())) {
+                    continue;
+                }
+                if (newNames.contains(existing.name().get())) {
+                    throw new IllegalStateException("effect track name already exists: " + existing.name().get());
+                }
+            }
+
+            JsonArray before = new JsonArray();
+            for (TrackRename rename : renames) {
+                before.add(trackState(rename.track()));
+            }
+            for (TrackRename rename : renames) {
+                rename.track().track().name().set(rename.newName());
+            }
+
+            JsonArray requested = new JsonArray();
+            for (TrackRename rename : renames) {
+                JsonObject state = new JsonObject();
+                state.addProperty("channelId", rename.track().channelId());
+                state.addProperty("expectedName", rename.track().name());
+                state.addProperty("newName", rename.newName());
+                requested.add(state);
+            }
+
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            result.addProperty("renameCount", renames.size());
+            result.add("before", before);
+            result.add("requested", requested);
+            return result;
+        });
     }
 
     private JsonObject getTracks() {
@@ -335,4 +402,6 @@ public class EffectTrackHandler {
         String pluginType,
         String pluginId
     ) {}
+
+    private record TrackRename(EffectTrack track, String newName) {}
 }
