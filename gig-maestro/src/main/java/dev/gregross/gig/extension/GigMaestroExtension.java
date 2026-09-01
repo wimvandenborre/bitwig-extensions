@@ -12,6 +12,7 @@ import dev.gregross.gig.handlers.ClipHandler;
 import dev.gregross.gig.handlers.DetailEditorHandler;
 import dev.gregross.gig.handlers.DeviceHandler;
 import dev.gregross.gig.handlers.DeviceLibrary;
+import dev.gregross.gig.handlers.EffectTrackHandler;
 import dev.gregross.gig.handlers.GrooveHandler;
 import dev.gregross.gig.handlers.MacroHandler;
 import dev.gregross.gig.handlers.MixerHandler;
@@ -34,6 +35,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class GigMaestroExtension extends ControllerExtension {
@@ -42,6 +45,8 @@ public class GigMaestroExtension extends ControllerExtension {
     private static final int TRACK_COUNT = 8;
     private static final int SEND_COUNT = 4;
     private static final int LAYER_SEND_COUNT = 32;
+    private static final int EFFECT_TRACK_COUNT = 32;
+    private static final int EFFECT_DEVICE_COUNT = 16;
     private static final int SCENE_COUNT = 5;
     private static final int CLIP_GRID_WIDTH = 256;
     private static final int CLIP_GRID_HEIGHT = 128;
@@ -70,6 +75,25 @@ public class GigMaestroExtension extends ControllerExtension {
         trackBank.sceneBank().setIndication(true);
         MasterTrack masterTrack = host.createMasterTrack(0);
         Application application = host.createApplication();
+
+        // Observe effect tracks and their top-level device chains for exact bulk device copies.
+        TrackBank effectTrackBank = host.createEffectTrackBank(EFFECT_TRACK_COUNT, 0, 0);
+        effectTrackBank.itemCount().markInterested();
+        List<DeviceBank> effectDeviceBanks = new ArrayList<>();
+        for (int trackIndex = 0; trackIndex < EFFECT_TRACK_COUNT; trackIndex++) {
+            Track effectTrack = (Track) effectTrackBank.getItemAt(trackIndex);
+            effectTrack.exists().markInterested();
+            effectTrack.name().markInterested();
+            effectTrack.channelId().markInterested();
+            DeviceBank deviceBank = effectTrack.createDeviceBank(EFFECT_DEVICE_COUNT);
+            deviceBank.itemCount().markInterested();
+            effectDeviceBanks.add(deviceBank);
+            for (int deviceIndex = 0; deviceIndex < EFFECT_DEVICE_COUNT; deviceIndex++) {
+                Device device = (Device) deviceBank.getItemAt(deviceIndex);
+                device.exists().markInterested();
+                device.name().markInterested();
+            }
+        }
 
         // Create cursor objects for device navigation
         // Layer channels (including Drum Machine pads) inherit the cursor's send-bank size.
@@ -193,6 +217,7 @@ public class GigMaestroExtension extends ControllerExtension {
             }
         }
         new DeviceHandler(cursorTrack, cursorDevice, remoteControlsPage, drumPadBank, deviceLibrary, transport, host, host::scheduleTask).register(dispatcher);
+        new EffectTrackHandler(effectTrackBank, effectDeviceBanks).register(dispatcher);
         new NoteHandler(cursorClip, stateCache).register(dispatcher);
         new SceneHandler(trackBank.sceneBank(), project, stateCache).register(dispatcher);
         new ArrangerHandler(arranger, transport, cueMarkerBank, arranger.getHorizontalScrollbarModel(), stateCache).register(dispatcher);
