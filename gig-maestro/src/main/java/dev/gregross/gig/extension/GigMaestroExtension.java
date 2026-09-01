@@ -71,7 +71,10 @@ public class GigMaestroExtension extends ControllerExtension {
         Application application = host.createApplication();
 
         // Create cursor objects for device navigation
-        CursorTrack cursorTrack = host.createCursorTrack("gig-cursor", "Gig Maestro", 0, SCENE_COUNT, true);
+        // Layer channels (including Drum Machine pads) inherit the cursor's send-bank size.
+        // Request the same capacity as the main track bank so their layered-mixer sends exist.
+        CursorTrack cursorTrack = host.createCursorTrack(
+            "gig-cursor", "Gig Maestro", SEND_COUNT, SCENE_COUNT, true);
         CursorDevice cursorDevice = cursorTrack.createCursorDevice("gig-device", "Gig Device", 0,
             CursorDeviceFollowMode.FOLLOW_SELECTION);
         CursorRemoteControlsPage remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
