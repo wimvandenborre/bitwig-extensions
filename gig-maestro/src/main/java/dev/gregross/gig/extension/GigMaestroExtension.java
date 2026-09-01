@@ -33,6 +33,7 @@ import dev.gregross.gig.server.ServerManager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
 
 public class GigMaestroExtension extends ControllerExtension {
@@ -45,6 +46,8 @@ public class GigMaestroExtension extends ControllerExtension {
     private static final int CLIP_GRID_HEIGHT = 128;
     private static final String BITWIG_DEVICE_LIBRARY =
         "/Applications/Bitwig Studio.app/Contents/Resources/Library/devices";
+    private static final Path AUTH_TOKEN_FILE = Paths.get(
+        System.getProperty("user.home"), ".gig-maestro", "token");
 
     private final ControllerHost host;
     private JsonRpcDispatcher dispatcher;
@@ -193,11 +196,16 @@ public class GigMaestroExtension extends ControllerExtension {
 
         // Start servers
         try {
-            serverManager.start(DEFAULT_PORT, this::handleRequest);
+            String authToken = Files.readString(AUTH_TOKEN_FILE).trim();
+            if (authToken.length() < 32) {
+                host.errorln("Gig Maestro token must contain at least 32 characters: " + AUTH_TOKEN_FILE);
+                return;
+            }
+            serverManager.start(DEFAULT_PORT, authToken, this::handleRequest);
             host.println("Gig Maestro started — HTTP on port " + DEFAULT_PORT
                 + ", WebSocket on port " + (DEFAULT_PORT + 1));
         } catch (IOException e) {
-            host.errorln("Failed to start Gig Maestro servers: " + e.getMessage());
+            host.errorln("Failed to load token or start Gig Maestro servers: " + e.getMessage());
         }
     }
 

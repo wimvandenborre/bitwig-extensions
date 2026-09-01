@@ -11,12 +11,13 @@ public class ServerManager {
     private HttpRpcServer httpServer;
     private WsRpcServer wsServer;
 
-    public void start(int httpPort, Function<String, CompletableFuture<String>> requestHandler) throws IOException {
-        httpServer = new HttpRpcServer(httpPort, requestHandler);
+    public void start(int httpPort, String authToken,
+                      Function<String, CompletableFuture<String>> requestHandler) throws IOException {
+        httpServer = new HttpRpcServer(httpPort, authToken, requestHandler);
         httpServer.start();
 
         int wsPort = httpPort + 1;
-        wsServer = new WsRpcServer(wsPort, requestHandler);
+        wsServer = new WsRpcServer(wsPort, authToken, requestHandler);
         wsServer.start();
     }
 

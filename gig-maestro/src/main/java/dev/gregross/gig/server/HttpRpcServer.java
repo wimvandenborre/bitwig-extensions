@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -16,10 +17,13 @@ import java.util.function.Function;
 public class HttpRpcServer {
 
     private final HttpServer server;
+    private final String authToken;
     private static final long TIMEOUT_MS = 5000;
 
-    public HttpRpcServer(int port, Function<String, CompletableFuture<String>> requestHandler) throws IOException {
-        server = HttpServer.create(new InetSocketAddress(port), 0);
+    public HttpRpcServer(int port, String authToken,
+                         Function<String, CompletableFuture<String>> requestHandler) throws IOException {
+        this.authToken = authToken;
+        server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), port), 0);
         server.setExecutor(Executors.newFixedThreadPool(4));
 
         server.createContext("/rpc", exchange -> handleRpc(exchange, requestHandler));
@@ -40,11 +44,14 @@ public class HttpRpcServer {
     }
 
     private void handleRpc(HttpExchange exchange, Function<String, CompletableFuture<String>> requestHandler) throws IOException {
-        addCorsHeaders(exchange);
-
         if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(204, -1);
             exchange.close();
+            return;
+        }
+
+        if (!isAuthorized(exchange)) {
+            sendUnauthorized(exchange);
             return;
         }
 
@@ -75,17 +82,26 @@ public class HttpRpcServer {
     }
 
     private void handleHealth(HttpExchange exchange) throws IOException {
-        addCorsHeaders(exchange);
+        if (!isAuthorized(exchange)) {
+            sendUnauthorized(exchange);
+            return;
+        }
         sendResponse(exchange, 200, "{\"status\":\"ok\",\"version\":\"0.1.0\"}");
     }
 
     private void handleDocs(HttpExchange exchange) throws IOException {
-        addCorsHeaders(exchange);
+        if (!isAuthorized(exchange)) {
+            sendUnauthorized(exchange);
+            return;
+        }
         serveClasspathResource(exchange, "/docs/api.html", "text/html");
     }
 
     private void handleOpenApiSpec(HttpExchange exchange) throws IOException {
-        addCorsHeaders(exchange);
+        if (!isAuthorized(exchange)) {
+            sendUnauthorized(exchange);
+            return;
+        }
         serveClasspathResource(exchange, "/docs/openapi.json", "application/json");
     }
 
@@ -113,9 +129,16 @@ public class HttpRpcServer {
         }
     }
 
-    private void addCorsHeaders(HttpExchange exchange) {
-        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
+    private boolean isAuthorized(HttpExchange exchange) {
+        return BearerAuth.matches(exchange.getRequestHeaders().getFirst("Authorization"), authToken);
+    }
+
+    private void sendUnauthorized(HttpExchange exchange) throws IOException {
+        exchange.getResponseHeaders().set("WWW-Authenticate", "Bearer");
+        sendResponse(exchange, 401, "{\"error\":\"Unauthorized\"}");
+    }
+
+    InetSocketAddress getAddress() {
+        return server.getAddress();
     }
 }

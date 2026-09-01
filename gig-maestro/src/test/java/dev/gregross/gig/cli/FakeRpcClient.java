@@ -17,7 +17,7 @@ class FakeRpcClient extends RpcClient {
     private String defaultRawResult = "{\"jsonrpc\":\"2.0\",\"result\":\"ok\",\"id\":1}";
 
     FakeRpcClient() {
-        super("localhost", 0); // base URL never used
+        super("localhost", 0, "test-token"); // base URL never used
     }
 
     @Override

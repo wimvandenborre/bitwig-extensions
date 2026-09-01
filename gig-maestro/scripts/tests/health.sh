@@ -6,7 +6,7 @@
 
 # --- 1. Health Check ---
 echo "--- Health Check ---"
-HEALTH=$(curl -s "${BASE}/health")
+HEALTH=$(curl -s -H "Authorization: Bearer ${AUTH_TOKEN}" "${BASE}/health")
 assert_contains "GET /health returns status ok" "$HEALTH" '"status":"ok"'
 assert_contains "GET /health returns version" "$HEALTH" '"version":"0.1.0"'
 

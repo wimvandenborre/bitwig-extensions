@@ -16,12 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpRpcServerTest {
 
     private static final int TEST_PORT = 19787;
+    private static final String TEST_TOKEN = "0123456789abcdef0123456789abcdef";
     private HttpRpcServer server;
     private final HttpClient client = HttpClient.newHttpClient();
 
     @BeforeEach
     void setUp() throws IOException {
-        server = new HttpRpcServer(TEST_PORT, body -> {
+        server = new HttpRpcServer(TEST_PORT, TEST_TOKEN, body -> {
             if (body.contains("\"echo\"")) {
                 return CompletableFuture.completedFuture(
                     "{\"jsonrpc\":\"2.0\",\"result\":\"pong\",\"id\":1}");
@@ -40,6 +41,7 @@ class HttpRpcServerTest {
     void healthEndpointReturnsOk() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:" + TEST_PORT + "/health"))
+            .header("Authorization", "Bearer " + TEST_TOKEN)
             .GET()
             .build();
 
@@ -56,6 +58,7 @@ class HttpRpcServerTest {
             .POST(HttpRequest.BodyPublishers.ofString(
                 "{\"jsonrpc\":\"2.0\",\"method\":\"echo\",\"id\":1}"))
             .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + TEST_TOKEN)
             .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -70,6 +73,7 @@ class HttpRpcServerTest {
             .POST(HttpRequest.BodyPublishers.ofString(
                 "{\"jsonrpc\":\"2.0\",\"method\":\"notify\"}"))
             .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + TEST_TOKEN)
             .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -80,6 +84,7 @@ class HttpRpcServerTest {
     void rpcRejectsGetMethod() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:" + TEST_PORT + "/rpc"))
+            .header("Authorization", "Bearer " + TEST_TOKEN)
             .GET()
             .build();
 
@@ -88,13 +93,19 @@ class HttpRpcServerTest {
     }
 
     @Test
-    void corsHeadersPresent() throws Exception {
+    void unauthenticatedRequestIsRejected() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:" + TEST_PORT + "/health"))
             .GET()
             .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals("*", response.headers().firstValue("Access-Control-Allow-Origin").orElse(""));
+        assertEquals(401, response.statusCode());
+        assertTrue(response.body().contains("Unauthorized"));
+    }
+
+    @Test
+    void serverBindsOnlyToLoopback() {
+        assertTrue(server.getAddress().getAddress().isLoopbackAddress());
     }
 }

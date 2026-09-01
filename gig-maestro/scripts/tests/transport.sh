@@ -69,5 +69,6 @@ assert_contains "batch response has id 51" "$BATCH" '"id":51'
 
 echo "--- HTTP Method Enforcement ---"
 
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${BASE}/rpc")
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+  -H "Authorization: Bearer ${AUTH_TOKEN}" "${BASE}/rpc")
 assert_equals "GET /rpc returns 405" "$HTTP_CODE" "405"

@@ -269,6 +269,9 @@ for (const tool of tools) {
             },
           },
         },
+        401: {
+          description: "Missing or invalid bearer token",
+        },
       },
     },
   };
@@ -303,6 +306,7 @@ const spec = {
       "All methods are invoked as POST requests to a single endpoint (`/rpc`). " +
       "This spec models each RPC method as its own path for interactive documentation. " +
       "In practice, all requests go to `POST /rpc` with the method name in the JSON body.\n\n" +
+      "**Authentication:** Bearer token from `~/.gig-maestro/token`\n\n" +
       "**HTTP Endpoint:** `POST http://localhost:8787/rpc`\n\n" +
       "**WebSocket Endpoint:** `ws://localhost:8788/` (real-time state streaming)\n\n" +
       "**Protocol:** JSON-RPC 2.0",
@@ -314,8 +318,15 @@ const spec = {
     },
   ],
   tags,
+  security: [{ bearerAuth: [] }],
   paths,
   components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+      },
+    },
     schemas: {
       JsonRpcResponse: {
         type: "object",

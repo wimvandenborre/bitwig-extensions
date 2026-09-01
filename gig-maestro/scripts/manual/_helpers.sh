@@ -7,6 +7,9 @@
 
 PORT="${PORT:-8787}"
 BASE="${BASE:-http://localhost:${PORT}}"
+TOKEN_FILE="${GIG_MAESTRO_TOKEN_FILE:-${HOME}/.gig-maestro/token}"
+AUTH_TOKEN=""
+[ -f "$TOKEN_FILE" ] && AUTH_TOKEN="$(tr -d '\r\n' < "$TOKEN_FILE")"
 
 # --- counters ---
 
@@ -28,6 +31,7 @@ _fetch_time_sig() {
     local snap
     snap=$(curl -s -X POST "${BASE}/rpc" \
       -H "Content-Type: application/json" \
+      -H "Authorization: Bearer ${AUTH_TOKEN}" \
       -d '{"jsonrpc":"2.0","method":"session/snapshot","id":0}')
     _TS_NUM=$(echo "$snap" | python3 -c "import sys,json; print(json.load(sys.stdin)['result']['transport']['timeSignatureNumerator'])")
     _TS_DENOM=$(echo "$snap" | python3 -c "import sys,json; print(json.load(sys.stdin)['result']['transport']['timeSignatureDenominator'])")
@@ -100,6 +104,7 @@ print(round(10 ** ((db - 6) / 60.0), 4))
 rpc() {
   curl -s -X POST "${BASE}/rpc" \
     -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${AUTH_TOKEN}" \
     -d "$1"
 }
 

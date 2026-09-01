@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -15,11 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class WsRpcServerTest {
 
     private static final int TEST_PORT = 19788;
+    private static final String TEST_TOKEN = "0123456789abcdef0123456789abcdef";
     private WsRpcServer server;
 
     @BeforeEach
     void setUp() throws Exception {
-        server = new WsRpcServer(TEST_PORT, body -> {
+        server = new WsRpcServer(TEST_PORT, TEST_TOKEN, body -> {
             if (body.contains("\"echo\"")) {
                 return CompletableFuture.completedFuture(
                     "{\"jsonrpc\":\"2.0\",\"result\":\"pong\",\"id\":1}");
@@ -39,12 +41,7 @@ class WsRpcServerTest {
     void clientReceivesResponse() throws Exception {
         CompletableFuture<String> responseFuture = new CompletableFuture<>();
 
-        WebSocketClient client = new WebSocketClient(URI.create("ws://localhost:" + TEST_PORT)) {
-            @Override public void onOpen(ServerHandshake handshake) {}
-            @Override public void onMessage(String message) { responseFuture.complete(message); }
-            @Override public void onClose(int code, String reason, boolean remote) {}
-            @Override public void onError(Exception ex) { responseFuture.completeExceptionally(ex); }
-        };
+        WebSocketClient client = authorizedClient(responseFuture);
 
         client.connectBlocking(2, TimeUnit.SECONDS);
         client.send("{\"jsonrpc\":\"2.0\",\"method\":\"echo\",\"id\":1}");
@@ -54,16 +51,22 @@ class WsRpcServerTest {
         client.closeBlocking();
     }
 
+    private WebSocketClient authorizedClient(CompletableFuture<String> messageFuture) {
+        return new WebSocketClient(
+            URI.create("ws://localhost:" + TEST_PORT),
+            Map.of("Authorization", "Bearer " + TEST_TOKEN)) {
+            @Override public void onOpen(ServerHandshake handshake) {}
+            @Override public void onMessage(String message) { messageFuture.complete(message); }
+            @Override public void onClose(int code, String reason, boolean remote) {}
+            @Override public void onError(Exception ex) { messageFuture.completeExceptionally(ex); }
+        };
+    }
+
     @Test
     void notificationSendsNoResponse() throws Exception {
         CompletableFuture<String> responseFuture = new CompletableFuture<>();
 
-        WebSocketClient client = new WebSocketClient(URI.create("ws://localhost:" + TEST_PORT)) {
-            @Override public void onOpen(ServerHandshake handshake) {}
-            @Override public void onMessage(String message) { responseFuture.complete(message); }
-            @Override public void onClose(int code, String reason, boolean remote) {}
-            @Override public void onError(Exception ex) {}
-        };
+        WebSocketClient client = authorizedClient(responseFuture);
 
         client.connectBlocking(2, TimeUnit.SECONDS);
         client.send("{\"jsonrpc\":\"2.0\",\"method\":\"notify\"}");
@@ -77,12 +80,7 @@ class WsRpcServerTest {
     void broadcastReachesClients() throws Exception {
         CompletableFuture<String> broadcastFuture = new CompletableFuture<>();
 
-        WebSocketClient client = new WebSocketClient(URI.create("ws://localhost:" + TEST_PORT)) {
-            @Override public void onOpen(ServerHandshake handshake) {}
-            @Override public void onMessage(String message) { broadcastFuture.complete(message); }
-            @Override public void onClose(int code, String reason, boolean remote) {}
-            @Override public void onError(Exception ex) {}
-        };
+        WebSocketClient client = authorizedClient(broadcastFuture);
 
         client.connectBlocking(2, TimeUnit.SECONDS);
         Thread.sleep(100);
@@ -108,12 +106,7 @@ class WsRpcServerTest {
     void tracksClientCount() throws Exception {
         assertEquals(0, server.getClientCount());
 
-        WebSocketClient client = new WebSocketClient(URI.create("ws://localhost:" + TEST_PORT)) {
-            @Override public void onOpen(ServerHandshake handshake) {}
-            @Override public void onMessage(String message) {}
-            @Override public void onClose(int code, String reason, boolean remote) {}
-            @Override public void onError(Exception ex) {}
-        };
+        WebSocketClient client = authorizedClient(new CompletableFuture<>());
 
         client.connectBlocking(2, TimeUnit.SECONDS);
         Thread.sleep(100);
@@ -122,6 +115,26 @@ class WsRpcServerTest {
         client.closeBlocking();
         Thread.sleep(200);
         assertEquals(0, server.getClientCount());
+    }
+
+    @Test
+    void unauthenticatedClientIsRejected() throws Exception {
+        CompletableFuture<Integer> closeCode = new CompletableFuture<>();
+        WebSocketClient client = new WebSocketClient(URI.create("ws://localhost:" + TEST_PORT)) {
+            @Override public void onOpen(ServerHandshake handshake) {}
+            @Override public void onMessage(String message) {}
+            @Override public void onClose(int code, String reason, boolean remote) { closeCode.complete(code); }
+            @Override public void onError(Exception ex) {}
+        };
+
+        client.connectBlocking(2, TimeUnit.SECONDS);
+        assertEquals(1008, closeCode.get(2, TimeUnit.SECONDS));
+        assertEquals(0, server.getClientCount());
+    }
+
+    @Test
+    void serverBindsOnlyToLoopback() {
+        assertTrue(server.getAddress().getAddress().isLoopbackAddress());
     }
 
     // --- Subscription management (unit tests) ---

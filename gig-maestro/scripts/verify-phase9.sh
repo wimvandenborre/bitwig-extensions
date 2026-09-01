@@ -16,6 +16,9 @@ set -euo pipefail
 
 PORT="${1:-8787}"
 BASE="http://localhost:${PORT}"
+TOKEN_FILE="${GIG_MAESTRO_TOKEN_FILE:-${HOME}/.gig-maestro/token}"
+AUTH_TOKEN=""
+[ -f "$TOKEN_FILE" ] && AUTH_TOKEN="$(tr -d '\r\n' < "$TOKEN_FILE")"
 PASS=0
 FAIL=0
 TOTAL=0
@@ -31,6 +34,7 @@ NC='\033[0m'
 rpc() {
   curl -s -X POST "${BASE}/rpc" \
     -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${AUTH_TOKEN}" \
     -d "$1"
 }
 

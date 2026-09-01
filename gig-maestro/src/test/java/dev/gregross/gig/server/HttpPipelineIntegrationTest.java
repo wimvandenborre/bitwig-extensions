@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpPipelineIntegrationTest {
 
     private static final int TEST_PORT = 19888;
+    private static final String TEST_TOKEN = "0123456789abcdef0123456789abcdef";
     private HttpRpcServer server;
     private ScheduledExecutorService drainExecutor;
     private final HttpClient client = HttpClient.newHttpClient();
@@ -38,7 +39,7 @@ class HttpPipelineIntegrationTest {
         CommandQueue queue = new CommandQueue();
 
         // Wire HTTP server to enqueue into CommandQueue
-        server = new HttpRpcServer(TEST_PORT, queue::enqueue);
+        server = new HttpRpcServer(TEST_PORT, TEST_TOKEN, queue::enqueue);
         server.start();
 
         // Simulate Bitwig's flush cycle — drain queue every 10ms
@@ -106,6 +107,7 @@ class HttpPipelineIntegrationTest {
             .uri(URI.create("http://localhost:" + TEST_PORT + "/rpc"))
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + TEST_TOKEN)
             .build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }

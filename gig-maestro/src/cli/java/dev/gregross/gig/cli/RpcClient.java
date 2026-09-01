@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Minimal JSON-RPC 2.0 client that POSTs to Gig Maestro's HTTP server.
@@ -22,11 +24,26 @@ class RpcClient {
 
     private final String baseUrl;
     private final HttpClient httpClient;
+    private final String authToken;
     private int nextId = 1;
 
     RpcClient(String host, int port) {
+        this(host, port, loadToken());
+    }
+
+    RpcClient(String host, int port, String authToken) {
         this.baseUrl = "http://" + host + ":" + port + "/rpc";
         this.httpClient = HttpClient.newHttpClient();
+        this.authToken = authToken;
+    }
+
+    static String loadToken() {
+        Path tokenFile = Path.of(System.getProperty("user.home"), ".gig-maestro", "token");
+        try {
+            return Files.readString(tokenFile).trim();
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot read Gig Maestro token: " + tokenFile, e);
+        }
     }
 
     /**
@@ -42,6 +59,7 @@ class RpcClient {
         HttpRequest httpRequest = HttpRequest.newBuilder()
             .uri(URI.create(baseUrl))
             .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + authToken)
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(request)))
             .build();
 
@@ -63,6 +81,7 @@ class RpcClient {
         HttpRequest httpRequest = HttpRequest.newBuilder()
             .uri(URI.create(baseUrl))
             .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + authToken)
             .POST(HttpRequest.BodyPublishers.ofString(requestJson))
             .build();
 

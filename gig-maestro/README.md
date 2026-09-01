@@ -27,8 +27,8 @@ graph TB
 
 The extension runs inside Bitwig as a controller script. It starts an HTTP
 server accepting JSON-RPC 2.0 requests and a WebSocket server for real-time
-state subscriptions. External clients connect over the network to read and
-manipulate the Bitwig session.
+state subscriptions. Local authenticated clients connect over loopback to read
+and manipulate the Bitwig session. Gig Maestro does not listen on LAN interfaces.
 
 ### Request Flow
 
@@ -82,6 +82,17 @@ Build the CLI:
 
 The extension JAR is output directly to the Bitwig Extensions directory.
 
+Create the local bearer token before enabling the extension:
+
+```sh
+mkdir -p ~/.gig-maestro
+openssl rand -hex 32 > ~/.gig-maestro/token
+chmod 600 ~/.gig-maestro/token
+```
+
+The extension refuses to start its servers when the token is missing or shorter
+than 32 characters. The CLI reads the same token file automatically.
+
 To enable it in Bitwig:
 
 1. Open Bitwig Studio
@@ -97,6 +108,7 @@ Once the extension is enabled in Bitwig, the HTTP server starts on port 8787.
 
 ```sh
 curl -s http://localhost:8787/rpc \
+  -H "Authorization: Bearer $(<~/.gig-maestro/token)" \
   -d '{"jsonrpc":"2.0","method":"session/snapshot","params":{},"id":1}' | jq .result
 ```
 
@@ -104,6 +116,7 @@ curl -s http://localhost:8787/rpc \
 
 ```sh
 curl -s http://localhost:8787/rpc \
+  -H "Authorization: Bearer $(<~/.gig-maestro/token)" \
   -d '{"jsonrpc":"2.0","method":"transport/play","params":{},"id":1}'
 ```
 
@@ -175,7 +188,9 @@ sequenceDiagram
 
 ```sh
 # Use the macro/buildSong RPC to create an entire arrangement
-curl -s http://localhost:8787/rpc -d '{
+curl -s http://localhost:8787/rpc \
+  -H "Authorization: Bearer $(<~/.gig-maestro/token)" \
+  -d '{
   "jsonrpc":"2.0",
   "method":"macro/buildSong",
   "params":{
@@ -221,6 +236,16 @@ gig rpc '{"jsonrpc":"2.0","method":"browser/commit","params":{},"id":1}'
 - [OpenAPI Spec](docs/openapi.json) -- machine-readable API definition (OpenAPI 3.1)
 
 The interactive docs are also available as a [static HTML page](docs/api.html) that can be opened locally.
+
+Authorize the interactive docs with the contents of `~/.gig-maestro/token`
+before using **Try It**.
+
+## Security
+
+- HTTP and WebSocket servers bind only to the operating system loopback address.
+- RPC, health, documentation, and WebSocket access require the local bearer token.
+- Cross-origin access is not enabled.
+- Keep `~/.gig-maestro/token` private and never commit it.
 
 ## Testing
 

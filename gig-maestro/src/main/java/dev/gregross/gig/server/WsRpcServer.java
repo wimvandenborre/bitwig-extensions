@@ -9,6 +9,7 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,17 +28,24 @@ public class WsRpcServer extends WebSocketServer {
     );
 
     private final Function<String, CompletableFuture<String>> requestHandler;
+    private final String authToken;
     private final Set<WebSocket> clients = new CopyOnWriteArraySet<>();
     private final Map<WebSocket, Set<String>> subscriptions = new ConcurrentHashMap<>();
 
-    public WsRpcServer(int port, Function<String, CompletableFuture<String>> requestHandler) {
-        super(new InetSocketAddress(port));
+    public WsRpcServer(int port, String authToken,
+                       Function<String, CompletableFuture<String>> requestHandler) {
+        super(new InetSocketAddress(InetAddress.getLoopbackAddress(), port));
+        this.authToken = authToken;
         this.requestHandler = requestHandler;
         setReuseAddr(true);
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        if (!BearerAuth.matches(handshake.getFieldValue("Authorization"), authToken)) {
+            conn.close(1008, "Unauthorized");
+            return;
+        }
         clients.add(conn);
     }
 

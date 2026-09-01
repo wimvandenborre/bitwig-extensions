@@ -8,6 +8,9 @@
 
 PORT="${PORT:-8787}"
 BASE="${BASE:-http://localhost:${PORT}}"
+TOKEN_FILE="${GIG_MAESTRO_TOKEN_FILE:-${HOME}/.gig-maestro/token}"
+AUTH_TOKEN=""
+[ -f "$TOKEN_FILE" ] && AUTH_TOKEN="$(tr -d '\r\n' < "$TOKEN_FILE")"
 
 # --- paths ---
 
@@ -31,6 +34,7 @@ TOTAL=${TOTAL:-0}
 rpc() {
   curl -s -X POST "${BASE}/rpc" \
     -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${AUTH_TOKEN}" \
     -d "$1"
 }
 

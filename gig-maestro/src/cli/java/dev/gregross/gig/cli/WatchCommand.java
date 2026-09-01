@@ -10,6 +10,7 @@ import picocli.CommandLine.ParentCommand;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 @Command(
@@ -31,7 +32,9 @@ class WatchCommand implements Runnable {
         String wsUrl = "ws://" + parent.host + ":" + wsPort;
         CountDownLatch closeLatch = new CountDownLatch(1);
 
-        WebSocketClient client = new WebSocketClient(URI.create(wsUrl)) {
+        WebSocketClient client = new WebSocketClient(
+            URI.create(wsUrl),
+            Map.of("Authorization", "Bearer " + RpcClient.loadToken())) {
             @Override
             public void onOpen(ServerHandshake handshake) {
                 if (topics != null && !topics.isEmpty()) {
