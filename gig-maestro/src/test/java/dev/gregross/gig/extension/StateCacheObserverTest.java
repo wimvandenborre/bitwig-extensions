@@ -4,6 +4,7 @@ import com.bitwig.extension.callback.BooleanValueChangedCallback;
 import com.bitwig.extension.callback.DoubleValueChangedCallback;
 import com.bitwig.extension.callback.StringValueChangedCallback;
 import com.bitwig.extension.controller.api.*;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -93,6 +94,22 @@ class StateCacheObserverTest {
         captor.getValue().valueChanged("Synth Lead");
 
         assertEquals("Synth Lead", cache.getTrackName(0));
+    }
+
+    @Test
+    void registerObservers_registersTrackChannelIdCallback() {
+        Track track0 = (Track) trackBank.getItemAt(0);
+
+        ArgumentCaptor<StringValueChangedCallback> captor =
+                ArgumentCaptor.forClass(StringValueChangedCallback.class);
+        verify(track0.channelId()).addValueObserver(captor.capture());
+
+        captor.getValue().valueChanged("6dd80000-0000-0000-0000-000000000001");
+
+        JsonObject track = cache.getSnapshot().getAsJsonObject("tracks")
+                .getAsJsonArray("tracks").get(0).getAsJsonObject();
+        assertEquals("6dd80000-0000-0000-0000-000000000001",
+                track.get("channelId").getAsString());
     }
 
     @Test

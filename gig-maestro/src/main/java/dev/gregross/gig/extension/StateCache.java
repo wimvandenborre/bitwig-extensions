@@ -35,6 +35,7 @@ public class StateCache {
     private volatile boolean isMetronomeEnabled;
 
     // Track state
+    private final String[] trackChannelIds = new String[TRACK_COUNT];
     private final String[] trackNames = new String[TRACK_COUNT];
     private final double[] trackVolumes = new double[TRACK_COUNT];
     private final double[] trackPans = new double[TRACK_COUNT];
@@ -351,6 +352,10 @@ public class StateCache {
         for (int i = 0; i < TRACK_COUNT; i++) {
             final int idx = i;
             Track track = (Track) trackBank.getItemAt(i);
+
+            track.channelId().markInterested();
+            track.channelId().addValueObserver((StringValueChangedCallback) v -> trackChannelIds[idx] = (String) v);
+            trackChannelIds[i] = "";
 
             track.name().markInterested();
             track.name().addValueObserver((StringValueChangedCallback) v -> trackNames[idx] = (String) v);
@@ -1336,6 +1341,7 @@ public class StateCache {
         for (int i = 0; i < TRACK_COUNT; i++) {
             JsonObject track = new JsonObject();
             track.addProperty("index", i);
+            track.addProperty("channelId", trackChannelIds[i] != null ? trackChannelIds[i] : "");
             track.addProperty("name", trackNames[i] != null ? trackNames[i] : "");
             track.addProperty("volume", trackVolumes[i]);
             track.addProperty("pan", trackPans[i]);

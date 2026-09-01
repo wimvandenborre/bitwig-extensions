@@ -59,6 +59,7 @@ class StateCacheTestHelper {
     }
 
     static void populateTrack(StateCache cache, int index) {
+        setArrayElement(cache, "trackChannelIds", index, "6dd80000-0000-0000-0000-000000000001");
         setArrayElement(cache, "trackNames", index, "Bass");
         setArrayElement(cache, "trackVolumes", index, 0.75);
         setArrayElement(cache, "trackPans", index, -0.2);

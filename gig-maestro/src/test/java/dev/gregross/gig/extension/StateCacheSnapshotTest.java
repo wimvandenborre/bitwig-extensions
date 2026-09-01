@@ -55,6 +55,7 @@ class StateCacheSnapshotTest {
 
         JsonObject track0 = trackArr.get(0).getAsJsonObject();
         assertEquals(0, track0.get("index").getAsInt());
+        assertEquals("6dd80000-0000-0000-0000-000000000001", track0.get("channelId").getAsString());
         assertEquals("Bass", track0.get("name").getAsString());
         assertEquals(0.75, track0.get("volume").getAsDouble(), 0.001);
         assertEquals(-0.2, track0.get("pan").getAsDouble(), 0.001);
