@@ -1,7 +1,10 @@
 group = "com.gregross.bitwig"
 version = "0.1.0"
 
-val bitwigExtensionsDir: String by project
+val bitwigExtensionsDir = providers.gradleProperty("bitwigExtensionsDir")
+    .orElse(providers.systemProperty("user.home").map {
+        "$it/Documents/Bitwig Studio/Extensions"
+    })
 
 dependencies {
     testImplementation(libs.bitwig.api)
@@ -22,5 +25,5 @@ tasks.named<Jar>("jar") {
 tasks.register<Copy>("install") {
     description = "Installs the extension to the Bitwig Studio Extensions directory"
     from(tasks.named("jar"))
-    into(bitwigExtensionsDir)
+    into(bitwigExtensionsDir.get())
 }

@@ -5,7 +5,10 @@ plugins {
 group = "dev.gregross"
 version = "0.1.0"
 
-val bitwigExtensionsDir: String by project
+val bitwigExtensionsDir = providers.gradleProperty("bitwigExtensionsDir")
+    .orElse(providers.systemProperty("user.home").map {
+        "$it/Documents/Bitwig Studio/Extensions"
+    })
 
 // --- Main (extension) source set ---
 
@@ -44,7 +47,7 @@ tasks.named<JavaCompile>("compileJava") {
 
 tasks.shadowJar {
     archiveFileName.set("GigMaestro.bwextension")
-    destinationDirectory.set(file(bitwigExtensionsDir))
+    destinationDirectory.set(file(bitwigExtensionsDir.get()))
     dependsOn(copyDocsToResources)
     from(layout.buildDirectory.dir("resources/main"))
 }
