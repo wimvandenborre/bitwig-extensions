@@ -41,6 +41,7 @@ public class GigMaestroExtension extends ControllerExtension {
     private static final int DEFAULT_PORT = 8787;
     private static final int TRACK_COUNT = 8;
     private static final int SEND_COUNT = 4;
+    private static final int LAYER_SEND_COUNT = 32;
     private static final int SCENE_COUNT = 5;
     private static final int CLIP_GRID_WIDTH = 256;
     private static final int CLIP_GRID_HEIGHT = 128;
@@ -72,10 +73,11 @@ public class GigMaestroExtension extends ControllerExtension {
 
         // Create cursor objects for device navigation
         // Layer channels (including Drum Machine pads) inherit the cursor's send-bank size.
-        // Request the same capacity as the main track bank so their layered-mixer sends exist.
+        // Keep enough destinations visible for larger layered-mixer routing setups.
         CursorTrack cursorTrack = host.createCursorTrack(
-            "gig-cursor", "Gig Maestro", SEND_COUNT, SCENE_COUNT, true);
-        CursorDevice cursorDevice = cursorTrack.createCursorDevice("gig-device", "Gig Device", SEND_COUNT,
+            "gig-cursor", "Gig Maestro", LAYER_SEND_COUNT, SCENE_COUNT, true);
+        CursorDevice cursorDevice = cursorTrack.createCursorDevice(
+            "gig-device", "Gig Device", LAYER_SEND_COUNT,
             CursorDeviceFollowMode.FOLLOW_SELECTION);
         CursorRemoteControlsPage remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
 
@@ -87,7 +89,7 @@ public class GigMaestroExtension extends ControllerExtension {
             pad.name().markInterested();
             pad.exists().markInterested();
             SendBank padSendBank = pad.sendBank();
-            for (int sendIndex = 0; sendIndex < SEND_COUNT; sendIndex++) {
+            for (int sendIndex = 0; sendIndex < LAYER_SEND_COUNT; sendIndex++) {
                 Send send = (Send) padSendBank.getItemAt(sendIndex);
                 send.name().markInterested();
                 send.value().markInterested();
