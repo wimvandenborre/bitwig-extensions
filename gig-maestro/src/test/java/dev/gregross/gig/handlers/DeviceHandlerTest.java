@@ -1,18 +1,23 @@
 package dev.gregross.gig.handlers;
 
 import com.bitwig.extension.controller.api.ControllerHost;
+import com.bitwig.extension.controller.api.BooleanValue;
 import com.bitwig.extension.controller.api.CursorDevice;
 import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
 import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.DrumPadBank;
+import com.bitwig.extension.controller.api.DrumPad;
 import com.bitwig.extension.controller.api.InsertionPoint;
 import com.bitwig.extension.controller.api.RemoteControl;
 import com.bitwig.extension.controller.api.SettableBooleanValue;
 import com.bitwig.extension.controller.api.SettableIntegerValue;
+import com.bitwig.extension.controller.api.SettableEnumValue;
 import com.bitwig.extension.controller.api.SettableRangedValue;
 import com.bitwig.extension.controller.api.SettableStringValue;
 import com.bitwig.extension.controller.api.StringArrayValue;
 import com.bitwig.extension.controller.api.StringValue;
+import com.bitwig.extension.controller.api.Send;
+import com.bitwig.extension.controller.api.SendBank;
 import com.bitwig.extension.controller.api.IntegerValue;
 import com.bitwig.extension.controller.api.Transport;
 import dev.gregross.gig.rpc.JsonRpcDispatcher;
@@ -103,6 +108,8 @@ class DeviceHandlerTest {
     void registersDrumPadMethod() {
         var methods = dispatcher.getRegisteredMethods();
         assertTrue(methods.contains("device/getDrumPads"));
+        assertTrue(methods.contains("device/getDrumPadSends"));
+        assertTrue(methods.contains("device/setDrumPadSend"));
     }
 
     @Test
@@ -121,8 +128,69 @@ class DeviceHandlerTest {
     }
 
     @Test
-    void registersExactlyThirtyFourMethods() {
-        assertEquals(34, dispatcher.getRegisteredMethods().size());
+    void registersExactlyThirtySixMethods() {
+        assertEquals(36, dispatcher.getRegisteredMethods().size());
+    }
+
+    @Test
+    void setDrumPadSend_resolvesExactPadAndDestination() {
+        DrumPad pad = mock(DrumPad.class);
+        SendBank sendBank = mock(SendBank.class);
+        Send send = mock(Send.class);
+        SettableStringValue padName = mock(SettableStringValue.class);
+        StringValue sendName = mock(StringValue.class);
+        SettableRangedValue sendValue = mock(SettableRangedValue.class);
+        SettableEnumValue sendMode = mock(SettableEnumValue.class);
+        SettableBooleanValue sendEnabled = mock(SettableBooleanValue.class);
+        BooleanValue hasDrumPads = mock(BooleanValue.class);
+        BooleanValue padExists = mock(BooleanValue.class);
+
+        when(mockCursorDevice.hasDrumPads()).thenReturn(hasDrumPads);
+        when(hasDrumPads.get()).thenReturn(true);
+        when(mockDrumPadBank.getItemAt(36)).thenReturn(pad);
+        when(pad.exists()).thenReturn(padExists);
+        when(padExists.get()).thenReturn(true);
+        when(pad.name()).thenReturn(padName);
+        when(padName.get()).thenReturn("Kick");
+        when(pad.sendBank()).thenReturn(sendBank);
+        when(sendBank.getSizeOfBank()).thenReturn(1);
+        when(sendBank.getItemAt(0)).thenReturn(send);
+        when(send.name()).thenReturn(sendName);
+        when(sendName.get()).thenReturn("FX 1");
+        when(send.value()).thenReturn(sendValue);
+        when(send.sendMode()).thenReturn(sendMode);
+        when(send.isEnabled()).thenReturn(sendEnabled);
+
+        String response = dispatcher.handle(rpc("device/setDrumPadSend",
+            "{\"key\":36,\"expectedPadName\":\"Kick\",\"destinationName\":\"FX 1\","
+                + "\"level\":1.0,\"mode\":\"POST\",\"enabled\":true}"));
+
+        assertContains(response, "\"ok\":true");
+        verify(sendMode).set("POST");
+        verify(sendEnabled).set(true);
+        verify(sendValue).setImmediately(1.0);
+    }
+
+    @Test
+    void setDrumPadSend_rejectsPadIdentityMismatch() {
+        DrumPad pad = mock(DrumPad.class);
+        SettableStringValue padName = mock(SettableStringValue.class);
+        BooleanValue hasDrumPads = mock(BooleanValue.class);
+        BooleanValue padExists = mock(BooleanValue.class);
+        when(mockCursorDevice.hasDrumPads()).thenReturn(hasDrumPads);
+        when(hasDrumPads.get()).thenReturn(true);
+        when(mockDrumPadBank.getItemAt(36)).thenReturn(pad);
+        when(pad.exists()).thenReturn(padExists);
+        when(padExists.get()).thenReturn(true);
+        when(pad.name()).thenReturn(padName);
+        when(padName.get()).thenReturn("Snare");
+
+        String response = dispatcher.handle(rpc("device/setDrumPadSend",
+            "{\"key\":36,\"expectedPadName\":\"Kick\",\"destinationName\":\"FX 1\","
+                + "\"level\":1.0,\"mode\":\"POST\",\"enabled\":true}"));
+
+        assertContains(response, "identity mismatch");
+        assertContains(response, "-32603");
     }
 
     // --- device/hasAutomation validation ---

@@ -5,8 +5,11 @@ import com.bitwig.extension.controller.api.CursorDevice;
 import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
 import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.DrumPadBank;
+import com.bitwig.extension.controller.api.DrumPad;
 import com.bitwig.extension.controller.api.InsertionPoint;
 import com.bitwig.extension.controller.api.RemoteControl;
+import com.bitwig.extension.controller.api.Send;
+import com.bitwig.extension.controller.api.SendBank;
 import com.bitwig.extension.controller.api.Transport;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -419,6 +422,66 @@ public class DeviceHandler {
             return pads;
         });
 
+        dispatcher.register("device/getDrumPadSends", params -> {
+            DrumPad pad = getExactDrumPad(params);
+            JsonArray sends = new JsonArray();
+            SendBank sendBank = pad.sendBank();
+            for (int i = 0; i < sendBank.getSizeOfBank(); i++) {
+                Send send = (Send) sendBank.getItemAt(i);
+                String name = send.name().get();
+                if (name != null && !name.isEmpty()) {
+                    sends.add(sendState(i, name, send));
+                }
+            }
+            return sends;
+        });
+
+        dispatcher.register("device/setDrumPadSend", params -> {
+            DrumPad pad = getExactDrumPad(params);
+            String destinationName = requireString(params, "destinationName");
+            double level = requireDouble(params, "level");
+            if (level < 0.0 || level > 1.0) {
+                throw new IllegalArgumentException("level must be 0.0-1.0, got " + level);
+            }
+            String mode = requireString(params, "mode").toUpperCase();
+            if (!mode.equals("AUTO") && !mode.equals("PRE") && !mode.equals("POST")) {
+                throw new IllegalArgumentException("invalid send mode: " + mode + " (expected AUTO, PRE, or POST)");
+            }
+            boolean enabled = requireBoolean(params, "enabled");
+
+            SendBank sendBank = pad.sendBank();
+            Send matched = null;
+            int matchedIndex = -1;
+            for (int i = 0; i < sendBank.getSizeOfBank(); i++) {
+                Send candidate = (Send) sendBank.getItemAt(i);
+                if (destinationName.equals(candidate.name().get())) {
+                    if (matched != null) {
+                        throw new IllegalStateException("ambiguous drum pad send destination: " + destinationName);
+                    }
+                    matched = candidate;
+                    matchedIndex = i;
+                }
+            }
+            if (matched == null) {
+                throw new IllegalArgumentException("drum pad send destination not found: " + destinationName);
+            }
+
+            matched.sendMode().set(mode);
+            matched.isEnabled().set(enabled);
+            matched.value().setImmediately(level);
+
+            JsonObject result = new JsonObject();
+            result.addProperty("ok", true);
+            result.addProperty("padKey", requireInt(params, "key"));
+            result.addProperty("padName", requireString(params, "expectedPadName"));
+            result.addProperty("destinationName", destinationName);
+            result.addProperty("sendIndex", matchedIndex);
+            result.addProperty("requestedLevel", level);
+            result.addProperty("requestedMode", mode);
+            result.addProperty("requestedEnabled", enabled);
+            return result;
+        });
+
         // Nested device chain navigation
         dispatcher.register("device/enterSlot", params -> {
             String name = requireString(params, "name");
@@ -602,6 +665,37 @@ public class DeviceHandler {
             }
             return result;
         });
+    }
+
+    private DrumPad getExactDrumPad(JsonObject params) {
+        if (!cursorDevice.hasDrumPads().get()) {
+            throw new IllegalStateException("Current device has no drum pads");
+        }
+        int key = requireInt(params, "key");
+        if (key < 0 || key > 127) {
+            throw new IllegalArgumentException("key must be 0-127, got " + key);
+        }
+        String expectedName = requireString(params, "expectedPadName");
+        DrumPad pad = (DrumPad) drumPadBank.getItemAt(key);
+        if (!pad.exists().get()) {
+            throw new IllegalArgumentException("drum pad does not exist at key " + key);
+        }
+        String actualName = pad.name().get();
+        if (!expectedName.equals(actualName)) {
+            throw new IllegalStateException("drum pad identity mismatch at key " + key
+                + ": expected '" + expectedName + "', found '" + actualName + "'");
+        }
+        return pad;
+    }
+
+    private JsonObject sendState(int index, String name, Send send) {
+        JsonObject state = new JsonObject();
+        state.addProperty("index", index);
+        state.addProperty("name", name);
+        state.addProperty("level", send.value().get());
+        state.addProperty("mode", send.sendMode().get());
+        state.addProperty("enabled", send.isEnabled().get());
+        return state;
     }
 
     static JsonObject toPresetFormat(JsonObject discoveryResult) {
