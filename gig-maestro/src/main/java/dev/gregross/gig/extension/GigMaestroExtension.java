@@ -75,7 +75,7 @@ public class GigMaestroExtension extends ControllerExtension {
         // Request the same capacity as the main track bank so their layered-mixer sends exist.
         CursorTrack cursorTrack = host.createCursorTrack(
             "gig-cursor", "Gig Maestro", SEND_COUNT, SCENE_COUNT, true);
-        CursorDevice cursorDevice = cursorTrack.createCursorDevice("gig-device", "Gig Device", 0,
+        CursorDevice cursorDevice = cursorTrack.createCursorDevice("gig-device", "Gig Device", SEND_COUNT,
             CursorDeviceFollowMode.FOLLOW_SELECTION);
         CursorRemoteControlsPage remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
 
